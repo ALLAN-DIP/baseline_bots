@@ -5,6 +5,9 @@ from diplomacy import Message
 from baseline_bot import BaselineBot
 import random
 
+from daide_utils import BotReturnData
+
+
 class RandomHonestBot(BaselineBot):
     """
     This bot always acts randomly and truthfully communicates
@@ -14,22 +17,21 @@ class RandomHonestBot(BaselineBot):
         super().__init__(power_name, game)
 
     def act(self):
+        # Return data initialization
+        ret_obj = BotReturnData()
+
         # select random orders
         random_orders = [random.choice(self.possible_orders[loc]) for loc in self.game.get_orderable_locations(self.power_name)
                          if self.possible_orders[loc]]
         # set the orders
-        game.set_orders(self.power_name, random_orders)
+        ret_obj.add_all_orders(random_orders)
         
         # for all other powers
         for other_power in [name for name in self.game.get_map_power_names() if name != self.power_name]:
             # send the other power a message containing the orders
-            game.add_message(Message(
-                sender=self.power_name,
-                recipient=other_power,
-                # convert the random orders to a str
-                message=str(random_orders),
-                phase=game.get_current_phase(),
-            ))
+            ret_obj.add_message(other_power, str(random_orders))
+
+        return ret_obj
 
 if __name__ == "__main__":
     from diplomacy import Game
@@ -41,7 +43,21 @@ if __name__ == "__main__":
     # instantiate random honest bot
     bot = RandomHonestBot(bot_power, game)
     while not game.is_game_done:
-        bot.act()
+        bot_state = bot.act()
+        messages, orders = bot_state.messages, bot_state.orders
+        if messages:
+            # print(power_name, messages)
+            for msg in messages:
+                msg_obj = Message(
+                    sender=bot.power_name,
+                    recipient=msg['recipient'],
+                    message=msg['message'],
+                    phase=game.get_current_phase(),
+                )
+                game.add_message(message=msg_obj)
+        # print("Submitted orders")
+        if orders is not None:
+            game.set_orders(power_name=bot.power_name, orders=orders)
         game.process()
 
     to_saved_game_format(game, output_path='RandomHonestBotGame.json')

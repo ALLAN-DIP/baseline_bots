@@ -4,7 +4,7 @@ __email__ = "kartik.shenoyy@gmail.com"
 from diplomacy import Message
 from baseline_bot import BaselineBot
 import random
-from daide_utils import ORR, XDO, get_other_powers
+from daide_utils import ORR, XDO, get_other_powers, BotReturnData
 
 
 class RandomNoPressBot(BaselineBot):
@@ -16,15 +16,16 @@ class RandomNoPressBot(BaselineBot):
         super().__init__(power_name, game)
 
     def act(self):
-        random_orders = [random.choice(self.possible_orders[loc]) for loc in
+        # Return data initialization
+        ret_obj = BotReturnData()
+
+        orders = [random.choice(self.possible_orders[loc]) for loc in
                          self.game.get_orderable_locations(self.power_name)
                          if self.possible_orders[loc]]
 
-        return {
-            'messages': [],
-            'orders': random_orders,
-            'stance': None
-        }
+        ret_obj.add_all_orders(orders)
+
+        return ret_obj
 
 
 if __name__ == "__main__":
@@ -36,13 +37,13 @@ if __name__ == "__main__":
     game = Game()
     powers = list(game.get_map_power_names())
     # select the first name in the list of powers
-    bots = [(bot_power, RandomNoPressBot(bot_power, game)) for bot_power in powers]
+    bots = [RandomNoPressBot(bot_power, game) for bot_power in powers]
 
     while not game.is_game_done:
-        for power_name, bot in bots:
+        for bot in bots:
             bot_state = bot.act()
-            messages, orders = bot_state['messages'], bot_state['orders']
-            # if messages is not None:
+            messages, orders = bot_state.messages, bot_state.orders
+            # if messages:
             #     # print(power_name, messages)
             #     for msg in messages:
             #         msg_obj = Message(
@@ -54,7 +55,7 @@ if __name__ == "__main__":
             #         game.add_message(message=msg_obj)
             # print("Submitted orders")
             if orders is not None:
-                game.set_orders(power_name=power_name, orders=orders)
+                game.set_orders(power_name=bot.power_name, orders=orders)
         game.process()
 
     to_saved_game_format(game, output_path='RandomNoPressBotGame.json')

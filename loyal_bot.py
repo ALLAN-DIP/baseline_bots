@@ -5,7 +5,7 @@ from lib2to3.pgen2.parse import ParseError
 
 from diplomacy import Message
 from random_allier_proposer_bot import RandomAllierProposerBot
-from daide_utils import parse_orr_xdo, parse_alliance_proposal, get_non_aggressive_orders, YES
+from daide_utils import parse_orr_xdo, parse_alliance_proposal, get_non_aggressive_orders, YES, BotReturnData
 
 from baseline_bot import BaselineBot
 
@@ -21,37 +21,36 @@ class LoyalBot(BaselineBot):
         self.allies = None
 
     def act(self):
+        # Return data initialization
+        ret_obj = BotReturnData()
+
         # get proposed orders sent by other countries
-        messages = game.filter_messages(messages = game.messages, game_role=bot_power)
+        rcvd_messages = game.filter_messages(messages = game.messages, game_role=self.power_name)
         # convert to list for sorting/indexing
-        keys = list(messages.keys())
+        keys = list(rcvd_messages.keys())
         # sort from most recent to least recent
         keys.sort(reverse=True)
         # get most recent message
-        last_message = messages[keys[0]]
+        last_message = rcvd_messages[keys[0]]
         if self.allies:
             # ensure message sender is an ally
             if last_message.sender in self.allies:
                 try:
-                    orders = get_non_aggressive_orders(parse_orr_xdo(last_message.message), self.power_name, self.game)
+                    ret_orders = get_non_aggressive_orders(parse_orr_xdo(last_message.message), self.power_name, self.game)
                     # set the orders
-                    game.set_orders(self.power_name, orders)
+                    ret_obj.add_all_orders(ret_orders)
                 except ParseError:
                     pass
         else:
             try:
                 self.allies = parse_alliance_proposal(last_message.message, self.power_name)
                 msg = YES(last_message.message)
-                
-                self.game.add_message(Message(
-                    sender=self.power_name,
-                    recipient=last_message.sender,
-                    # convert the random orders to a str
-                    message=msg,
-                    phase=game.get_current_phase(),
-                ))
+                ret_obj.add_message(last_message.sender, str(msg))
+
             except ParseError:
                 pass
+
+        return ret_obj
 
 if __name__ == "__main__":
     from diplomacy import Game
@@ -63,14 +62,35 @@ if __name__ == "__main__":
     bot_power = powers[0]
     # instantiate proposed random honest bot
     bot = LoyalBot(bot_power, game)
-    print(bot_power)
+    # print(bot_power)
     proposer_1 = RandomAllierProposerBot(powers[1], game)
     proposer_2 = RandomAllierProposerBot(powers[2], game)
+
+    bots = [proposer_1, proposer_2, bot]
     
     while not game.is_game_done:
-        proposer_1.act()
-        proposer_2.act()
-        bot.act()
+        # proposer_1.act()
+        # proposer_2.act()
+        # bot.act()
+
+        for bot in bots:
+            bot_state = bot.act()
+            messages, orders = bot_state.messages, bot_state.orders
+            if messages:
+                # print(bot.power_name, messages)
+                for msg in messages:
+                    msg_obj = Message(
+                        sender=bot.power_name,
+                        recipient=msg['recipient'],
+                        message=msg['message'],
+                        phase=game.get_current_phase(),
+                    )
+                    game.add_message(message=msg_obj)
+            # print("Submitted orders")
+            if orders is not None:
+                game.set_orders(power_name=bot.power_name, orders=orders)
+
+            break
         
         # p1_messages = list(game.filter_messages(messages = game.messages, game_role=proposer_1.power_name).values())
         # p1m = next(msg for msg in p1_messages if msg.recipient == bot_power)

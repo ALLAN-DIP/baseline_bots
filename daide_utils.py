@@ -46,7 +46,8 @@ def ORR(arrangements: List[str]) -> str:
     """
 
     if len(arrangements) < 2:
-        raise Exception("Need at least 2 items to ORR")
+        return "".join([f"({a})" for a in arrangements])
+        # raise Exception("Need at least 2 items to ORR")
 
     return "ORR" + "".join([f" ({a})" for a in arrangements])
 
@@ -143,6 +144,24 @@ def get_non_aggressive_orders(orders: List[str], sender:str, game: Game) -> List
 
 # def parse_daide_message(msg):
 #     """where's ocaml when I need it"""
+
+class BotReturnData:
+    def __init__(self):
+        self.messages = []
+        self.orders = []
+        self.stance = None
+
+    def add_message(self, recipient: str, message: str):
+        self.messages.append({
+            'recipient': recipient,
+            'message': message
+        })
+
+    def add_order(self, order):
+        self.orders.append(order)
+
+    def add_all_orders(self, orders):
+        self.orders += orders
 
 if __name__ == "__main__":
     from diplomacy import Game

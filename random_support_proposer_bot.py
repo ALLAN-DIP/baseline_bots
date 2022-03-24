@@ -7,6 +7,8 @@ from diplomacy.agents.baseline_bots.baseline_bot import BaselineBot
 import random
 from diplomacy.agents.baseline_bots.daide_utils import get_order_tokens, ORR, XDO
 
+from daide_utils import BotReturnData
+
 
 class RandomSupportProposerBot(BaselineBot):
     """
@@ -18,6 +20,9 @@ class RandomSupportProposerBot(BaselineBot):
         super().__init__(power_name, game)
 
     def act(self):
+        # Return data initialization
+        ret_obj = BotReturnData()
+
         #TODO: Ensure that supporting province and province to be attacked are not owned by the same power
         #TODO: Ensure that attack should not be to a province that the power already owns
         final_messages = defaultdict(list)
@@ -60,20 +65,15 @@ class RandomSupportProposerBot(BaselineBot):
 
         for recipient in final_messages:
             suggested_proposals = ORR(XDO(final_messages[recipient]))
-            messages.append({
-                'recipient': recipient,
-                'message': str(suggested_proposals)
-            })
+            ret_obj.add_message(recipient, str(suggested_proposals))
 
-        random_orders = [random.choice(self.possible_orders[loc]) for loc in
+        orders = [random.choice(self.possible_orders[loc]) for loc in
                          self.game.get_orderable_locations(self.power_name)
                          if self.possible_orders[loc]]
 
-        return {
-            'messages': messages,
-            'orders': random_orders,
-            'stance': None
-        }
+        ret_obj.add_all_orders(orders)
+
+        return ret_obj
 
 if __name__ == "__main__":
     from diplomacy import Game
@@ -84,25 +84,25 @@ if __name__ == "__main__":
     game = Game()
     powers = list(game.get_map_power_names())
     # select the first name in the list of powers
-    bots = [(bot_power, RandomSupportProposerBot(bot_power, game)) for bot_power in powers]
+    bots = [RandomSupportProposerBot(bot_power, game) for bot_power in powers]
 
     while not game.is_game_done:
-        for power_name, bot in bots:
+        for bot in bots:
             bot_state = bot.act()
-            messages, orders = bot_state['messages'], bot_state['orders']
-            if messages is not None:
+            messages, orders = bot_state.messages, bot_state.orders
+            if messages:
                 # print(power_name, messages)
                 for msg in messages:
                     msg_obj = Message(
-                        sender=power_name,
-                        recipient=msg[1],
-                        message=msg[2],
+                        sender=bot.power_name,
+                        recipient=msg['recipient'],
+                        message=msg['message'],
                         phase=game.get_current_phase(),
                     )
                     game.add_message(message=msg_obj)
             # print("Submitted orders")
             if orders is not None:
-                game.set_orders(power_name=power_name, orders=orders)
+                game.set_orders(power_name=bot.power_name, orders=orders)
         game.process()
 
     to_saved_game_format(game, output_path='RandomSupportProposerBot.json')

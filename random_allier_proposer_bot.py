@@ -3,7 +3,8 @@ __email__ = "sanderschulhoff@gmail.com"
 
 from diplomacy import Message
 from random_proposer_bot import RandomProposerBot
-from daide_utils import ALY, get_other_powers
+from daide_utils import ALY, get_other_powers, BotReturnData
+
 
 class RandomAllierProposerBot(RandomProposerBot):
     """
@@ -17,6 +18,9 @@ class RandomAllierProposerBot(RandomProposerBot):
         self.alliance_props_sent = False
 
     def act(self):
+        # Return data initialization
+        ret_obj = BotReturnData()
+
         if self.alliance_props_sent:
             # send random action proposals
             super().act()
@@ -28,15 +32,12 @@ class RandomAllierProposerBot(RandomProposerBot):
                 # encode alliance message in daide syntax
                 alliance_message = ALY([other_power, self.power_name], self.game)
                 # send the other power an ally request
-                self.game.add_message(Message(
-                    sender=self.power_name,
-                    recipient=other_power,
-                    message=alliance_message,
-                    phase=self.game.get_current_phase(),
-                ))
+                ret_obj.add_message(other_power, alliance_message)
 
             # dont sent alliance props again
             self.alliance_props_sent = True
+        
+        return ret_obj
 
 if __name__ == "__main__":
     from diplomacy import Game
@@ -48,7 +49,22 @@ if __name__ == "__main__":
     # instantiate random honest bot
     bot = RandomAllierProposerBot(bot_power, game)
     while not game.is_game_done:
-        bot.act()
+        bot_state = bot.act()
+        messages, orders = bot_state.messages, bot_state.orders
+        if messages:
+            print(bot.power_name, messages)
+            for msg in messages:
+                msg_obj = Message(
+                    sender=bot.power_name,
+                    recipient=msg['recipient'],
+                    message=msg['message'],
+                    phase=game.get_current_phase(),
+                )
+                game.add_message(message=msg_obj)
+        # print("Submitted orders")
+        if orders is not None:
+            game.set_orders(power_name=bot.power_name, orders=orders)
+
         game.process()
 
     to_saved_game_format(game, output_path='RandomAllierProposerBotGame.json')
