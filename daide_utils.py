@@ -85,7 +85,10 @@ def parse_orr_xdo(msg: str) -> List[str]:
     if "VSS" in msg:
         raise ParseError("This looks an ally message")
     try:
-        msg = msg[5:-1]
+        if "ORR" in msg:
+            msg = msg[5:-1]
+        else:
+            msg = msg[1:-1]
         parts = msg.split(") (")
 
         return [part[5:-1] for part in parts]
@@ -149,6 +152,7 @@ class BotReturnData:
     def __init__(self):
         self.messages = []
         self.orders = []
+        self.orders_start_locs = set()
         self.stance = None
 
     def add_message(self, recipient: str, message: str):
@@ -161,7 +165,11 @@ class BotReturnData:
         self.orders.append(order)
 
     def add_all_orders(self, orders):
-        self.orders += orders
+        for order in orders:
+            order_tokens = get_order_tokens(order)
+            if order_tokens[0] not in self.orders_start_locs:
+                self.orders.append(order)
+                self.orders_start_locs.add(order_tokens[0])
 
 if __name__ == "__main__":
     from diplomacy import Game

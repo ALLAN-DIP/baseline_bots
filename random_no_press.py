@@ -5,6 +5,7 @@ from diplomacy import Message
 from baseline_bot import BaselineBot
 import random
 from daide_utils import ORR, XDO, get_other_powers, BotReturnData
+from time import time
 
 
 class RandomNoPressBot(BaselineBot):
@@ -19,9 +20,12 @@ class RandomNoPressBot(BaselineBot):
         # Return data initialization
         ret_obj = BotReturnData()
 
+        # Fetch latest possible moves
+        self.possible_orders = self.game.get_all_possible_orders()
+
         orders = [random.choice(self.possible_orders[loc]) for loc in
-                         self.game.get_orderable_locations(self.power_name)
-                         if self.possible_orders[loc]]
+                             self.game.get_orderable_locations(self.power_name)
+                             if self.possible_orders[loc]]
 
         ret_obj.add_all_orders(orders)
 
@@ -38,7 +42,7 @@ if __name__ == "__main__":
     powers = list(game.get_map_power_names())
     # select the first name in the list of powers
     bots = [RandomNoPressBot(bot_power, game) for bot_power in powers]
-
+    start = time()
     while not game.is_game_done:
         for bot in bots:
             bot_state = bot.act()
@@ -57,5 +61,5 @@ if __name__ == "__main__":
             if orders is not None:
                 game.set_orders(power_name=bot.power_name, orders=orders)
         game.process()
-
+    print(time() - start)
     to_saved_game_format(game, output_path='RandomNoPressBotGame.json')
