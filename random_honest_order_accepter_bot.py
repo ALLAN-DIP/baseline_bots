@@ -6,6 +6,7 @@ from baseline_bot import BaselineBot
 import random
 from daide_utils import parse_orr_xdo, ORR, XDO, YES, get_non_aggressive_orders
 
+#TODO: Upgrade to new design layout
 class RandomHonestAccepterBot(BaselineBot):
     """
     This bot reads proposed order messages from other powers.
@@ -82,12 +83,33 @@ if __name__ == "__main__":
     bot = RandomHonestAccepterBot(bot_power, game)
     proposer_1 = RandomAllierProposerBot(powers[1], game)
     proposer_2 = RandomAllierProposerBot(powers[2], game)
+
+    bots = [proposer_1, proposer_2, bot]
+
     while not game.is_game_done:
-        proposer_1.act()
-        proposer_2.act()
-        bot.act()
+        # proposer_1.act()
+        # proposer_2.act()
+        # bot.act()
+
+        for bot in bots:
+            bot_state = bot.act()
+            messages, orders = bot_state.messages, bot_state.orders
+            if messages:
+                # print(power_name, messages)
+                for msg in messages:
+                    msg_obj = Message(
+                        sender=bot.power_name,
+                        recipient=msg['recipient'],
+                        message=msg['message'],
+                        phase=game.get_current_phase(),
+                    )
+                    game.add_message(message=msg_obj)
+            # print("Submitted orders")
+            if orders is not None:
+                game.set_orders(power_name=bot.power_name, orders=orders)
 
         game.process()
+
         break
 
     to_saved_game_format(game, output_path='RandomHonestOrderAccepterBotGame.json')

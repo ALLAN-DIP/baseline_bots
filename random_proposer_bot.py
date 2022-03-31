@@ -4,7 +4,8 @@ __email__ = "sanderschulhoff@gmail.com"
 from diplomacy import Message
 from baseline_bot import BaselineBot
 import random
-from daide_utils import ORR, XDO, get_other_powers
+from daide_utils import ORR, XDO, get_other_powers, BotReturnData
+
 
 class RandomProposerBot(BaselineBot):
     """
@@ -15,6 +16,9 @@ class RandomProposerBot(BaselineBot):
         super().__init__(power_name, game)
 
     def act(self):
+        # Return data initialization
+        ret_obj = BotReturnData()
+
         # for all other powers
         for other_power in get_other_powers([self.power_name], self.game):
             # generate some random moves to suggest to them
@@ -24,13 +28,9 @@ class RandomProposerBot(BaselineBot):
             suggested_random_orders = ORR(XDO(suggested_random_orders))
 
             # send the other power a message containing the orders
-            self.game.add_message(Message(
-                sender=self.power_name,
-                recipient=other_power,
-                # convert the random orders to a str
-                message=str(suggested_random_orders),
-                phase=self.game.get_current_phase(),
-            ))
+            ret_obj.add_message(other_power, str(suggested_random_orders))
+
+        return ret_obj
         
 if __name__ == "__main__":
     from diplomacy import Game
@@ -42,7 +42,22 @@ if __name__ == "__main__":
     # instantiate random honest bot
     bot = RandomProposerBot(bot_power, game)
     while not game.is_game_done:
-        bot.act()
+        bot_state = bot.act()
+        messages, orders = bot_state.messages, bot_state.orders
+        if messages:
+            # print(power_name, messages)
+            for msg in messages:
+                msg_obj = Message(
+                    sender=bot.power_name,
+                    recipient=msg['recipient'],
+                    message=msg['message'],
+                    phase=game.get_current_phase(),
+                )
+                game.add_message(message=msg_obj)
+        # print("Submitted orders")
+        if orders is not None:
+            game.set_orders(power_name=bot.power_name, orders=orders)
+
         game.process()
 
     to_saved_game_format(game, output_path='RandomProposerBotGame.json')

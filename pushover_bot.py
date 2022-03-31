@@ -2,7 +2,9 @@ __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
 from baseline_bot import BaselineBot
-from daide_utils import parse_orr_xdo, get_non_aggressive_orders
+from daide_utils import parse_orr_xdo, get_non_aggressive_orders, BotReturnData
+from diplomacy import Message
+
 
 class PushoverBot(BaselineBot):
     """
@@ -13,6 +15,9 @@ class PushoverBot(BaselineBot):
         super().__init__(power_name, game)
 
     def act(self):
+        # Return data initialization
+        ret_obj = BotReturnData()
+
         # get proposed orders sent by other countries
         messages = game.filter_messages(messages = game.messages, game_role=bot_power)
         keys = list(messages.keys())
@@ -22,10 +27,11 @@ class PushoverBot(BaselineBot):
         try:
             orders = get_non_aggressive_orders(parse_orr_xdo(last_message.message), self.power_name, self.game)
             # set the orders
-            game.set_orders(self.power_name, orders)
+            ret_obj.add_all_orders(orders)
         except:
             pass
 
+        return ret_obj
 
 if __name__ == "__main__":
     from diplomacy import Game
@@ -40,10 +46,30 @@ if __name__ == "__main__":
     bot = PushoverBot(bot_power, game)
     proposer_1 = RandomProposerBot(powers[1], game)
     proposer_2 = RandomProposerBot(powers[2], game)
+
+    bots = [proposer_1, proposer_2, bot]
+
     while not game.is_game_done:
-        proposer_1.act()
-        proposer_2.act()
-        bot.act()
+        # proposer_1.act()
+        # proposer_2.act()
+        # bot.act()
+
+        for bot in bots:
+            bot_state = bot.act()
+            messages, orders = bot_state.messages, bot_state.orders
+            if messages:
+                # print(power_name, messages)
+                for msg in messages:
+                    msg_obj = Message(
+                        sender=bot.power_name,
+                        recipient=msg['recipient'],
+                        message=msg['message'],
+                        phase=game.get_current_phase(),
+                    )
+                    game.add_message(message=msg_obj)
+            # print("Submitted orders")
+            if orders is not None:
+                game.set_orders(power_name=bot.power_name, orders=orders)
 
         game.process()
 
