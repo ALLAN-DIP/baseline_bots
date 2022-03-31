@@ -6,6 +6,7 @@ It would be preferrable to use a real DAIDE parser in prod
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
+from collections import defaultdict
 from lib2to3.pgen2.parse import ParseError
 from typing import List
 
@@ -170,6 +171,47 @@ class BotReturnData:
             if order_tokens[0] not in self.orders_start_locs:
                 self.orders.append(order)
                 self.orders_start_locs.add(order_tokens[0])
+
+class CommsData:
+    def __init__(self):
+        self.messages = []
+
+    def add_message(self, recipient: str, message: str):
+        self.messages.append({
+            'recipient': recipient,
+            'message': message
+        })
+
+class OrdersData:
+    def __init__(self):
+        self.orders = defaultdict(str)
+
+    def add_order(self, order):
+        order_tokens = get_order_tokens(order)
+        self.orders[order_tokens[0].split()[1]] = order
+
+    def add_all_orders(self, orders):
+        '''Guarded add all orders'''
+        for order in orders:
+            order_tokens = get_order_tokens(order)
+            try:
+                if order_tokens[0].split()[1] not in self.orders:
+                    self.add_order(order)
+                else:
+                    # Prevents unnecessary addition of orders
+                    print(f"Not adding {order} since one with this start location is already added")
+            except IndexError:
+                self.orders[order_tokens[0]] = order
+    def update_orders(self, orders):
+        for order in orders:
+            try:
+                self.add_order(order)
+            except IndexError:
+                self.orders[get_order_tokens(order)[0]] = order
+
+    def get_final_orders(self):
+        return list(self.orders.values())
+
 
 if __name__ == "__main__":
     from diplomacy import Game

@@ -5,12 +5,12 @@ from collections import defaultdict
 from lib2to3.pgen2.parse import ParseError
 
 from diplomacy import Message
-from diplomacy.agents.baseline_bots.baseline_bot import BaselineBot
+from baseline_bot import BaselineBot
 import random
 from diplomacy.agents.baseline_bots.daide_utils import get_order_tokens, ORR, XDO
 
 from daide_utils import BotReturnData, parse_orr_xdo, parse_alliance_proposal, get_non_aggressive_orders, YES, \
-    BotReturnData, get_other_powers, ALY
+    BotReturnData, get_other_powers, ALY, CommsData, OrdersData
 
 
 class RandomLSPBot(BaselineBot):
@@ -21,77 +21,84 @@ class RandomLSPBot(BaselineBot):
     def __init__(self, power_name, game) -> None:
         super().__init__(power_name, game)
         self.allies = []
+        self.allies_influence = set()
+        self.my_master = None
+
+        self.alliance_all_in = False
+
+        # Alliance stages
         self.alliance_props_sent = False
-        self.alliance_props_ack_to_be_sent = None
-        self.alliance_props_ack_recipient = None
+        self.alliance_props_ack_sent = False
+        self.support_proposals_sent = False
 
-    def parse_orders(self, rcvd_messages, ret_obj):
-        '''
-        possible paths:
-          1. alliance proposal received - accept proposal, send YES msg, retain allies names from this message
-          2. alliance affirmation receieved - retain allies names from this message
-          3. if allies are known, filter orders only from allies' messages and from this point onwards no sending of
-               alliance proposals or affirmations
-        '''
-        # convert to list for sorting/indexing
-        rcvd_messages = list(rcvd_messages.items())
-        rcvd_messages.sort()
+        self.master_mode = False
 
-        alliance_msgs = [msg for msg in rcvd_messages if "YES" in msg[1].message or "ALY" in msg[1].message]
-        order_msgs = [msg for msg in rcvd_messages if "YES" not in msg[1].message and "ALY" not in msg[1].message]
+    def set_master(self):
+        self.master_mode = True
 
-        if self.allies:
-            ret_orders = []
-            for _, msg in order_msgs:
-                if msg.sender in self.allies:
-                    try:
-                        ret_orders += parse_orr_xdo(msg.message)
+    def set_slave(self):
+        self.master_mode = False
 
-                    except ParseError:
-                        pass
-                # set the orders
-            return ret_orders, []
-        elif len(alliance_msgs):
-            # print(alliance_msgs)
-            last_message = alliance_msgs[-1][1]
-            try:
-                if "YES" in last_message.message:
-                    allies = parse_alliance_proposal(last_message.message[5:-1], self.power_name)
-                elif "ALY" in last_message.message:
-                    try:
-                        allies = parse_alliance_proposal(last_message.message, self.power_name)
-                        msg = YES(last_message.message)
-                        # ret_obj.add_message(last_message.sender, str(msg))
-                        self.alliance_props_ack_to_be_sent = msg
-                        self.alliance_props_ack_recipient = last_message.sender
-                    except TypeError:
-                        print(last_message.message)
-                        raise TypeError
-                else:
-                    allies = []
-                return [], allies
+    def interpret_orders(self, rcvd_messages):
+        alliance_msgs = [msg for msg in rcvd_messages if "ALY" in msg[1].message]
+        yes_alliance_msgs = [msg for msg in alliance_msgs if "YES" in msg[1].message]
+        alliance_proposal_msgs = [msg for msg in alliance_msgs if "YES" not in msg[1].message]
 
-            except ParseError:
-                pass
-        return [], []
+        order_msgs = [msg[1] for msg in rcvd_messages if "ALY" not in msg[1].message]
 
-    def filter_moves(self, orders):
-        '''
-        Retain only aggressive/non-aggressive attacks and hold moves
-        '''
-        # TODO: look into convoy moves
-        filtered_orders = []
-        filtered_orders_dict = defaultdict(str)
-        for order in orders:
-            order_tokens = get_order_tokens(order)
-            if len(order_tokens) <= 2 and len(order_tokens[0].split()) == 2:
-                try:
-                    filtered_orders.append(order)
-                    filtered_orders_dict[order_tokens[0].split()[1]] = order
-                except IndexError:
-                    print(order)
-                    raise IndexError
-        return filtered_orders, filtered_orders_dict
+        # Alliance related interpretations
+        # Interpret alliance acceptance message
+        if yes_alliance_msgs:
+            last_message = yes_alliance_msgs[-1][1]
+            yes_allies = parse_alliance_proposal(last_message.message[5:-1], self.power_name)
+        else:
+            yes_allies = []
+
+        # Interpret alliance proposal message
+        if alliance_proposal_msgs:
+            last_message = alliance_proposal_msgs[-1][1]
+            allies_proposed = parse_alliance_proposal(last_message.message, self.power_name)
+            alliance_proposer = last_message.sender
+            alliance_msg = last_message.message
+        else:
+            allies_proposed = []
+            alliance_proposer = None
+            alliance_msg = None
+
+        rcvd_orders = []
+        if order_msgs:
+            for msg in order_msgs:
+                if msg.sender == self.my_master:
+                    rcvd_orders += parse_orr_xdo(msg.message)
+
+        return {
+            'alliance_proposer': alliance_proposer,
+            'allies_proposed': allies_proposed,
+            'alliance_msg': alliance_msg,
+            'yes_allies_proposed': yes_allies,
+            'orders_proposed': rcvd_orders
+        }
+
+    def bad_move(self, order):
+        order_tokens = get_order_tokens(order)
+
+        if len(order_tokens) == 2:
+            # Attack move
+            if order_tokens[1].split()[-1] in self.my_influence:
+                return True
+        elif len(order_tokens) == 4 and order_tokens[1] == 'S':
+            # Support move
+            if order_tokens[1].split()[-1] in self.my_influence:
+                return True
+
+        return False
+
+    def support_move(self, order):
+        order_tokens = get_order_tokens(order)
+        if 3 <= len(order_tokens) <= 4 and order_tokens[1] == 'S':
+            return True
+        else:
+            return False
 
     def get_allies_orderable_locs(self):
         provinces = set()
@@ -100,150 +107,156 @@ class RandomLSPBot(BaselineBot):
             provinces.update(new_provs)
         return provinces
 
-    def generate_support_proposals(self, selected_orders, ret_obj):
-        # TODO: Ensure that supporting province and province to be attacked are not owned by the same power
-        # TODO: Ensure that attack should not be to a province that the power already owns
+    def get_2_neigh_provinces(self):
+        provs = [loc.upper() for loc in self.game.get_orderable_locations(self.power_name)]
+
+        # Agent's 1-neighbourhood provinces
+        n_provs = set()
+        for prov in provs:
+            n_provs.update(set([prov2.upper() for prov2 in self.game.map.abut_list(prov) if
+                                prov2.upper().split('/')[0] not in provs and prov2.upper().split('/')[0] in self.allies_influence]))
+
+        # Agent's alliances provinces set:
+        allies_provs = self.get_allies_orderable_locs()
+
+        # Agent's 2-neighbourhood provinces (retained only alliance's provinces)
+        n2n_provs = set()
+        for prov in n_provs:
+            if prov in allies_provs:
+                n2n_provs.update(
+                    set([prov2.upper() for prov2 in self.game.map.abut_list(prov) if
+                         prov2.upper().split('/')[0] not in provs and prov2.upper().split('/')[0] not in n_provs and prov2.upper().split('/')[0] in self.allies_influence]))
+        n2n_provs.update(n_provs)
+        return n2n_provs
+
+    def is_support_for_selected_orders(self, support_order):
+        order_tokens = get_order_tokens(support_order)
+        selected_order = get_order_tokens(self.selected_orders.orders[order_tokens[2].split()[1]])
+
+        if len(order_tokens[2:]) == len(selected_order) and order_tokens[2:] == selected_order:
+            # Attack move
+            return True
+        elif selected_order[1].strip() == 'H' and (len(order_tokens[2:]) == len(selected_order) - 1):
+            # Hold move
+            return True
+        return False
+
+    def generate_support_proposals(self, comms_obj):
         final_messages = defaultdict(list)
-        messages = []
 
         # TODO: Some scenario is getting missed out | Sanity check: If current phase fetched is not matching with server phase, skip execution
         if self.game.get_current_phase()[0] != 'W':
-            # TODO: Replace orderable locations with all possible units of a power if needed
-
-            # Agent's provinces
-            provs = [loc.upper() for loc in self.game.get_orderable_locations(self.power_name)]
-
-            # Agent's 1-neighbourhood provinces
-            n_provs = set()
-            for prov in provs:
-                n_provs.update(set([prov2.upper() for prov2 in self.game.map.abut_list(prov) if
-                                    prov2.upper().split('/')[0] not in provs]))
-
-            # Agent's alliances provinces set:
-            allies_provs = self.get_allies_orderable_locs()
-
-            # Agent's 2-neighbourhood provinces (retained only alliance's provinces)
-            n2n_provs = set()
-            for prov in n_provs:
-                if prov in allies_provs:
-                    n2n_provs.update(
-                        set([prov2.upper() for prov2 in self.game.map.abut_list(prov) if
-                             prov2.upper().split('/')[0] not in provs and prov2.upper().split('/')[0] not in n_provs]))
+            n2n_provs = self.get_2_neigh_provinces()
 
             possible_support_proposals = defaultdict(list)
             for n2n_p in n2n_provs:
                 if not (self.possible_orders[n2n_p]):
                     continue
-                possible_orders = self.possible_orders[n2n_p]
+                possible_orders = [ord for ord in self.possible_orders[n2n_p] if self.support_move(ord)]
 
                 for order in possible_orders:
                     order_tokens = get_order_tokens(order)
-                    # Skip possible order if it is not a support move
-                    if len(order_tokens) <= 1 or order_tokens[1] != 'S':
-                        continue
-
-                    # Skip possible order if attacking unit is not in agent's provinces
-                    #    or the province to be attacked is not withing agent's 1-neighbourhood provinces
-                    if len(order_tokens) != 4 or order_tokens[2].split()[1] not in provs or order_tokens[3].split()[
-                        1] not in n_provs:
-                        continue
-
-                    # Support Order Pattern
-                    # 'A PAR', 'S', 'A MAR', '- BUR'
-
-                    # Skip possible order if the attacking order is not amongst
-                    #    the randomly selected orders for the agent
-                    # if order_tokens[2].split()[1] not in selected_orders \
-                    #         or selected_orders[order_tokens[2].split()[1]].split()[-1] != order_tokens[3].split()[1]:
-                    #     continue
-                    possible_support_proposals[(order_tokens[2].split()[1], order_tokens[3].split()[1])].append(
-                        (order_tokens[0], order))
-            self_nonsupport_orders = []
+                    if self.support_move(order) and \
+                        (order_tokens[2].split()[1] in self.selected_orders.orders
+                         and self.is_support_for_selected_orders(order)):
+                            location_comb = tuple([oc.split()[1] for oc in order_tokens[2:]])
+                            possible_support_proposals[location_comb].append(
+                                        (order_tokens[0], order))
             for attack_key in possible_support_proposals:
                 selected_order = random.choice(possible_support_proposals[attack_key])
                 if self.game._unit_owner(selected_order[0]) is None:
                     raise "Coding Error"
                 final_messages[self.game._unit_owner(selected_order[0]).name].append(selected_order[1])
-                self_nonsupport_orders.append(selected_order[1].split(" S ")[1])
 
             for recipient in final_messages:
                 suggested_proposals = ORR(XDO(final_messages[recipient]))
-                ret_obj.add_message(recipient, str(suggested_proposals))
-            # print(len(final_messages))
-            return self_nonsupport_orders
-        return []
+                comms_obj.add_message(recipient, str(suggested_proposals))
+        pass
+
+    def cache_allies_influence(self):
+        self.allies_influence = set()
+        for pow in self.allies:
+            self.allies_influence.update(set(self.game.get_power(pow).influence))
+
+    def phase_init(self):
+        super().phase_init()
+        self.support_proposals_sent = False
+        self.selected_orders = OrdersData()
+
+    def config(self, configg):
+        super().config(configg)
+        self.alliance_all_in = configg['alliance_all_in']
+
+    def comms(self, rcvd_messages):
+        # Only if it is the first comms round, do this
+        if self.curr_comms_round == 1:
+            # Select set of non-support orders which are not bad moves
+            for loc in self.game.get_orderable_locations(self.power_name):
+                if self.possible_orders[loc]:
+                    subset_orders = [order for order in self.possible_orders[loc]
+                                     if not self.bad_move(order) and not self.support_move(order)]
+                    self.selected_orders.add_order(random.choice(subset_orders))
+        comms_obj = CommsData()
+
+        if self.comms_rounds_completed():
+            raise "Wrapper's invocation error: Comms function called after comms rounds are over"
+
+        comms_rcvd = self.interpret_orders(rcvd_messages)
+
+        # If no alliance formed
+        if not self.allies:
+            # if alliance proposal acceptance message received
+            if comms_rcvd['yes_allies_proposed']:
+                if not self.alliance_props_sent:
+                    raise "Received ALY YES without sending ALY"
+                self.allies = comms_rcvd['yes_allies_proposed']
+                self.cache_allies_influence()
+            # if alliance proposal receieved
+            elif comms_rcvd['allies_proposed']:
+                self.allies = comms_rcvd['allies_proposed']
+                self.cache_allies_influence()
+                self.my_master = comms_rcvd['alliance_proposer']
+                comms_obj.add_message(self.my_master, str(YES(comms_rcvd['alliance_msg'])))
+            # else propose alliance if not already sent
+            elif not self.alliance_props_sent and self.master_mode:
+                # Send 2-power alliance proposals to all powers
+                if not self.alliance_all_in:
+                    for other_power in get_other_powers([self.power_name], self.game):
+                        alliance_message = ALY([other_power, self.power_name], self.game)
+                        comms_obj.add_message(other_power, alliance_message)
+                # Send all-power alliance proposals to all powers
+                else:
+                    alliance_message = ALY(game.get_map_power_names(), self.game)
+                    for other_power in get_other_powers([self.power_name], self.game):
+                        comms_obj.add_message(other_power, alliance_message)
+                self.alliance_props_sent = True
+        # If alliance is formed already, depending on master/slave, command or be commanded
+        else:
+            # Generate support proposal messages
+            if not self.support_proposals_sent and self.master_mode:
+                self.generate_support_proposals(comms_obj)
+                self.support_proposals_sent = True
+
+        # Update all received proposed orders
+        self.selected_orders.update_orders(comms_rcvd['orders_proposed'])
+
+        return comms_obj
+
 
     def act(self):
-        # Return data initialization
-        ret_obj = BotReturnData()
-
-        rcvd_messages = self.game.filter_messages(messages = self.game.messages, game_role=self.power_name)
-
-        self.possible_orders = self.game.get_all_possible_orders()
-
-        if self.alliance_props_ack_to_be_sent:
-            print("Alliance ack sent")
-            ret_obj.add_message(self.alliance_props_ack_recipient, str(self.alliance_props_ack_to_be_sent))
-            self.alliance_props_ack_to_be_sent = None
-
-        # parse messages
-        rcvd_orders, allies = self.parse_orders(rcvd_messages, ret_obj)
-
-        # select your orders
-        random_orders = [random.choice(self.possible_orders[loc]) for loc in
-                  self.game.get_orderable_locations(self.power_name)
-                  if self.possible_orders[loc]]
-
-        random_nonsupport_orders, random_nonsupport_orders_dict = self.filter_moves(random_orders)
-
-
-
-        # if alliance already exists, exec received orders and self random orders
-        if self.allies:
-            if len(rcvd_orders) > 0:
-                print("Orders received")
-            # Exec received orders
-            ret_obj.add_all_orders(rcvd_orders)
-
-            # Send support proposals for selected random orders
-            non_support_orders = self.generate_support_proposals(random_nonsupport_orders_dict, ret_obj)
-            ret_obj.add_all_orders(non_support_orders)
-
-            # Exec selected random orders
-            ret_obj.add_all_orders(random_nonsupport_orders)
-
-
-        # else if received new alliance, accept alliance, exec self selected random orders
-        elif not self.allies and allies:
-            print("Alliance accepted")
-            self.allies = allies
-            print(self.allies)
-
-            # Send support proposals for selected random orders
-            self.generate_support_proposals(random_nonsupport_orders_dict, ret_obj)
-
-            ret_obj.add_all_orders(random_nonsupport_orders)
-
-        # else if alliance proposal not yet sent, propose alliance, exec self selected random orders
-        elif not self.alliance_props_sent:
-            for other_power in get_other_powers([self.power_name], self.game):
-                # encode alliance message in daide syntax
-                alliance_message = ALY([other_power, self.power_name], self.game)
-                # send the other power an ally request
-                ret_obj.add_message(other_power, alliance_message)
-
-            # dont sent alliance props again
-            print("Alliances proposed")
-            self.alliance_props_sent = True
-
-            ret_obj.add_all_orders(random_nonsupport_orders)
-
-        # else (if alliance proposal sent but no accept messages received), go on execing self random orders
+        if self.current_phase[-1] == 'M':
+            # Fill out orders randomly if not decided already
+            filled_out_orders = [random.choice(self.possible_orders[loc]) for loc in
+                             self.game.get_orderable_locations(self.power_name)
+                             if loc not in self.selected_orders.orders and self.possible_orders[loc]]
+            self.selected_orders.add_all_orders(filled_out_orders)
         else:
-            print("SHOULD NOT BE EXECINGGGGGGG")
-            ret_obj.add_all_orders(random_nonsupport_orders)
+            random_orders = [random.choice(self.possible_orders[loc]) for loc in
+                             self.game.get_orderable_locations(self.power_name)
+                             if self.possible_orders[loc]]
+            self.selected_orders.add_all_orders(random_orders)
 
-        return ret_obj
+        return self.selected_orders.get_final_orders()
 
 if __name__ == "__main__":
     from diplomacy import Game

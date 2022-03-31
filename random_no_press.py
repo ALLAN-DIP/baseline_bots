@@ -16,20 +16,17 @@ class RandomNoPressBot(BaselineBot):
     def __init__(self, power_name, game) -> None:
         super().__init__(power_name, game)
 
+    def comms(self, rcvd_messages):
+        return None
+
     def act(self):
-        # Return data initialization
-        ret_obj = BotReturnData()
-
-        # Fetch latest possible moves
-        self.possible_orders = self.game.get_all_possible_orders()
-
         orders = [random.choice(self.possible_orders[loc]) for loc in
                              self.game.get_orderable_locations(self.power_name)
                              if self.possible_orders[loc]]
 
-        ret_obj.add_all_orders(orders)
+        self.selected_orders.add_all_orders(orders)
 
-        return ret_obj
+        return self.selected_orders.get_final_orders()
 
 
 if __name__ == "__main__":
