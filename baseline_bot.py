@@ -3,7 +3,7 @@ __email__ = "sanderschulhoff@gmail.com"
 
 from abc import ABC, abstractmethod
 
-from daide_utils import OrdersData
+from daide_utils import OrdersData, get_order_tokens
 
 
 class BaselineBot(ABC):
@@ -30,6 +30,27 @@ class BaselineBot(ABC):
 
     def comms_rounds_completed(self):
         return self.curr_comms_round == self.total_comms_rounds
+
+    def bad_move(self, order):
+        order_tokens = get_order_tokens(order)
+
+        if len(order_tokens) == 2:
+            # Attack move
+            if order_tokens[1].split()[-1] in self.my_influence:
+                return True
+        elif len(order_tokens) == 4 and order_tokens[1] == 'S':
+            # Support move
+            if order_tokens[1].split()[-1] in self.my_influence:
+                return True
+
+        return False
+
+    def support_move(self, order):
+        order_tokens = get_order_tokens(order)
+        if 3 <= len(order_tokens) <= 4 and order_tokens[1] == 'S':
+            return True
+        else:
+            return False
 
     @abstractmethod
     def comms(self, rcvd_messages):

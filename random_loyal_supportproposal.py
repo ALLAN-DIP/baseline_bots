@@ -171,7 +171,6 @@ class RandomLSPBot(BaselineBot):
             for recipient in final_messages:
                 suggested_proposals = ORR(XDO(final_messages[recipient]))
                 comms_obj.add_message(recipient, str(suggested_proposals))
-        pass
 
     def cache_allies_influence(self):
         self.allies_influence = set()
@@ -226,7 +225,7 @@ class RandomLSPBot(BaselineBot):
                         comms_obj.add_message(other_power, alliance_message)
                 # Send all-power alliance proposals to all powers
                 else:
-                    alliance_message = ALY(game.get_map_power_names(), self.game)
+                    alliance_message = ALY(self.game.get_map_power_names(), self.game)
                     for other_power in get_other_powers([self.power_name], self.game):
                         comms_obj.add_message(other_power, alliance_message)
                 self.alliance_props_sent = True

@@ -20,7 +20,7 @@ class RandomNoPressBot(BaselineBot):
         return None
 
     def act(self):
-        orders = [random.choice(self.possible_orders[loc]) for loc in
+        orders = [random.choice([ord for ord in self.possible_orders[loc] if not self.bad_move(ord)]) for loc in
                              self.game.get_orderable_locations(self.power_name)
                              if self.possible_orders[loc]]
 

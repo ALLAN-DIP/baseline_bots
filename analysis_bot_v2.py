@@ -31,9 +31,13 @@ if __name__ == "__main__":
 
     assert len(args.powers.split(",")) == 7, "Powers specified are not 7"
 
+    alliance_all_in = sum(typ.startswith("lsp") for typ in args.types.split(",")) == 7
+    if alliance_all_in:
+        print("Alliances are all in")
+
     config = {
         'comms_rounds': comms_rounds,
-        'alliance_all_in': False
+        'alliance_all_in': alliance_all_in
     }
 
     bots = []
@@ -59,9 +63,11 @@ if __name__ == "__main__":
         if game.get_current_phase()[-1] == 'M':
             # Iterate through multiple rounds of comms during movement phases
             for _ in range(comms_rounds):
+                round_msgs = game.messages
+                to_send_msgs = []
                 for bot in bots:
                     # Retrieve messages
-                    rcvd_messages = game.filter_messages(messages=game.messages, game_role=bot.power_name)
+                    rcvd_messages = game.filter_messages(messages=round_msgs, game_role=bot.power_name)
                     rcvd_messages = list(rcvd_messages.items())
                     rcvd_messages.sort()
 
@@ -70,15 +76,17 @@ if __name__ == "__main__":
 
                     # If messages are to be sent, send them
                     if bot_messages and bot_messages.messages:
-                        # print(power_name, messages)
-                        for msg in bot_messages.messages:
-                            msg_obj = Message(
-                                sender=bot.power_name,
-                                recipient=msg['recipient'],
-                                message=msg['message'],
-                                phase=game.get_current_phase(),
-                            )
-                            game.add_message(message=msg_obj)
+                        to_send_msgs += bot_messages.messages
+
+                # Send all messages after all bots decide on comms
+                for msg in to_send_msgs:
+                    msg_obj = Message(
+                        sender=bot.power_name,
+                        recipient=msg['recipient'],
+                        message=msg['message'],
+                        phase=game.get_current_phase(),
+                    )
+                    game.add_message(message=msg_obj)
 
         for bot in bots:
             # Orders round
