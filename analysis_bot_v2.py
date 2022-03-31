@@ -48,11 +48,10 @@ if __name__ == "__main__":
         elif bot_type.startswith('lsp'):
             bot = RandomLSPBot(bot_power, game)
             if bot_type.endswith('m'):
-                bot.set_master()
+                bot.set_leader()
         bot.config(config)
         bots.append(bot)
 
-    # Set first mentioned lsp bot as master
 
     start = time()
 

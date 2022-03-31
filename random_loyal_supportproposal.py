@@ -22,7 +22,7 @@ class RandomLSPBot(BaselineBot):
         super().__init__(power_name, game)
         self.allies = []
         self.allies_influence = set()
-        self.my_master = None
+        self.my_leader = None
 
         self.alliance_all_in = False
 
@@ -31,13 +31,13 @@ class RandomLSPBot(BaselineBot):
         self.alliance_props_ack_sent = False
         self.support_proposals_sent = False
 
-        self.master_mode = False
+        self.leader_mode = False
 
-    def set_master(self):
-        self.master_mode = True
+    def set_leader(self):
+        self.leader_mode = True
 
-    def set_slave(self):
-        self.master_mode = False
+    def set_follower(self):
+        self.leader_mode = False
 
     def interpret_orders(self, rcvd_messages):
         alliance_msgs = [msg for msg in rcvd_messages if "ALY" in msg[1].message]
@@ -68,7 +68,7 @@ class RandomLSPBot(BaselineBot):
         rcvd_orders = []
         if order_msgs:
             for msg in order_msgs:
-                if msg.sender == self.my_master:
+                if msg.sender == self.my_leader:
                     rcvd_orders += parse_orr_xdo(msg.message)
 
         return {
@@ -214,10 +214,10 @@ class RandomLSPBot(BaselineBot):
             elif comms_rcvd['allies_proposed']:
                 self.allies = comms_rcvd['allies_proposed']
                 self.cache_allies_influence()
-                self.my_master = comms_rcvd['alliance_proposer']
-                comms_obj.add_message(self.my_master, str(YES(comms_rcvd['alliance_msg'])))
+                self.my_leader = comms_rcvd['alliance_proposer']
+                comms_obj.add_message(self.my_leader, str(YES(comms_rcvd['alliance_msg'])))
             # else propose alliance if not already sent
-            elif not self.alliance_props_sent and self.master_mode:
+            elif not self.alliance_props_sent and self.leader_mode:
                 # Send 2-power alliance proposals to all powers
                 if not self.alliance_all_in:
                     for other_power in get_other_powers([self.power_name], self.game):
@@ -229,10 +229,10 @@ class RandomLSPBot(BaselineBot):
                     for other_power in get_other_powers([self.power_name], self.game):
                         comms_obj.add_message(other_power, alliance_message)
                 self.alliance_props_sent = True
-        # If alliance is formed already, depending on master/slave, command or be commanded
+        # If alliance is formed already, depending on leader/follower, command or be commanded
         else:
             # Generate support proposal messages
-            if not self.support_proposals_sent and self.master_mode:
+            if not self.support_proposals_sent and self.leader_mode:
                 self.generate_support_proposals(comms_obj)
                 self.support_proposals_sent = True
 
