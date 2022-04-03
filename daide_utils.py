@@ -172,7 +172,7 @@ class BotReturnData:
                 self.orders.append(order)
                 self.orders_start_locs.add(order_tokens[0])
 
-class CommsData:
+class MessagesData:
     def __init__(self):
         self.messages = []
 
@@ -202,6 +202,7 @@ class OrdersData:
                     print(f"Not adding {order} since one with this start location is already added")
             except IndexError:
                 self.orders[order_tokens[0]] = order
+
     def update_orders(self, orders):
         for order in orders:
             try:

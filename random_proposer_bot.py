@@ -14,8 +14,8 @@ class RandomProposerBot(BaselineBot):
 
     def __init__(self, power_name, game) -> None:
         super().__init__(power_name, game)
-
-    def act(self):
+    
+    def gen_messages(self, _) -> BotReturnData:
         # Return data initialization
         ret_obj = BotReturnData()
 
@@ -31,6 +31,9 @@ class RandomProposerBot(BaselineBot):
             ret_obj.add_message(other_power, str(suggested_random_orders))
 
         return ret_obj
+
+    def gen_orders(self):
+        return None
         
 if __name__ == "__main__":
     from diplomacy import Game
@@ -42,21 +45,15 @@ if __name__ == "__main__":
     # instantiate random honest bot
     bot = RandomProposerBot(bot_power, game)
     while not game.is_game_done:
-        bot_state = bot.act()
-        messages, orders = bot_state.messages, bot_state.orders
-        if messages:
-            # print(power_name, messages)
-            for msg in messages:
-                msg_obj = Message(
-                    sender=bot.power_name,
-                    recipient=msg['recipient'],
-                    message=msg['message'],
-                    phase=game.get_current_phase(),
-                )
-                game.add_message(message=msg_obj)
-        # print("Submitted orders")
-        if orders is not None:
-            game.set_orders(power_name=bot.power_name, orders=orders)
+        messages = bot.gen_messages(None).messages
+        for msg in messages:
+            msg_obj = Message(
+                sender=bot.power_name,
+                recipient=msg['recipient'],
+                message=msg['message'],
+                phase=game.get_current_phase(),
+            )
+            game.add_message(message=msg_obj)
 
         game.process()
 
