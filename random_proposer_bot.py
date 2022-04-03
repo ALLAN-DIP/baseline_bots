@@ -4,7 +4,8 @@ __email__ = "sanderschulhoff@gmail.com"
 from diplomacy import Message
 from baseline_bot import BaselineBot
 import random
-from daide_utils import ORR, XDO, get_other_powers, BotReturnData
+from DAIDE import ORR, XDO
+from daide_utils import get_other_powers, BotReturnData
 
 
 class RandomProposerBot(BaselineBot):
@@ -25,7 +26,7 @@ class RandomProposerBot(BaselineBot):
             suggested_random_orders = [random.choice(self.possible_orders[loc]) for loc in self.game.get_orderable_locations(other_power)
                         if self.possible_orders[loc]]
 
-            suggested_random_orders = ORR(XDO(suggested_random_orders))
+            suggested_random_orders = ORR([XDO(order) for order in suggested_random_orders])
 
             # send the other power a message containing the orders
             ret_obj.add_message(other_power, str(suggested_random_orders))
