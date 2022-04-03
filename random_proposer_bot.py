@@ -7,7 +7,6 @@ import random
 from DAIDE import ORR, XDO
 from daide_utils import get_other_powers, BotReturnData
 
-
 class RandomProposerBot(BaselineBot):
     """
     Just sends random order proposals to other bots.
