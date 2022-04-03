@@ -53,11 +53,11 @@ class BaselineBot(ABC):
             return False
 
     @abstractmethod
-    def comms(self, rcvd_messages):
+    def gen_messages(self, rcvd_messages):
         """sets messages to be sent"""
         raise NotImplementedError()
 
     @abstractmethod
-    def act(self) -> None:
+    def gen_orders(self) -> None:
         """finalizes moves"""
         raise NotImplementedError()

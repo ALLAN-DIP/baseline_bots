@@ -1,5 +1,7 @@
 # Baselines Bots
 
+[x] means it has been updated to Karthik's new style
+
 This is a collection of simple baseline bots
 
 The bot parent-child relationships are as follow:
@@ -10,7 +12,7 @@ The bot parent-child relationships are as follow:
 
     * pushover_bot - executes whatever orders the last message told it to (Joy #5)
 
-    * random_proposer_bot - randomly proposes moves to other bots
+    * random_proposer_bot - randomly proposes moves to other bots [x]
 
         * random_allier_proposer_bot - first sends alliance proposals then randomly proposes moves to other bots
 
