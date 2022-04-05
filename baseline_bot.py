@@ -11,7 +11,6 @@ class BaselineBot(ABC):
     def __init__(self, power_name, game) -> None:
         self.power_name = power_name
         self.game = game
-        self.possible_orders = game.get_all_possible_orders()
         self.total_comms_rounds = 0
         self.curr_comms_round = 1
         self.current_phase = ""
@@ -20,7 +19,6 @@ class BaselineBot(ABC):
 
     def phase_init(self):
         self.curr_comms_round = 1
-        self.possible_orders = self.game.get_all_possible_orders()
         self.current_phase = self.game.get_current_phase()
         self.selected_orders = OrdersData()
         self.my_influence = set(self.game.get_power(self.power_name).influence)

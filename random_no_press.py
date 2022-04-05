@@ -4,9 +4,8 @@ __email__ = "kartik.shenoyy@gmail.com"
 from diplomacy import Message
 from baseline_bot import BaselineBot
 import random
-from daide_utils import ORR, XDO, get_other_powers, BotReturnData
+from daide_utils import get_other_powers, BotReturnData
 from time import time
-
 
 class RandomNoPressBot(BaselineBot):
     """
@@ -16,13 +15,15 @@ class RandomNoPressBot(BaselineBot):
     def __init__(self, power_name, game) -> None:
         super().__init__(power_name, game)
 
-    def comms(self, rcvd_messages):
+    def gen_messages(self, rcvd_messages):
         return None
 
-    def act(self):
-        orders = [random.choice([ord for ord in self.possible_orders[loc] if not self.bad_move(ord)]) for loc in
+    def gen_orders(self):
+        possible_orders = game.get_all_possible_orders()
+
+        orders = [random.choice([ord for ord in possible_orders[loc] if not self.bad_move(ord)]) for loc in
                              self.game.get_orderable_locations(self.power_name)
-                             if self.possible_orders[loc]]
+                             if possible_orders[loc]]
 
         self.selected_orders.add_all_orders(orders)
 

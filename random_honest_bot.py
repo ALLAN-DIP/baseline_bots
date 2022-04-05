@@ -19,10 +19,10 @@ class RandomHonestBot(BaselineBot):
     def act(self):
         # Return data initialization
         ret_obj = BotReturnData()
-
+        possible_orders = game.get_all_possible_orders()
         # select random orders
-        random_orders = [random.choice(self.possible_orders[loc]) for loc in self.game.get_orderable_locations(self.power_name)
-                         if self.possible_orders[loc]]
+        random_orders = [random.choice(possible_orders[loc]) for loc in self.game.get_orderable_locations(self.power_name)
+                         if possible_orders[loc]]
         # set the orders
         ret_obj.add_all_orders(random_orders)
         

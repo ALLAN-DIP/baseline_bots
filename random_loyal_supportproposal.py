@@ -143,16 +143,16 @@ class RandomLSPBot(BaselineBot):
 
     def generate_support_proposals(self, comms_obj):
         final_messages = defaultdict(list)
-
+        possible_orders = game.get_all_possible_orders()
         # TODO: Some scenario is getting missed out | Sanity check: If current phase fetched is not matching with server phase, skip execution
         if self.game.get_current_phase()[0] != 'W':
             n2n_provs = self.get_2_neigh_provinces()
 
             possible_support_proposals = defaultdict(list)
             for n2n_p in n2n_provs:
-                if not (self.possible_orders[n2n_p]):
+                if not (possible_orders[n2n_p]):
                     continue
-                possible_orders = [ord for ord in self.possible_orders[n2n_p] if self.support_move(ord)]
+                possible_orders = [ord for ord in possible_orders[n2n_p] if self.support_move(ord)]
 
                 for order in possible_orders:
                     order_tokens = get_order_tokens(order)
@@ -187,12 +187,14 @@ class RandomLSPBot(BaselineBot):
         self.alliance_all_in = configg['alliance_all_in']
 
     def comms(self, rcvd_messages):
+        possible_orders = game.get_all_possible_orders()
+
         # Only if it is the first comms round, do this
         if self.curr_comms_round == 1:
             # Select set of non-support orders which are not bad moves
             for loc in self.game.get_orderable_locations(self.power_name):
-                if self.possible_orders[loc]:
-                    subset_orders = [order for order in self.possible_orders[loc]
+                if possible_orders[loc]:
+                    subset_orders = [order for order in possible_orders[loc]
                                      if not self.bad_move(order) and not self.support_move(order)]
                     self.selected_orders.add_order(random.choice(subset_orders))
         comms_obj = CommsData()
@@ -243,16 +245,18 @@ class RandomLSPBot(BaselineBot):
 
 
     def act(self):
+        possible_orders = game.get_all_possible_orders()
+
         if self.current_phase[-1] == 'M':
             # Fill out orders randomly if not decided already
-            filled_out_orders = [random.choice(self.possible_orders[loc]) for loc in
+            filled_out_orders = [random.choice(possible_orders[loc]) for loc in
                              self.game.get_orderable_locations(self.power_name)
-                             if loc not in self.selected_orders.orders and self.possible_orders[loc]]
+                             if loc not in self.selected_orders.orders and possible_orders[loc]]
             self.selected_orders.add_all_orders(filled_out_orders)
         else:
-            random_orders = [random.choice(self.possible_orders[loc]) for loc in
+            random_orders = [random.choice(possible_orders[loc]) for loc in
                              self.game.get_orderable_locations(self.power_name)
-                             if self.possible_orders[loc]]
+                             if possible_orders[loc]]
             self.selected_orders.add_all_orders(random_orders)
 
         return self.selected_orders.get_final_orders()

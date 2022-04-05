@@ -81,13 +81,14 @@ class RandomStanceBot(BaselineBot):
             # send messages
             ret_obj.add_message(other_power, str(msg))
 
+        possible_orders = game.get_all_possible_orders()
 
         # for all other powers
         for other_power in get_other_powers([self.power_name], self.game):
             # generate some random moves to suggest to them
-            suggested_random_orders = [random.choice(self.possible_orders[loc]) for loc in
+            suggested_random_orders = [random.choice(possible_orders[loc]) for loc in
                                        self.game.get_orderable_locations(other_power)
-                                       if self.possible_orders[loc]]
+                                       if possible_orders[loc]]
             if suggested_random_orders:
                 suggested_random_orders = ORR(XDO(suggested_random_orders))
 

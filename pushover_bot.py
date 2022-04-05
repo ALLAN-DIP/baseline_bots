@@ -5,7 +5,6 @@ from baseline_bot import BaselineBot
 from daide_utils import parse_orr_xdo, get_non_aggressive_orders, BotReturnData
 from diplomacy import Message
 
-
 class PushoverBot(BaselineBot):
     """
     Does whatever the last message/bot told it to do
