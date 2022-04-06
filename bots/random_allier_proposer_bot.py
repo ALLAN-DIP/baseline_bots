@@ -1,10 +1,12 @@
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
-from diplomacy import Message
-from random_proposer_bot import RandomProposerBot
-from daide_utils import ALY, get_other_powers, BotReturnData
+import sys
+sys.path.append("..")
 
+from diplomacy import Message
+from .random_proposer_bot import RandomProposerBot
+from utils import ALY, get_other_powers, MessagesData, OrdersData
 
 class RandomAllierProposerBot(RandomProposerBot):
     """
@@ -17,13 +19,11 @@ class RandomAllierProposerBot(RandomProposerBot):
         super().__init__(power_name, game)
         self.alliance_props_sent = False
 
-    def act(self):
-        # Return data initialization
-        ret_obj = BotReturnData()
-
+    def gen_messages(self, rcvd_messages):
+        ret_msgs = MessagesData()
         if self.alliance_props_sent:
             # send random action proposals
-            super().act()
+            return super.gen_messages(rcvd_messages)
         else:
             # send alliance proposals to other bots
 
@@ -32,12 +32,15 @@ class RandomAllierProposerBot(RandomProposerBot):
                 # encode alliance message in daide syntax
                 alliance_message = ALY([other_power, self.power_name], self.game)
                 # send the other power an ally request
-                ret_obj.add_message(other_power, alliance_message)
+                ret_msgs.add_message(other_power, alliance_message)
 
             # dont sent alliance props again
             self.alliance_props_sent = True
-        
-        return ret_obj
+            
+        return ret_msgs
+
+    def gen_orders(self):
+        return None
 
 if __name__ == "__main__":
     from diplomacy import Game

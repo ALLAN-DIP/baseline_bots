@@ -1,11 +1,12 @@
 import argparse
 from time import time
 
-from random_loyal_supportproposal import RandomLSPBot
-from random_no_press import RandomNoPressBot
 from diplomacy import Message
 from diplomacy import Game
 from diplomacy.utils.export import to_saved_game_format
+
+from random_loyal_supportproposal import RandomLSPBot
+from random_no_press import RandomNoPressBot
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Analysis-Dip')

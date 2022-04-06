@@ -1,15 +1,18 @@
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
-from lib2to3.pgen2.parse import ParseError
+import sys
+sys.path.append("..")
 
 from diplomacy import Message
-from random_allier_proposer_bot import RandomAllierProposerBot
-from daide_utils import parse_orr_xdo, parse_alliance_proposal, get_non_aggressive_orders, YES, BotReturnData
+from DAIDE.utils.exceptions import ParseError
+from DAIDE import YES
 
-from baseline_bot import BaselineBot
+from .random_allier_proposer_bot import RandomAllierProposerBot
+from utils import parse_orr_xdo, parse_alliance_proposal, get_non_aggressive_orders, MessagesData
+from .baseline_bot import BaselineMsgRoundBot
 
-class LoyalBot(BaselineBot):
+class LoyalBot(BaselineMsgRoundBot):
     """
     Accepts first alliance it receives. 
     Then only accepts orders bots in that alliance.
@@ -19,15 +22,18 @@ class LoyalBot(BaselineBot):
         super().__init__(power_name, game)
         # will always follow this country's orders
         self.allies = None
+        # orders to be provided by allies
+        self.orders = None
 
-    def act(self):
+    def gen_messages(self, rcvd_messages):
         # Return data initialization
-        ret_obj = BotReturnData()
+        ret_obj = MessagesData()
 
-        # get proposed orders sent by other countries
-        rcvd_messages = game.filter_messages(messages = game.messages, game_role=self.power_name)
         # convert to list for sorting/indexing
         keys = list(rcvd_messages.keys())
+        if len(keys) == 0:
+            return ret_obj
+
         # sort from most recent to least recent
         keys.sort(reverse=True)
         # get most recent message
@@ -36,9 +42,9 @@ class LoyalBot(BaselineBot):
             # ensure message sender is an ally
             if last_message.sender in self.allies:
                 try:
-                    ret_orders = get_non_aggressive_orders(parse_orr_xdo(last_message.message), self.power_name, self.game)
-                    # set the orders
-                    ret_obj.add_all_orders(ret_orders)
+                    orders = get_non_aggressive_orders(parse_orr_xdo(last_message.message), self.power_name, self.game)
+                    self.selected_orders.add_orders(orders)
+                     
                 except ParseError:
                     pass
         else:
@@ -52,6 +58,10 @@ class LoyalBot(BaselineBot):
 
         return ret_obj
 
+
+    def gen_orders(self):
+        return self.selected_orders
+        
 if __name__ == "__main__":
     from diplomacy import Game
     from diplomacy.utils.export import to_saved_game_format
