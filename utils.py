@@ -10,7 +10,7 @@ from collections import defaultdict
 from DAIDE.utils.exceptions import ParseError
 from typing import List
 
-from diplomacy import Game
+from diplomacy import Game, Message
 # from diplomacy_research.models.state_space import get_order_tokens
 import re
 
@@ -210,6 +210,32 @@ class OrdersData:
     def __iter__(self):
         return iter(self.orders)
 
+def sort_messages_by_most_recent(messages:List[Message]):
+    messages.sort(key=lambda msg: msg.time_sent)
+    return messages
+
+if __name__ == "__main__":
+    game = Game()
+    powers = list(game.powers)
+    power_0 = powers[0]
+    power_1 = powers[1]
+    msg_obj1 = Message(
+        sender=power_0,
+        recipient=power_1,
+        message="HELLO",
+        phase=game.get_current_phase(),
+    )
+    game.add_message(message=msg_obj1)
+    msg_obj2 = Message(
+        sender=power_1,
+        recipient=power_0,
+        message="GOODBYE",
+        phase=game.get_current_phase(),
+    )
+    game.add_message(message=msg_obj2)
+    msgs = [msg_obj2, msg_obj1]
+    
+    assert sort_messages_by_most_recent(msgs)[0].message == "HELLO"
 
 # if __name__ == "__main__":
     # from diplomacy import Game

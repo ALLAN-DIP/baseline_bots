@@ -53,10 +53,10 @@ class GamePlay():
                     msgs_to_send = {}
                     for bot in self.bots:
                         # retrieve messages sent to bot
-                        # an array of Message objects
                         rcvd_messages = self.game.filter_messages(messages=round_msgs, game_role=bot.power_name)
-                        rcvd_messages = list(rcvd_messages.items())
-                        rcvd_messages.sort()
+                        
+                        # an array of Message objects
+                        rcvd_messages = list(rcvd_messages.values())
                         
                         # get messages to be sent from bot
                         bot_messages = bot.gen_messages(rcvd_messages)

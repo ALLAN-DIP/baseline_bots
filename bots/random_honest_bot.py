@@ -5,7 +5,7 @@ from diplomacy import Message
 from baseline_bot import BaselineBot
 import random
 
-from daide_utils import BotReturnData
+from utils import BotReturnData
 
 
 class RandomHonestBot(BaselineBot):

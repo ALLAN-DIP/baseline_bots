@@ -5,9 +5,9 @@ from collections import defaultdict
 from diplomacy import Message
 from diplomacy.agents.baseline_bots.baseline_bot import BaselineBot
 import random
-from diplomacy.agents.baseline_bots.daide_utils import get_order_tokens, ORR, XDO
+from diplomacy.agents.baseline_bots.utils import get_order_tokens, ORR, XDO
 
-from daide_utils import BotReturnData
+from utils import BotReturnData
 
 
 class RandomSupportProposerBot(BaselineBot):

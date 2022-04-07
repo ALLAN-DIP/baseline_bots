@@ -5,10 +5,10 @@ import sys
 sys.path.append("..")
 
 from diplomacy import Message
-from .random_proposer_bot import RandomProposerBot
+from . import random_proposer_bot
 from utils import ALY, get_other_powers, MessagesData, OrdersData
 
-class RandomAllierProposerBot(RandomProposerBot):
+class RandomAllierProposerBot(random_proposer_bot.RandomProposerBot):
     """
     The first time this bot acts, it sends an alliance message to 
     all other bots. Otherwise, it just sends random order proposals to 

@@ -5,14 +5,12 @@ __email__ = "sanderschulhoff@gmail.com"
 
 import sys
 sys.path.append("..")
-
 from abc import ABC, abstractmethod
 from typing import List
 
 from diplomacy import Game, Message
 
 from utils import OrdersData, MessagesData, get_order_tokens
-
 
 class BaselineBot(ABC):
     """Abstract Base Class for baselines bots"""
