@@ -37,6 +37,8 @@ def bot_loop():
     for bot_power, bot_type in zip(args.powers.split(","), args.types.split(",")):
         if bot_type == 'np':
             bot = NoPressDipBot(bot_power, game)
+        elif bot_type == 'rnp':
+            bot = RandomNoPressBot(bot_power, game)
         elif bot_type.startswith('lsp'):
             bot = RandomLSP_DipBot(bot_power, game, 3, alliance_all_in)
             if bot_type.endswith('m'):
