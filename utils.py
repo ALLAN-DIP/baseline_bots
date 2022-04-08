@@ -165,9 +165,8 @@ class MessagesData:
     def __init__(self):
         self.messages = []
 
-    def add_message(self, sender: str, recipient: str, message: str):
+    def add_message(self, recipient: str, message: str):
         self.messages.append({
-            'sender': sender,
             'recipient': recipient,
             'message': message
         })
