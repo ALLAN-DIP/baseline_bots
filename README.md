@@ -11,7 +11,7 @@ pip install git+https://github.com/trigaten/DAIDE
 
 ## Bots
 
-[x] means it has been updated to Karthik's new style
+[x] means it has been updated to Kartik's new style
 
 This is a collection of simple baseline bots
 
