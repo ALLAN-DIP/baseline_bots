@@ -2,41 +2,35 @@ __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
 from diplomacy import Message
-from random_proposer_bot import RandomProposerBot
-from daide_utils import ALY, get_other_powers, BotReturnData
+from baseline_bot import BaselineBot
+import random
+
+from utils import BotReturnData
 
 
-class RandomAllierProposerBot(RandomProposerBot):
+class RandomHonestBot(BaselineBot):
     """
-    The first time this bot acts, it sends an alliance message to 
-    all other bots. Otherwise, it just sends random order proposals to 
-    other bots.
+    This bot always acts randomly and truthfully communicates
+    its intended moves in messages to all of its opponents
     """
-
     def __init__(self, power_name, game) -> None:
         super().__init__(power_name, game)
-        self.alliance_props_sent = False
 
     def act(self):
         # Return data initialization
         ret_obj = BotReturnData()
-
-        if self.alliance_props_sent:
-            # send random action proposals
-            super().act()
-        else:
-            # send alliance proposals to other bots
-
-            # for all other powers
-            for other_power in get_other_powers([self.power_name], self.game):
-                # encode alliance message in daide syntax
-                alliance_message = ALY([other_power, self.power_name], self.game)
-                # send the other power an ally request
-                ret_obj.add_message(other_power, alliance_message)
-
-            # dont sent alliance props again
-            self.alliance_props_sent = True
+        possible_orders = game.get_all_possible_orders()
+        # select random orders
+        random_orders = [random.choice(possible_orders[loc]) for loc in self.game.get_orderable_locations(self.power_name)
+                         if possible_orders[loc]]
+        # set the orders
+        ret_obj.add_all_orders(random_orders)
         
+        # for all other powers
+        for other_power in [name for name in self.game.get_map_power_names() if name != self.power_name]:
+            # send the other power a message containing the orders
+            ret_obj.add_message(other_power, str(random_orders))
+
         return ret_obj
 
 if __name__ == "__main__":
@@ -47,12 +41,12 @@ if __name__ == "__main__":
     # select the first name in the list of powers
     bot_power = list(game.get_map_power_names())[0]
     # instantiate random honest bot
-    bot = RandomAllierProposerBot(bot_power, game)
+    bot = RandomHonestBot(bot_power, game)
     while not game.is_game_done:
         bot_state = bot.act()
         messages, orders = bot_state.messages, bot_state.orders
         if messages:
-            print(bot.power_name, messages)
+            # print(power_name, messages)
             for msg in messages:
                 msg_obj = Message(
                     sender=bot.power_name,
@@ -64,7 +58,6 @@ if __name__ == "__main__":
         # print("Submitted orders")
         if orders is not None:
             game.set_orders(power_name=bot.power_name, orders=orders)
-
         game.process()
 
-    to_saved_game_format(game, output_path='RandomAllierProposerBotGame.json')
+    to_saved_game_format(game, output_path='RandomHonestBotGame.json')

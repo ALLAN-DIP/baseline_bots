@@ -1,19 +1,19 @@
 __author__ = "Kartik Shenoy"
 __email__ = "kartik.shenoyy@gmail.com"
 
+import random
 from collections import defaultdict
-from lib2to3.pgen2.parse import ParseError
+import sys
+sys.path.append("..")
 
 from diplomacy import Message
-from baseline_bot import BaselineBot
-import random
-from diplomacy.agents.baseline_bots.daide_utils import get_order_tokens, ORR, XDO
 
-from daide_utils import BotReturnData, parse_orr_xdo, parse_alliance_proposal, get_non_aggressive_orders, YES, \
-    BotReturnData, get_other_powers, ALY, CommsData, OrdersData
+from baseline_bot import BaselineMsgRoundBot
+from utils import BotReturnData, parse_orr_xdo, parse_alliance_proposal, get_non_aggressive_orders, YES, \
+    BotReturnData, get_other_powers, ALY, CommsData, OrdersData, get_order_tokens, ORR, XDO
 
 
-class RandomLSPBot(BaselineBot):
+class RandomLSPBot(BaselineMsgRoundBot):
     """
 
     """
@@ -183,10 +183,10 @@ class RandomLSPBot(BaselineBot):
         self.selected_orders = OrdersData()
 
     def config(self, configg):
-        super().config(configg)
+        # super().config(configg)
         self.alliance_all_in = configg['alliance_all_in']
 
-    def comms(self, rcvd_messages):
+    def gen_messages(self, rcvd_messages):
         possible_orders = game.get_all_possible_orders()
 
         # Only if it is the first comms round, do this
@@ -243,8 +243,7 @@ class RandomLSPBot(BaselineBot):
 
         return comms_obj
 
-
-    def act(self):
+    def gen_orders(self):
         possible_orders = game.get_all_possible_orders()
 
         if self.current_phase[-1] == 'M':

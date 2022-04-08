@@ -7,10 +7,10 @@ __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
 from collections import defaultdict
-from lib2to3.pgen2.parse import ParseError
+from DAIDE.utils.exceptions import ParseError
 from typing import List
 
-from diplomacy import Game
+from diplomacy import Game, Message
 # from diplomacy_research.models.state_space import get_order_tokens
 import re
 
@@ -146,31 +146,20 @@ def get_non_aggressive_orders(orders: List[str], sender:str, game: Game) -> List
     """
     return [order for order in orders if not is_order_aggressive(order, sender, game)]
 
-# def parse_daide_message(msg):
-#     """where's ocaml when I need it"""
+def is_support_order(order):
+    order_tokens = get_order_tokens(order)
+    if 3 <= len(order_tokens) <= 4 and order_tokens[1] == 'S':
+        return True
+    else:
+        return False
 
-class BotReturnData:
-    def __init__(self):
-        self.messages = []
-        self.orders = []
-        self.orders_start_locs = set()
-        self.stance = None
-
-    def add_message(self, recipient: str, message: str):
-        self.messages.append({
-            'recipient': recipient,
-            'message': message
-        })
-
-    def add_order(self, order):
-        self.orders.append(order)
-
-    def add_all_orders(self, orders):
-        for order in orders:
-            order_tokens = get_order_tokens(order)
-            if order_tokens[0] not in self.orders_start_locs:
-                self.orders.append(order)
-                self.orders_start_locs.add(order_tokens[0])
+def get_province_from_order(order):
+    order_tokens = get_order_tokens(order)
+    parts = order_tokens[0].split()
+    if len(parts) >= 2:
+        return parts[1]
+    else:
+        return order_tokens[0]
 
 class MessagesData:
     def __init__(self):
@@ -181,49 +170,86 @@ class MessagesData:
             'recipient': recipient,
             'message': message
         })
+    
+    def __iter__(self):
+        return iter(self.messages)
+
 
 class OrdersData:
     def __init__(self):
         self.orders = defaultdict(str)
 
-    def add_order(self, order):
-        order_tokens = get_order_tokens(order)
-        self.orders[order_tokens[0].split()[1]] = order
+    def add_order(self, order, overwrite=True):
+        """
+        Adds single order
 
-    def add_all_orders(self, orders):
-        '''Guarded add all orders'''
+        :param overwrite: whether or not to overwrite an order
+        """
+
+        province = get_province_from_order(order)
+        
+        if overwrite:
+            self.orders[province] = order
+        else:
+            if province not in self.orders:
+                self.orders[province] = order
+
+    def add_orders(self, orders, overwrite=True):
+        """
+        Adds multiple orders
+
+        :param overwrite: whether or not to overwrite orders
+        """
         for order in orders:
-            order_tokens = get_order_tokens(order)
-            try:
-                if order_tokens[0].split()[1] not in self.orders:
-                    self.add_order(order)
-                else:
-                    # Prevents unnecessary addition of orders
-                    print(f"Not adding {order} since one with this start location is already added")
-            except IndexError:
-                self.orders[order_tokens[0]] = order
+            add_order(order, overwrite)
+            
 
-    def update_orders(self, orders):
-        for order in orders:
-            try:
-                self.add_order(order)
-            except IndexError:
-                self.orders[get_order_tokens(order)[0]] = order
-
-    def get_final_orders(self):
+    def get_list_of_orders(self):
         return list(self.orders.values())
 
+    def __iter__(self):
+        return iter(self.orders)
+
+    def empty(self):
+        return len(self.orders) > 0
+
+def sort_messages_by_most_recent(messages:List[Message]):
+    messages.sort(key=lambda msg: msg.time_sent)
+    return messages
 
 if __name__ == "__main__":
-    from diplomacy import Game
-    # game instance
     game = Game()
-    print(AND(["GO HOME", "BAD MONKEY"]))
-    # print(AND(["GO HOME"]))
-    print(XDO(["Move back", "Move"]))
-    # msg = ORR(XDO(["Move back", "Move"]))
-    # print(parse_orr_xdo(msg))
-    # print(ALY(["p1", "p2"]))
-    # print(ALY(["GERMANY", "RUSSIA"], game))
-    # print(parse_alliance_proposal("ALY (GERMANY RUSSIA) VSS (FRANCE ENGLAND ITALY TURKEY AUSTRIA)", "RUSSIA"))
-    print(is_order_aggressive("A CON BUL", "TURKEY", game))
+    powers = list(game.powers)
+    power_0 = powers[0]
+    power_1 = powers[1]
+    msg_obj1 = Message(
+        sender=power_0,
+        recipient=power_1,
+        message="HELLO",
+        phase=game.get_current_phase(),
+    )
+    game.add_message(message=msg_obj1)
+    msg_obj2 = Message(
+        sender=power_1,
+        recipient=power_0,
+        message="GOODBYE",
+        phase=game.get_current_phase(),
+    )
+    game.add_message(message=msg_obj2)
+    msgs = [msg_obj2, msg_obj1]
+    
+    assert sort_messages_by_most_recent(msgs)[0].message == "HELLO"
+
+# if __name__ == "__main__":
+    # from diplomacy import Game
+    # # game instance
+    # game = Game()
+    # print(AND(["GO HOME", "BAD MONKEY"]))
+    # # print(AND(["GO HOME"]))
+    # print(XDO(["Move back", "Move"]))
+    # # msg = ORR(XDO(["Move back", "Move"]))
+    # # print(parse_orr_xdo(msg))
+    # # print(ALY(["p1", "p2"]))
+    # # print(ALY(["GERMANY", "RUSSIA"], game))
+    # # print(parse_alliance_proposal("ALY (GERMANY RUSSIA) VSS (FRANCE ENGLAND ITALY TURKEY AUSTRIA)", "RUSSIA"))
+    # print(is_order_aggressive("A CON BUL", "TURKEY", game))
