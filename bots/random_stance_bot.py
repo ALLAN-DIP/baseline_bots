@@ -4,7 +4,7 @@ __email__ = "sanderschulhoff@gmail.com"
 from diplomacy import Message
 from baseline_bot import BaselineBot
 import random
-from daide_utils import parse_orr_xdo, ORR, XDO, YES, get_non_aggressive_orders, get_other_powers, BotReturnData
+from utils import parse_orr_xdo, ORR, XDO, YES, get_non_aggressive_orders, get_other_powers, BotReturnData
 
 
 # TODO: Upgrade to new design layout
@@ -40,7 +40,7 @@ class RandomStanceBot(BaselineBot):
             try:
                 parsed = parse_orr_xdo(message.message)
                 if self.stance[message.sender] > 0:
-                    ret_obj.add_all_orders(parsed)
+                    ret_obj.add_orders(parsed)
                     proposed_orders_by_country[message.sender] = parsed
             except:
                 pass
@@ -49,7 +49,7 @@ class RandomStanceBot(BaselineBot):
         #           self.game.get_orderable_locations(self.power_name)
         #           if self.possible_orders[loc]]
         # # Add random orders for all other provinces with no orders
-        # ret_obj.add_all_orders(orders)
+        # ret_obj.add_orders(orders)
 
         # set orders
         # print(ret_obj.orders)
@@ -81,13 +81,14 @@ class RandomStanceBot(BaselineBot):
             # send messages
             ret_obj.add_message(other_power, str(msg))
 
+        possible_orders = game.get_all_possible_orders()
 
         # for all other powers
         for other_power in get_other_powers([self.power_name], self.game):
             # generate some random moves to suggest to them
-            suggested_random_orders = [random.choice(self.possible_orders[loc]) for loc in
+            suggested_random_orders = [random.choice(possible_orders[loc]) for loc in
                                        self.game.get_orderable_locations(other_power)
-                                       if self.possible_orders[loc]]
+                                       if possible_orders[loc]]
             if suggested_random_orders:
                 suggested_random_orders = ORR(XDO(suggested_random_orders))
 

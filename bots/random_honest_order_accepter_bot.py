@@ -4,7 +4,7 @@ __email__ = "sanderschulhoff@gmail.com"
 from diplomacy import Message
 from baseline_bot import BaselineBot
 import random
-from daide_utils import parse_orr_xdo, ORR, XDO, YES, get_non_aggressive_orders
+from utils import parse_orr_xdo, ORR, XDO, YES, get_non_aggressive_orders
 
 #TODO: Upgrade to new design layout
 class RandomHonestAccepterBot(BaselineBot):

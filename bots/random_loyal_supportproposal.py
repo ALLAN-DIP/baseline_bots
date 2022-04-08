@@ -1,25 +1,25 @@
 __author__ = "Kartik Shenoy"
 __email__ = "kartik.shenoyy@gmail.com"
 
+import random
 from collections import defaultdict
-from lib2to3.pgen2.parse import ParseError
+import sys
+sys.path.append("..")
 
 from diplomacy import Message
-from baseline_bot import BaselineBot
-import random
-from diplomacy.agents.baseline_bots.daide_utils import get_order_tokens, ORR, XDO
 
-from daide_utils import BotReturnData, parse_orr_xdo, parse_alliance_proposal, get_non_aggressive_orders, YES, \
-    BotReturnData, get_other_powers, ALY, CommsData, OrdersData
+from bots.baseline_bot import BaselineMsgRoundBot
+from utils import parse_orr_xdo, parse_alliance_proposal, get_non_aggressive_orders, YES, \
+    get_other_powers, ALY, MessagesData, OrdersData, get_order_tokens, ORR, XDO
 
 
-class RandomLSPBot(BaselineBot):
+class RandomLSPBot(BaselineMsgRoundBot):
     """
 
     """
 
-    def __init__(self, power_name, game) -> None:
-        super().__init__(power_name, game)
+    def __init__(self, power_name, game, total_msg_rounds=3, alliance_all_in=True) -> None:
+        super().__init__(power_name, game, total_msg_rounds)
         self.allies = []
         self.allies_influence = set()
         self.my_leader = None
@@ -32,6 +32,10 @@ class RandomLSPBot(BaselineBot):
         self.support_proposals_sent = False
 
         self.leader_mode = False
+
+        self.alliance_all_in = alliance_all_in
+        self.my_influence = set()
+        self.possible_orders = {}
 
     def set_leader(self):
         self.leader_mode = True
@@ -131,7 +135,7 @@ class RandomLSPBot(BaselineBot):
 
     def is_support_for_selected_orders(self, support_order):
         order_tokens = get_order_tokens(support_order)
-        selected_order = get_order_tokens(self.selected_orders.orders[order_tokens[2].split()[1]])
+        selected_order = get_order_tokens(self.orders.orders[order_tokens[2].split()[1]])
 
         if len(order_tokens[2:]) == len(selected_order) and order_tokens[2:] == selected_order:
             # Attack move
@@ -152,12 +156,12 @@ class RandomLSPBot(BaselineBot):
             for n2n_p in n2n_provs:
                 if not (self.possible_orders[n2n_p]):
                     continue
-                possible_orders = [ord for ord in self.possible_orders[n2n_p] if self.support_move(ord)]
+                subset_possible_orders = [ord for ord in self.possible_orders[n2n_p] if self.support_move(ord)]
 
-                for order in possible_orders:
+                for order in subset_possible_orders:
                     order_tokens = get_order_tokens(order)
                     if self.support_move(order) and \
-                        (order_tokens[2].split()[1] in self.selected_orders.orders
+                        (order_tokens[2].split()[1] in self.orders.orders
                          and self.is_support_for_selected_orders(order)):
                             location_comb = tuple([oc.split()[1] for oc in order_tokens[2:]])
                             possible_support_proposals[location_comb].append(
@@ -179,29 +183,33 @@ class RandomLSPBot(BaselineBot):
 
     def phase_init(self):
         super().phase_init()
+        self.my_influence = set(self.game.get_power(self.power_name).influence)
+        self.possible_orders = self.game.get_all_possible_orders()
         self.support_proposals_sent = False
-        self.selected_orders = OrdersData()
+        self.orders = OrdersData()
 
-    def config(self, configg):
-        super().config(configg)
-        self.alliance_all_in = configg['alliance_all_in']
+    # def config(self, configg):
+    #     # super().config(configg)
+    #     self.alliance_all_in = configg['alliance_all_in']
 
-    def comms(self, rcvd_messages):
+    def gen_messages(self, rcvd_messages):
+        # self.possible_orders = self.game.get_all_possible_orders()
+
         # Only if it is the first comms round, do this
-        if self.curr_comms_round == 1:
+        if self.curr_msg_round == 1:
             # Select set of non-support orders which are not bad moves
             for loc in self.game.get_orderable_locations(self.power_name):
                 if self.possible_orders[loc]:
                     subset_orders = [order for order in self.possible_orders[loc]
                                      if not self.bad_move(order) and not self.support_move(order)]
                     sel_order = random.choice(subset_orders)
-                    self.selected_orders.add_order(sel_order)
-                    if " C " in sel_order:
+                    self.orders.add_order(sel_order)
+                    # if " C " in sel_order:
                         
 
-        comms_obj = CommsData()
+        comms_obj = MessagesData()
 
-        if self.comms_rounds_completed():
+        if self.are_msg_rounds_done():
             raise "Wrapper's invocation error: Comms function called after comms rounds are over"
 
         comms_rcvd = self.interpret_orders(rcvd_messages)
@@ -241,25 +249,26 @@ class RandomLSPBot(BaselineBot):
                 self.support_proposals_sent = True
 
         # Update all received proposed orders
-        self.selected_orders.update_orders(comms_rcvd['orders_proposed'])
+        self.orders.add_orders(comms_rcvd['orders_proposed'], overwrite=True)
 
         return comms_obj
 
+    def gen_orders(self):
+        # possible_orders = game.get_all_possible_orders()
 
-    def act(self):
-        if self.current_phase[-1] == 'M':
+        if self.game.get_current_phase()[-1] == 'M':
             # Fill out orders randomly if not decided already
             filled_out_orders = [random.choice(self.possible_orders[loc]) for loc in
                              self.game.get_orderable_locations(self.power_name)
-                             if loc not in self.selected_orders.orders and self.possible_orders[loc]]
-            self.selected_orders.add_all_orders(filled_out_orders)
+                             if loc not in self.orders.orders and self.possible_orders[loc]]
+            self.orders.add_orders(filled_out_orders, overwrite=False)
         else:
             random_orders = [random.choice(self.possible_orders[loc]) for loc in
                              self.game.get_orderable_locations(self.power_name)
                              if self.possible_orders[loc]]
-            self.selected_orders.add_all_orders(random_orders)
+            self.orders.add_orders(random_orders, overwrite=False)
 
-        return self.selected_orders.get_final_orders()
+        return self.orders.get_list_of_orders()
 
 if __name__ == "__main__":
     from diplomacy import Game

@@ -1,11 +1,14 @@
 import argparse
 from time import time
 
-from random_loyal_supportproposal import RandomLSPBot
-from random_no_press import RandomNoPressBot
 from diplomacy import Message
 from diplomacy import Game
 from diplomacy.utils.export import to_saved_game_format
+
+from bots.baseline_bot import BaselineMsgRoundBot
+from bots.dipnet.no_press_bot import NoPressDipBot
+from bots.random_loyal_supportproposal import RandomLSPBot
+from bots.random_no_press import RandomNoPressBot
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Analysis-Dip')
@@ -22,7 +25,6 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
     comms_rounds = 3
-    from random_allier_proposer_bot import RandomAllierProposerBot
 
     # game instance
     game = Game()
@@ -44,12 +46,12 @@ if __name__ == "__main__":
 
     for bot_power, bot_type in zip(args.powers.split(","), args.types.split(",")):
         if bot_type == 'np':
-            bot = RandomNoPressBot(bot_power, game)
+            bot = NoPressDipBot(bot_power, game)
         elif bot_type.startswith('lsp'):
-            bot = RandomLSPBot(bot_power, game)
+            bot = RandomLSPBot(bot_power, game, 3, alliance_all_in)
             if bot_type.endswith('m'):
                 bot.set_leader()
-        bot.config(config)
+        # bot.config(config)
         bots.append(bot)
 
 
@@ -57,7 +59,8 @@ if __name__ == "__main__":
 
     while not game.is_game_done:
         for bot in bots:
-            bot.phase_init()
+            if isinstance(bot, BaselineMsgRoundBot):
+                bot.phase_init()
 
         if game.get_current_phase()[-1] == 'M':
             # Iterate through multiple rounds of comms during movement phases
@@ -71,7 +74,7 @@ if __name__ == "__main__":
                     rcvd_messages.sort()
 
                     # Send messages to bots and fetch messages from bot
-                    bot_messages = bot.comms(rcvd_messages)
+                    bot_messages = bot.gen_messages(rcvd_messages)
 
                     # If messages are to be sent, send them
                     if bot_messages and bot_messages.messages:
@@ -89,7 +92,7 @@ if __name__ == "__main__":
 
         for bot in bots:
             # Orders round
-            orders = bot.act()
+            orders = bot.gen_orders()
             # messages, orders = bot_state.messages, bot_state.orders
 
             if orders is not None:

@@ -5,9 +5,9 @@ from collections import defaultdict
 from diplomacy import Message
 from diplomacy.agents.baseline_bots.baseline_bot import BaselineBot
 import random
-from diplomacy.agents.baseline_bots.daide_utils import get_order_tokens, ORR, XDO
+from diplomacy.agents.baseline_bots.utils import get_order_tokens, ORR, XDO
 
-from daide_utils import BotReturnData
+from utils import BotReturnData
 
 
 class RandomSupportProposerBot(BaselineBot):
@@ -20,6 +20,7 @@ class RandomSupportProposerBot(BaselineBot):
         super().__init__(power_name, game)
 
     def act(self):
+        
         # Return data initialization
         ret_obj = BotReturnData()
 
@@ -27,11 +28,12 @@ class RandomSupportProposerBot(BaselineBot):
         #TODO: Ensure that attack should not be to a province that the power already owns
         final_messages = defaultdict(list)
         messages = []
+        possible_orders = game.get_all_possible_orders()
 
         #TODO: Some scenario is getting missed out | Sanity check: If current phase fetched is not matching with server phase, skip execution
         if self.game.get_current_phase()[0] != 'W':
             #TODO: Replace orderable locations with all possible units of a power if needed
-            self.possible_orders = self.game.get_all_possible_orders()
+            possible_orders = self.game.get_all_possible_orders()
             provs = [loc.upper() for loc in self.game.get_orderable_locations(self.power_name)]
 
             n_provs = set()
@@ -44,9 +46,9 @@ class RandomSupportProposerBot(BaselineBot):
 
             possible_support_proposals = defaultdict(list)
             for n2n_p in n2n_provs:
-                if not(self.possible_orders[n2n_p]):
+                if not(possible_orders[n2n_p]):
                     continue
-                possible_orders = self.possible_orders[n2n_p]
+                possible_orders = possible_orders[n2n_p]
 
                 for order in possible_orders:
                     order_tokens = get_order_tokens(order)
@@ -66,12 +68,13 @@ class RandomSupportProposerBot(BaselineBot):
         for recipient in final_messages:
             suggested_proposals = ORR(XDO(final_messages[recipient]))
             ret_obj.add_message(recipient, str(suggested_proposals))
+        possible_orders = game.get_all_possible_orders()
 
-        orders = [random.choice(self.possible_orders[loc]) for loc in
+        orders = [random.choice(possible_orders[loc]) for loc in
                          self.game.get_orderable_locations(self.power_name)
-                         if self.possible_orders[loc]]
+                         if possible_orders[loc]]
 
-        ret_obj.add_all_orders(orders)
+        ret_obj.add_orders(orders)
 
         return ret_obj
 
