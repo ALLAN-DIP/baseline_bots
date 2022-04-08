@@ -59,7 +59,7 @@ class RandomLSP_DipBot(DipnetBot):
             * yes_allies_proposed: If alliance acceptance message receieved, set to alliance powers list, else []
             * orders_proposed: If suggested orders received, set to this list of orders, else []
         """
-        alliance_msgs = [msg for msg in rcvd_messages if "ALY" in msg[1].message]
+        alliance_msgs = [msg for msg in rcvd_messages if "ALY" in msg[1].message and msg[1].sender != self.power_name]
         yes_alliance_msgs = [msg for msg in alliance_msgs if "YES" in msg[1].message]
         alliance_proposal_msgs = [msg for msg in alliance_msgs if "YES" not in msg[1].message]
 
