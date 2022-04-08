@@ -210,6 +210,9 @@ class OrdersData:
     def __iter__(self):
         return iter(self.orders)
 
+    def empty(self):
+        return len(self.orders) > 0
+
 def sort_messages_by_most_recent(messages:List[Message]):
     messages.sort(key=lambda msg: msg.time_sent)
     return messages
