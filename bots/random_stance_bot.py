@@ -40,7 +40,7 @@ class RandomStanceBot(BaselineBot):
             try:
                 parsed = parse_orr_xdo(message.message)
                 if self.stance[message.sender] > 0:
-                    ret_obj.add_all_orders(parsed)
+                    ret_obj.add_orders(parsed)
                     proposed_orders_by_country[message.sender] = parsed
             except:
                 pass
@@ -49,7 +49,7 @@ class RandomStanceBot(BaselineBot):
         #           self.game.get_orderable_locations(self.power_name)
         #           if self.possible_orders[loc]]
         # # Add random orders for all other provinces with no orders
-        # ret_obj.add_all_orders(orders)
+        # ret_obj.add_orders(orders)
 
         # set orders
         # print(ret_obj.orders)

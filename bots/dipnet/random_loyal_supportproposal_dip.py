@@ -8,12 +8,12 @@ sys.path.append("..")
 
 from diplomacy import Message
 
-from bots.baseline_bot import BaselineMsgRoundBot
+from bots.dipnet.dipnet_bot import DipnetBot
 from utils import parse_orr_xdo, parse_alliance_proposal, get_non_aggressive_orders, YES, \
     get_other_powers, ALY, MessagesData, OrdersData, get_order_tokens, ORR, XDO
+from tornado import gen
 
-
-class RandomLSPBot(BaselineMsgRoundBot):
+class RandomLSP_DipBot(DipnetBot):
 
     def __init__(self, power_name, game, total_msg_rounds=3, alliance_all_in=True) -> None:
         super().__init__(power_name, game, total_msg_rounds)
@@ -206,7 +206,7 @@ class RandomLSPBot(BaselineMsgRoundBot):
             for recipient in final_messages:
                 # Construct message for each support proposal
                 suggested_proposals = ORR(XDO(final_messages[recipient]))
-                comms_obj.add_message(self.power_name, recipient, str(suggested_proposals))
+                comms_obj.add_message(recipient, str(suggested_proposals))
 
     def cache_allies_influence(self):
         """Cache allies' influence"""
@@ -226,18 +226,15 @@ class RandomLSPBot(BaselineMsgRoundBot):
     #     # super().config(configg)
     #     self.alliance_all_in = configg['alliance_all_in']
 
+    @gen.coroutine
     def gen_messages(self, rcvd_messages):
         # self.possible_orders = self.game.get_all_possible_orders()
 
         # Only if it is the first comms round, do this
         if self.curr_msg_round == 1:
-            # Select set of non-support orders which are not bad moves
-            for loc in self.game.get_orderable_locations(self.power_name):
-                if self.possible_orders[loc]:
-                    subset_orders = [order for order in self.possible_orders[loc]
-                                     if not self.bad_move(order) and not self.support_move(order)]
-                    sel_order = random.choice(subset_orders)
-                    self.orders.add_order(sel_order, overwrite=True)
+            # Fetch list of orders from DipNet
+            orders = yield from self.brain.get_orders(self.game, self.power_name)
+            self.orders.add_orders(orders, overwrite=True)
 
         comms_obj = MessagesData()
 
@@ -260,19 +257,19 @@ class RandomLSPBot(BaselineMsgRoundBot):
                 self.allies = comms_rcvd['allies_proposed']
                 self.cache_allies_influence()
                 self.my_leader = comms_rcvd['alliance_proposer']
-                comms_obj.add_message(self.power_name, self.my_leader, str(YES(comms_rcvd['alliance_msg'])))
+                comms_obj.add_message(self.my_leader, str(YES(comms_rcvd['alliance_msg'])))
             # else propose alliance if not already sent
             elif not self.alliance_props_sent and self.leader_mode:
                 # Send 2-power alliance proposals to all powers
                 if not self.alliance_all_in:
                     for other_power in get_other_powers([self.power_name], self.game):
                         alliance_message = ALY([other_power, self.power_name], self.game)
-                        comms_obj.add_message(self.power_name, other_power, alliance_message)
+                        comms_obj.add_message(other_power, alliance_message)
                 # Send all-power alliance proposals to all powers
                 else:
                     alliance_message = ALY(self.game.get_map_power_names(), self.game)
                     for other_power in get_other_powers([self.power_name], self.game):
-                        comms_obj.add_message(self.power_name, other_power, alliance_message)
+                        comms_obj.add_message(other_power, alliance_message)
                 self.alliance_props_sent = True
         # If alliance is formed already, depending on leader/follower, command or be commanded
         else:
@@ -283,9 +280,10 @@ class RandomLSPBot(BaselineMsgRoundBot):
 
         # Update all received proposed orders
         self.orders.add_orders(comms_rcvd['orders_proposed'], overwrite=True)
-
+        self.curr_msg_round += 1
         return comms_obj
 
+    @gen.coroutine
     def gen_orders(self):
 
         if self.game.get_current_phase()[-1] == 'M':

@@ -43,7 +43,7 @@ class BaselineMsgRoundBot(BaselineBot, ABC):
         self.total_msg_rounds = total_msg_rounds
         self.phase_init()
         self.orders = OrdersData()
-
+    
     def gen_orders(self) -> OrdersData:
         """finalizes moves"""
         return self.orders
@@ -53,7 +53,7 @@ class BaselineMsgRoundBot(BaselineBot, ABC):
         # the current message round, which is reset after each order round
         self.curr_msg_round = 1
         # reset selected orders
-        self.selected_orders = OrdersData()
+        self.orders = OrdersData()
 
     def are_msg_rounds_done(self) -> bool:
-        return self.curr_msg_round == self.total_msg_rounds
+        return self.curr_msg_round == self.total_msg_rounds + 1

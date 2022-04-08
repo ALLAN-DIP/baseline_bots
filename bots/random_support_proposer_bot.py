@@ -74,7 +74,7 @@ class RandomSupportProposerBot(BaselineBot):
                          self.game.get_orderable_locations(self.power_name)
                          if possible_orders[loc]]
 
-        ret_obj.add_all_orders(orders)
+        ret_obj.add_orders(orders)
 
         return ret_obj
 

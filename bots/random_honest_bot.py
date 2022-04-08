@@ -24,7 +24,7 @@ class RandomHonestBot(BaselineBot):
         random_orders = [random.choice(possible_orders[loc]) for loc in self.game.get_orderable_locations(self.power_name)
                          if possible_orders[loc]]
         # set the orders
-        ret_obj.add_all_orders(random_orders)
+        ret_obj.add_orders(random_orders)
         
         # for all other powers
         for other_power in [name for name in self.game.get_map_power_names() if name != self.power_name]:

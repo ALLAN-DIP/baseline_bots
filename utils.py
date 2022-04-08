@@ -100,25 +100,25 @@ def parse_alliance_proposal(msg: str, recipient: str) -> List[str]:
     """
     Parses an alliance proposal
     E.g. (assuming the receiving country is RUSSIA)
-    "ALY (GERMANY RUSSIA) VSS (FRANCE ENGLAND ITALY TURKEY AUSTRIA)" -> [GERMANY] 
+    "ALY (GERMANY RUSSIA) VSS (FRANCE ENGLAND ITALY TURKEY AUSTRIA)" -> [GERMANY]
     :param recipient: the power which has received the alliance proposal
     :return: list of allies in the proposal
     """
     groups = re.findall(r'\(([a-zA-Z\s]*)\)', msg)
-    
+
     if len(groups) != 2:
         raise ParseError("Found more than 2 groups")
-    
+
     # get proposed allies
     allies = groups[0].split(" ")
 
     if recipient not in allies:
         raise ParseError("Recipient not in allies")
-    
+
     allies.remove(recipient)
 
     if allies:
-        return allies 
+        return allies
     else:
         raise ParseError("A minimum of 2 powers are needed for an alliance")
 
@@ -137,7 +137,7 @@ def is_order_aggressive(order: str, sender: str, game: Game) -> bool:
         for power in game.powers:
           if sender != power:
             if order_unit in game.powers[power].units:
-              return True 
+              return True
     return False
 
 def get_non_aggressive_orders(orders: List[str], sender:str, game: Game) -> List[str]:
@@ -170,7 +170,7 @@ class MessagesData:
             'recipient': recipient,
             'message': message
         })
-    
+
     def __iter__(self):
         return iter(self.messages)
 
@@ -187,7 +187,7 @@ class OrdersData:
         """
 
         province = get_province_from_order(order)
-        
+
         if overwrite:
             self.orders[province] = order
         else:
@@ -201,8 +201,8 @@ class OrdersData:
         :param overwrite: whether or not to overwrite orders
         """
         for order in orders:
-            add_order(order, overwrite)
-            
+            self.add_order(order, overwrite)
+
 
     def get_list_of_orders(self):
         return list(self.orders.values())
@@ -237,7 +237,7 @@ if __name__ == "__main__":
     )
     game.add_message(message=msg_obj2)
     msgs = [msg_obj2, msg_obj1]
-    
+
     assert sort_messages_by_most_recent(msgs)[0].message == "HELLO"
 
 # if __name__ == "__main__":
