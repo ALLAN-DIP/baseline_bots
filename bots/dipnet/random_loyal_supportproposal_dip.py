@@ -8,12 +8,12 @@ sys.path.append("..")
 
 from diplomacy import Message
 
-from bots.baseline_bot import BaselineMsgRoundBot
+from bots.dipnet.dipnet_bot import DipnetBot
 from utils import parse_orr_xdo, parse_alliance_proposal, get_non_aggressive_orders, YES, \
     get_other_powers, ALY, MessagesData, OrdersData, get_order_tokens, ORR, XDO
+from tornado import gen
 
-
-class RandomLSPBot(BaselineMsgRoundBot):
+class RandomLSP_DipBot(DipnetBot):
 
     def __init__(self, power_name, game, total_msg_rounds=3, alliance_all_in=True) -> None:
         super().__init__(power_name, game, total_msg_rounds)
@@ -226,18 +226,15 @@ class RandomLSPBot(BaselineMsgRoundBot):
     #     # super().config(configg)
     #     self.alliance_all_in = configg['alliance_all_in']
 
+    @gen.coroutine
     def gen_messages(self, rcvd_messages):
         # self.possible_orders = self.game.get_all_possible_orders()
 
         # Only if it is the first comms round, do this
         if self.curr_msg_round == 1:
-            # Select set of non-support orders which are not bad moves
-            for loc in self.game.get_orderable_locations(self.power_name):
-                if self.possible_orders[loc]:
-                    subset_orders = [order for order in self.possible_orders[loc]
-                                     if not self.bad_move(order) and not self.support_move(order)]
-                    sel_order = random.choice(subset_orders)
-                    self.orders.add_order(sel_order, overwrite=True)
+            # Fetch list of orders from DipNet
+            orders = yield from self.brain.get_orders(self.game, self.power_name)
+            self.orders.add_orders(orders, overwrite=True)
 
         comms_obj = MessagesData()
 
@@ -283,9 +280,10 @@ class RandomLSPBot(BaselineMsgRoundBot):
 
         # Update all received proposed orders
         self.orders.add_orders(comms_rcvd['orders_proposed'], overwrite=True)
-
+        self.curr_msg_round += 1
         return comms_obj
 
+    @gen.coroutine
     def gen_orders(self):
 
         if self.game.get_current_phase()[-1] == 'M':

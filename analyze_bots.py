@@ -6,7 +6,6 @@ from diplomacy import Game
 from diplomacy.utils.export import to_saved_game_format
 
 from bots.baseline_bot import BaselineMsgRoundBot
-from bots.dipnet.no_press_bot import NoPressDipBot
 from bots.random_loyal_supportproposal import RandomLSPBot
 from bots.random_no_press import RandomNoPressBot
 
@@ -46,7 +45,7 @@ if __name__ == "__main__":
 
     for bot_power, bot_type in zip(args.powers.split(","), args.types.split(",")):
         if bot_type == 'np':
-            bot = NoPressDipBot(bot_power, game)
+            bot = RandomNoPressBot(bot_power, game)
         elif bot_type.startswith('lsp'):
             bot = RandomLSPBot(bot_power, game, 3, alliance_all_in)
             if bot_type.endswith('m'):

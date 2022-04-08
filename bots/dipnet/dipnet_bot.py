@@ -20,8 +20,8 @@ from bots.baseline_bot import BaselineMsgRoundBot
 
 class DipnetBot(BaselineMsgRoundBot, ABC):
     """Abstract Base Class for dipnet derivitive bots"""
-    def __init__(self, power_name:str, game:Game) -> None:
-        super().__init__(power_name, game)
+    def __init__(self, power_name:str, game:Game, total_msg_rounds=3) -> None:
+        super().__init__(power_name, game, total_msg_rounds)
         self.brain = DipNetSLPlayer()
         
     @abstractmethod
@@ -33,4 +33,5 @@ class DipnetBot(BaselineMsgRoundBot, ABC):
         """finalizes moves"""
         if not self.orders:
             self.orders = self.player.get_orders(self.game, self.power_name)
+            print(self.orders)
         return self.orders

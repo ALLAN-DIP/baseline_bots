@@ -7,10 +7,13 @@ from diplomacy.utils.export import to_saved_game_format
 
 from bots.baseline_bot import BaselineMsgRoundBot
 from bots.dipnet.no_press_bot import NoPressDipBot
+from bots.dipnet.random_loyal_supportproposal_dip import RandomLSP_DipBot
 from bots.random_loyal_supportproposal import RandomLSPBot
 from bots.random_no_press import RandomNoPressBot
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from tornado import gen
+import asyncio
+import sys
 
 sys.path.append("..")
 sys.path.append("../dipnet_press")
@@ -18,7 +21,7 @@ sys.path.append("../dipnet_press")
 def parse_args():
     parser = argparse.ArgumentParser(description='Analysis-Dip')
     parser.add_argument('--powers', '-p', type=str, default='AUSTRIA,ITALY,ENGLAND,FRANCE,GERMANY,RUSSIA,TURKEY', help='comma-seperated country names (AUSTRIA,ITALY,ENGLAND,FRANCE,GERMANY,RUSSIA,TURKEY)')
-    parser.add_argument('--filename', '-f', type=str, default='RandomLSPBotGame.json',
+    parser.add_argument('--filename', '-f', type=str, default='DipNetBotGame.json',
                         help='json filename')
     parser.add_argument('--types', '-t', type=str, default='lspm,lsp,np,np,np,np,np',
                         help='comma-seperated bottypes (lspm,lsp,np,np,np,np,np)')
@@ -35,12 +38,11 @@ def bot_loop():
         if bot_type == 'np':
             bot = NoPressDipBot(bot_power, game)
         elif bot_type.startswith('lsp'):
-            bot = RandomLSPBot(bot_power, game, 3, alliance_all_in)
+            bot = RandomLSP_DipBot(bot_power, game, 3, alliance_all_in)
             if bot_type.endswith('m'):
                 bot.set_leader()
         # bot.config(config)
         bots.append(bot)
-
     start = time()
 
     while not game.is_game_done:
@@ -60,7 +62,7 @@ def bot_loop():
                     rcvd_messages.sort()
 
                     # Send messages to bots and fetch messages from bot
-                    bot_messages = bot.gen_messages(rcvd_messages)
+                    bot_messages = yield bot.gen_messages(rcvd_messages)
 
                     # If messages are to be sent, send them
                     if bot_messages and bot_messages.messages:
@@ -78,14 +80,13 @@ def bot_loop():
 
         for bot in bots:
             # Orders round
-            orders = bot.gen_orders()
+            orders = yield bot.gen_orders()
             # messages, orders = bot_state.messages, bot_state.orders
 
             if orders is not None:
                 game.set_orders(power_name=bot.power_name, orders=orders)
 
         game.process()
-
 
     print(time() - start)
     to_saved_game_format(game, output_path=args.filename)
@@ -111,5 +112,5 @@ if __name__ == "__main__":
         'comms_rounds': comms_rounds,
         'alliance_all_in': alliance_all_in
     }
-
+    start_io_loop(bot_loop)
 
