@@ -5,7 +5,7 @@ __email__ = "sanderschulhoff@gmail.com"
 
 import sys
 sys.path.append("..")
-sys.path.append("../..")
+sys.path.append("../dipnet_press")
 from abc import ABC, abstractmethod
 from typing import List
 import random
