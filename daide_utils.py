@@ -176,8 +176,9 @@ class CommsData:
     def __init__(self):
         self.messages = []
 
-    def add_message(self, recipient: str, message: str):
+    def add_message(self, sender: str, recipient: str, message: str):
         self.messages.append({
+            'sender': sender,
             'recipient': recipient,
             'message': message
         })
@@ -202,6 +203,7 @@ class OrdersData:
                     print(f"Not adding {order} since one with this start location is already added")
             except IndexError:
                 self.orders[order_tokens[0]] = order
+
     def update_orders(self, orders):
         for order in orders:
             try:

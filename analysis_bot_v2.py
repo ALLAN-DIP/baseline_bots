@@ -80,7 +80,7 @@ if __name__ == "__main__":
                 # Send all messages after all bots decide on comms
                 for msg in to_send_msgs:
                     msg_obj = Message(
-                        sender=bot.power_name,
+                        sender=msg['sender'],
                         recipient=msg['recipient'],
                         message=msg['message'],
                         phase=game.get_current_phase(),

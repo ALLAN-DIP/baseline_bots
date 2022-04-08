@@ -170,7 +170,7 @@ class RandomLSPBot(BaselineBot):
 
             for recipient in final_messages:
                 suggested_proposals = ORR(XDO(final_messages[recipient]))
-                comms_obj.add_message(recipient, str(suggested_proposals))
+                comms_obj.add_message(self.power_name, recipient, str(suggested_proposals))
 
     def cache_allies_influence(self):
         self.allies_influence = set()
@@ -194,7 +194,11 @@ class RandomLSPBot(BaselineBot):
                 if self.possible_orders[loc]:
                     subset_orders = [order for order in self.possible_orders[loc]
                                      if not self.bad_move(order) and not self.support_move(order)]
-                    self.selected_orders.add_order(random.choice(subset_orders))
+                    sel_order = random.choice(subset_orders)
+                    self.selected_orders.add_order(sel_order)
+                    if " C " in sel_order:
+                        
+
         comms_obj = CommsData()
 
         if self.comms_rounds_completed():
@@ -215,19 +219,19 @@ class RandomLSPBot(BaselineBot):
                 self.allies = comms_rcvd['allies_proposed']
                 self.cache_allies_influence()
                 self.my_leader = comms_rcvd['alliance_proposer']
-                comms_obj.add_message(self.my_leader, str(YES(comms_rcvd['alliance_msg'])))
+                comms_obj.add_message(self.power_name, self.my_leader, str(YES(comms_rcvd['alliance_msg'])))
             # else propose alliance if not already sent
             elif not self.alliance_props_sent and self.leader_mode:
                 # Send 2-power alliance proposals to all powers
                 if not self.alliance_all_in:
                     for other_power in get_other_powers([self.power_name], self.game):
                         alliance_message = ALY([other_power, self.power_name], self.game)
-                        comms_obj.add_message(other_power, alliance_message)
+                        comms_obj.add_message(self.power_name, other_power, alliance_message)
                 # Send all-power alliance proposals to all powers
                 else:
                     alliance_message = ALY(self.game.get_map_power_names(), self.game)
                     for other_power in get_other_powers([self.power_name], self.game):
-                        comms_obj.add_message(other_power, alliance_message)
+                        comms_obj.add_message(self.power_name, other_power, alliance_message)
                 self.alliance_props_sent = True
         # If alliance is formed already, depending on leader/follower, command or be commanded
         else:
