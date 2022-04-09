@@ -1,0 +1,15 @@
+#!/bin/bash
+#SBATCH -J myjob           # Job name
+#SBATCH -o myjob.o%j       # Name of stdout output file
+#SBATCH -e myjob.e%j       # Name of stderr error file
+#SBATCH -p rtx           # Queue (partition) name
+#SBATCH -N 1               # Total # of nodes (must be 1 for serial)
+#SBATCH -n 2
+#SBATCH -t 15:00:00        # Run time (hh:mm:ss)
+#SBATCH --mail-type=all    # Send email at begin and end of job
+#SBATCH --mail-user=kshenoy@usc.edu
+
+module load tacc-singularity
+export WORKING_DIR=$WORK2/dipnet_press/WORKING_DIR/
+
+python analysis_script.py

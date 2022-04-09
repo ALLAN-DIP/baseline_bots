@@ -56,7 +56,7 @@ def bot_loop():
             # Iterate through multiple rounds of comms during movement phases
             for _ in range(comms_rounds):
                 round_msgs = game.messages
-                to_send_msgs = []
+                to_send_msgs = {}
                 for bot in bots:
                     # Retrieve messages
                     rcvd_messages = game.filter_messages(messages=round_msgs, game_role=bot.power_name)
@@ -68,17 +68,18 @@ def bot_loop():
 
                     # If messages are to be sent, send them
                     if bot_messages and bot_messages.messages:
-                        to_send_msgs += bot_messages.messages
+                        to_send_msgs[bot.power_name] = bot_messages.messages
 
                 # Send all messages after all bots decide on comms
-                for msg in to_send_msgs:
-                    msg_obj = Message(
-                        sender=msg['sender'],
-                        recipient=msg['recipient'],
-                        message=msg['message'],
-                        phase=game.get_current_phase(),
-                    )
-                    game.add_message(message=msg_obj)
+                for sender in to_send_msgs:
+                    for msg in to_send_msgs[sender]:
+                        msg_obj = Message(
+                            sender=sender,
+                            recipient=msg['recipient'],
+                            message=msg['message'],
+                            phase=game.get_current_phase(),
+                        )
+                        game.add_message(message=msg_obj)
 
         for bot in bots:
             # Orders round

@@ -80,14 +80,15 @@ if __name__ == "__main__":
                         to_send_msgs[bot.power_name] = bot_messages.messages
 
                 # Send all messages after all bots decide on comms
-                for sender, msg in to_send_msgs.items():
-                    msg_obj = Message(
-                        sender=sender,
-                        recipient=msg['recipient'],
-                        message=msg['message'],
-                        phase=game.get_current_phase(),
-                    )
-                    game.add_message(message=msg_obj)
+                for sender in to_send_msgs:
+                    for msg in to_send_msgs[sender]:
+                        msg_obj = Message(
+                            sender=sender,
+                            recipient=msg['recipient'],
+                            message=msg['message'],
+                            phase=game.get_current_phase(),
+                        )
+                        game.add_message(message=msg_obj)
 
         for bot in bots:
             # Orders round
