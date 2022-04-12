@@ -3,3 +3,4 @@ __pycache__
 ./Analysis/GameAnalysisFiles/*
 ./GameAnalysisFiles/*
 launch.json
+myjob.*

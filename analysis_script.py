@@ -6,12 +6,12 @@ from tqdm import tqdm
 from datetime import datetime
 
 today = datetime.today()
-# suffix = today.strftime("%Y_%m_%d-%H:%M:%S")
-suffix = '2022_04_08-20:34:01'
+suffix = today.strftime("%Y_%m_%d-%H:%M:%S")
+# suffix = '2022_04_08-20:34:01'
 
 parent_analysis = []
 
-def execute_scenario(pows, types, file, runname, parent_analysis, bypass_exec=False, game_play_count = 100, del_file=True):
+def execute_scenario(pows, types, file, runname, parent_analysis, bypass_exec=False, game_play_count = 30, del_file=True):
     file = "GameAnalysisFiles/" + file
     if not bypass_exec:
         if del_file:
@@ -67,21 +67,21 @@ pows = 'ENGLAND,AUSTRIA,ITALY,FRANCE,GERMANY,RUSSIA,TURKEY'
 types = 'np,lspm,lsp,np,np,np,np'
 runname = 'All_dip_Aus_Ita'
 file = runname + "_" + suffix + ".json"
-execute_scenario(pows, types, file, runname, parent_analysis, False, 21, False)
+execute_scenario(pows, types, file, runname, parent_analysis, True)
 
-# Eng Leader, France Follower All Dipnets
+# # Eng Leader, France Follower All Dipnets
 pows = 'ENGLAND,AUSTRIA,ITALY,FRANCE,GERMANY,RUSSIA,TURKEY'
 types = 'lspm,np,np,lsp,np,np,np'
 runname = 'All_dip_Eng_Fra'
 file = runname + "_" + suffix + ".json"
-execute_scenario(pows, types, file, runname, parent_analysis)
+execute_scenario(pows, types, file, runname, parent_analysis, True)
 
-# France Leader, Eng Follower All Dipnets
+# # France Leader, Eng Follower All Dipnets
 pows = 'ENGLAND,AUSTRIA,ITALY,FRANCE,GERMANY,RUSSIA,TURKEY'
 types = 'lsp,np,np,lspm,np,np,np'
 runname = 'All_dip_Fra_Eng'
 file = runname + "_" + suffix + ".json"
-execute_scenario(pows, types, file, runname, parent_analysis)
+execute_scenario(pows, types, file, runname, parent_analysis, True)
 
 # Aus Dipnet, All others random
 pows = 'ENGLAND,AUSTRIA,ITALY,FRANCE,GERMANY,RUSSIA,TURKEY'
