@@ -78,6 +78,19 @@ def YES(string) -> str:
     """Forms YES message"""
     return f"YES ({string})"
 
+def FCT(string) -> str:
+    """Forms FCT message"""
+    return f"FCT ({string})"
+
+def parse_FCT(msg) -> str:
+    """Detaches FCT from main arrangement"""
+    if "FCT" not in msg:
+        raise ParseError("This is not an FCT message")
+    try:
+        return msg[5:-1]
+    except Exception:
+        raise ParseError(f"Cant parse ORR XDO msg {msg}")
+
 def parse_orr_xdo(msg: str) -> List[str]:
     """
     Attempts to parse a specific message configuration

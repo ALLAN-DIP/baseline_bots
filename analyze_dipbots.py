@@ -8,8 +8,9 @@ from diplomacy.utils.export import to_saved_game_format
 from bots.baseline_bot import BaselineMsgRoundBot
 from bots.dipnet.no_press_bot import NoPressDipBot
 from bots.dipnet.random_loyal_supportproposal_dip import RandomLSP_DipBot
+from bots.dipnet.transparent_bot import TransparentBot
 from bots.random_loyal_supportproposal import RandomLSPBot
-from bots.random_no_press import RandomNoPressBot
+from bots.random_no_press import RandomNoPress_AsyncBot
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from tornado import gen
 import asyncio
@@ -23,7 +24,7 @@ def parse_args():
     parser.add_argument('--powers', '-p', type=str, default='AUSTRIA,ITALY,ENGLAND,FRANCE,GERMANY,RUSSIA,TURKEY', help='comma-seperated country names (AUSTRIA,ITALY,ENGLAND,FRANCE,GERMANY,RUSSIA,TURKEY)')
     parser.add_argument('--filename', '-f', type=str, default='DipNetBotGame.json',
                         help='json filename')
-    parser.add_argument('--types', '-t', type=str, default='lspm,lsp,np,np,np,np,np',
+    parser.add_argument('--types', '-t', type=str, default='tbt,tbt,tbt,tbt,tbt,tbt,tbt',
                         help='comma-seperated bottypes (lspm,lsp,np,np,np,np,np)')
 
     args = parser.parse_args()
@@ -38,11 +39,13 @@ def bot_loop():
         if bot_type == 'np':
             bot = NoPressDipBot(bot_power, game)
         elif bot_type == 'rnp':
-            bot = RandomNoPressBot(bot_power, game)
+            bot = RandomNoPress_AsyncBot(bot_power, game)
         elif bot_type.startswith('lsp'):
             bot = RandomLSP_DipBot(bot_power, game, 3, alliance_all_in)
             if bot_type.endswith('m'):
                 bot.set_leader()
+        elif bot_type == 'tbt':
+            bot = TransparentBot(bot_power, game, 3)
         # bot.config(config)
         bots.append(bot)
     start = time()
@@ -51,12 +54,12 @@ def bot_loop():
         for bot in bots:
             if isinstance(bot, BaselineMsgRoundBot):
                 bot.phase_init()
-
+        print(game.get_current_phase())
         if game.get_current_phase()[-1] == 'M':
             # Iterate through multiple rounds of comms during movement phases
             for _ in range(comms_rounds):
                 round_msgs = game.messages
-                to_send_msgs = []
+                to_send_msgs = {}
                 for bot in bots:
                     # Retrieve messages
                     rcvd_messages = game.filter_messages(messages=round_msgs, game_role=bot.power_name)
@@ -68,17 +71,19 @@ def bot_loop():
 
                     # If messages are to be sent, send them
                     if bot_messages and bot_messages.messages:
-                        to_send_msgs += bot_messages.messages
+                        to_send_msgs[bot.power_name] = bot_messages.messages
 
                 # Send all messages after all bots decide on comms
-                for msg in to_send_msgs:
-                    msg_obj = Message(
-                        sender=msg['sender'],
-                        recipient=msg['recipient'],
-                        message=msg['message'],
-                        phase=game.get_current_phase(),
-                    )
-                    game.add_message(message=msg_obj)
+                for sender in to_send_msgs:
+                    for msg in to_send_msgs[sender]:
+                        msg_obj = Message(
+                            sender=sender,
+                            recipient=msg['recipient'],
+                            message=msg['message'],
+                            phase=game.get_current_phase(),
+                        )
+                        game.add_message(message=msg_obj)
+        
 
         for bot in bots:
             # Orders round

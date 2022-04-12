@@ -1,3 +1,6 @@
 __pycache__
 *Game.json
 ./Analysis/GameAnalysisFiles/*
+./GameAnalysisFiles/*
+launch.json
+myjob.*

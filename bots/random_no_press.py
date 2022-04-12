@@ -10,7 +10,7 @@ from diplomacy import Message
 
 from bots.baseline_bot import BaselineBot
 from utils import get_other_powers, OrdersData
-
+from tornado import gen
 
 class RandomNoPressBot(BaselineBot):
     """
@@ -35,6 +35,16 @@ class RandomNoPressBot(BaselineBot):
         self.orders.add_orders(orders)
 
         return self.orders.get_list_of_orders()
+
+class RandomNoPress_AsyncBot(RandomNoPressBot):
+    """Wrapper to RandomNoPressBot with tornado decorators for async calls"""
+    @gen.coroutine
+    def gen_messages(self, rcvd_messages):
+        return super().gen_messages(rcvd_messages)
+
+    @gen.coroutine
+    def gen_orders(self):
+        return super().gen_orders()
 
 
 if __name__ == "__main__":
