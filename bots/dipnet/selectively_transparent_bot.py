@@ -1,4 +1,4 @@
-__author__ = "Sander Schulhoff"
+__authors__ = ["Sander Schulhoff"]
 __email__ = "sanderschulhoff@gmail.com"
 
 import random
@@ -6,18 +6,20 @@ import sys
 sys.path.append("..")
 sys.path.append("../..")
 
-from utils import get_order_tokens
-from baseline_bot import BaselineBot
+from baseline_bots.utils import MessagesData, parse_orr_xdo, parse_FCT, ORR, XDO, FCT, get_other_powers
+from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
+from collections import defaultdict
+from tornado import gen
 
-class SelectivelyTransparent(BaselineBot):
+class SelectivelyTransparentBot(TransparentBot):
     """
     Execute orders computed by dipnet
-    Send out some of them randomly
+    Sends out non-aggressive actions 
     """
 
-    def gen_orders(self):
-        """query dipnet for orders"""
-        pass
+    @gen.coroutine
+    def gen_messages(self, rcvd_messages):
+        messages = super().gen_messages(rcvd_messages)
 
-    def gen_messages(self, _):
-        return None
+if __name__ == "__main__":
+    import sys

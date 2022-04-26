@@ -42,6 +42,9 @@ class RandomAllierProposerBot(random_proposer_bot.RandomProposerBot):
     def gen_orders(self):
         return None
 
+    def __call__(self, rcvd_messages=None):
+        self.messages = self.gen_messages(rcvd_messages)
+
 if __name__ == "__main__":
     from diplomacy import Game
     from diplomacy.utils.export import to_saved_game_format

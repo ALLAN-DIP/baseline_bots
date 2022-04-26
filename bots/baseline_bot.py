@@ -10,7 +10,7 @@ from typing import List
 
 from diplomacy import Game, Message
 
-from utils import OrdersData, MessagesData, get_order_tokens
+from baseline_bots.utils import OrdersData, MessagesData, get_order_tokens
 
 class BaselineBot(ABC):
     """Abstract Base Class for baselines bots"""

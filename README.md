@@ -30,3 +30,16 @@ The bot parent-child relationships are as follow:
     * random_honest_order_accepter_bot - randomly accepts proposed orders and messages the proposers whose moves it accepted (Joy #4)
 
     * random_honest_bot - executes random orders and messages all other bots the orders it executed 
+
+
+### 
+
+```python
+
+idev -m 60
+export WORKING_DIR=~/dipnet_press/WORKING_DIR/
+module load tacc-singularity
+# add path to diplomacy_research to PYTHONPATH
+export PYTHONPATH=$PYTHONPATH:/home1/08764/trigaten/research/diplomacy_research
+
+```
