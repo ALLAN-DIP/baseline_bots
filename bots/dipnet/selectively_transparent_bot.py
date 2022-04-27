@@ -1,4 +1,4 @@
-__author__ = "Sander Schulhoff"
+__authors__ = ["Sander Schulhoff"]
 __email__ = "sanderschulhoff@gmail.com"
 
 import random
@@ -6,18 +6,43 @@ import sys
 sys.path.append("..")
 sys.path.append("../..")
 
-from utils import get_order_tokens
-from baseline_bot import BaselineBot
+from baseline_bots.utils import MessagesData, parse_orr_xdo, parse_FCT, ORR, XDO, FCT, get_other_powers, is_order_aggressive
+from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
+from collections import defaultdict
+from DAIDE import config
+config.ORDERS_DAIDE = False
+from DAIDE import parse, FCT, ORR, XDO, Order
+from tornado import gen
 
-class SelectivelyTransparent(BaselineBot):
+class SelectivelyTransparentBot(TransparentBot):
     """
     Execute orders computed by dipnet
-    Send out some of them randomly
+    Sends out non-aggressive actions 
     """
+    def __init__(self, power_name, game, total_msg_rounds=3):
+        super().__init__(power_name, game, total_msg_rounds)
 
-    def gen_orders(self):
-        """query dipnet for orders"""
-        pass
+    @gen.coroutine
+    def gen_messages(self, rcvd_messages):
+        """send out non-aggressive orders that is bot is taking"""
+        messages = yield super().gen_messages(rcvd_messages)
+        for message in messages:
+            parsed_message = parse(message["message"])
+            if type(parsed_message) == FCT:
+                arrangement = parsed_message.arrangement
+                if type(arrangement) == ORR:
+                    xdo_arrangements = arrangement.arrangements 
+                    peaceful_orders = []
+                    for xdo_arrangement in xdo_arrangements:
+                        if type(xdo_arrangement) == XDO and type(xdo_arrangement.arrangement) == Order:
+                            if not is_order_aggressive(str(xdo_arrangement.arrangement), self.power_name, self.game):
+                                peaceful_orders.append(xdo_arrangement.arrangement)
 
-    def gen_messages(self, _):
-        return None
+                    # reconstruct message
+                    xdo_arrangements = [XDO(order) for order in peaceful_orders]
+                    orr_arrangement = ORR(xdo_arrangements)
+                    fct_arrangement = FCT(orr_arrangement)
+                    message["message"] = str(fct_arrangement)
+
+        return messages
+

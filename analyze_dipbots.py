@@ -9,6 +9,7 @@ from bots.baseline_bot import BaselineMsgRoundBot
 from bots.dipnet.no_press_bot import NoPressDipBot
 from bots.dipnet.random_loyal_supportproposal_dip import RandomLSP_DipBot
 from bots.dipnet.transparent_bot import TransparentBot
+from bots.dipnet.selectively_transparent_bot import SelectivelyTransparentBot
 from bots.random_loyal_supportproposal import RandomLSPBot
 from bots.random_no_press import RandomNoPress_AsyncBot
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
@@ -25,7 +26,7 @@ def parse_args():
     parser.add_argument('--filename', '-f', type=str, default='DipNetBotGame.json',
                         help='json filename')
     parser.add_argument('--types', '-t', type=str, default='tbt,tbt,tbt,tbt,tbt,tbt,tbt',
-                        help='comma-seperated bottypes (lspm,lsp,np,np,np,np,np)')
+                        help='comma-separated bottypes (lspm,lsp,np,np,np,np,np)')
 
     args = parser.parse_args()
     print(args)
@@ -46,7 +47,9 @@ def bot_loop():
                 bot.set_leader()
         elif bot_type == 'tbt':
             bot = TransparentBot(bot_power, game, 3)
-        # bot.config(config)
+        elif bot_type == "stbt":
+            bot = SelectivelyTransparentBot(bot_power, game, 3)
+        
         bots.append(bot)
     start = time()
 
@@ -54,7 +57,7 @@ def bot_loop():
         for bot in bots:
             if isinstance(bot, BaselineMsgRoundBot):
                 bot.phase_init()
-        print(game.get_current_phase())
+        # print(game.get_current_phase())
         if game.get_current_phase()[-1] == 'M':
             # Iterate through multiple rounds of comms during movement phases
             for _ in range(comms_rounds):

@@ -6,6 +6,7 @@ from bots.baseline_bot import BaselineBot
 
 from bots.random_proposer_bot import RandomProposerBot
 
+
 from bots.loyal_bot import LoyalBot
 
 game_play = GamePlay(None, [RandomProposerBot, RandomProposerBot], 3)
