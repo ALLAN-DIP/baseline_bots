@@ -32,14 +32,17 @@ The bot parent-child relationships are as follow:
     * random_honest_bot - executes random orders and messages all other bots the orders it executed 
 
 
-### 
+### Using diplomacy_research
 
 ```python
 
 idev -m 60
 export WORKING_DIR=~/dipnet_press/WORKING_DIR/
 module load tacc-singularity
+# activate conda environment
+conda activate diplomacy
 # add path to diplomacy_research to PYTHONPATH
 export PYTHONPATH=$PYTHONPATH:/home1/08764/trigaten/research/diplomacy_research
+
 
 ```
