@@ -28,6 +28,12 @@ class BaselineBot(ABC):
         """finalizes moves"""
         raise NotImplementedError()
 
+    def __call__(self, rcvd_messages):
+        messages = self.gen_messages(rcvd_messages)
+        orders = self.gen_orders()
+        self.orders = orders
+        return {"messages":messages, "orders":orders}
+
 class BaselineMsgRoundBot(BaselineBot, ABC):
     """
     Abstract Base Class for bots which execute
@@ -42,7 +48,6 @@ class BaselineMsgRoundBot(BaselineBot, ABC):
         super().__init__(power_name, game)
         self.total_msg_rounds = total_msg_rounds
         self.phase_init()
-        self.orders = OrdersData()
     
     def gen_orders(self) -> OrdersData:
         """finalizes moves"""
