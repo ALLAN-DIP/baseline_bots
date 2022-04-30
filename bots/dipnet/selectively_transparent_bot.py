@@ -25,6 +25,7 @@ class SelectivelyTransparentBot(TransparentBot):
     @gen.coroutine
     def gen_messages(self, rcvd_messages):
         """send out non-aggressive orders that is bot is taking"""
+        # call super then find non-aggressive orders
         messages = yield super().gen_messages(rcvd_messages)
         for message in messages:
             parsed_message = parse(message["message"])

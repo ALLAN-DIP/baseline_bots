@@ -38,6 +38,9 @@ class RandomProposerBot(baseline_bot.BaselineBot):
 
     def gen_orders(self):
         return None
+
+    def __call__(self, rcvd_messages):
+        return super().__call__(rcvd_messages)
         
 if __name__ == "__main__":
     from diplomacy import Game
