@@ -7,7 +7,7 @@ sys.path.append("..")
 from diplomacy import Message
 from DAIDE import ParseError
 from DAIDE.utils.exceptions import ParseError
-from DAIDE import YES, ALY
+from DAIDE import YES, ALY, ORR, XDO
 
 from utils import parse_orr_xdo, get_non_aggressive_orders, MessagesData, OrdersData, sort_messages_by_most_recent
 import bots.baseline_bot as baseline_bot
@@ -58,65 +58,5 @@ class LoyalBot(baseline_bot.BaselineBot):
 
         return ret_obj
 
-
     def gen_orders(self):
         return self.orders
-
-# if __name__ == "__main__":
-#     import sys 
-#     sys.path.append()
-#     from diplomacy import Game
-#     from diplomacy.utils.export import to_saved_game_format
-#     # game instance
-#     game = Game()
-#     powers = list(game.get_map_power_names())
-#     # select the first name in the list of powers
-#     bot_power = powers[0]
-#     # instantiate proposed random honest bot
-#     bot = LoyalBot(bot_power, game)
-#     # print(bot_power)
-#     proposer_1 = RandomAllierProposerBot(powers[1], game)
-#     proposer_2 = RandomAllierProposerBot(powers[2], game)
-
-#     bots = [proposer_1, proposer_2, bot]
-    
-#     while not game.is_game_done:
-#         # proposer_1.act()
-#         # proposer_2.act()
-#         # bot.act()
-
-#         for bot in bots:
-#             bot_state = bot.act()
-#             messages, orders = bot_state.messages, bot_state.orders
-#             if messages:
-#                 # print(bot.power_name, messages)
-#                 for msg in messages:
-#                     msg_obj = Message(
-#                         sender=bot.power_name,
-#                         recipient=msg['recipient'],
-#                         message=msg['message'],
-#                         phase=game.get_current_phase(),
-#                     )
-#                     game.add_message(message=msg_obj)
-#             # print("Submitted orders")
-#             if orders is not None:
-#                 game.set_orders(power_name=bot.power_name, orders=orders)
-
-#             break
-        
-        # p1_messages = list(game.filter_messages(messages = game.messages, game_role=proposer_1.power_name).values())
-        # p1m = next(msg for msg in p1_messages if msg.recipient == bot_power)
-        # p2_messages = list(game.filter_messages(messages = game.messages, game_role=proposer_2.power_name).values())
-        # p2m = next(msg for msg in p2_messages if msg.recipient == bot_power)
-        # bot_messages = list(game.filter_messages(messages = game.messages, game_role=bot.power_name).values())
-        # bot_m = bot_messages[0]
-        # print("Proposer_1 message to bot\n", p1m.message)
-        # print("Proposer_2 message to bot\n", p2m.message)
-        # print("Bot message\n", bot_m.sender)
-        # print("---------------------")
-        # exit()
-    #     game.process()
-        
-
-
-    # to_saved_game_format(game, output_path='LoyalBotGame.json')

@@ -44,47 +44,4 @@ class PushoverBot(baseline_bot.BaselineBot):
 
         self.orders = ret_obj
 
-        return {"orders":ret_obj}
-
-# if __name__ == "__main__":
-#     from diplomacy import Game
-#     from diplomacy.utils.export import to_saved_game_format
-#     from random_proposer_bot import RandomProposerBot
-#     # game instance
-#     game = Game()
-#     powers = list(game.get_map_power_names())
-#     # select the first name in the list of powers
-#     bot_power = powers[0]
-#     # instantiate proposed random honest bot
-#     bot = PushoverBot(bot_power, game)
-#     proposer_1 = RandomProposerBot(powers[1], game)
-#     proposer_2 = RandomProposerBot(powers[2], game)
-
-#     bots = [proposer_1, proposer_2, bot]
-
-#     while not game.is_game_done:
-#         # proposer_1.act()
-#         # proposer_2.act()
-#         # bot.act()
-
-#         for bot in bots:
-#             bot_state = bot.act()
-#             messages, orders = bot_state.messages, bot_state.orders
-#             if messages:
-#                 # print(power_name, messages)
-#                 for msg in messages:
-#                     msg_obj = Message(
-#                         sender=bot.power_name,
-#                         recipient=msg['recipient'],
-#                         message=msg['message'],
-#                         phase=game.get_current_phase(),
-#                     )
-#                     game.add_message(message=msg_obj)
-#             # print("Submitted orders")
-#             if orders is not None:
-#                 game.set_orders(power_name=bot.power_name, orders=orders)
-
-#         game.process()
-
-
-#     to_saved_game_format(game, output_path='PushoverBotGame.json')
+        return {"orders": ret_obj}

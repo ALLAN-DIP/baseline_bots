@@ -5,8 +5,10 @@ import sys
 sys.path.append("..")
 
 from diplomacy import Message
+from DAIDE import ALY, PRP
+
 from . import random_proposer_bot
-from utils import ALY, get_other_powers, MessagesData, OrdersData
+from utils import get_other_powers, MessagesData, OrdersData
 
 class RandomAllierProposerBot(random_proposer_bot.RandomProposerBot):
     """
@@ -29,10 +31,11 @@ class RandomAllierProposerBot(random_proposer_bot.RandomProposerBot):
 
             # for all other powers
             for other_power in get_other_powers([self.power_name], self.game):
+                allies = [other_power, self.power_name]
                 # encode alliance message in daide syntax
-                alliance_message = ALY([other_power, self.power_name], self.game)
+                alliance_message = ALY(allies, get_other_powers(allies, self.game))
                 # send the other power an ally request
-                ret_msgs.add_message(other_power, alliance_message)
+                ret_msgs.add_message(other_power, str(PRP(alliance_message)))
 
             # dont sent alliance props again
             self.alliance_props_sent = True
@@ -44,4 +47,4 @@ class RandomAllierProposerBot(random_proposer_bot.RandomProposerBot):
 
     def __call__(self, rcvd_messages):
         messages = self.gen_messages(rcvd_messages)
-        return {"messages":messages}
+        return {"messages": messages}
