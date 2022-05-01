@@ -9,8 +9,6 @@ from DAIDE import ORR, XDO, YES
 from bots.baseline_bot import BaselineMsgRoundBot
 from utils import parse_orr_xdo, get_non_aggressive_orders, OrdersData, MessagesData
 
-
-#TODO: Upgrade to new design layout
 class RandomHonestOrderAccepterBot(BaselineMsgRoundBot):
     """
     This bot reads proposed order messages from other powers.
@@ -79,7 +77,6 @@ class RandomHonestOrderAccepterBot(BaselineMsgRoundBot):
             
             
             # encode orders taken with daide syntax
-            print(orders_taken)
             msg = YES(ORR([XDO(order) for order in orders_taken]))
 
             messages_data.add_message(other_power, str(msg))

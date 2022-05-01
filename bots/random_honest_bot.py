@@ -1,10 +1,12 @@
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
-from diplomacy import Message
-from bots.baseline_bot import BaselineMsgRoundBot
 import random
 
+from diplomacy import Message
+from DAIDE import FCT
+
+from bots.baseline_bot import BaselineMsgRoundBot
 from utils import MessagesData, OrdersData
 
 class RandomHonestBot(BaselineMsgRoundBot):
@@ -22,7 +24,7 @@ class RandomHonestBot(BaselineMsgRoundBot):
         # for all other powers
         for other_power in [name for name in self.game.get_map_power_names() if name != self.power_name]:
             # send the other power a message containing the orders
-            ret_obj.add_message(other_power, str(self.orders))
+            ret_obj.add_message(other_power, str(FCT(self.orders)))
 
         return ret_obj
 

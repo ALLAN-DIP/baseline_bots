@@ -1,10 +1,13 @@
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
+import random
+
 from diplomacy import Message
 from baseline_bot import BaselineBot
-import random
-from utils import parse_orr_xdo, ORR, XDO, YES, get_non_aggressive_orders, get_other_powers, BotReturnData
+from DAIDE ORR, XDO, YES
+
+from utils import parse_orr_xdo, get_non_aggressive_orders, get_other_powers, BotReturnData
 
 
 # TODO: Upgrade to new design layout
