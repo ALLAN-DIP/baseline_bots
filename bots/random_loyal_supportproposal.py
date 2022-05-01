@@ -1,16 +1,17 @@
 __author__ = "Kartik Shenoy"
 __email__ = "kartik.shenoyy@gmail.com"
 
-import random
-from collections import defaultdict
 import sys
 sys.path.append("..")
+import random
+from collections import defaultdict
 
 from diplomacy import Message
+from DAIDE import YES, ALY, ORR, XDO
 
 from bots.baseline_bot import BaselineMsgRoundBot
-from utils import parse_orr_xdo, parse_alliance_proposal, get_non_aggressive_orders, YES, \
-    get_other_powers, ALY, MessagesData, OrdersData, get_order_tokens, ORR, XDO
+from utils import parse_orr_xdo, parse_alliance_proposal, get_non_aggressive_orders, \
+    get_other_powers, MessagesData, OrdersData, get_order_tokens
 
 
 class RandomLSPBot(BaselineMsgRoundBot):
@@ -318,7 +319,6 @@ if __name__ == "__main__":
             bot_state = bot.act()
             messages, orders = bot_state.messages, bot_state.orders
             if messages:
-                # print(power_name, messages)
                 for msg in messages:
                     msg_obj = Message(
                         sender=bot.power_name,
@@ -327,7 +327,6 @@ if __name__ == "__main__":
                         phase=game.get_current_phase(),
                     )
                     game.add_message(message=msg_obj)
-            # print("Submitted orders")
             if orders is not None:
                 game.set_orders(power_name=bot.power_name, orders=orders)
         game.process()
