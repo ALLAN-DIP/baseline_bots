@@ -58,8 +58,9 @@ if __name__ == "__main__":
 
     while not game.is_game_done:
         for bot in bots:
-            if isinstance(bot, BaselineMsgRoundBot):
-                bot.phase_init()
+            if not game.powers[bot.power_name].is_eliminated():
+                if isinstance(bot, BaselineMsgRoundBot):
+                    bot.phase_init()
 
         if game.get_current_phase()[-1] == 'M':
             # Iterate through multiple rounds of comms during movement phases
@@ -67,17 +68,18 @@ if __name__ == "__main__":
                 round_msgs = game.messages
                 to_send_msgs = {}
                 for bot in bots:
-                    # Retrieve messages
-                    rcvd_messages = game.filter_messages(messages=round_msgs, game_role=bot.power_name)
-                    rcvd_messages = list(rcvd_messages.items())
-                    rcvd_messages.sort()
+                    if not game.powers[bot.power_name].is_eliminated():
+                        # Retrieve messages
+                        rcvd_messages = game.filter_messages(messages=round_msgs, game_role=bot.power_name)
+                        rcvd_messages = list(rcvd_messages.items())
+                        rcvd_messages.sort()
 
-                    # Send messages to bots and fetch messages from bot
-                    bot_messages = bot.gen_messages(rcvd_messages)
+                        # Send messages to bots and fetch messages from bot
+                        bot_messages = bot.gen_messages(rcvd_messages)
 
-                    # If messages are to be sent, send them
-                    if bot_messages and bot_messages.messages:
-                        to_send_msgs[bot.power_name] = bot_messages.messages
+                        # If messages are to be sent, send them
+                        if bot_messages and bot_messages.messages:
+                            to_send_msgs[bot.power_name] = bot_messages.messages
 
                 # Send all messages after all bots decide on comms
                 for sender in to_send_msgs:
@@ -91,12 +93,13 @@ if __name__ == "__main__":
                         game.add_message(message=msg_obj)
 
         for bot in bots:
-            # Orders round
-            orders = bot.gen_orders()
-            # messages, orders = bot_state.messages, bot_state.orders
+            if not game.powers[bot.power_name].is_eliminated():
+                # Orders round
+                orders = bot.gen_orders()
+                # messages, orders = bot_state.messages, bot_state.orders
 
-            if orders is not None:
-                game.set_orders(power_name=bot.power_name, orders=orders)
+                if orders is not None:
+                    game.set_orders(power_name=bot.power_name, orders=orders)
 
         game.process()
 

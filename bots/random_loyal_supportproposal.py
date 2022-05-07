@@ -221,6 +221,7 @@ class RandomLSPBot(BaselineMsgRoundBot):
         self.possible_orders = self.game.get_all_possible_orders()
         self.support_proposals_sent = False
         self.orders = OrdersData()
+        self.cache_allies_influence()
 
     # def config(self, configg):
     #     # super().config(configg)
@@ -254,11 +255,9 @@ class RandomLSPBot(BaselineMsgRoundBot):
                 if not self.alliance_props_sent:
                     raise "Received ALY YES without sending ALY"
                 self.allies = comms_rcvd['yes_allies_proposed']
-                self.cache_allies_influence()
             # if alliance proposal receieved
             elif comms_rcvd['allies_proposed']:
                 self.allies = comms_rcvd['allies_proposed']
-                self.cache_allies_influence()
                 self.my_leader = comms_rcvd['alliance_proposer']
                 comms_obj.add_message(self.my_leader, str(YES(comms_rcvd['alliance_msg'])))
             # else propose alliance if not already sent
