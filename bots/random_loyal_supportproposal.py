@@ -14,6 +14,11 @@ from utils import parse_orr_xdo, parse_alliance_proposal, get_non_aggressive_ord
 
 
 class RandomLSPBot(BaselineMsgRoundBot):
+    """
+    This bot either leads, proposes alliances and proposes support moves for moves proposed by Dipnet to the supporting allies or 
+    follows, accepts alliances, accepts support proposals and blindly follows them 
+    while filling the remaining units with Dipnet's orders
+    """
 
     def __init__(self, power_name, game, total_msg_rounds=3, alliance_all_in=True) -> None:
         super().__init__(power_name, game, total_msg_rounds)
