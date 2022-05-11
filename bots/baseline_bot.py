@@ -10,7 +10,7 @@ from typing import List
 
 from diplomacy import Game, Message
 
-from utils import OrdersData, MessagesData, get_order_tokens
+from baseline_bots.utils import OrdersData, MessagesData, get_order_tokens
 
 class BaselineBot(ABC):
     """Abstract Base Class for baselines bots"""
@@ -20,13 +20,27 @@ class BaselineBot(ABC):
         
     @abstractmethod
     def gen_messages(self, rcvd_messages:List[Message]) -> MessagesData:
-        """sets messages to be sent"""
+        """
+        :return: messages to be sent
+        """
         raise NotImplementedError()
 
     @abstractmethod
     def gen_orders(self) -> OrdersData:
-        """finalizes moves"""
+        """
+        :return: orders to be executed
+        """
         raise NotImplementedError()
+
+    def __call__(self, rcvd_messages:List[Message]) -> dict:
+        """
+        :return: dict containing messages and orders
+        """
+        messages = self.gen_messages(rcvd_messages)
+        orders = self.gen_orders()
+        # maintain current orders
+        self.orders = orders
+        return {"messages": messages, "orders": orders}
 
 class BaselineMsgRoundBot(BaselineBot, ABC):
     """

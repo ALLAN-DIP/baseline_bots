@@ -15,8 +15,8 @@ from diplomacy import Game, Message
 from diplomacy_research.players.benchmark_player import DipNetSLPlayer, DipNetRLPlayer
 
 
-from utils import OrdersData, MessagesData, get_order_tokens
-from bots.baseline_bot import BaselineMsgRoundBot
+from baseline_bots.utils import OrdersData, MessagesData, get_order_tokens
+from baseline_bots.bots.baseline_bot import BaselineMsgRoundBot
 
 class DipnetBot(BaselineMsgRoundBot, ABC):
     """Abstract Base Class for dipnet derivitive bots"""

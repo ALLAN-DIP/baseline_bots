@@ -1,29 +1,48 @@
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
-from diplomacy import Message
-from baseline_bot import BaselineBot
 import random
-from utils import parse_orr_xdo, ORR, XDO, YES, get_non_aggressive_orders
 
-#TODO: Upgrade to new design layout
-class RandomHonestAccepterBot(BaselineBot):
+from diplomacy import Message
+from DAIDE import ORR, XDO, YES
+
+from bots.baseline_bot import BaselineMsgRoundBot
+from utils import parse_orr_xdo, get_non_aggressive_orders, OrdersData, MessagesData
+
+class RandomHonestOrderAccepterBot(BaselineMsgRoundBot):
     """
     This bot reads proposed order messages from other powers.
     It then randomly selects some to take and messages the proposing powers
     with whichever proposed orders of theirs it selected.
     NOTE: It will only execute non-aggressive moves
+    NOTE: Only selects/sends messages on the last communication round
     """
     def __init__(self, power_name, game) -> None:
         super().__init__(power_name, game)
+        
+    def phase_init(self):
+        super().phase_init()
+        self.cur_msg_round = 0
+        self.messages = MessagesData()
+        self.orders = OrdersData()
 
-    def act(self):
-        # get proposed orders sent by other countries
-        messages = game.filter_messages(messages = game.messages, game_role=bot_power)
+    def gen_messages(self, rcvd_messages):
+        return self.messages
+
+    def gen_orders(self):
+        return self.orders
+
+    def __call__(self, rcvd_messages):
+        self.cur_msg_round+=1
+        # only generate messages/orders on final message round
+        if self.cur_msg_round == self.total_msg_rounds:
+            pass
+        else:
+            return {"messages": MessagesData(), "orders": OrdersData()}
+        
         proposed_orders = []
         proposed_orders_by_country = {}
-        for key in messages:
-            message = messages[key]
+        for message in rcvd_messages:
             # parse_orr_xdo could fail if the message type isnt right
             try:
                 parsed = parse_orr_xdo(message.message)
@@ -37,38 +56,35 @@ class RandomHonestAccepterBot(BaselineBot):
         
         # keep ~3/4 of the remaining orders at random
         orders = [order for order in proposed_orders if random.random() > 0.25]
-
-        # set orders
-        self.game.set_orders(self.power_name, orders)
-
-        # not all intended orders can be set at the same time: some overlap
-        # thus, get the orders that are currently set
-        orders_set = self.game.get_orders(self.power_name)
-
+        
+        orders_data = OrdersData()
+        orders_data.add_orders(orders)
+        messages_data = MessagesData()
         # send messages to other powers if this bot has taken some 
         # of their messages
         for other_power in proposed_orders_by_country:
             # construct list of orders which other_power proposed
             # which this bot has taken
             orders_taken = []
-            for order in orders_set:
+            for destination in orders_data:
+                order = orders_data.orders[destination]
                 if order in proposed_orders_by_country[other_power]:
                     orders_taken.append(order)
-
+            
             # if none of the country's suggested orders were taken
             if not orders_taken:
                 break
             
+            
             # encode orders taken with daide syntax
-            msg = YES(ORR(XDO(orders_taken)))
+            msg = YES(ORR([XDO(order) for order in orders_taken]))
 
-            # send messages
-            self.game.add_message(Message(
-                sender=self.power_name,
-                recipient=other_power,
-                message=msg,
-                phase=self.game.get_current_phase(),
-            ))
+            messages_data.add_message(other_power, str(msg))
+
+        self.messages = messages_data
+        self.orders = orders_data
+
+        return {"messages": messages_data, "orders": orders_data}
 
 if __name__ == "__main__":
     from diplomacy import Game
@@ -95,7 +111,6 @@ if __name__ == "__main__":
             bot_state = bot.act()
             messages, orders = bot_state.messages, bot_state.orders
             if messages:
-                # print(power_name, messages)
                 for msg in messages:
                     msg_obj = Message(
                         sender=bot.power_name,
@@ -104,7 +119,6 @@ if __name__ == "__main__":
                         phase=game.get_current_phase(),
                     )
                     game.add_message(message=msg_obj)
-            # print("Submitted orders")
             if orders is not None:
                 game.set_orders(power_name=bot.power_name, orders=orders)
 
