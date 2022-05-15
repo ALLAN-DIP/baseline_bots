@@ -1,8 +1,14 @@
 __authors__ = "Wichayaporn Wongkamjan"
 __email__ = "w.wongkamjan@gmail.com"
 
+
 import random
 import sys
+
+sys.path.append("..")
+sys.path.append("../..")
+sys.path.append("../../../dipnet_press")
+
 from diplomacy_research.players.benchmark_player import DipNetRLPlayer
 from bots.dipnet.dipnet_bot import DipnetBot
 from diplomacy import Game, Message
@@ -12,9 +18,7 @@ from typing import List
 from tornado import gen
 from stance.stance_extraction import StanceExtraction, ScoreBasedStance
 
-sys.path.append("..")
-sys.path.append("../..")
-sys.path.append("../../../dipnet_press")
+
 
 from utils import get_order_tokens
 
