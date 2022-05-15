@@ -14,6 +14,7 @@ from stance.stance_extraction import StanceExtraction, ScoreBasedStance
 
 sys.path.append("..")
 sys.path.append("../..")
+sys.path.append("../../../dipnet_press")
 
 from utils import get_order_tokens
 
