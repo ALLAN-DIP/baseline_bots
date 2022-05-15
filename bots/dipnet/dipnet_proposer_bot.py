@@ -20,6 +20,7 @@ from tornado import gen
 from stance.stance_extraction import StanceExtraction, ScoreBasedStance
 from utils import get_order_tokens
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
+from bots.baseline_bot import BaselineMsgRoundBot
 
 class ProposerDipBot(DipnetBot):
     """execute orders computed by dipnet and propose orders computed by dipnet"""
@@ -59,25 +60,29 @@ class ProposerDipBot(DipnetBot):
 def test_bot():
     bots = [ProposerDipBot(bot_power, game) for bot_power in powers]
     while not game.is_game_done:
+        for bot in bots:
+            if isinstance(bot, BaselineMsgRoundBot):
+                bot.phase_init()
+
         sc = {bot_power: len(game.get_centers(bot_power)) for bot_power in powers}
         stance_vec = stance.get_stance(game_rec= sc, game_rec_type='game')
-        for bot in bots:
-            # update stance 
-            bot.stance = stance_vec[bot.power_name]
-            bot_state = bot.act()
-            messages, orders = bot_state.messages, bot_state.orders
-            if messages:
+        if game.get_current_phase()[-1] == 'M':
+            for bot in bots:
+                # update stance 
+                bot.stance = stance_vec[bot.power_name]
+                messages = yield bot.gen_messages()
+                orders = yield bot.gen_orders()
+                if messages:
                 # print(power_name, messages)
-                for msg in messages:
-                    msg_obj = Message(
-                        sender=bot.power_name,
-                        recipient=msg['recipient'],
-                        message=msg['message'],
-                        phase=game.get_current_phase(),
-                    )
-                    game.add_message(message=msg_obj)
-            # print("Submitted orders")
-            if orders is not None:
+                    for msg in messages:
+                        msg_obj = Message(
+                            sender=bot.power_name,
+                            recipient=msg['recipient'],
+                            message=msg['message'],
+                            phase=game.get_current_phase(),
+                        )
+                        game.add_message(message=msg_obj)
+                
                 game.set_orders(power_name=bot.power_name, orders=orders)
         
         game.process()
