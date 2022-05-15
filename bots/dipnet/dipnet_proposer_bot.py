@@ -70,7 +70,7 @@ def test_bot():
             for bot in bots:
                 # update stance 
                 bot.stance = stance_vec[bot.power_name]
-                messages = yield bot.gen_messages()
+                messages = yield bot.gen_messages(None)
                 orders = yield bot.gen_orders()
                 if messages:
                 # print(power_name, messages)
