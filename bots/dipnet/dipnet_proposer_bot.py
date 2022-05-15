@@ -55,7 +55,7 @@ class ProposerDipBot(DipnetBot):
         self.orders.add_orders(orders, overwrite=True)
         return self.orders.get_list_of_orders()
 
-
+@gen.coroutine
 def test_bot():
     bots = [ProposerDipBot(bot_power, game) for bot_power in powers]
     while not game.is_game_done:
