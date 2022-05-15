@@ -10,6 +10,7 @@ from utils import OrdersData, MessagesData, get_order_tokens, get_other_powers
 from DAIDE import ORR, XDO
 from typing import List
 from tornado import gen
+from stance.stance_extraction import StanceExtraction, ScoreBasedStance
 
 sys.path.append("..")
 sys.path.append("../..")
@@ -22,7 +23,7 @@ class ProposerDipBot(DipnetBot):
         super().__init__(power_name, game)
         self.brain = DipNetRLPlayer()
         self.n_proposal_orders = 5
-        self.stance_class = stance()
+        self.stance_class = stance(power_name, game.powers)
 
     @gen.coroutine
     def gen_messages(self, _) -> MessagesData:
@@ -49,3 +50,37 @@ class ProposerDipBot(DipnetBot):
         self.orders.add_orders(orders, overwrite=True)
         return self.orders.get_list_of_orders()
 
+if __name__ == "__main__":
+    from diplomacy.utils.export import to_saved_game_format
+
+    # game instance
+    game = Game()
+    powers = list(game.get_map_power_names())
+    stance = ScoreBasedStance()
+    # select the first name in the list of powers
+    bots = [ProposerDipBot(bot_power, game, stance) for bot_power in powers]
+
+    while not game.is_game_done:
+        for bot in bots:
+            # update stance 
+            sc = {bot_power: len(game.get_centers(bot_power)) for bot_power in powers}
+            bot.stance_class.get_stance(game_rec= sc, game_rec_type='game')
+            bot_state = bot.act()
+            messages, orders = bot_state.messages, bot_state.orders
+            if messages:
+                # print(power_name, messages)
+                for msg in messages:
+                    msg_obj = Message(
+                        sender=bot.power_name,
+                        recipient=msg['recipient'],
+                        message=msg['message'],
+                        phase=game.get_current_phase(),
+                    )
+                    game.add_message(message=msg_obj)
+            # print("Submitted orders")
+            if orders is not None:
+                game.set_orders(power_name=bot.power_name, orders=orders)
+        
+        game.process()
+
+    to_saved_game_format(game, output_path='DipNetProposerBot.json')
