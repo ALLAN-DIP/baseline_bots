@@ -57,6 +57,7 @@ class ProposerDipBot(DipnetBot):
 
 
 def test_bot():
+    bots = [ProposerDipBot(bot_power, game) for bot_power in powers]
     while not game.is_game_done:
         sc = {bot_power: len(game.get_centers(bot_power)) for bot_power in powers}
         stance_vec = stance.get_stance(game_rec= sc, game_rec_type='game')
@@ -93,7 +94,5 @@ if __name__ == "__main__":
     
     # identity does not matter
     stance = ScoreBasedStance('', powers)
-
-    bots = [ProposerDipBot(bot_power, game) for bot_power in powers]
 
     start_io_loop(test_bot)
