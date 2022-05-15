@@ -25,11 +25,11 @@ from utils import get_order_tokens
 
 class ProposerDipBot(DipnetBot):
     """execute orders computed by dipnet and propose orders computed by dipnet"""
-    def __init__(self, power_name:str, game:Game, stance:StanceExtraction) -> None:
+    def __init__(self, power_name:str, game:Game) -> None:
         super().__init__(power_name, game)
         self.brain = DipNetRLPlayer()
         self.n_proposal_orders = 5
-        self.stance_class = stance(power_name, game.powers)
+        self.stance= None
 
     @gen.coroutine
     def gen_messages(self, _) -> MessagesData:
@@ -40,7 +40,7 @@ class ProposerDipBot(DipnetBot):
         
         for other_power in get_other_powers([self.power_name], self.game):
             # get stance of other_power
-            stance = self.stance_class.stance[self.power_name][other_power]
+            stance = self.stance[other_power]
 
             # if other_power = neutral or ally 
             if stance >= 0:
@@ -49,6 +49,7 @@ class ProposerDipBot(DipnetBot):
                 suggested_orders = ORR([XDO(order) for order in suggested_orders])
                 # send the other power a message containing the orders
                 ret_obj.add_message(other_power, str(suggested_orders))
+        return ret_obj
 
     @gen.coroutine
     def gen_orders(self):
@@ -62,15 +63,18 @@ if __name__ == "__main__":
     # game instance
     game = Game()
     powers = list(game.get_map_power_names())
-    stance = ScoreBasedStance()
-    # select the first name in the list of powers
-    bots = [ProposerDipBot(bot_power, game, stance) for bot_power in powers]
+    
+    # identity does not matter
+    stance = ScoreBasedStance('', powers)
+
+    bots = [ProposerDipBot(bot_power, game) for bot_power in powers]
 
     while not game.is_game_done:
+        sc = {bot_power: len(game.get_centers(bot_power)) for bot_power in powers}
+        stance_vec = stance.get_stance(game_rec= sc, game_rec_type='game')
         for bot in bots:
             # update stance 
-            sc = {bot_power: len(game.get_centers(bot_power)) for bot_power in powers}
-            bot.stance_class.get_stance(game_rec= sc, game_rec_type='game')
+            bot.stance = stance_vec[bot.power_name]
             bot_state = bot.act()
             messages, orders = bot_state.messages, bot_state.orders
             if messages:
