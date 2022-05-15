@@ -18,10 +18,8 @@ from DAIDE import ORR, XDO
 from typing import List
 from tornado import gen
 from stance.stance_extraction import StanceExtraction, ScoreBasedStance
-
-
-
 from utils import get_order_tokens
+from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 
 class ProposerDipBot(DipnetBot):
     """execute orders computed by dipnet and propose orders computed by dipnet"""
@@ -57,18 +55,8 @@ class ProposerDipBot(DipnetBot):
         self.orders.add_orders(orders, overwrite=True)
         return self.orders.get_list_of_orders()
 
-if __name__ == "__main__":
-    from diplomacy.utils.export import to_saved_game_format
 
-    # game instance
-    game = Game()
-    powers = list(game.get_map_power_names())
-    
-    # identity does not matter
-    stance = ScoreBasedStance('', powers)
-
-    bots = [ProposerDipBot(bot_power, game) for bot_power in powers]
-
+def test_bot():
     while not game.is_game_done:
         sc = {bot_power: len(game.get_centers(bot_power)) for bot_power in powers}
         stance_vec = stance.get_stance(game_rec= sc, game_rec_type='game')
@@ -94,3 +82,18 @@ if __name__ == "__main__":
         game.process()
 
     to_saved_game_format(game, output_path='DipNetProposerBot.json')
+    stop_io_loop()
+
+if __name__ == "__main__":
+    from diplomacy.utils.export import to_saved_game_format
+
+    # game instance
+    game = Game()
+    powers = list(game.get_map_power_names())
+    
+    # identity does not matter
+    stance = ScoreBasedStance('', powers)
+
+    bots = [ProposerDipBot(bot_power, game) for bot_power in powers]
+
+    start_io_loop(test_bot)
