@@ -4,6 +4,7 @@ __email__ = "w.wongkamjan@gmail.com"
 
 import random
 import sys
+import ujson as json
 
 sys.path.append("..")
 sys.path.append("../..")
@@ -87,7 +88,10 @@ def test_bot():
         
         game.process()
 
-    to_saved_game_format(game, output_path='DipNetProposerBot.json')
+    # to_saved_game_format(game, output_path='DipNetProposerBot.json')
+    game_history_name = 'DipNetProposerBot.json'
+    with open(game_history_name, 'w') as file:
+        file.write(json.dumps(to_saved_game_format(game.game)))
     stop_io_loop()
 
 if __name__ == "__main__":
