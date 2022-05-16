@@ -11,7 +11,7 @@ sys.path.append("../../..")
 sys.path.append("../../../dipnet_press")
 
 from diplomacy_research.players.benchmark_player import DipNetRLPlayer
-from bots.dipnet.transparent_bot import TransparentBot
+from bots.dipnet.dipnet_bot import DipnetBot
 from diplomacy import Game, Message
 from utils import OrdersData, MessagesData, get_order_tokens, get_other_powers
 from DAIDE import ORR, XDO, FCT
