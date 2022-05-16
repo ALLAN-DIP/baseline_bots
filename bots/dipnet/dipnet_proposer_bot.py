@@ -34,18 +34,18 @@ class ProposerDipBot(DipnetBot):
     def gen_messages(self, _) -> MessagesData:
         # Return data initialization
         ret_obj = MessagesData()
-        
-        for other_power in get_other_powers([self.power_name], self.game):
-            # get stance of other_power
-            stance = self.stance[other_power]
+        if self.curr_msg_round == 1:
+            for other_power in get_other_powers([self.power_name], self.game):
+                # get stance of other_power
+                stance = self.stance[other_power]
 
-            # if other_power = neutral or ally 
-            if stance >= 0:
-                suggested_orders = yield self.brain.get_orders(self.game, other_power)
-                suggested_orders = suggested_orders[:min(self.n_proposal_orders, len(suggested_orders))]
-                suggested_orders = ORR([XDO(order) for order in suggested_orders])
-                # send the other power a message containing the orders
-                ret_obj.add_message(other_power, str(suggested_orders))
+                # if other_power = neutral or ally 
+                if stance >= 0:
+                    suggested_orders = yield self.brain.get_orders(self.game, other_power)
+                    suggested_orders = suggested_orders[:min(self.n_proposal_orders, len(suggested_orders))]
+                    suggested_orders = ORR([XDO(order) for order in suggested_orders])
+                    # send the other power a message containing the orders
+                    ret_obj.add_message(other_power, str(suggested_orders))
         self.curr_msg_round += 1
         return ret_obj
 
