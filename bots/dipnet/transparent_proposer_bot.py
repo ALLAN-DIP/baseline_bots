@@ -28,7 +28,6 @@ class TransparentProposerDipBot(TransparentBot):
     """
     def __init__(self, power_name:str, game:Game, total_msg_rounds=3) -> None:
         super().__init__(power_name, game, total_msg_rounds)
-        self.brain = DipNetRLPlayer()
         self.n_proposal_orders = 5
         self.stance= None
         self.my_orders_informed = False

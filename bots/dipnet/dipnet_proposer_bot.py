@@ -71,7 +71,7 @@ def test_bot():
                 bot.stance = stance_vec[bot.power_name]
                 messages = yield bot.gen_messages(None)
                 orders = yield bot.gen_orders()
-                if messages and messages.messages:
+                if len(messages.messages):
                 # print(power_name, messages)
                     for msg in messages:
                         msg_obj = Message(
