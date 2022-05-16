@@ -25,9 +25,8 @@ from bots.baseline_bot import BaselineMsgRoundBot
 
 class ProposerDipBot(DipnetBot):
     """execute orders computed by dipnet and propose orders computed by dipnet"""
-    def __init__(self, power_name:str, game:Game) -> None:
-        super().__init__(power_name, game)
-        self.brain = DipNetRLPlayer()
+    def __init__(self, power_name:str, game:Game, total_msg_rounds=3) -> None:
+        super().__init__(power_name, game, total_msg_rounds)
         self.n_proposal_orders = 5
         self.stance= None
 
@@ -35,8 +34,6 @@ class ProposerDipBot(DipnetBot):
     def gen_messages(self, _) -> MessagesData:
         # Return data initialization
         ret_obj = MessagesData()
-
-        # For each power, randomly sample a valid order
         
         for other_power in get_other_powers([self.power_name], self.game):
             # get stance of other_power
@@ -49,6 +46,7 @@ class ProposerDipBot(DipnetBot):
                 suggested_orders = ORR([XDO(order) for order in suggested_orders])
                 # send the other power a message containing the orders
                 ret_obj.add_message(other_power, str(suggested_orders))
+        self.curr_msg_round += 1
         return ret_obj
 
     @gen.coroutine
@@ -73,7 +71,7 @@ def test_bot():
                 bot.stance = stance_vec[bot.power_name]
                 messages = yield bot.gen_messages(None)
                 orders = yield bot.gen_orders()
-                if messages:
+                if messages and messages.messages:
                 # print(power_name, messages)
                     for msg in messages:
                         msg_obj = Message(

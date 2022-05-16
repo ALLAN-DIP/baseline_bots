@@ -22,7 +22,7 @@ class DipnetBot(BaselineMsgRoundBot, ABC):
     """Abstract Base Class for dipnet derivitive bots"""
     def __init__(self, power_name:str, game:Game, total_msg_rounds=3) -> None:
         super().__init__(power_name, game, total_msg_rounds)
-        self.brain = DipNetSLPlayer()
+        self.brain = DipNetRLPlayer()
         
     @abstractmethod
     def gen_messages(self, rcvd_messages:List[Message]) -> MessagesData:
