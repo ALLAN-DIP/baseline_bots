@@ -40,11 +40,12 @@ class TransparentProposerDipBot(ProposerDipBot):
             final_order=shared_orders
 
         if self.curr_msg_round ==2:
-            suggested_orders = yield self.brain.get_orders(self.game, other_power)
-            suggested_orders = suggested_orders[:min(self.n_proposal_orders, len(suggested_orders))]
-            suggested_orders = ORR([XDO(order) for order in suggested_orders])
-            final_order=suggested_orders
-        
+            for other_power in get_other_powers([self.power_name], self.game):
+                suggested_orders = yield self.brain.get_orders(self.game, other_power)
+                suggested_orders = suggested_orders[:min(self.n_proposal_orders, len(suggested_orders))]
+                suggested_orders = ORR([XDO(order) for order in suggested_orders])
+                final_order=suggested_orders
+            
         # For each power, randomly sample a valid order
         for other_power in get_other_powers([self.power_name], self.game):
             # get stance of other_power
