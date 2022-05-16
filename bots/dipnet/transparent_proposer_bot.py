@@ -26,8 +26,8 @@ class TransparentProposerDipBot(TransparentBot):
     Send out some of them randomly
     Propose orders computed by dipnet
     """
-    def __init__(self, power_name:str, game:Game) -> None:
-        super().__init__(power_name, game)
+    def __init__(self, power_name:str, game:Game, total_msg_rounds=3) -> None:
+        super().__init__(power_name, game, total_msg_rounds)
         self.brain = DipNetRLPlayer()
         self.n_proposal_orders = 5
         self.stance= None

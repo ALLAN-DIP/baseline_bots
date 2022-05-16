@@ -12,7 +12,7 @@ import random
 
 
 from diplomacy import Game, Message
-from diplomacy_research.players.benchmark_player import DipNetSLPlayer
+from diplomacy_research.players.benchmark_player import DipNetRLPlayer
 
 
 from baseline_bots.utils import OrdersData, MessagesData, get_order_tokens
