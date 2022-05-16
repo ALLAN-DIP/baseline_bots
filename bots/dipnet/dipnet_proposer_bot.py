@@ -44,7 +44,7 @@ class ProposerDipBot(DipnetBot):
             # if other_power = neutral or ally 
             if stance >= 0:
                 suggested_orders = yield self.brain.get_orders(self.game, other_power)
-                suggested_orders = suggested_orders[:min(self.n_proposal_orders, len(suggested_orders()))]
+                suggested_orders = suggested_orders[:min(self.n_proposal_orders, len(suggested_orders))]
                 suggested_orders = ORR([XDO(order) for order in suggested_orders])
                 # send the other power a message containing the orders
                 ret_obj.add_message(other_power, str(suggested_orders))
