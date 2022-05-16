@@ -14,7 +14,7 @@ from bots.dipnet.transparent_proposer_bot import TransparentProposerDipBot
 from bots.dipnet.dipnet_proposer_bot import ProposerDipBot
 from bots.random_loyal_supportproposal import RandomLSPBot
 from bots.random_no_press import RandomNoPress_AsyncBot
-
+from stance.stance_extraction import StanceExtraction, ScoreBasedStance
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from tornado import gen
 import asyncio
@@ -58,18 +58,24 @@ def bot_loop():
             bot = ProposerDipBot(bot_power, game, 3)
         bots.append(bot)
     start = time()
-
+    stance = ScoreBasedStance('', powers)
     while not game.is_game_done:
         for bot in bots:
             if isinstance(bot, BaselineMsgRoundBot):
                 bot.phase_init()
         # print(game.get_current_phase())
         if game.get_current_phase()[-1] == 'M':
+            # stance vector
+            sc = {bot_power: len(game.get_centers(bot_power)) for bot_power in powers}
+            stance_vec = stance.get_stance(game_rec= sc, game_rec_type='game')
             # Iterate through multiple rounds of comms during movement phases
+
             for _ in range(comms_rounds):
                 round_msgs = game.messages
                 to_send_msgs = {}
                 for bot in bots:
+                    if isinstance(bot, ProposerDipBot):
+                        bot.stance = stance_vec[bot.power_name]
                     # Retrieve messages
                     rcvd_messages = game.filter_messages(messages=round_msgs, game_role=bot.power_name)
                     rcvd_messages = list(rcvd_messages.items())
@@ -117,7 +123,7 @@ if __name__ == "__main__":
 
     # game instance
     game = Game()
-    # powers = list(game.get_map_power_names())
+    powers = list(game.get_map_power_names())
     # powers = ['ENGLAND', 'FRANCE', 'GERMANY', 'ITALY', 'AUSTRIA', 'RUSSIA', 'TURKEY']
 
     assert len(args.powers.split(",")) == 7, "Powers specified are not 7"
