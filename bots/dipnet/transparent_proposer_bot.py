@@ -36,7 +36,7 @@ class TransparentProposerDipBot(ProposerDipBot):
             self.orders.add_orders(orders, overwrite=True)
             self.my_orders_informed = True
             shared_orders = self.orders.get_list_of_orders()
-            shared_orders = FCT(ORR(XDO(shared_orders)))
+            shared_orders = FCT(ORR([XDO(order) for order in shared_orders]))
             final_order=shared_orders
 
         if self.curr_msg_round ==2:
