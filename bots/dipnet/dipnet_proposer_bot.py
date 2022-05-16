@@ -91,7 +91,7 @@ def test_bot():
     # to_saved_game_format(game, output_path='DipNetProposerBot.json')
     game_history_name = 'DipNetProposerBot.json'
     with open(game_history_name, 'w') as file:
-        file.write(json.dumps(to_saved_game_format(game.game)))
+        file.write(json.dumps(to_saved_game_format(game)))
     stop_io_loop()
 
 if __name__ == "__main__":
