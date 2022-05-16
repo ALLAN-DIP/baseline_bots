@@ -53,7 +53,6 @@ class TransparentProposerDipBot(TransparentBot):
             self.my_orders_informed = True
 
         # For each power, randomly sample a valid order
-        
         for other_power in get_other_powers([self.power_name], self.game):
             # get stance of other_power
             stance = self.stance[other_power]

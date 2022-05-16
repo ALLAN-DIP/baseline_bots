@@ -1,6 +1,6 @@
 import argparse
 from time import time
-
+import ujson as json
 from diplomacy import Message
 from diplomacy import Game
 from diplomacy.utils.export import to_saved_game_format
@@ -10,8 +10,11 @@ from bots.dipnet.no_press_bot import NoPressDipBot
 from bots.dipnet.random_loyal_supportproposal_dip import RandomLSP_DipBot
 from bots.dipnet.transparent_bot import TransparentBot
 from bots.dipnet.selectively_transparent_bot import SelectivelyTransparentBot
+from bots.dipnet.transparent_proposer_bot import TransparentProposerDipBot
+from bots.dipnet.dipnet_proposer_bot import ProposerDipBot
 from bots.random_loyal_supportproposal import RandomLSPBot
 from bots.random_no_press import RandomNoPress_AsyncBot
+
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from tornado import gen
 import asyncio
@@ -49,7 +52,10 @@ def bot_loop():
             bot = TransparentBot(bot_power, game, 3)
         elif bot_type == "stbt":
             bot = SelectivelyTransparentBot(bot_power, game, 3)
-        
+        elif bot_type == "tpbt":
+            bot = TransparentProposerDipBot(bot_power, game, 3)
+        elif bot_type == "pbt":
+            bot = ProposerDipBot(bot_power, game, 3)
         bots.append(bot)
     start = time()
 
@@ -99,7 +105,9 @@ def bot_loop():
         game.process()
 
     print(time() - start)
-    to_saved_game_format(game, output_path=args.filename)
+    # to_saved_game_format(game, output_path=args.filename)
+    with open(args.filename, 'w') as file:
+        file.write(json.dumps(to_saved_game_format(game)))
 
     stop_io_loop()
 
