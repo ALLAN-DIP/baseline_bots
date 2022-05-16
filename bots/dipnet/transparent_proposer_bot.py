@@ -30,6 +30,7 @@ class TransparentProposerDipBot(ProposerDipBot):
     @gen.coroutine
     def gen_messages(self, _) -> MessagesData:
         ret_obj = MessagesData()
+        final_order = {other_power: None for other_power in get_other_powers([self.power_name], self.game)}
         if self.curr_msg_round == 1:
             # Fetch list of orders from DipNet
             orders = yield from self.brain.get_orders(self.game, self.power_name)
@@ -37,14 +38,14 @@ class TransparentProposerDipBot(ProposerDipBot):
             self.my_orders_informed = True
             shared_orders = self.orders.get_list_of_orders()
             shared_orders = FCT(ORR([XDO(order) for order in shared_orders]))
-            final_order=shared_orders
+            final_order={other_power: shared_orders for other_power in get_other_powers([self.power_name], self.game)}
 
         if self.curr_msg_round ==2:
             for other_power in get_other_powers([self.power_name], self.game):
                 suggested_orders = yield self.brain.get_orders(self.game, other_power)
                 suggested_orders = suggested_orders[:min(self.n_proposal_orders, len(suggested_orders))]
                 suggested_orders = ORR([XDO(order) for order in suggested_orders])
-                final_order=suggested_orders
+                final_order[other_power]=suggested_orders
             
         # For each power, randomly sample a valid order
         for other_power in get_other_powers([self.power_name], self.game):
@@ -53,7 +54,8 @@ class TransparentProposerDipBot(ProposerDipBot):
             # if other_power = neutral or ally 
             if stance >= 0:
                 # send the other power a message containing the proposals
-                ret_obj.add_message(other_power, str(final_order))
+                if final_order[other_power]:
+                    ret_obj.add_message(other_power, str(final_order[other_power]))
 
         self.curr_msg_round += 1
         return ret_obj
