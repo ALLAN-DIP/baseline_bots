@@ -15,6 +15,7 @@ from bots.dipnet.dipnet_proposer_bot import ProposerDipBot
 from bots.dipnet.RealPolitik import RealPolitik
 from bots.random_loyal_supportproposal import RandomLSPBot
 from bots.random_no_press import RandomNoPress_AsyncBot
+from bots.random_proposer_bot import RandomProposerBot
 from stance.stance_extraction import StanceExtraction, ScoreBasedStance
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from tornado import gen
@@ -51,6 +52,8 @@ def bot_loop():
     for bot_power, bot_type in zip(args.powers.split(","), args.types.split(",")):
         if bot_type == 'np':
             bot = NoPressDipBot(bot_power, game)
+        elif bot_type == 'rpbt':
+            bot = RandomProposerBot(bot_power, game)
         elif bot_type == 'rnp':
             bot = RandomNoPress_AsyncBot(bot_power, game)
         elif bot_type.startswith('lsp'):
