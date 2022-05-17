@@ -71,12 +71,12 @@ class RealPolitik(DipnetBot):
 
             # for each xdo order set (max at 6 for now) -> simulate worlds by execute all of shared orders + xdo order set
             state_value = {other_power: None for other_power in get_other_powers([self.power_name], self.game)}
-            for proposer, orders in proposal_order:
+            for proposer, orders in proposal_order.items():
                 if orders:
                     proposed = True
                     simulated_game = self.game.__deepcopy__(None) 
                     simulated_game.set_orders(power_name=self.power_name, orders=orders)
-                    for other_power, power_orders in shared_order:
+                    for other_power, power_orders in shared_order.items():
                         if power_orders:
                             simulated_game.set_orders(power_name=other_power, orders=power_orders)
                     simulated_game.process()
