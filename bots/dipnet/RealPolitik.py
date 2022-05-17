@@ -94,7 +94,7 @@ class RealPolitik(DipnetBot):
                         if power_orders:
                             simulated_game.set_orders(power_name=other_power, orders=power_orders)
                     simulated_game.process()
-                    state_value[proposer] = self.get_state_value(simulated_game, self.power_name)
+                    state_value[proposer] = yield self.get_state_value(simulated_game, self.power_name)
 
             if not proposed:
                 # if there is no proposal orders, set orders execute by dipnet
