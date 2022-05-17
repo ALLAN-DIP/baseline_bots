@@ -61,11 +61,10 @@ class RealPolitik(DipnetBot):
 
         ret_obj = MessagesData()
         if self.curr_msg_round != self.total_msg_rounds:
-            self.accum_messages += rcvd_messages 
             self.curr_msg_round += 1
             return ret_obj
         else:
-            if len(self.accum_messages) == 0:
+            if len(rcvd_messages) == 0:
                 orders = yield self.brain.get_orders(self.game, self.power_name)
                 self.orders.add_orders(orders, overwrite=True)
                 self.curr_msg_round += 1
@@ -75,7 +74,7 @@ class RealPolitik(DipnetBot):
             proposal_order = {other_power: None for other_power in get_other_powers([self.power_name], self.game)}
 
             # group messages into 2: (1) shared (with FCT) orders and (2) xdo (without FCT) orders
-            for game_msg in self.accum_messages:
+            for game_msg in rcvd_messages:
                 game_msg = game_msg[1]
                 # this is for sharing info orders 
                 if 'FCT' in game_msg.message:
