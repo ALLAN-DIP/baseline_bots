@@ -101,8 +101,9 @@ def parse_orr_xdo(msg: str) -> List[str]:
     try:
         if "ORR" in msg:
             msg = msg[5:-1]
-        else:
-            msg = msg[1:-1]
+        # else:
+        #     # one xdo order
+        #     msg = msg[1:-1]
         parts = msg.split(") (")
 
         return [part[5:-1] for part in parts]
