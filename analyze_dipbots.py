@@ -65,7 +65,7 @@ def bot_loop():
     while not game.is_game_done:
         for bot in bots:
             
-            if isinstance(bot, BaselineMsgRoundBot) or BaselineMsgRoundBot in bot.__mro__:
+            if isinstance(bot, BaselineMsgRoundBot) or BaselineMsgRoundBot in bot.__class__.__mro__:
                 print(type(bot))
                 bot.phase_init()
 
@@ -73,7 +73,7 @@ def bot_loop():
             sc = {bot_power: len(game.get_centers(bot_power)) for bot_power in powers}
             stance_vec = stance.get_stance(game_rec= sc, game_rec_type='game')
 
-            if isinstance(bot, ProposerDipBot) or ProposerDipBot in bot.__mro__:
+            if isinstance(bot, ProposerDipBot) or ProposerDipBot in bot.__class__.__mro__:
                 bot.stance = stance_vec[bot.power_name]
         # print(game.get_current_phase())
         if game.get_current_phase()[-1] == 'M':
