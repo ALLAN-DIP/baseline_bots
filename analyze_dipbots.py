@@ -75,16 +75,16 @@ def bot_loop():
     stance = ScoreBasedStance('', powers)
     while not game.is_game_done:
         for bot in bots:
-            instance_list = [NoPressDipBot, RandomLSP_DipBot, TransparentBot, SelectivelyTransparentBot, TransparentProposerDipBot, ProposerDipBot, RealPolitik]
-            if is_in_instance_list(bot, instance_list):
+            dip_instance_list = [NoPressDipBot, RandomLSP_DipBot, TransparentBot, SelectivelyTransparentBot, TransparentProposerDipBot, ProposerDipBot, RealPolitik]
+            if is_in_instance_list(bot, dip_instance_list):
                 bot.phase_init()
 
             # stance vector
             sc = {bot_power: len(game.get_centers(bot_power)) for bot_power in powers}
             stance_vec = stance.get_stance(game_rec= sc, game_rec_type='game')
 
-            instance_list = [TransparentBot, ProposerDipBot, RealPolitik]
-            if is_in_instance_list(bot, instance_list):
+            proposer_instance_list = [TransparentBot, ProposerDipBot, RealPolitik]
+            if is_in_instance_list(bot, proposer_instance_list):
                 bot.stance = stance_vec[bot.power_name]
         # print(game.get_current_phase())
         if game.get_current_phase()[-1] == 'M':
@@ -99,8 +99,11 @@ def bot_loop():
                     rcvd_messages = list(rcvd_messages.items())
                     rcvd_messages.sort()
 
-                    # Send messages to bots and fetch messages from bot
-                    bot_messages = yield bot.gen_messages(rcvd_messages)
+                    if is_in_instance_list(bot, dip_instance_list):
+                        # Send messages to bots and fetch messages from bot
+                        bot_messages = yield bot.gen_messages(rcvd_messages)
+                    else:
+                        bot_messages = bot.gen_messages(rcvd_messages)
 
                     # If messages are to be sent, send them
                     if bot_messages and bot_messages.messages:
@@ -119,8 +122,11 @@ def bot_loop():
         
 
         for bot in bots:
+            if is_in_instance_list(bot, dip_instance_list):
             # Orders round
-            orders = yield bot.gen_orders()
+                orders = yield bot.gen_orders()
+            else:
+                orders = bot.gen_orders()
             # messages, orders = bot_state.messages, bot_state.orders
 
             if orders is not None:
