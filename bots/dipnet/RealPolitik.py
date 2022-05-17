@@ -41,11 +41,11 @@ class RealPolitik(DipnetBot):
         # rollout the game --- orders in rollout are from dipnet 
         # state value 
         for i in range (self.rollout_length):
-            print('rollout: ', i)
+            # print('rollout: ', i)
             for power in game.powers:
                 orders = yield self.brain.get_orders(game, power)
-                print(power + ': ')
-                print(orders)
+                # print(power + ': ')
+                # print(orders)
                 game.set_orders(power_name=power, orders=orders[:min(self.rollout_n_order, len(orders))])
             game.process()
         return len(game.get_centers(power_name))
@@ -80,9 +80,11 @@ class RealPolitik(DipnetBot):
                 # this is for sharing info orders 
                 if 'FCT' in game_msg.message:
                     shared_order[game_msg.sender] = parse_orr_xdo(parse_FCT(game_msg.message))
+                    print(shared_order[game_msg.sender])
                 # this is for proposal orders
                 else:
                     proposal_order[game_msg.sender] = parse_orr_xdo(game_msg.message)
+                    print(proposal_order[game_msg.sender])
 
             proposed = False
 
@@ -92,8 +94,8 @@ class RealPolitik(DipnetBot):
                 if orders:
                     proposed = True
                     simulated_game = self.game.__deepcopy__(None) 
-                    print('from: ', proposer)
-                    print(orders)
+                    # print('from: ', proposer)
+                    # print(orders)
                     simulated_game.set_orders(power_name=self.power_name, orders=orders)
                     for other_power, power_orders in shared_order.items():
                         if power_orders:
@@ -111,8 +113,8 @@ class RealPolitik(DipnetBot):
                 self.orders.add_orders(proposal_order[best_proposer], overwrite=True)
                 msg = YES(ORR([XDO(order) for order in proposal_order[best_proposer]]))
                 ret_obj.add_message(best_proposer, str(msg))
-            print(self.power_name + ': ')
-            print(self.orders.get_list_of_orders())
+            # print(self.power_name + ': ')
+            # print(self.orders.get_list_of_orders())
             self.curr_msg_round += 1
             return ret_obj
 
