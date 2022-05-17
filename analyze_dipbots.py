@@ -15,7 +15,7 @@ from bots.dipnet.dipnet_proposer_bot import ProposerDipBot
 from bots.dipnet.RealPolitik import RealPolitik
 from bots.random_loyal_supportproposal import RandomLSPBot
 from bots.random_no_press import RandomNoPress_AsyncBot
-from bots.random_proposer_bot import RandomProposerBot
+from bots.random_proposer_bot import RandomProposerBot_AsyncBot
 from stance.stance_extraction import StanceExtraction, ScoreBasedStance
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from tornado import gen
@@ -53,7 +53,7 @@ def bot_loop():
         if bot_type == 'np':
             bot = NoPressDipBot(bot_power, game)
         elif bot_type == 'rpbt':
-            bot = RandomProposerBot(bot_power, game)
+            bot = RandomProposerBot_AsyncBot(bot_power, game)
         elif bot_type == 'rnp':
             bot = RandomNoPress_AsyncBot(bot_power, game)
         elif bot_type.startswith('lsp'):
@@ -75,7 +75,7 @@ def bot_loop():
     stance = ScoreBasedStance('', powers)
     while not game.is_game_done:
         for bot in bots:
-            dip_instance_list = [NoPressDipBot, RandomLSP_DipBot, RandomNoPress_AsyncBot, TransparentBot, SelectivelyTransparentBot, TransparentProposerDipBot, ProposerDipBot, RealPolitik]
+            dip_instance_list = [NoPressDipBot, RandomLSP_DipBot, TransparentBot, SelectivelyTransparentBot, TransparentProposerDipBot, ProposerDipBot, RealPolitik]
             if is_in_instance_list(bot, dip_instance_list):
                 bot.phase_init()
 
@@ -99,11 +99,8 @@ def bot_loop():
                     rcvd_messages = list(rcvd_messages.items())
                     rcvd_messages.sort()
 
-                    if is_in_instance_list(bot, dip_instance_list):
-                        # Send messages to bots and fetch messages from bot
-                        bot_messages = yield bot.gen_messages(rcvd_messages)
-                    else:
-                        bot_messages = bot.gen_messages(rcvd_messages)
+                    # Send messages to bots and fetch messages from bot
+                    bot_messages = yield bot.gen_messages(rcvd_messages)
 
                     # If messages are to be sent, send them
                     if bot_messages and bot_messages.messages:
@@ -122,13 +119,10 @@ def bot_loop():
         
 
         for bot in bots:
-            if is_in_instance_list(bot, dip_instance_list):
             # Orders round
-                orders = yield bot.gen_orders()
-            else:
-                orders = bot.gen_orders()
+            orders = yield bot.gen_orders()
+            
             # messages, orders = bot_state.messages, bot_state.orders
-
             if orders is not None:
                 game.set_orders(power_name=bot.power_name, orders=orders)
 

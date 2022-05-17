@@ -10,6 +10,7 @@ from DAIDE import ORR, XDO
 
 from . import baseline_bot
 from utils import get_other_powers, MessagesData
+from tornado import gen
 
 class RandomProposerBot(baseline_bot.BaselineBot):
     """
@@ -41,7 +42,17 @@ class RandomProposerBot(baseline_bot.BaselineBot):
 
     def __call__(self, rcvd_messages):
         return super().__call__(rcvd_messages)
-        
+
+class RandomProposerBot_AsyncBot(RandomProposerBot):
+    """Wrapper to RandomProposerBot with tornado decorators for async calls"""
+    @gen.coroutine
+    def gen_messages(self, rcvd_messages):
+        return super().gen_messages(rcvd_messages)
+
+    @gen.coroutine
+    def gen_orders(self):
+        return super().gen_orders()
+
 if __name__ == "__main__":
     from diplomacy import Game
     from diplomacy.utils.export import to_saved_game_format
