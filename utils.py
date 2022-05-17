@@ -102,7 +102,7 @@ def parse_orr_xdo(msg: str) -> List[str]:
         if "ORR" in msg:
             msg = msg[5:-1]
         # else:
-        #     # one xdo order
+        #     # remove else since it is a bug to 'XDO (order)' 
         #     msg = msg[1:-1]
         parts = msg.split(") (")
 
