@@ -64,12 +64,14 @@ def bot_loop():
     stance = ScoreBasedStance('', powers)
     while not game.is_game_done:
         for bot in bots:
-            if isinstance(bot, BaselineMsgRoundBot) or issubclass(bot, BaselineMsgRoundBot):
+            if isinstance(bot, BaselineMsgRoundBot) or issubclass(type(bot), BaselineMsgRoundBot):
                 bot.phase_init()
+                
             # stance vector
             sc = {bot_power: len(game.get_centers(bot_power)) for bot_power in powers}
             stance_vec = stance.get_stance(game_rec= sc, game_rec_type='game')
-            if isinstance(bot, ProposerDipBot) or issubclass(bot, ProposerDipBot):
+
+            if isinstance(bot, ProposerDipBot) or issubclass(type(bot), ProposerDipBot):
                 bot.stance = stance_vec[bot.power_name]
         # print(game.get_current_phase())
         if game.get_current_phase()[-1] == 'M':
