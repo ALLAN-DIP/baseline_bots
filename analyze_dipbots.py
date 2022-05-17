@@ -64,21 +64,21 @@ def bot_loop():
     stance = ScoreBasedStance('', powers)
     while not game.is_game_done:
         for bot in bots:
-            if isinstance(bot, BaselineMsgRoundBot):
+            if isinstance(bot, BaselineMsgRoundBot) or issubclass(bot, BaselineMsgRoundBot):
                 bot.phase_init()
-        # print(game.get_current_phase())
-        if game.get_current_phase()[-1] == 'M':
             # stance vector
             sc = {bot_power: len(game.get_centers(bot_power)) for bot_power in powers}
             stance_vec = stance.get_stance(game_rec= sc, game_rec_type='game')
+            if isinstance(bot, ProposerDipBot) or issubclass(bot, ProposerDipBot):
+                bot.stance = stance_vec[bot.power_name]
+        # print(game.get_current_phase())
+        if game.get_current_phase()[-1] == 'M':
             # Iterate through multiple rounds of comms during movement phases
-
             for _ in range(comms_rounds):
                 round_msgs = game.messages
                 to_send_msgs = {}
                 for bot in bots:
-                    if isinstance(bot, ProposerDipBot):
-                        bot.stance = stance_vec[bot.power_name]
+
                     # Retrieve messages
                     rcvd_messages = game.filter_messages(messages=round_msgs, game_role=bot.power_name)
                     rcvd_messages = list(rcvd_messages.items())

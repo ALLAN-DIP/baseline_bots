@@ -102,7 +102,6 @@ class RealPolitik(DipnetBot):
                 self.orders.add_orders(orders, overwrite=True)
             else:
                 # else, set proposal order that return maximum state value
-                print(state_value)
                 best_proposer = max(state_value, key=state_value.get)
                 self.orders.add_orders(proposal_order[best_proposer], overwrite=True)
                 msg = YES(ORR([XDO(order) for order in proposal_order[best_proposer]]))
