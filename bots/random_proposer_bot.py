@@ -29,7 +29,7 @@ class RandomProposerBot(baseline_bot.BaselineBot):
 
         # For each power, randomly sample a valid order
         for other_power in get_other_powers([self.power_name], self.game):
-            suggested_random_orders = [random.choice(possible_orders[loc]) for loc in self.game.get_orderable_locations(self.power_name)
+            suggested_random_orders = [random.choice(possible_orders[loc]) for loc in self.game.get_orderable_locations(other_power)
                         if possible_orders[loc]]
             suggested_random_orders = ORR([XDO(order) for order in suggested_random_orders])
             # send the other power a message containing the orders
