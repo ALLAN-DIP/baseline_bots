@@ -43,6 +43,7 @@ class RealPolitik(DipnetBot):
         for i in range (self.rollout_length):
             for power in game.powers:
                 orders = yield self.brain.get_orders(game, power)
+                print(orders)
                 game.set_orders(power_name=power, orders=orders[power][:min(self.rollout_n_order, len(orders))])
             game.process()
         return game.get_centers(power_name) 
