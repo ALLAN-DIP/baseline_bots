@@ -70,7 +70,7 @@ class RealPolitik(DipnetBot):
             proposed = False
 
             # for each xdo order set (max at 6 for now) -> simulate worlds by execute all of shared orders + xdo order set
-            state_value = {other_power: None for other_power in get_other_powers([self.power_name], self.game)}
+            state_value = {other_power: -10000 for other_power in get_other_powers([self.power_name], self.game)}
             for proposer, orders in proposal_order.items():
                 if orders:
                     proposed = True
@@ -88,6 +88,7 @@ class RealPolitik(DipnetBot):
                 self.orders.add_orders(orders, overwrite=True)
             else:
                 # else, set proposal order that return maximum state value
+                print(state_value)
                 best_proposer = max(state_value, key=state_value.get)
                 self.orders.add_orders(proposal_order[best_proposer], overwrite=True)
                 msg = YES(ORR([XDO(order) for order in proposal_order[best_proposer]]))
