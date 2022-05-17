@@ -112,7 +112,7 @@ class RealPolitik(DipnetBot):
                 best_proposer = max(state_value, key=state_value.get)
                 self.orders.add_orders(proposal_order[best_proposer], overwrite=True)
                 msg = YES(ORR([XDO(order) for order in proposal_order[best_proposer]]))
-                ret_obj.add_message(best_proposer, str(msg))
+                ret_obj.add_message(best_proposer, str(msg)+' '+state_value[best_proposer])
             # print(self.power_name + ': ')
             # print(self.orders.get_list_of_orders())
             self.curr_msg_round += 1
