@@ -117,7 +117,7 @@ class RealPolitik(DipnetBot):
                             msg = YES(ORR([XDO(order) for order in proposal_order[proposer]]))
                         else:
                             msg = REJ(ORR([XDO(order) for order in proposal_order[proposer]]))
-                        ret_obj.add_message(proposer, str(msg)+' '+state_value[proposer])
+                        ret_obj.add_message(proposer, str(msg)+' '+str(state_value[proposer]))
             # print(self.power_name + ': ')
             # print(self.orders.get_list_of_orders())
             self.curr_msg_round += 1
