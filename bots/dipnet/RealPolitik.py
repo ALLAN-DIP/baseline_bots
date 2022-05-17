@@ -44,7 +44,8 @@ class RealPolitik(DipnetBot):
             print('rollout: ', self.rollout_length)
             for power in game.powers:
                 orders = yield self.brain.get_orders(game, power)
-                print(power + ': ' + orders)
+                print(power + ': ')
+                print(orders)
                 game.set_orders(power_name=power, orders=orders[:min(self.rollout_n_order, len(orders))])
             game.process()
         return len(game.get_centers(power_name))
@@ -108,7 +109,8 @@ class RealPolitik(DipnetBot):
                 self.orders.add_orders(proposal_order[best_proposer], overwrite=True)
                 msg = YES(ORR([XDO(order) for order in proposal_order[best_proposer]]))
                 ret_obj.add_message(best_proposer, str(msg))
-            print(self.power_name + ': ' + self.orders.get_list_of_orders())
+            print(self.power_name + ': ')
+            print(self.orders.get_list_of_orders())
             self.curr_msg_round += 1
             return ret_obj
 
