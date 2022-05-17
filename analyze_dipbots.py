@@ -75,7 +75,6 @@ def bot_loop():
             instance_list = [NoPressDipBot, RandomLSP_DipBot, TransparentBot, SelectivelyTransparentBot, TransparentProposerDipBot, ProposerDipBot, RealPolitik]
             if is_in_instance_list(bot, instance_list):
                 bot.phase_init()
-                print("bot", type(bot))
 
             # stance vector
             sc = {bot_power: len(game.get_centers(bot_power)) for bot_power in powers}
