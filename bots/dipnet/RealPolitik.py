@@ -29,7 +29,7 @@ class RealPolitik(DipnetBot):
         super().__init__(power_name, game, total_msg_rounds)
         self.stance= None
         self.accum_messages = []
-        self.rollout_length = 5
+        self.rollout_length = 3
         self.rollout_n_order = 2
 
     def phase_init(self) -> None:
