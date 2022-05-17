@@ -41,7 +41,7 @@ class RealPolitik(DipnetBot):
         # rollout the game --- orders in rollout are from dipnet 
         # state value 
         for i in range (self.rollout_length):
-            print('rollout: ' self.rollout_length)
+            print('rollout: ', self.rollout_length)
             for power in game.powers:
                 orders = yield self.brain.get_orders(game, power)
                 print(power + ': ' + orders)
