@@ -82,9 +82,9 @@ class RealPolitik(DipnetBot):
                     shared_order[game_msg.sender] = parse_orr_xdo(parse_FCT(game_msg.message))
                 # this is for proposal orders
                 else:
-                    print(game_msg.message)
+                    # print(game_msg.message)
                     proposal_order[game_msg.sender] = parse_orr_xdo(game_msg.message)
-                    print(proposal_order[game_msg.sender])
+                    # print(proposal_order[game_msg.sender])
 
             proposed = False
 
