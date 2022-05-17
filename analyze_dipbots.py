@@ -36,6 +36,14 @@ def parse_args():
     print(args)
     return args
 
+def is_in_instance_list(obj, instance_list):
+    boo_v = False
+    for instance in instance_list:
+        boo_v = isinstance(obj, instance)
+        if boo_v:
+            break
+    return boo_v
+
 @gen.coroutine
 def bot_loop():
     bots = []
@@ -64,16 +72,17 @@ def bot_loop():
     stance = ScoreBasedStance('', powers)
     while not game.is_game_done:
         for bot in bots:
-            
-            if isinstance(bot, BaselineMsgRoundBot) or BaselineMsgRoundBot in bot.__class__.__mro__:
-                print(type(bot))
+            instance_list = [NoPressDipBot, RandomLSP_DipBot, TransparentBot, SelectivelyTransparentBot, TransparentProposerDipBot, ProposerDipBot, RealPolitik]
+            if is_in_instance_list(bot, instance_list):
                 bot.phase_init()
+                print("bot", type(bot))
 
             # stance vector
             sc = {bot_power: len(game.get_centers(bot_power)) for bot_power in powers}
             stance_vec = stance.get_stance(game_rec= sc, game_rec_type='game')
 
-            if isinstance(bot, ProposerDipBot) or ProposerDipBot in bot.__class__.__mro__:
+            instance_list = [TransparentBot, ProposerDipBot, RealPolitik]
+            if is_in_instance_list(bot, instance_list):
                 bot.stance = stance_vec[bot.power_name]
         # print(game.get_current_phase())
         if game.get_current_phase()[-1] == 'M':
