@@ -64,8 +64,9 @@ def bot_loop():
     stance = ScoreBasedStance('', powers)
     while not game.is_game_done:
         for bot in bots:
-            print(type(bot))
+            
             if isinstance(bot, BaselineMsgRoundBot) or issubclass(type(bot), BaselineMsgRoundBot):
+                print(type(bot))
                 bot.phase_init()
 
             # stance vector
