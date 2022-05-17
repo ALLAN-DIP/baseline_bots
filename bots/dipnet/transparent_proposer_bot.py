@@ -23,7 +23,7 @@ from utils import get_order_tokens
 class TransparentProposerDipBot(ProposerDipBot):
     """
     Execute orders computed by dipnet 
-    Send out some of them randomly
+    Share orders computed by dipnet 
     Propose orders computed by dipnet
     """
 

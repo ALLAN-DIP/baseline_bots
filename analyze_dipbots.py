@@ -12,6 +12,7 @@ from bots.dipnet.transparent_bot import TransparentBot
 from bots.dipnet.selectively_transparent_bot import SelectivelyTransparentBot
 from bots.dipnet.transparent_proposer_bot import TransparentProposerDipBot
 from bots.dipnet.dipnet_proposer_bot import ProposerDipBot
+from bots.dipnet.RealPolitik import RealPolitik
 from bots.random_loyal_supportproposal import RandomLSPBot
 from bots.random_no_press import RandomNoPress_AsyncBot
 from stance.stance_extraction import StanceExtraction, ScoreBasedStance
@@ -56,6 +57,8 @@ def bot_loop():
             bot = TransparentProposerDipBot(bot_power, game, 3)
         elif bot_type == "pbt":
             bot = ProposerDipBot(bot_power, game, 3)
+        elif bot_type == "rplt":
+            bot = RealPolitik(bot_power, game, 3)
         bots.append(bot)
     start = time()
     stance = ScoreBasedStance('', powers)
