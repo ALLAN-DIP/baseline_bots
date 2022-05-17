@@ -29,10 +29,24 @@ class RealPolitik(DipnetBot):
         super().__init__(power_name, game, total_msg_rounds)
         self.stance= None
         self.accum_messages = []
+        self.rollout_length = 5
+        self.rollout_n_order = 2
 
     def phase_init(self) -> None:
         super().phase_init()
         self.accum_messages = []
+
+    @gen.coroutine
+    def get_state_value(self, game, power_name):
+        # rollout the game --- orders in rollout are from dipnet 
+        # state value 
+        for i in range (self.rollout_length):
+            for power in game.powers:
+                orders = yield self.brain.get_orders(game, power)
+                game.set_orders(power_name=power, orders=orders[power][:min(self.rollout_n_order, len(orders))])
+            game.process()
+        return game.get_centers(power_name) 
+
 
     @gen.coroutine
     def gen_messages(self, rcvd_messages):
@@ -80,7 +94,7 @@ class RealPolitik(DipnetBot):
                         if power_orders:
                             simulated_game.set_orders(power_name=other_power, orders=power_orders)
                     simulated_game.process()
-                    state_value[proposer] = self.brain.get_state_value(self.game,self.power_name)
+                    state_value[proposer] = self.get_state_value(simulated_game, self.power_name)
 
             if not proposed:
                 # if there is no proposal orders, set orders execute by dipnet
