@@ -80,9 +80,9 @@ class RealPolitik(DipnetBot):
                 # this is for sharing info orders 
                 if 'FCT' in game_msg.message:
                     shared_order[game_msg.sender] = parse_orr_xdo(parse_FCT(game_msg.message))
-                    print(shared_order[game_msg.sender])
                 # this is for proposal orders
                 else:
+                    print(game_msg.message)
                     proposal_order[game_msg.sender] = parse_orr_xdo(game_msg.message)
                     print(proposal_order[game_msg.sender])
 
