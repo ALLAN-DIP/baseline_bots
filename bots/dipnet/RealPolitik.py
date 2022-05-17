@@ -17,7 +17,7 @@ from utils import OrdersData, MessagesData, get_order_tokens, get_other_powers
 from DAIDE import ORR, XDO, FCT
 from typing import List
 from tornado import gen
-from utils import get_order_tokens, parse_FCT, parse_orr_xdo, YES
+from utils import get_order_tokens, parse_FCT, parse_orr_xdo, YES, REJ
 
 
 class RealPolitik(DipnetBot):
@@ -111,8 +111,13 @@ class RealPolitik(DipnetBot):
                 # else, set proposal order that return maximum state value
                 best_proposer = max(state_value, key=state_value.get)
                 self.orders.add_orders(proposal_order[best_proposer], overwrite=True)
-                msg = YES(ORR([XDO(order) for order in proposal_order[best_proposer]]))
-                ret_obj.add_message(best_proposer, str(msg)+' '+state_value[best_proposer])
+                for proposer, orders in proposal_order.items():
+                    if orders: 
+                        if proposer == best_proposer:
+                            msg = YES(ORR([XDO(order) for order in proposal_order[proposer]]))
+                        else:
+                            msg = REJ(ORR([XDO(order) for order in proposal_order[proposer]]))
+                        ret_obj.add_message(proposer, str(msg)+' '+state_value[proposer])
             # print(self.power_name + ': ')
             # print(self.orders.get_list_of_orders())
             self.curr_msg_round += 1

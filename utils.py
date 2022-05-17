@@ -78,6 +78,10 @@ def YES(string) -> str:
     """Forms YES message"""
     return f"YES ({string})"
 
+def REJ(string) -> str:
+    """Forms REJ message"""
+    return f"REJ ({string})"
+
 def FCT(string) -> str:
     """Forms FCT message"""
     return f"FCT ({string})"
