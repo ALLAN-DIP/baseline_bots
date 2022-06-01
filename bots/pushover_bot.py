@@ -23,7 +23,7 @@ class PushoverBot(baseline_bot.BaselineBot):
         return None
 
     def gen_orders(self):
-        return self.orders
+        return self.orders.get_list_of_orders()
 
     def __call__(self, rcvd_messages):
         ret_obj = OrdersData()
