@@ -37,6 +37,10 @@ class PushoverBot(baseline_bot.BaselineBot):
         while 'FCT' in last_message.message:
             sorted_rcvd_messages.pop(0)
             last_message = sorted_rcvd_messages[0]
+
+        if 'FCT' in last_message.message:
+            self.orders = ret_obj
+            return {"orders": ret_obj, "messages": reply_obj}
         
         # parse may fail
         try:
