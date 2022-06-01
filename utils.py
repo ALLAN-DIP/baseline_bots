@@ -148,7 +148,7 @@ def is_order_aggressive(order: str, sender: str, game: Game) -> bool:
     NOTE: Adapted directly from Joy's code
     """
     order_token = get_order_tokens(order)
-    print(order_token)
+    # print(order_token)
     if order_token[0][0] =='A' or order_token[0][0] =='F':
         #get location - add order_token[0] ('A' or 'F') at front to check if it collides with other powers' units
         order_unit = order_token[0][0] + order_token[1][1:]

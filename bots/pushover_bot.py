@@ -30,7 +30,7 @@ class PushoverBot(baseline_bot.BaselineBot):
         reply_obj = MessagesData()
 
         if len(rcvd_messages) == 0:
-            return {"orders":ret_obj}
+            return {"orders":ret_obj, "messages": reply_obj}
 
         sorted_rcvd_messages = sort_messages_by_most_recent(rcvd_messages)
         last_message = sorted_rcvd_messages[0]
