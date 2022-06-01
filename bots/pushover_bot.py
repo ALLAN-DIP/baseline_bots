@@ -45,6 +45,7 @@ class PushoverBot(baseline_bot.BaselineBot):
         # parse may fail
         try:
             print(last_message.message)
+            print(parse_orr_xdo(last_message.message))
             orders = get_non_aggressive_orders(parse_orr_xdo(last_message.message), self.power_name, self.game)
             # set the orders
             ret_obj.add_orders(orders)
