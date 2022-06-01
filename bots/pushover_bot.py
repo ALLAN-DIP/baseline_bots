@@ -2,12 +2,12 @@ __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
 from diplomacy import Message
-from DAIDE import ParseError, YES, REJ, ALY, ORR, XDO
+from DAIDE import ParseError, ALY, ORR, XDO
 import DAIDE 
 DAIDE.config.ORDERS_DAIDE = False
 
 from . import baseline_bot
-from utils import parse_orr_xdo, get_non_aggressive_orders, MessagesData, OrdersData, sort_messages_by_most_recent
+from utils import YES, REJ, parse_orr_xdo, get_non_aggressive_orders, MessagesData, OrdersData, sort_messages_by_most_recent
 
 class PushoverBot(baseline_bot.BaselineBot):
     """
