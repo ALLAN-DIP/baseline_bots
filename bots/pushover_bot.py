@@ -49,7 +49,7 @@ class PushoverBot(baseline_bot.BaselineBot):
             reply_obj.add_message(last_message.sender, str(msg))
 
             for message in sorted_rcvd_messages[1:]:
-                if 'FCT' not in last_message:
+                if 'FCT' not in last_message.message:
                     msg = REJ(message)
                     reply_obj.add_message(message.sender, str(msg))
 
