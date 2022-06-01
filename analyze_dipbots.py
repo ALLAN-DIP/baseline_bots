@@ -16,6 +16,7 @@ from bots.dipnet.RealPolitik import RealPolitik
 from bots.random_loyal_supportproposal import RandomLSPBot
 from bots.random_no_press import RandomNoPress_AsyncBot
 from bots.random_proposer_bot import RandomProposerBot_AsyncBot
+from bots.pushover_bot import PushoverBot_AsyncBot
 from stance.stance_extraction import StanceExtraction, ScoreBasedStance
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from tornado import gen
@@ -56,6 +57,8 @@ def bot_loop():
             bot = RandomProposerBot_AsyncBot(bot_power, game)
         elif bot_type == 'rnp':
             bot = RandomNoPress_AsyncBot(bot_power, game)
+        elif bot_type =='push':
+            bot =  PushoverBot_AsyncBot(bot_power, game)
         elif bot_type.startswith('lsp'):
             bot = RandomLSP_DipBot(bot_power, game, 3, alliance_all_in)
             if bot_type.endswith('m'):
@@ -70,6 +73,7 @@ def bot_loop():
             bot = ProposerDipBot(bot_power, game, 3)
         elif bot_type == "rplt":
             bot = RealPolitik(bot_power, game, 3)
+        
         bots.append(bot)
     start = time()
     stance = ScoreBasedStance('', powers)
@@ -116,11 +120,24 @@ def bot_loop():
                             phase=game.get_current_phase(),
                         )
                         game.add_message(message=msg_obj)
-        
 
         for bot in bots:
+
             # Orders round
             orders = yield bot.gen_orders()
+
+            # __call__ for pushover bot to retrieve last order
+            if isinstance(bot,PushoverBot_AsyncBot):
+                orders = bot()['orders'].get_list_of_orders()
+                messages = bot()['messages'].messages
+                for msg in messages:
+                    msg_obj = Message(
+                        sender=sender,
+                        recipient=msg['recipient'],
+                        message=msg['message'],
+                        phase=game.get_current_phase(),
+                    )
+                    game.add_message(message=msg_obj)
             
             # messages, orders = bot_state.messages, bot_state.orders
             if orders is not None:

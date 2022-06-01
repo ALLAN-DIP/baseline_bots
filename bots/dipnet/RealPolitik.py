@@ -17,7 +17,7 @@ from utils import OrdersData, MessagesData, get_order_tokens, get_other_powers
 from DAIDE import ORR, XDO, FCT
 from typing import List
 from tornado import gen
-from utils import get_order_tokens, parse_FCT, parse_orr_xdo, YES, REJ
+from utils import get_order_tokens, parse_FCT, parse_orr_xdo, YES, REJ, get_non_aggressive_orders
 
 
 class RealPolitik(DipnetBot):
@@ -93,6 +93,7 @@ class RealPolitik(DipnetBot):
                 if orders:
                     proposed = True
                     simulated_game = self.game.__deepcopy__(None) 
+                    orders = get_non_aggressive_orders(orders, self.power_name, self.game)
                     # print('from: ', proposer)
                     # print(orders)
                     simulated_game.set_orders(power_name=self.power_name, orders=orders)
