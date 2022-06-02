@@ -127,7 +127,7 @@ def bot_loop():
 
             # __call__ for pushover bot to retrieve last order
             if isinstance(bot,PushoverBot_AsyncBot):
-                rcvd_messages = game.filter_messages(messages=game.messages, game_role=bot)
+                rcvd_messages = game.filter_messages(messages=game.messages, game_role=bot.power_name)
                 rcvd_messages = list(rcvd_messages.items())
                 rcvd_messages.sort()
                 rcvd_messages = [msg for _,msg in rcvd_messages]
