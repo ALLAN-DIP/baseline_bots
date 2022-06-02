@@ -132,7 +132,7 @@ def bot_loop():
                 rcvd_messages.sort()
                 rcvd_messages = [msg for _,msg in rcvd_messages]
 
-                return_obj = bot(rcvd_messages)
+                return_obj = yield bot(rcvd_messages)
                 for msg in return_obj['messages']:
                     msg_obj = Message(
                         sender=sender,
