@@ -78,6 +78,7 @@ def bot_loop():
     start = time()
     stance = ScoreBasedStance('', powers)
     while not game.is_game_done:
+        print(game.get_current_phase())
         for bot in bots:
             dip_instance_list = [NoPressDipBot, RandomLSP_DipBot, TransparentBot, SelectivelyTransparentBot, TransparentProposerDipBot, ProposerDipBot, RealPolitik]
             if is_in_instance_list(bot, dip_instance_list):
@@ -122,8 +123,6 @@ def bot_loop():
                         game.add_message(message=msg_obj)
 
         for bot in bots:
-
-
 
             # __call__ for pushover bot to retrieve last order
             if isinstance(bot,PushoverBot_AsyncBot):
