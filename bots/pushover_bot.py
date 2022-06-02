@@ -1,6 +1,7 @@
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
+from tornado import gen
 from diplomacy import Message
 from DAIDE import ParseError, ALY, ORR, XDO
 import DAIDE 
@@ -67,3 +68,17 @@ class PushoverBot(baseline_bot.BaselineBot):
 
 
         return {"orders": ret_obj, "messages": reply_obj}
+
+class PushoverBot_AsyncBot(PushoverBot):
+    """Wrapper to PushoverBot with tornado decorators for async calls"""
+    @gen.coroutine
+    def gen_messages(self, rcvd_messages):
+        return super().gen_messages(rcvd_messages)
+
+    @gen.coroutine
+    def gen_orders(self):
+        return super().gen_orders()
+
+    @gen.coroutine
+    def __call__(self, rcvd_messages):
+        return super().__call__(rcvd_messages)

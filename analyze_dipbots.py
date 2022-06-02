@@ -128,9 +128,13 @@ def bot_loop():
 
             # __call__ for pushover bot to retrieve last order
             if isinstance(bot,PushoverBot_AsyncBot):
-                orders = bot()['orders'].get_list_of_orders()
-                messages = bot()['messages'].messages
-                for msg in messages:
+                rcvd_messages = game.filter_messages(messages=game.messages, game_role=bot)
+                rcvd_messages = list(rcvd_messages.items())
+                rcvd_messages.sort()
+                rcvd_messages = [msg for _,msg in rcvd_messages]
+
+                return_obj = bot(rcvd_messages)
+                for msg in return_obj['messages']:
                     msg_obj = Message(
                         sender=sender,
                         recipient=msg['recipient'],
@@ -141,7 +145,7 @@ def bot_loop():
             
             # messages, orders = bot_state.messages, bot_state.orders
             if orders is not None:
-                game.set_orders(power_name=bot.power_name, orders=orders)
+                game.set_orders(power_name=bot.power_name, orders=return_obj['orders'])
 
         game.process()
 
