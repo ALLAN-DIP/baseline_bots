@@ -123,8 +123,7 @@ def bot_loop():
 
         for bot in bots:
 
-            # Orders round
-            orders = yield bot.gen_orders()
+
 
             # __call__ for pushover bot to retrieve last order
             if isinstance(bot,PushoverBot_AsyncBot):
@@ -143,9 +142,12 @@ def bot_loop():
                     )
                     game.add_message(message=msg_obj)
             
+            # Orders round
+            orders = yield bot.gen_orders()
+            
             # messages, orders = bot_state.messages, bot_state.orders
             if orders is not None:
-                game.set_orders(power_name=bot.power_name, orders=return_obj['orders'])
+                game.set_orders(power_name=bot.power_name, orders=orders)
 
         game.process()
 
