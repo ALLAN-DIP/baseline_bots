@@ -52,6 +52,7 @@ class ProposerDipBot(DipnetBot):
 
     @gen.coroutine
     def gen_orders(self):
+        self.orders = OrdersData()
         orders = yield self.brain.get_orders(self.game, self.power_name)
         self.orders.add_orders(orders, overwrite=True)
         return self.orders.get_list_of_orders()
