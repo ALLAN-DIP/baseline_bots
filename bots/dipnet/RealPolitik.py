@@ -107,7 +107,7 @@ class RealPolitik(DipnetBot):
                 # if there is no proposal orders, set orders execute by dipnet
                 orders = yield self.brain.get_orders(self.game, self.power_name)
                 self.orders.add_orders(orders, overwrite=True)
-            else:
+            # else:
                 # else, set proposal order that return maximum state value
                 best_proposer = max(state_value, key=state_value.get)
                 self.orders.add_orders(proposal_order[best_proposer], overwrite=True)
