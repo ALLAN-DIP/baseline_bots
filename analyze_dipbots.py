@@ -1,6 +1,6 @@
 import argparse
 from time import time
-
+import ujson as json
 from diplomacy import Message
 from diplomacy import Game
 from diplomacy.utils.export import to_saved_game_format
@@ -10,8 +10,14 @@ from bots.dipnet.no_press_bot import NoPressDipBot
 from bots.dipnet.random_loyal_supportproposal_dip import RandomLSP_DipBot
 from bots.dipnet.transparent_bot import TransparentBot
 from bots.dipnet.selectively_transparent_bot import SelectivelyTransparentBot
+from bots.dipnet.transparent_proposer_bot import TransparentProposerDipBot
+from bots.dipnet.dipnet_proposer_bot import ProposerDipBot
+from bots.dipnet.RealPolitik import RealPolitik
 from bots.random_loyal_supportproposal import RandomLSPBot
 from bots.random_no_press import RandomNoPress_AsyncBot
+from bots.random_proposer_bot import RandomProposerBot_AsyncBot
+from bots.pushover_bot import PushoverBot_AsyncBot
+from stance.stance_extraction import StanceExtraction, ScoreBasedStance
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from tornado import gen
 import asyncio
@@ -33,6 +39,14 @@ def parse_args():
     print(args)
     return args
 
+def is_in_instance_list(obj, instance_list):
+    boo_v = False
+    for instance in instance_list:
+        boo_v = isinstance(obj, instance)
+        if boo_v:
+            break
+    return boo_v
+
 @gen.coroutine
 def bot_loop():
     bots = []
@@ -42,8 +56,12 @@ def bot_loop():
             bot = NoPressDipBot(bot_power, game)
         elif bot_type == 're_np':
             bot = NoPressDipBot(bot_power, game, dipnet_type='rlp')
+        elif bot_type == 'rpbt':
+            bot = RandomProposerBot_AsyncBot(bot_power, game)
         elif bot_type == 'rnp':
             bot = RandomNoPress_AsyncBot(bot_power, game)
+        elif bot_type =='push':
+            bot =  PushoverBot_AsyncBot(bot_power, game)
         elif bot_type.startswith('lsp'):
             bot = RandomLSP_DipBot(bot_power, game, 3, alliance_all_in)
             if bot_type.endswith('m'):
@@ -56,16 +74,34 @@ def bot_loop():
             bot = TransparentBot(bot_power, game, 3)
         elif bot_type == "stbt":
             bot = SelectivelyTransparentBot(bot_power, game, 3)
+        elif bot_type == "tpbt":
+            bot = TransparentProposerDipBot(bot_power, game, 3)
+        elif bot_type == "pbt":
+            bot = ProposerDipBot(bot_power, game, 3)
+        elif bot_type == "rplt":
+            bot = RealPolitik(bot_power, game, 3)
         
         bots.append(bot)
     start = time()
-
+    stance = ScoreBasedStance('', powers)
     while not game.is_game_done:
-        for bot in bots:
-            if not game.powers[bot.power_name].is_eliminated():
-                if isinstance(bot, BaselineMsgRoundBot):
-                    bot.phase_init()
         print(game.get_current_phase())
+        for bot in bots:
+            # if not game.powers[bot.power_name].is_eliminated():
+            #     if isinstance(bot, BaselineMsgRoundBot):
+            #         bot.phase_init()
+            dip_instance_list = [NoPressDipBot, RandomLSP_DipBot, TransparentBot, SelectivelyTransparentBot, TransparentProposerDipBot, ProposerDipBot, RealPolitik]
+            if is_in_instance_list(bot, dip_instance_list):
+                bot.phase_init()
+
+            # stance vector
+            sc = {bot_power: len(game.get_centers(bot_power)) for bot_power in powers}
+            stance_vec = stance.get_stance(game_rec= sc, game_rec_type='game')
+
+            proposer_instance_list = [TransparentBot, ProposerDipBot, RealPolitik]
+            if is_in_instance_list(bot, proposer_instance_list):
+                bot.stance = stance_vec[bot.power_name]
+        # print(game.get_current_phase())
         if game.get_current_phase()[-1] == 'M':
             # Iterate through multiple rounds of comms during movement phases
             for _ in range(comms_rounds):
@@ -95,21 +131,46 @@ def bot_loop():
                             phase=game.get_current_phase(),
                         )
                         game.add_message(message=msg_obj)
-        
 
         for bot in bots:
-            if not game.powers[bot.power_name].is_eliminated():
-                # Orders round
-                orders = yield bot.gen_orders()
-                # messages, orders = bot_state.messages, bot_state.orders
+            # if not game.powers[bot.power_name].is_eliminated():
+            #     # Orders round
+            #     orders = yield bot.gen_orders()
+            #     # messages, orders = bot_state.messages, bot_state.orders
 
-                if orders is not None:
-                    game.set_orders(power_name=bot.power_name, orders=orders)
+            #     if orders is not None:
+            #         game.set_orders(power_name=bot.power_name, orders=orders)
+
+            # __call__ for pushover bot to retrieve last order
+            if isinstance(bot,PushoverBot_AsyncBot):
+                rcvd_messages = game.filter_messages(messages=game.messages, game_role=bot.power_name)
+                rcvd_messages = list(rcvd_messages.items())
+                rcvd_messages.sort()
+                rcvd_messages = [msg for _,msg in rcvd_messages]
+
+                return_obj = yield bot(rcvd_messages)
+                for msg in return_obj['messages']:
+                    msg_obj = Message(
+                        sender=sender,
+                        recipient=msg['recipient'],
+                        message=msg['message'],
+                        phase=game.get_current_phase(),
+                    )
+                    game.add_message(message=msg_obj)
+            
+            # Orders round
+            orders = yield bot.gen_orders()
+            
+            # messages, orders = bot_state.messages, bot_state.orders
+            if orders is not None:
+                game.set_orders(power_name=bot.power_name, orders=orders)
 
         game.process()
 
     print(time() - start)
-    to_saved_game_format(game, output_path=args.filename)
+    # to_saved_game_format(game, output_path=args.filename)
+    with open(args.filename, 'w') as file:
+        file.write(json.dumps(to_saved_game_format(game)))
 
     stop_io_loop()
 
@@ -119,7 +180,7 @@ if __name__ == "__main__":
 
     # game instance
     game = Game()
-    # powers = list(game.get_map_power_names())
+    powers = list(game.get_map_power_names())
     # powers = ['ENGLAND', 'FRANCE', 'GERMANY', 'ITALY', 'AUSTRIA', 'RUSSIA', 'TURKEY']
 
     assert len(args.powers.split(",")) == 7, "Powers specified are not 7"

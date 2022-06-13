@@ -78,6 +78,10 @@ def YES(string) -> str:
     """Forms YES message"""
     return f"YES ({string})"
 
+def REJ(string) -> str:
+    """Forms REJ message"""
+    return f"REJ ({string})"
+
 def FCT(string) -> str:
     """Forms FCT message"""
     return f"FCT ({string})"
@@ -101,8 +105,9 @@ def parse_orr_xdo(msg: str) -> List[str]:
     try:
         if "ORR" in msg:
             msg = msg[5:-1]
-        else:
-            msg = msg[1:-1]
+        # else:
+        #     # remove else since it is a bug to 'XDO (order)' 
+        #     msg = msg[1:-1]
         parts = msg.split(") (")
 
         return [part[5:-1] for part in parts]
@@ -143,9 +148,10 @@ def is_order_aggressive(order: str, sender: str, game: Game) -> bool:
     NOTE: Adapted directly from Joy's code
     """
     order_token = get_order_tokens(order)
-    if order_token[0] =='A' or order_token[0] =='F':
+    # print(order_token)
+    if order_token[0][0] =='A' or order_token[0][0] =='F':
         #get location - add order_token[0] ('A' or 'F') at front to check if it collides with other powers' units
-        order_unit = order_token[0]+' '+order_token[2]
+        order_unit = order_token[0][0] + order_token[1][1:]
         #check if loc has some units of other powers on
         for power in game.powers:
           if sender != power:
