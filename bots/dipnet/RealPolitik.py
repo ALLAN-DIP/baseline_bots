@@ -75,7 +75,7 @@ class RealPolitik(DipnetBot):
 
             # group messages into 2: (1) shared (with FCT) orders and (2) xdo (without FCT) orders
             for game_msg in rcvd_messages:
-                game_msg = game_msg[1]
+                # game_msg = game_msg[1]
                 # this is for sharing info orders 
                 if 'FCT' in game_msg.message:
                     shared_order[game_msg.sender] = parse_orr_xdo(parse_FCT(game_msg.message))
