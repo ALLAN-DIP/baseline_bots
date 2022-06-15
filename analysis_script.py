@@ -34,7 +34,7 @@ def execute_scenario(pows, types, file, runname, parent_analysis, bypass_exec=Fa
             os.system(f"rm {file}")
         for _ in tqdm(range(game_play_count)):
             start = time()
-            cmd = f"python analyze_dipbots.py -p {pows} -t {types} -f {file}"
+            cmd = f"python botgame_launcher_dipnet.py -p {pows} -t {types} -f {file}"
             print(os.system(cmd))
             end = time()
             times.append(end-start)

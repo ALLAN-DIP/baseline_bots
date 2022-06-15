@@ -7,13 +7,13 @@ from diplomacy.utils.export import to_saved_game_format
 
 from bots.baseline_bot import BaselineMsgRoundBot
 from bots.dipnet.no_press_bot import NoPressDipBot
-from bots.dipnet.random_loyal_supportproposal_dip import RandomLSP_DipBot
+from bots.dipnet.loyal_support_proposal import LSP_DipBot
 from bots.dipnet.transparent_bot import TransparentBot
 from bots.dipnet.selectively_transparent_bot import SelectivelyTransparentBot
 from bots.dipnet.transparent_proposer_bot import TransparentProposerDipBot
 from bots.dipnet.dipnet_proposer_bot import ProposerDipBot
 from bots.dipnet.RealPolitik import RealPolitik
-from bots.random_loyal_supportproposal import RandomLSPBot
+from bots.random_loyal_support_proposal import RandomLSPBot
 from bots.random_no_press import RandomNoPress_AsyncBot
 from bots.random_proposer_bot import RandomProposerBot_AsyncBot
 from bots.pushover_bot import PushoverBot_AsyncBot
@@ -63,11 +63,11 @@ def bot_loop():
         elif bot_type =='push':
             bot =  PushoverBot_AsyncBot(bot_power, game)
         elif bot_type.startswith('lsp'):
-            bot = RandomLSP_DipBot(bot_power, game, 3, alliance_all_in)
+            bot = LSP_DipBot(bot_power, game, 3, alliance_all_in)
             if bot_type.endswith('m'):
                 bot.set_leader()
         elif bot_type.startswith('rlsp'):
-            bot = RandomLSP_DipBot(bot_power, game, 3, alliance_all_in, dipnet_type='rlp')
+            bot = LSP_DipBot(bot_power, game, 3, alliance_all_in, dipnet_type='rlp')
             if bot_type.endswith('m'):
                 bot.set_leader()
         elif bot_type == 'tbt':
@@ -90,7 +90,7 @@ def bot_loop():
             # if not game.powers[bot.power_name].is_eliminated():
             #     if isinstance(bot, BaselineMsgRoundBot):
             #         bot.phase_init()
-            dip_instance_list = [NoPressDipBot, RandomLSP_DipBot, TransparentBot, SelectivelyTransparentBot, TransparentProposerDipBot, ProposerDipBot, RealPolitik]
+            dip_instance_list = [NoPressDipBot, LSP_DipBot, TransparentBot, SelectivelyTransparentBot, TransparentProposerDipBot, ProposerDipBot, RealPolitik]
             if is_in_instance_list(bot, dip_instance_list):
                 bot.phase_init()
 

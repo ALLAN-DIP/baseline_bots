@@ -13,7 +13,7 @@ from utils import parse_orr_xdo, parse_alliance_proposal, YES, \
     get_other_powers, ALY, MessagesData, OrdersData, get_order_tokens, ORR, XDO
 from tornado import gen
 
-class RandomLSP_DipBot(DipnetBot):
+class LSP_DipBot(DipnetBot):
 
     def __init__(self, power_name, game, total_msg_rounds=3, alliance_all_in=True, dipnet_type='slp') -> None:
         super().__init__(power_name, game, total_msg_rounds, dipnet_type)
@@ -176,20 +176,20 @@ class RandomLSP_DipBot(DipnetBot):
             # Fetch neighbour's orderable provinces
             n2n_provs = self.get_2_neigh_provinces()
      
-            print(f"\n\nPower: {self.power_name}")
-            print("My influence")
-            print(self.my_influence)
-            print(self.orders.orders)
+            # print(f"\n\nPower: {self.power_name}")
+            # print("My influence")
+            # print(self.my_influence)
+            # print(self.orders.orders)
             possible_support_proposals = defaultdict(list)
-            print(n2n_provs)
+            # print(n2n_provs)
             for n2n_p in n2n_provs:
                 if not (self.possible_orders[n2n_p]):
                     continue
 
                 # Filter out support orders from list of all possible orders
                 subset_possible_orders = [ord for ord in self.possible_orders[n2n_p] if self.support_move(ord)]
-                print(f"Province: {n2n_p}")
-                print(subset_possible_orders)                
+                # print(f"Province: {n2n_p}")
+                # print(subset_possible_orders)                
                 for order in subset_possible_orders:
                     order_tokens = get_order_tokens(order)
                     if (order_tokens[2].split()[1] in self.orders.orders
@@ -203,7 +203,7 @@ class RandomLSP_DipBot(DipnetBot):
                             possible_support_proposals[location_comb].append(
                                         (order_tokens[0], order))
             
-            print(possible_support_proposals)
+            # print(possible_support_proposals)
             for attack_key in possible_support_proposals:
                 # For each location combination, randomly select one of the support orders
                 selected_order = random.choice(possible_support_proposals[attack_key])
@@ -230,6 +230,7 @@ class RandomLSP_DipBot(DipnetBot):
         self.possible_orders = self.game.get_all_possible_orders()
         self.support_proposals_sent = False
         self.orders = OrdersData()
+        self.curr_msg_round = 1
         self.cache_allies_influence()
 
     # def config(self, configg):
@@ -263,7 +264,7 @@ class RandomLSP_DipBot(DipnetBot):
                 self.my_leader = comms_rcvd['alliance_proposer']
                 comms_obj.add_message(self.my_leader, str(YES(comms_rcvd['alliance_msg'])))
             # else propose alliance if not already sent
-            elif not self.alliance_props_sent and self.leader_mode:
+            elif self.leader_mode:
                 # Send 2-power alliance proposals to all powers
                 if not self.alliance_all_in:
                     for other_power in get_other_powers([self.power_name], self.game):

@@ -6,7 +6,7 @@ from diplomacy import Game
 from diplomacy.utils.export import to_saved_game_format
 
 from bots.baseline_bot import BaselineMsgRoundBot
-from bots.random_loyal_supportproposal import RandomLSPBot
+from bots.random_loyal_support_proposal import RandomLSPBot
 from bots.random_no_press import RandomNoPressBot
 
 def parse_args():

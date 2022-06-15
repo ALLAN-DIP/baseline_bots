@@ -9,6 +9,7 @@ sys.path.append("..")
 sys.path.append("../..")
 sys.path.append("../../..")
 sys.path.append("../../../dipnet_press")
+sys.path.append("../dipnet_press")
 
 from diplomacy_research.players.benchmark_player import DipNetRLPlayer
 from bots.dipnet.dipnet_bot import DipnetBot
