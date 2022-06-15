@@ -1,19 +1,25 @@
 __author__ = "Kartik Shenoy"
 __email__ = "kartik.shenoyy@gmail.com"
 
-import random
-from collections import defaultdict
 import sys
 sys.path.append("..")
+import random
+from collections import defaultdict
 
 from diplomacy import Message
+from DAIDE import YES, ALY, ORR, XDO
 
-from bots.dipnet.dipnet_bot import DipnetBot
-from utils import parse_orr_xdo, parse_alliance_proposal, YES, \
-    get_other_powers, ALY, MessagesData, OrdersData, get_order_tokens, ORR, XDO
-from tornado import gen
+from bots.baseline_bot import BaselineMsgRoundBot
+from utils import parse_orr_xdo, parse_alliance_proposal, get_non_aggressive_orders, \
+    get_other_powers, MessagesData, OrdersData, get_order_tokens
 
-class RandomLSP_DipBot(DipnetBot):
+
+class RandomLSPBot(BaselineMsgRoundBot):
+    """
+    This bot either leads, proposes alliances and proposes support moves for moves proposed by Dipnet to the supporting allies or 
+    follows, accepts alliances, accepts support proposals and blindly follows them 
+    while filling the remaining units with Dipnet's orders
+    """
 
     def __init__(self, power_name, game, total_msg_rounds=3, alliance_all_in=True) -> None:
         super().__init__(power_name, game, total_msg_rounds)
@@ -174,20 +180,15 @@ class RandomLSP_DipBot(DipnetBot):
         if self.game.get_current_phase()[-1] == 'M':
             # Fetch neighbour's orderable provinces
             n2n_provs = self.get_2_neigh_provinces()
-     
-            # print(f"\n\nPower: {self.power_name}")
-            # print("My influence")
-            # print(self.my_influence)
-            # print(self.orders.orders)
+
             possible_support_proposals = defaultdict(list)
-            # print(n2n_provs)
             for n2n_p in n2n_provs:
                 if not (self.possible_orders[n2n_p]):
                     continue
 
                 # Filter out support orders from list of all possible orders
                 subset_possible_orders = [ord for ord in self.possible_orders[n2n_p] if self.support_move(ord)]
-                # print(subset_possible_orders)                
+
                 for order in subset_possible_orders:
                     order_tokens = get_order_tokens(order)
                     if (order_tokens[2].split()[1] in self.orders.orders
@@ -200,8 +201,7 @@ class RandomLSP_DipBot(DipnetBot):
                             # Add to list of possible support proposals for this location combination
                             possible_support_proposals[location_comb].append(
                                         (order_tokens[0], order))
-            
-            # print(possible_support_proposals)
+
             for attack_key in possible_support_proposals:
                 # For each location combination, randomly select one of the support orders
                 selected_order = random.choice(possible_support_proposals[attack_key])
@@ -223,27 +223,33 @@ class RandomLSP_DipBot(DipnetBot):
     def phase_init(self):
         """Phase initialization code"""
         super().phase_init()
-        # print("Phase inited")
         self.my_influence = set(self.game.get_power(self.power_name).influence)
         self.possible_orders = self.game.get_all_possible_orders()
         self.support_proposals_sent = False
         self.orders = OrdersData()
+        self.cache_allies_influence()
 
     # def config(self, configg):
     #     # super().config(configg)
     #     self.alliance_all_in = configg['alliance_all_in']
 
-    @gen.coroutine
     def gen_messages(self, rcvd_messages):
         # self.possible_orders = self.game.get_all_possible_orders()
 
         # Only if it is the first comms round, do this
         if self.curr_msg_round == 1:
-            # Fetch list of orders from DipNet
-            orders = yield from self.brain.get_orders(self.game, self.power_name)
-            self.orders.add_orders(orders, overwrite=True)
-        # print(f"Selected orders for {self.power_name}: {self.orders.get_list_of_orders()}")
+            # Select set of non-support orders which are not bad moves
+            for loc in self.game.get_orderable_locations(self.power_name):
+                if self.possible_orders[loc]:
+                    subset_orders = [order for order in self.possible_orders[loc]
+                                     if not self.bad_move(order) and not self.support_move(order)]
+                    sel_order = random.choice(subset_orders)
+                    self.orders.add_order(sel_order, overwrite=True)
+
         comms_obj = MessagesData()
+
+        if self.are_msg_rounds_done():
+            raise "Wrapper's invocation error: Comms function called after comms rounds are over"
 
         # Parse comms receieved
         comms_rcvd = self.interpret_orders(rcvd_messages)
@@ -255,11 +261,9 @@ class RandomLSP_DipBot(DipnetBot):
                 if not self.alliance_props_sent:
                     raise "Received ALY YES without sending ALY"
                 self.allies = comms_rcvd['yes_allies_proposed']
-                self.cache_allies_influence()
             # if alliance proposal receieved
             elif comms_rcvd['allies_proposed']:
                 self.allies = comms_rcvd['allies_proposed']
-                self.cache_allies_influence()
                 self.my_leader = comms_rcvd['alliance_proposer']
                 comms_obj.add_message(self.my_leader, str(YES(comms_rcvd['alliance_msg'])))
             # else propose alliance if not already sent
@@ -284,16 +288,22 @@ class RandomLSP_DipBot(DipnetBot):
 
         # Update all received proposed orders
         self.orders.add_orders(comms_rcvd['orders_proposed'], overwrite=True)
-        self.curr_msg_round += 1
+
         return comms_obj
 
-    @gen.coroutine
     def gen_orders(self):
 
-        if self.game.get_current_phase()[-1] != 'M':
-            # Fetch list of orders from DipNet
-            orders = yield from self.brain.get_orders(self.game, self.power_name)
-            self.orders.add_orders(orders, overwrite=True)
+        if self.game.get_current_phase()[-1] == 'M':
+            # Fill out orders randomly if not decided already
+            filled_out_orders = [random.choice(self.possible_orders[loc]) for loc in
+                             self.game.get_orderable_locations(self.power_name)
+                             if loc not in self.orders.orders and self.possible_orders[loc]]
+            self.orders.add_orders(filled_out_orders, overwrite=False)
+        else:
+            random_orders = [random.choice(self.possible_orders[loc]) for loc in
+                             self.game.get_orderable_locations(self.power_name)
+                             if self.possible_orders[loc]]
+            self.orders.add_orders(random_orders, overwrite=False)
 
         return self.orders.get_list_of_orders()
 
@@ -313,7 +323,6 @@ if __name__ == "__main__":
             bot_state = bot.act()
             messages, orders = bot_state.messages, bot_state.orders
             if messages:
-                # print(power_name, messages)
                 for msg in messages:
                     msg_obj = Message(
                         sender=bot.power_name,
@@ -322,7 +331,6 @@ if __name__ == "__main__":
                         phase=game.get_current_phase(),
                     )
                     game.add_message(message=msg_obj)
-            # print("Submitted orders")
             if orders is not None:
                 game.set_orders(power_name=bot.power_name, orders=orders)
         game.process()

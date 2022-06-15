@@ -5,8 +5,8 @@ import random
 from collections import defaultdict
 
 from diplomacy import Message
-from diplomacy.agents.baseline_bots.baseline_bot import BaselineBot
-from diplomacy.agents.baseline_bots.utils import get_order_tokens
+from bots.baseline_bot import BaselineBot
+from utils import get_order_tokens
 from DAIDE import ORR, XDO
 
 from utils import BotReturnData

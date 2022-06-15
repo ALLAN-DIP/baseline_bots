@@ -55,7 +55,7 @@ class BaselineMsgRoundBot(BaselineBot, ABC):
         """
         super().__init__(power_name, game)
         self.total_msg_rounds = total_msg_rounds
-        self.phase_init()
+        self.orders = OrdersData()
     
     def gen_orders(self) -> OrdersData:
         """finalizes moves"""

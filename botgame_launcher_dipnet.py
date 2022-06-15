@@ -7,13 +7,13 @@ from diplomacy.utils.export import to_saved_game_format
 
 from bots.baseline_bot import BaselineMsgRoundBot
 from bots.dipnet.no_press_bot import NoPressDipBot
-from bots.dipnet.random_loyal_supportproposal_dip import RandomLSP_DipBot
+from bots.dipnet.loyal_support_proposal import LSP_DipBot
 from bots.dipnet.transparent_bot import TransparentBot
 from bots.dipnet.selectively_transparent_bot import SelectivelyTransparentBot
 from bots.dipnet.transparent_proposer_bot import TransparentProposerDipBot
 from bots.dipnet.dipnet_proposer_bot import ProposerDipBot
 from bots.dipnet.RealPolitik import RealPolitik
-from bots.random_loyal_supportproposal import RandomLSPBot
+from bots.random_loyal_support_proposal import RandomLSPBot
 from bots.random_no_press import RandomNoPress_AsyncBot
 from bots.random_proposer_bot import RandomProposerBot_AsyncBot
 from bots.pushover_bot import PushoverBot_AsyncBot
@@ -22,6 +22,7 @@ from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from tornado import gen
 import asyncio
 import sys
+import os
 
 sys.path.append("..")
 sys.path.append("../dipnet_press")
@@ -31,8 +32,8 @@ def parse_args():
     parser.add_argument('--powers', '-p', type=str, default='AUSTRIA,ITALY,ENGLAND,FRANCE,GERMANY,RUSSIA,TURKEY', help='comma-seperated country names (AUSTRIA,ITALY,ENGLAND,FRANCE,GERMANY,RUSSIA,TURKEY)')
     parser.add_argument('--filename', '-f', type=str, default='DipNetBotGame.json',
                         help='json filename')
-    parser.add_argument('--types', '-t', type=str, default='tbt,tbt,tbt,tbt,tbt,tbt,tbt',
-                        help='comma-separated bottypes (lspm,lsp,np,np,np,np,np)')
+    parser.add_argument('--types', '-t', type=str, default='lspm,lsp,np,np,np,np,np',
+                        help='comma-seperated bottypes (lspm,lsp,np,np,np,np,np)')
 
     args = parser.parse_args()
     print(args)
@@ -53,6 +54,8 @@ def bot_loop():
     for bot_power, bot_type in zip(args.powers.split(","), args.types.split(",")):
         if bot_type == 'np':
             bot = NoPressDipBot(bot_power, game)
+        elif bot_type == 're_np':
+            bot = NoPressDipBot(bot_power, game, dipnet_type='rlp')
         elif bot_type == 'rpbt':
             bot = RandomProposerBot_AsyncBot(bot_power, game)
         elif bot_type == 'rnp':
@@ -60,7 +63,11 @@ def bot_loop():
         elif bot_type =='push':
             bot =  PushoverBot_AsyncBot(bot_power, game)
         elif bot_type.startswith('lsp'):
-            bot = RandomLSP_DipBot(bot_power, game, 3, alliance_all_in)
+            bot = LSP_DipBot(bot_power, game, 3, alliance_all_in)
+            if bot_type.endswith('m'):
+                bot.set_leader()
+        elif bot_type.startswith('rlsp'):
+            bot = LSP_DipBot(bot_power, game, 3, alliance_all_in, dipnet_type='rlp')
             if bot_type.endswith('m'):
                 bot.set_leader()
         elif bot_type == 'tbt':
@@ -80,7 +87,10 @@ def bot_loop():
     while not game.is_game_done:
         print(game.get_current_phase())
         for bot in bots:
-            dip_instance_list = [NoPressDipBot, RandomLSP_DipBot, TransparentBot, SelectivelyTransparentBot, TransparentProposerDipBot, ProposerDipBot, RealPolitik]
+            # if not game.powers[bot.power_name].is_eliminated():
+            #     if isinstance(bot, BaselineMsgRoundBot):
+            #         bot.phase_init()
+            dip_instance_list = [NoPressDipBot, LSP_DipBot, TransparentBot, SelectivelyTransparentBot, TransparentProposerDipBot, ProposerDipBot, RealPolitik]
             if is_in_instance_list(bot, dip_instance_list):
                 bot.phase_init()
 
@@ -98,18 +108,18 @@ def bot_loop():
                 round_msgs = game.messages
                 to_send_msgs = {}
                 for bot in bots:
+                    if not game.powers[bot.power_name].is_eliminated():
+                        # Retrieve messages
+                        rcvd_messages = game.filter_messages(messages=round_msgs, game_role=bot.power_name)
+                        rcvd_messages = list(rcvd_messages.items())
+                        rcvd_messages.sort()
 
-                    # Retrieve messages
-                    rcvd_messages = game.filter_messages(messages=round_msgs, game_role=bot.power_name)
-                    rcvd_messages = list(rcvd_messages.items())
-                    rcvd_messages.sort()
+                        # Send messages to bots and fetch messages from bot
+                        bot_messages = yield bot.gen_messages(rcvd_messages)
 
-                    # Send messages to bots and fetch messages from bot
-                    bot_messages = yield bot.gen_messages(rcvd_messages)
-
-                    # If messages are to be sent, send them
-                    if bot_messages and bot_messages.messages:
-                        to_send_msgs[bot.power_name] = bot_messages.messages
+                        # If messages are to be sent, send them
+                        if bot_messages and bot_messages.messages:
+                            to_send_msgs[bot.power_name] = bot_messages.messages
 
                 # Send all messages after all bots decide on comms
                 for sender in to_send_msgs:
@@ -123,6 +133,13 @@ def bot_loop():
                         game.add_message(message=msg_obj)
 
         for bot in bots:
+            # if not game.powers[bot.power_name].is_eliminated():
+            #     # Orders round
+            #     orders = yield bot.gen_orders()
+            #     # messages, orders = bot_state.messages, bot_state.orders
+
+            #     if orders is not None:
+            #         game.set_orders(power_name=bot.power_name, orders=orders)
 
             # __call__ for pushover bot to retrieve last order
             if isinstance(bot,PushoverBot_AsyncBot):
