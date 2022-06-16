@@ -29,6 +29,7 @@ import os
 sys.path.append("..")
 sys.path.append("../dipnet_press")
 sys.path.append("./bots/RL/")
+print(sys.path)
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Analysis-Dip')
