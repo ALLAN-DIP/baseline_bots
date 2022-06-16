@@ -4,7 +4,7 @@ import ujson as json
 from diplomacy import Message
 from diplomacy import Game
 from diplomacy.utils.export import to_saved_game_format
-
+import sys
 sys.path.append("..")
 sys.path.append("../dipnet_press")
 sys.path.append("./bots/RL/")
@@ -27,7 +27,7 @@ from stance.stance_extraction import StanceExtraction, ScoreBasedStance
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from tornado import gen
 import asyncio
-import sys
+
 import os
 
 
