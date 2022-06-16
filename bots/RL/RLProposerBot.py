@@ -68,6 +68,7 @@ class RLProposerBot(RLOrderBot):
         self.curr_msg_round += 1
         return ret_obj
 
+@gen.coroutine
 def main(): 
     from diplomacy import Game
     from diplomacy.utils.export import to_saved_game_format
