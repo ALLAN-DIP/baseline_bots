@@ -18,6 +18,7 @@ from diplomacy import Game, Message
 from DAIDE import ORR, XDO
 from utils import OrdersData, MessagesData
 from bots.RL.RLOrderBot import RLOrderBot
+from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 
 
 class RLProposerBot(RLOrderBot):
@@ -67,7 +68,7 @@ class RLProposerBot(RLOrderBot):
         self.curr_msg_round += 1
         return ret_obj
 
-if __name__ == "__main__":
+def main(): 
     from diplomacy import Game
     from diplomacy.utils.export import to_saved_game_format
     # game instance
@@ -95,3 +96,6 @@ if __name__ == "__main__":
     file_name = 'RLProposerBot.json'
     with open(file_name, 'w') as file:
         file.write(json.dumps(to_saved_game_format(game.game)))
+    stop_io_loop()
+if __name__ == "__main__":
+    start_io_loop(main)
