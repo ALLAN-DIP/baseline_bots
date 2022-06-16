@@ -77,7 +77,7 @@ def main():
     # select the first name in the list of powers
     bot_power = list(game.get_map_power_names())[0]
    
-    env = DiplomacyEnv
+    env = DiplomacyEnv()
     bot = RLProposerBot(bot_power, game, env)
     while not game.is_game_done:
         if game.phase_type =='M':
