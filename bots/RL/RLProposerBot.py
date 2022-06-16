@@ -78,8 +78,8 @@ def main():
     while not game.is_game_done:
         if game.phase_type =='M':
             bot.phase_init()
-            messages = yield bot.gen_messages(None).messages
-            for msg in messages:
+            messages = yield bot.gen_messages(None)
+            for msg in messages.messages:
                 msg_obj = Message(
                     sender=bot.power_name,
                     recipient=msg['recipient'],
