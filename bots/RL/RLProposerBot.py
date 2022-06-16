@@ -10,6 +10,7 @@ sys.path.append("../../../dipnet_press")
 from typing import List
 import ujson as json
 import random
+from tornado import gen
 from pytorch_DRL.common.utils import dict_to_arr
 from DiplomacyEnv import DiplomacyEnv
 
