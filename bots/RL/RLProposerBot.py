@@ -26,7 +26,7 @@ class RLProposerBot(RLOrderBot):
     def __init__(self, power_name:str, game:Game, env:DiplomacyEnv, total_msg_rounds=3) -> None:
         super().__init__(power_name, game, env, total_msg_rounds)
         self.K_ORDERS = 5
-        super().load_model('models/a2c_actor_diplomacy_proposer', 'models/a2c_critic_diplomacy_proposer')
+        super().load_model('./models/a2c_actor_diplomacy_proposer', './models/a2c_critic_diplomacy_proposer')
         
     @gen.coroutine    
     def gen_messages(self, rcvd_messages:List[Message]) -> MessagesData:
