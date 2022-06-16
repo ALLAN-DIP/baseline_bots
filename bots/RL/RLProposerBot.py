@@ -45,13 +45,13 @@ class RLProposerBot(RLOrderBot):
                     #state = no order in consideation
                     self.maa2c.env_state = dict_to_arr(self.env.cur_obs, self.maa2c.n_agents)
                     action = self.maa2c.exploration_action(self.maa2c.env_state)
-                    action_dict = {agent_id: action[agent_id] for agent_id in range(self.maa2c.n_agents)}
+                    action_dict = {agent_id: action[agent_id] if agent_id == self.env.power_mapping[self.power_name] else 0 for agent_id in self.env.agent_id}
                     self.env.step(action_dict, self.power_name, recipient, order)
 
                     #state = considering order
                     self.maa2c.env_state = dict_to_arr(self.env.cur_obs, self.maa2c.n_agents)
                     action = self.maa2c.exploration_action(self.maa2c.env_state)
-                    action_dict = {agent_id: action[agent_id] for agent_id in range(self.maa2c.n_agents)}
+                    action_dict = {agent_id: action[agent_id] if agent_id == self.env.power_mapping[self.power_name] else 0 for agent_id in self.env.agent_id}
                     self.env.step(action_dict, self.power_name, recipient, order)
                     # if action=propose, we add it to the list
                     if action_dict[self.env.power_mapping[self.power_name]]==1:
@@ -75,6 +75,7 @@ def main():
    
     env = DiplomacyEnv()
     bot = RLProposerBot(bot_power, game, env)
+    env.power_mapping[bot_power] = 0
     while not game.is_game_done:
         if game.phase_type =='M':
             bot.phase_init()
