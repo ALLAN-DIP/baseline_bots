@@ -8,6 +8,7 @@ import sys
 sys.path.append("..")
 sys.path.append("../dipnet_press")
 sys.path.append("./bots/RL/")
+sys.path.append("./bots/RL/models")
 
 from bots.baseline_bot import BaselineMsgRoundBot
 from bots.dipnet.no_press_bot import NoPressDipBot
