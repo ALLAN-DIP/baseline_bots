@@ -29,6 +29,9 @@ class RLProposerBot(RLOrderBot):
     @gen.coroutine    
     def gen_messages(self, rcvd_messages:List[Message]) -> MessagesData:
         ret_obj = MessagesData()
+        if self.curr_msg_round > self.total_msg_rounds:
+            self.curr_msg_round += 1
+            return ret_obj
         for recipient in self.game.powers:
             proposal_list = []
             if self.power_name != recipient and not self.powers[recipient].is_eliminated():
@@ -60,6 +63,7 @@ class RLProposerBot(RLOrderBot):
                     suggested_orders = ORR([XDO(order) for order in proposal_list])
                     ret_obj.add_message(recipient, str(suggested_orders))
                 self.env.reset_power_state(self.power_name, recipient)
+        self.curr_msg_round += 1
         return ret_obj
 
 if __name__ == "__main__":
@@ -74,6 +78,7 @@ if __name__ == "__main__":
     bot = RLProposerBot(bot_power, game, env)
     while not game.is_game_done:
         if game.phase_type =='M':
+            bot.phase_init()
             messages = bot.gen_messages(None).messages
             for msg in messages:
                 msg_obj = Message(
