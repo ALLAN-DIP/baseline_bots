@@ -36,7 +36,7 @@ class RLProposerBot(RLOrderBot):
             return ret_obj
         for recipient in self.game.powers:
             proposal_list = []
-            if self.power_name != recipient and not self.powers[recipient].is_eliminated():
+            if self.power_name != recipient and not self.game.powers[recipient].is_eliminated():
                 orders = yield self.brain.get_orders(self.game, recipient)
                 stance = self.env.dip_player.stance[self.power_name][recipient] 
                 self.env.set_power_state(self.power_name, stance)
