@@ -5,6 +5,10 @@ from diplomacy import Message
 from diplomacy import Game
 from diplomacy.utils.export import to_saved_game_format
 
+sys.path.append("..")
+sys.path.append("../dipnet_press")
+sys.path.append("./bots/RL/")
+
 from bots.baseline_bot import BaselineMsgRoundBot
 from bots.dipnet.no_press_bot import NoPressDipBot
 from bots.dipnet.loyal_support_proposal import LSP_DipBot
@@ -26,10 +30,6 @@ import asyncio
 import sys
 import os
 
-sys.path.append("..")
-sys.path.append("../dipnet_press")
-sys.path.append("./bots/RL/")
-print(sys.path)
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Analysis-Dip')
