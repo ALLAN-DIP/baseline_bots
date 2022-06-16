@@ -52,7 +52,7 @@ def is_in_instance_list(obj, instance_list):
 @gen.coroutine
 def bot_loop():
     bots = []
-
+    agent_id = 0
     for bot_power, bot_type in zip(args.powers.split(","), args.types.split(",")):
         if bot_type == 'np':
             bot = NoPressDipBot(bot_power, game)
@@ -86,8 +86,10 @@ def bot_loop():
             env = DiplomacyEnv()
             env.game = game
             env.n_agents = 7
+            #keep track of RL agents
+            env.power_mapping[bot_power] = agent_id
             bot = RLProposerBot(bot_power, game, env, 3)
-        
+        agent_id += 1
         bots.append(bot)
     start = time()
     stance = ScoreBasedStance('', powers)
