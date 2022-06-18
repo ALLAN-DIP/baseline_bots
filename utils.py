@@ -125,13 +125,16 @@ def parse_alliance_proposal(msg: str, recipient: str) -> List[str]:
     groups = re.findall(r'\(([a-zA-Z\s]*)\)', msg)
 
     if len(groups) != 2:
-        raise ParseError("Found more than 2 groups")
+        # raise ParseError("Found more than 2 groups")
+        allies = []
 
     # get proposed allies
     allies = groups[0].split(" ")
 
     if recipient not in allies:
-        raise ParseError("Recipient not in allies")
+        # raise ParseError("Recipient not in allies")
+        allies = []
+        return allies
 
     allies.remove(recipient)
 
