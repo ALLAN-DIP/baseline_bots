@@ -77,8 +77,9 @@ class LSP_DipBot(DipnetBot):
         if alliance_proposal_msgs:
             last_message = alliance_proposal_msgs[-1][1]
             allies_proposed = parse_alliance_proposal(last_message.message, self.power_name)
-            alliance_proposer = last_message.sender
-            alliance_msg = last_message.message
+            if allies_proposed:
+                alliance_proposer = last_message.sender
+                alliance_msg = last_message.message
         else:
             allies_proposed = []
             alliance_proposer = None

@@ -1,6 +1,6 @@
-# python dip_ui_bot_launcher.py -H shade.tacc.utexas.edu -p ENGLAND,GERMANY,RUSSIA,TURKEY,FRANCE -B np -g kshenoy-test10
-# python dip_ui_bot_launcher.py -H shade.tacc.utexas.edu -p AUSTRIA -B rlspm -g kshenoy-test10
-# python dip_ui_bot_launcher.py -H shade.tacc.utexas.edu -p ITALY -B rlsp -g kshenoy-test10
+# python dip_ui_bot_launcher.py -H shade.tacc.utexas.edu -p AUSTRIA,ITALY,ENGLAND,GERMANY,FRANCE -B np -g kshenoy-test10
+# python dip_ui_bot_launcher.py -H shade.tacc.utexas.edu -p RUSSIA -B rlspm -g kshenoy-test10
+# python dip_ui_bot_launcher.py -H shade.tacc.utexas.edu -p TURKEY -B rlsp -g kshenoy-test10
 
 import asyncio
 import random
@@ -69,7 +69,12 @@ async def play(game_id, botname, power_name, hostname='localhost', port=8432):
     # elif botname == 'random_allier_proposer':
     #     bot = RandomAllierProposerBot(power_name, game)
 
-# Playing game
+    # Wait while game is still being formed
+    while game.is_game_forming:
+        await asyncio.sleep(0.5)
+
+    # Playing game
+    print("Started playing")
     while not game.is_game_done:
         current_phase = game.get_current_phase()
         dip_instance_list = [NoPressDipBot, LSP_DipBot ]#TransparentBot, SelectivelyTransparentBot, TransparentProposerDipBot, ProposerDipBot, RealPolitik]
