@@ -68,6 +68,7 @@ class LSP_DipBot(DipnetBot):
         # Alliance related interpretations
         # Interpret alliance acceptance message
         if yes_alliance_msgs:
+            # Leader
             last_message = yes_alliance_msgs[-1][1]
             yes_allies = parse_alliance_proposal(last_message.message[5:-1], self.power_name)
         else:
@@ -75,11 +76,18 @@ class LSP_DipBot(DipnetBot):
 
         # Interpret alliance proposal message
         if alliance_proposal_msgs:
+            # Follower
             last_message = alliance_proposal_msgs[-1][1]
-            allies_proposed = parse_alliance_proposal(last_message.message, self.power_name)
-            if allies_proposed:
+            temp_allies_proposed = parse_alliance_proposal(last_message.message, self.power_name)
+            if temp_allies_proposed and last_message.sender == "RUS":
+                allies_proposed = temp_allies_proposed
                 alliance_proposer = last_message.sender
                 alliance_msg = last_message.message
+            else:
+                allies_proposed = []
+                alliance_proposer = None
+                alliance_msg = None
+
         else:
             allies_proposed = []
             alliance_proposer = None
@@ -87,6 +95,7 @@ class LSP_DipBot(DipnetBot):
 
         rcvd_orders = []
         if order_msgs:
+            # Follower
             for msg in order_msgs:
                 if msg.sender == self.my_leader:
                     rcvd_orders += parse_orr_xdo(msg.message)
@@ -198,7 +207,8 @@ class LSP_DipBot(DipnetBot):
                             # If this support move corresponds to one of the orders the current bot has selected, exec following
 
                             # Generate (source, destination) tuple for move or (source,) tuple for hold
-                            location_comb = tuple([oc.split()[1] for oc in order_tokens[2:]])
+                            # location_comb = tuple([oc.split()[1] for oc in order_tokens[2:]])
+                            location_comb = order_tokens[0].split()[1]
 
                             # Add to list of possible support proposals for this location combination
                             possible_support_proposals[location_comb].append(
@@ -268,7 +278,8 @@ class LSP_DipBot(DipnetBot):
             elif self.leader_mode:
                 # Send 2-power alliance proposals to all powers
                 if not self.alliance_all_in:
-                    for other_power in get_other_powers([self.power_name], self.game):
+                    # for other_power in get_other_powers([self.power_name], self.game):
+                    for other_power in ['TURKEY']:
                         alliance_message = ALY([other_power, self.power_name], self.game)
                         comms_obj.add_message(other_power, alliance_message)
                 # Send all-power alliance proposals to all powers
