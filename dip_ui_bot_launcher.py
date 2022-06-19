@@ -4,18 +4,18 @@
 
 import asyncio
 import random
-from bots.dipnet import RealPolitik
-from bots.dipnet.dipnet_proposer_bot import ProposerDipBot
+# from bots.dipnet import RealPolitik
+# from bots.dipnet.dipnet_proposer_bot import ProposerDipBot
 from bots.dipnet.loyal_support_proposal import LSP_DipBot
 from bots.dipnet.no_press_bot import NoPressDipBot
 from diplomacy.client.connection import connect
 from diplomacy.utils import exceptions
 from diplomacy import Message
 import argparse
-from bots.dipnet.selectively_transparent_bot import SelectivelyTransparentBot
+# from bots.dipnet.selectively_transparent_bot import SelectivelyTransparentBot
 
-from bots.dipnet.transparent_bot import TransparentBot
-from bots.dipnet.transparent_proposer_bot import TransparentProposerDipBot
+# from bots.dipnet.transparent_bot import TransparentBot
+# from bots.dipnet.transparent_proposer_bot import TransparentProposerDipBot
 
 def is_in_instance_list(obj, instance_list):
     boo_v = False
@@ -77,7 +77,7 @@ async def play(game_id, botname, power_name, hostname='localhost', port=8432):
     print("Started playing")
     while not game.is_game_done:
         current_phase = game.get_current_phase()
-        dip_instance_list = [NoPressDipBot, LSP_DipBot, TransparentBot, SelectivelyTransparentBot, TransparentProposerDipBot, ProposerDipBot, RealPolitik]
+        dip_instance_list = [NoPressDipBot, LSP_DipBot ]#TransparentBot, SelectivelyTransparentBot, TransparentProposerDipBot, ProposerDipBot, RealPolitik]
         if is_in_instance_list(bot, dip_instance_list):
             bot.phase_init()
         if game.get_current_phase()[-1] == 'M':

@@ -4,6 +4,11 @@ import ujson as json
 from diplomacy import Message
 from diplomacy import Game
 from diplomacy.utils.export import to_saved_game_format
+import sys
+sys.path.append("..")
+sys.path.append("../dipnet_press")
+sys.path.append("./bots/RL/")
+sys.path.append("./bots/RL/models")
 
 from bots.baseline_bot import BaselineMsgRoundBot
 from bots.dipnet.no_press_bot import NoPressDipBot
@@ -17,15 +22,15 @@ from bots.random_loyal_support_proposal import RandomLSPBot
 from bots.random_no_press import RandomNoPress_AsyncBot
 from bots.random_proposer_bot import RandomProposerBot_AsyncBot
 from bots.pushover_bot import PushoverBot_AsyncBot
+from bots.RL.RLProposerBot import RLProposerBot
+from bots.RL.DiplomacyEnv import DiplomacyEnv
 from stance.stance_extraction import StanceExtraction, ScoreBasedStance
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from tornado import gen
 import asyncio
-import sys
+
 import os
 
-sys.path.append("..")
-sys.path.append("../dipnet_press")
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Analysis-Dip')
@@ -50,7 +55,7 @@ def is_in_instance_list(obj, instance_list):
 @gen.coroutine
 def bot_loop():
     bots = []
-
+    agent_id = 0
     for bot_power, bot_type in zip(args.powers.split(","), args.types.split(",")):
         if bot_type == 'np':
             bot = NoPressDipBot(bot_power, game)
@@ -80,7 +85,14 @@ def bot_loop():
             bot = ProposerDipBot(bot_power, game, 3)
         elif bot_type == "rplt":
             bot = RealPolitik(bot_power, game, 3)
-        
+        elif bot_type == "rlprop":
+            env = DiplomacyEnv()
+            env.game = game
+            env.n_agents = 7
+            #keep track of RL agents
+            env.power_mapping[bot_power] = agent_id
+            bot = RLProposerBot(bot_power, game, env, 3)
+        agent_id += 1
         bots.append(bot)
     start = time()
     stance = ScoreBasedStance('', powers)
@@ -90,7 +102,7 @@ def bot_loop():
             # if not game.powers[bot.power_name].is_eliminated():
             #     if isinstance(bot, BaselineMsgRoundBot):
             #         bot.phase_init()
-            dip_instance_list = [NoPressDipBot, LSP_DipBot, TransparentBot, SelectivelyTransparentBot, TransparentProposerDipBot, ProposerDipBot, RealPolitik]
+            dip_instance_list = [NoPressDipBot, LSP_DipBot, TransparentBot, SelectivelyTransparentBot, TransparentProposerDipBot, ProposerDipBot, RealPolitik, RLProposerBot]
             if is_in_instance_list(bot, dip_instance_list):
                 bot.phase_init()
 
