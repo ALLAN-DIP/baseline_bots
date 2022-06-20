@@ -220,6 +220,7 @@ class LSP_DipBot(DipnetBot):
                                     prov2.upper().split('/')[0] not in provs and prov2.upper().split('/')[0] in self.allies_influence]))
             distance += 1                 
             provs = n_provs
+        print('distance for '+ power +': '+distance)
         return distance
 
     def is_move_for_ally(self, order):
