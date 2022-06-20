@@ -227,14 +227,14 @@ class LSP_DipBot(DipnetBot):
 
     def is_move_for_ally(self, order):
         order_token = get_order_tokens(order)
-        is_ally_shortest = (False, [])
+        is_ally_shortest = [False, []]
         # check if it is move order
         dist_powers = {power: 100 for power in self.game.powers}
         if order_token[1][0] == '-':
             for power in self.game.powers:
                 dist_powers[power] = min(self.get_shortest_distance(order_token[1][2:], power),dist_powers[power])
             min_dist = min(dist_powers.values())
-            is_ally_shortest = (True, [])
+            is_ally_shortest = [False, []]
             for power, dist in dist_powers.items():
                 if dist == min_dist:
                     if power in self.allies:
@@ -247,11 +247,11 @@ class LSP_DipBot(DipnetBot):
     def find_best_move(self, unit):
         loc_unit = unit[2:]
         for order in self.possible_orders[loc_unit]:
-            is_move_for_ally, allies = self.is_move_for_ally(order)
+            [is_move_for_ally, allies] = self.is_move_for_ally(order)
             if not self.bad_move(order) and not is_move_for_ally and len(allies)==0:
                 return order
         for order in self.possible_orders[loc_unit]:
-            is_move_for_ally, allies = self.is_move_for_ally(order)
+            [is_move_for_ally, allies] = self.is_move_for_ally(order)
             if not self.bad_move(order) and not is_move_for_ally:
                 return order  
         return loc_unit + ' H' 
@@ -400,7 +400,7 @@ class LSP_DipBot(DipnetBot):
                 for order in orders:
                     order_token = get_order_tokens(order) 
                     print('check move if this is for ally or other power')
-                    if order_token[0] not in units and self.is_move_for_ally(order):
+                    if order_token[0] not in units and self.is_move_for_ally(order)[0]:
                         unit = order_token[0][2:]
                         print('add new best move')
                         self.orders.add_orders([self.find_best_move(unit)], overwrite=True)   
