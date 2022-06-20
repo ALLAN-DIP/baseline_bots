@@ -135,6 +135,7 @@ class LSP_DipBot(DipnetBot):
             # for 3 and 4
             if order_token[1][0] == 'S':
                 # if support hold
+                print(order)
                 if order_token[3][0] == 'H':
                     return False
                 order_unit = order_token[2][0] + order_token[3][1:]
