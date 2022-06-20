@@ -237,7 +237,7 @@ class LSP_DipBot(DipnetBot):
             for power in game_powers:
                 dist_powers[power] = min(self.get_shortest_distance(order_token[1][2:], power),dist_powers[power])
             min_dist = min(dist_powers.values())
-            is_ally_shortest = [False, []]
+            is_ally_shortest = [True, []]
             for power, dist in dist_powers.items():
                 if dist == min_dist:
                     if power in self.allies:
