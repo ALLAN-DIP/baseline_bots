@@ -212,7 +212,7 @@ class LSP_DipBot(DipnetBot):
         distance = 0
         found_unit = False
         while not found_unit and distance <limit:
-            print(provs)
+            # print(provs)
             if loc_unit in provs:  
                 found_unit = True
                 break 
@@ -222,7 +222,7 @@ class LSP_DipBot(DipnetBot):
                                     prov2.upper().split('/')[0] not in provs]))
             distance += 1                 
             provs = n_provs
-        print('distance for '+ power +': '+str(distance))
+        # print('distance for '+ power +': '+str(distance))
         return distance
 
     def is_move_for_ally(self, order):
@@ -401,9 +401,15 @@ class LSP_DipBot(DipnetBot):
                     order_token = get_order_tokens(order) 
                     # print('check move if this is for ally or other power')
                     if order_token[0] not in units and self.is_move_for_ally(order)[0]:
+                        if order== 'F SEV - BLA':
+                            print(order)
                         unit = order_token[0][2:]
                         # print('add new best move')
-                        self.orders.add_orders([self.find_best_move(unit)], overwrite=True)   
+                        new_order = self.find_best_move(unit)
+                        if order== 'F SEV - BLA':
+                            print(new_order)
+                        
+                        self.orders.add_orders([new_order], overwrite=True)   
 
             
         # print(f"Selected orders for {self.power_name}: {self.orders.get_list_of_orders()}")
