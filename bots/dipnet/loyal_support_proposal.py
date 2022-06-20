@@ -351,13 +351,13 @@ class LSP_DipBot(DipnetBot):
                         print(unit)
                         for order in orders:
                             order_token = get_order_tokens(order) 
-                            #support self/ally order
+                            #support self order
                         
                             if order_token[0] not in order and unit + ' S ' + order in self.possible_orders[unit[2:]]:
                                 self.orders.add_orders([unit + ' S ' + order], overwrite=True)   
                                 break
                         #hold if no better option
-                        self.orders.add_orders([order_token[0] + ' H'], overwrite=True)                 
+                        self.orders.add_orders([unit + ' H'], overwrite=True)                 
             
         # print(f"Selected orders for {self.power_name}: {self.orders.get_list_of_orders()}")
         comms_obj = MessagesData()
