@@ -316,7 +316,7 @@ class LSP_DipBot(DipnetBot):
             for power in self.allies:
                 sim_game.set_centers(self.power_name, self.game.get_centers(power))
                 sim_game.set_units(self.power_name, self.game.get_units(power))
-            orders = yield from self.brain.get_orders(self.sim_game, self.power_name)
+            orders = yield from self.brain.get_orders(sim_game, self.power_name)
             self.orders.add_orders(orders, overwrite=True)
 
             # # filter out aggressive actions to ally
