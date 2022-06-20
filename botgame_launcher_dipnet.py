@@ -172,6 +172,8 @@ def bot_loop():
             
             # Orders round
             orders = yield bot.gen_orders()
+            print(bot.power_name)
+            print(orders)
             
             # messages, orders = bot_state.messages, bot_state.orders
             if orders is not None:
