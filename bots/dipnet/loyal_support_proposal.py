@@ -398,6 +398,7 @@ class LSP_DipBot(DipnetBot):
                     order_token = get_order_tokens(order) 
                     if order_token[0] not in units and self.is_move_for_ally(order):
                         unit = order_token[0][2:]
+                        print('add new best move')
                         self.orders.add_orders([self.find_best_move(unit)], overwrite=True)   
 
             
