@@ -343,7 +343,7 @@ class LSP_DipBot(DipnetBot):
                     units=[]   
                     for agg_order in agg_orders:
                         orders.remove(agg_order)
-                        order_token = get_order_tokens(order)    
+                        order_token = get_order_tokens(agg_order)    
                         units.append(order_token[0])
 
                     #replace order if those new orders are doable
