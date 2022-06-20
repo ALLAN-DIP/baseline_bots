@@ -345,11 +345,12 @@ class LSP_DipBot(DipnetBot):
                     #replace order if those new orders are doable
                     for order in orders:
                         order_token = get_order_tokens(order) 
-                        if order_token[0] in units and order in self.possible_orders[order_token[0][2:]]:
-                            self.orders.add_orders([order], overwrite=True)
-                        else:
-                            #hold if no better option
-                            self.orders.add_orders([order_token[0] + ' H'], overwrite=True)                 
+                        if order_token[0] in units: 
+                            if order in self.possible_orders[order_token[0][2:]]:
+                                self.orders.add_orders([order], overwrite=True)
+                            else:
+                                #hold if no better option
+                                self.orders.add_orders([order_token[0] + ' H'], overwrite=True)                 
             
         # print(f"Selected orders for {self.power_name}: {self.orders.get_list_of_orders()}")
         comms_obj = MessagesData()
