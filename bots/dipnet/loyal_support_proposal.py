@@ -211,6 +211,7 @@ class LSP_DipBot(DipnetBot):
         distance = 0
         found_unit = False
         while not found_unit:
+            print(provs)
             if loc_unit in provs:  
                 found_unit = True
                 break 
