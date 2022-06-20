@@ -134,6 +134,9 @@ class LSP_DipBot(DipnetBot):
                             return True
             # for 3 and 4
             if order_token[1][0] == 'S':
+                # if support hold
+                if order_token[3][0] == 'H':
+                    return False
                 order_unit = order_token[2][0] + order_token[3][1:]
                 for power in self.allies:
                     if sender != power:
