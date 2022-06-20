@@ -158,15 +158,15 @@ class LSP_DipBot(DipnetBot):
                 return True
         elif len(order_tokens) == 4 and order_tokens[1] == 'S':
             # Support move
-            if order_tokens[1].split()[-1] in self.my_influence:
+            if order_tokens[3].split()[-1] in self.my_influence:
                 return True
 
         return False
 
     def support_move(self, order):
-        """Indicates if order is a support order or not"""
+        """Indicates if order is a support order and is not attacking on one of its provinces"""
         order_tokens = get_order_tokens(order)
-        if 3 <= len(order_tokens) <= 4 and order_tokens[1] == 'S':
+        if 3 <= len(order_tokens) <= 4 and order_tokens[1] == 'S' and not self.bad_move(order):
             return True
         else:
             return False
@@ -205,23 +205,54 @@ class LSP_DipBot(DipnetBot):
         n2n_provs.update(n_provs)
         return n2n_provs
 
-    def get_shortest_distance(self, unit, power):
+    def get_shortest_distance(self, loc_unit, power):
         """ Find the shortest distance from self unit to any unit of a given power """
         provs = {loc.upper() for loc in self.game.get_orderable_locations(power)}
-        distance = 1
-        loc_unit = unit[2:]
+        distance = 0
         found_unit = False
         while not found_unit:
+            if loc_unit in provs:  
+                found_unit = True
+                break 
             n_provs = set()
             for prov in provs:
                 n_provs.update(set([prov2.upper() for prov2 in self.game.map.abut_list(prov) if
                                     prov2.upper().split('/')[0] not in provs and prov2.upper().split('/')[0] in self.allies_influence]))
-            if loc_unit in n_provs:  
-                found_unit = True
-                break  
             distance += 1                 
             provs = n_provs
         return distance
+
+    def is_move_for_ally(self, order):
+        order_token = get_order_tokens(order)
+        is_ally_shortest = (False, [])
+        # check if it is move order
+        dist_powers = {power: 100 for power in self.game.powers}
+        if order_token[1][0] == '-':
+            for power in self.game.powers:
+                dist_powers[power] = min(self.get_shortest_distance(order_token[1][2:], power),dist_powers[power])
+            min_dist = min(dist_powers[power].values())
+            is_ally_shortest = (True, [])
+            for power, dist in dist_powers.items():
+                if dist == min_dist:
+                    if power in self.allies:
+                        is_ally_shortest[0] = is_ally_shortest[0] and True
+                        is_ally_shortest[1].append(power)
+                    else:
+                        is_ally_shortest[0] = is_ally_shortest[0] and False
+        return is_ally_shortest     
+
+    def find_best_move(self, unit):
+        loc_unit = unit[2:]
+        for order in self.possible_orders[loc_unit]:
+            is_move_for_ally, allies = self.is_move_for_ally(order)
+            if not self.bad_move(order) and not is_move_for_ally and len(allies)==0:
+                return order
+        for order in self.possible_orders[loc_unit]:
+            is_move_for_ally, allies = self.is_move_for_ally(order)
+            if not self.bad_move(order) and not is_move_for_ally:
+                return order  
+        return loc_unit + ' H' 
+
 
     def is_support_for_selected_orders(self, support_order):
         """Determine if selected support order for neighbour corresponds to a self order selected"""
@@ -311,12 +342,15 @@ class LSP_DipBot(DipnetBot):
         # self.possible_orders = self.game.get_all_possible_orders()
         # Only if it is the first comms round, do this
         if self.curr_msg_round == 1:
-            # Fetch list of orders from DipNet
+            #assume that ally = self
             sim_game = self.game.__deepcopy__(None) 
             for power in self.allies:
                 sim_game.set_centers(self.power_name, self.game.get_centers(power))
                 sim_game.set_units(self.power_name, self.game.get_units(power))
+            # Fetch list of orders from DipNet
             orders = yield from self.brain.get_orders(sim_game, self.power_name)
+
+            #delete order for ally's units
             ally_order = []
             for order in orders:
                 order_token = get_order_tokens(order) 
@@ -328,12 +362,12 @@ class LSP_DipBot(DipnetBot):
 
             # filter out aggressive actions to ally
             if self.allies:
-                print(self.allies)
+
                 agg_orders = []
                 for order in orders:
                     if self.is_order_aggressive_to_allies(order, self.power_name, self.game):
                         agg_orders.append(order)
-                print(agg_orders)
+
                 if agg_orders:
                     sim_game = self.game.__deepcopy__(None) 
                     for power in self.allies:
@@ -348,7 +382,7 @@ class LSP_DipBot(DipnetBot):
 
                     #replace order if those new orders are doable
                     for unit in units: 
-                        print(unit)
+
                         for order in orders:
                             order_token = get_order_tokens(order) 
                             #support self order
@@ -357,7 +391,14 @@ class LSP_DipBot(DipnetBot):
                                 self.orders.add_orders([unit + ' S ' + order], overwrite=True)   
                                 break
                         #hold if no better option
-                        self.orders.add_orders([unit + ' H'], overwrite=True)                 
+                        self.orders.add_orders([unit + ' H'], overwrite=True)        
+
+                for order in orders:
+                    order_token = get_order_tokens(order) 
+                    if order_token[0] not in units and self.is_move_for_ally(order):
+                        unit = order_token[0][2:]
+                        self.orders.add_orders([self.find_best_move(unit)], overwrite=True)   
+
             
         # print(f"Selected orders for {self.power_name}: {self.orders.get_list_of_orders()}")
         comms_obj = MessagesData()
