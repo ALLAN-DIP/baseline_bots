@@ -409,14 +409,9 @@ class LSP_DipBot(DipnetBot):
                     print(order)
                     print(self.is_move_for_ally(order))
                     if order_token[0] not in units and self.is_move_for_ally(order)[0]:
-                        if 'F SEV - BLA' in order:
-                            print(order)
-                        unit = order_token[0][2:]
+                        unit = order_token[0]
                         # print('add new best move')
                         new_order = self.find_best_move(unit)
-                        if 'F SEV - BLA' in order:
-                            print(new_order)
-                        
                         self.orders.add_orders([new_order], overwrite=True)   
 
             
