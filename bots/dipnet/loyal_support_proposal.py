@@ -230,7 +230,7 @@ class LSP_DipBot(DipnetBot):
         print(order_token)
         is_ally_shortest = [False, []]
         # check if it is move order
-        dist_powers = {power: 100 for power in self.game.powers}
+        dist_powers = {power: 100 for power in self.game.powers if power!= self.power_name}
         if order_token[1][0] == '-':
             for power in self.game.powers:
                 dist_powers[power] = min(self.get_shortest_distance(order_token[1][2:], power),dist_powers[power])
