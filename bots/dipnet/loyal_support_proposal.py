@@ -341,12 +341,13 @@ class LSP_DipBot(DipnetBot):
 
                     #replace order if those new orders are doable
                     for unit in units: 
+                        print(unit)
                         for order in orders:
                             order_token = get_order_tokens(order) 
                             #support self/ally order
                         
                             if order_token[0] not in order and unit + ' S ' + order in self.possible_orders[unit[2:]]:
-                                self.orders.add_orders([order_token[0] + ' S ' + order], overwrite=True)   
+                                self.orders.add_orders([unit + ' S ' + order], overwrite=True)   
                                 break
                         #hold if no better option
                         self.orders.add_orders([order_token[0] + ' H'], overwrite=True)                 
