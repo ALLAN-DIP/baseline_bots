@@ -2,7 +2,7 @@
 #SBATCH -J np_leader_follower           # Job name
 #SBATCH -o out/np_leader_follower.o%j       # Name of stdout output file
 #SBATCH -e out/np_leader_follower.e%j       # Name of stderr error file
-#SBATCH -p rtx           # Queue (partition) name
+#SBATCH -p normal           # Queue (partition) name
 #SBATCH -N 1              # Total # of nodes (must be 1 for serial)
 #SBATCH -n 1
 #SBATCH -t 48:00:00        # Run time (hh:mm:ss)
