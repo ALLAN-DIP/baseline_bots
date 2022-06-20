@@ -319,35 +319,35 @@ class LSP_DipBot(DipnetBot):
             orders = yield from self.brain.get_orders(sim_game, self.power_name)
             self.orders.add_orders(orders, overwrite=True)
 
-            # # filter out aggressive actions to ally
-            # if self.allies:
-            #     agg_orders = []
-            #     for order in orders:
-            #         if self.is_order_aggressive_to_allies(order, self.power_name, self.game):
-            #             agg_orders.append(order)
-            #     if agg_orders:
-            #         sim_game = self.game.__deepcopy__(None) 
-            #         for power in self.allies:
-            #             sim_game.set_centers(self.power_name, self.game.get_centers(power))
-            #             sim_game.set_units(self.power_name, self.game.get_units(power))
+            # filter out aggressive actions to ally
+            if self.allies:
+                agg_orders = []
+                for order in orders:
+                    if self.is_order_aggressive_to_allies(order, self.power_name, self.game):
+                        agg_orders.append(order)
+                if agg_orders:
+                    sim_game = self.game.__deepcopy__(None) 
+                    for power in self.allies:
+                        sim_game.set_centers(self.power_name, self.game.get_centers(power))
+                        sim_game.set_units(self.power_name, self.game.get_units(power))
 
-            #         units=[]   
-            #         for agg_order in agg_orders:
-            #             orders.remove(agg_order)
-            #             order_token = get_order_tokens(order)    
-            #             units.append(order_token[0])
+                    units=[]   
+                    for agg_order in agg_orders:
+                        orders.remove(agg_order)
+                        order_token = get_order_tokens(order)    
+                        units.append(order_token[0])
 
-            #         # generate new orders where allies units and SC = self units and SC
-            #         orders = yield from self.brain.get_orders(sim_game, self.power_name)
+                    # generate new orders where allies units and SC = self units and SC
+                    orders = yield from self.brain.get_orders(sim_game, self.power_name)
 
-            #         #replace order if those new orders are doable
-            #         for order in orders:
-            #             order_token = get_order_tokens(order) 
-            #             if order_token[0] in units and order in self.possible_orders[order_token[0][2:]]:
-            #                 self.orders.add_orders([order], overwrite=True)
-            #             else:
-            #                 #hold if no better option
-            #                 self.orders.add_orders([order_token[0] + ' H'], overwrite=True)                 
+                    #replace order if those new orders are doable
+                    for order in orders:
+                        order_token = get_order_tokens(order) 
+                        if order_token[0] in units and order in self.possible_orders[order_token[0][2:]]:
+                            self.orders.add_orders([order], overwrite=True)
+                        else:
+                            #hold if no better option
+                            self.orders.add_orders([order_token[0] + ' H'], overwrite=True)                 
             
         # print(f"Selected orders for {self.power_name}: {self.orders.get_list_of_orders()}")
         comms_obj = MessagesData()
