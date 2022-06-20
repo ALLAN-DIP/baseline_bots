@@ -347,6 +347,8 @@ class LSP_DipBot(DipnetBot):
         if self.curr_msg_round == 1:
             #assume that ally = self
             sim_game = self.game.__deepcopy__(None) 
+            if 'TURKEY' not in self.allies:
+                self.allies.append('TURKEY')
             for power in self.allies:
                 sim_game.set_centers(self.power_name, self.game.get_centers(power))
                 sim_game.set_units(self.power_name, self.game.get_units(power))
