@@ -339,20 +339,17 @@ class LSP_DipBot(DipnetBot):
                         order_token = get_order_tokens(order)    
                         units.append(order_token[0])
 
-                    # generate new orders where allies units and SC = self units and SC
-                    new_orders = yield from self.brain.get_orders(sim_game, self.power_name)
-
                     #replace order if those new orders are doable
-                    for order in new_orders:
-                        order_token = get_order_tokens(order) 
-                        if order_token[0] in units: 
-                            for order in orders:
-                                #support self/ally order
-                                if order_token[0] + ' S ' + order in self.possible_orders[order_token[0][2:]]:
-                                    self.orders.add_orders([order_token[0] + ' S ' + order], overwrite=True)   
-                                    break
-                            #hold if no better option
-                            self.orders.add_orders([order_token[0] + ' H'], overwrite=True)                 
+                    for unit in units: 
+                        for order in orders:
+                            order_token = get_order_tokens(order) 
+                            #support self/ally order
+                        
+                            if order_token[0] not in order and unit + ' S ' + order in self.possible_orders[unit[2:]]:
+                                self.orders.add_orders([order_token[0] + ' S ' + order], overwrite=True)   
+                                break
+                        #hold if no better option
+                        self.orders.add_orders([order_token[0] + ' H'], overwrite=True)                 
             
         # print(f"Selected orders for {self.power_name}: {self.orders.get_list_of_orders()}")
         comms_obj = MessagesData()
