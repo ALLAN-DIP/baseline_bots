@@ -403,8 +403,7 @@ class LSP_DipBot(DipnetBot):
                     order_token = get_order_tokens(order) 
                     # print('check move if this is for ally or other power')
                     print(order)
-                    if 'F SEV - BLA' in order:
-                        self.is_move_for_ally(order)
+                    print(self.is_move_for_ally(order))
                     if order_token[0] not in units and self.is_move_for_ally(order)[0]:
                         if 'F SEV - BLA' in order:
                             print(order)
