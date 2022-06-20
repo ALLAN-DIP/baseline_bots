@@ -219,7 +219,7 @@ class LSP_DipBot(DipnetBot):
             n_provs = set()
             for prov in provs:
                 n_provs.update(set([prov2.upper() for prov2 in self.game.map.abut_list(prov) if
-                                    prov2.upper().split('/')[0] not in provs and prov2.upper().split('/')[0] in self.allies_influence]))
+                                    prov2.upper().split('/')[0] not in provs]))
             distance += 1                 
             provs = n_provs
         print('distance for '+ power +': '+str(distance))
