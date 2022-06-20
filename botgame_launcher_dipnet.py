@@ -93,7 +93,7 @@ def bot_loop():
         #     env.power_mapping[bot_power] = agent_id
         #     bot = RLProposerBot(bot_power, game, env, 3)
         # agent_id += 1
-        # bots.append(bot)
+        bots.append(bot)
     start = time()
     stance = ScoreBasedStance('', powers)
     while not game.is_game_done:
@@ -172,8 +172,6 @@ def bot_loop():
             
             # Orders round
             orders = yield bot.gen_orders()
-            print(bot.power_name)
-            print(orders)
             
             # messages, orders = bot_state.messages, bot_state.orders
             if orders is not None:
