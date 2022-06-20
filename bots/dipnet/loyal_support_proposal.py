@@ -339,7 +339,7 @@ class LSP_DipBot(DipnetBot):
                     #replace order if those new orders are doable
                     for order in orders:
                         order_token = get_order_tokens(order) 
-                        if order_token[0] in units and order in self.possible_orders[order_token[2:]]:
+                        if order_token[0] in units and order in self.possible_orders[order_token[0][2:]]:
                             self.orders.add_orders([order], overwrite=True)
                         else:
                             #hold if no better option
