@@ -208,9 +208,10 @@ class LSP_DipBot(DipnetBot):
     def get_shortest_distance(self, loc_unit, power):
         """ Find the shortest distance from self unit to any unit of a given power """
         provs = {loc.upper() for loc in self.game.get_orderable_locations(power)}
+        limit = 50 # avoid infinite loop
         distance = 0
         found_unit = False
-        while not found_unit:
+        while not found_unit and distance <limit:
             print(provs)
             if loc_unit in provs:  
                 found_unit = True
