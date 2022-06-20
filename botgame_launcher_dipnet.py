@@ -23,7 +23,7 @@ from bots.random_no_press import RandomNoPress_AsyncBot
 from bots.random_proposer_bot import RandomProposerBot_AsyncBot
 from bots.pushover_bot import PushoverBot_AsyncBot
 # from bots.RL.RLProposerBot import RLProposerBot
-from bots.RL.DiplomacyEnv import DiplomacyEnv
+# from bots.RL.DiplomacyEnv import DiplomacyEnv
 from stance.stance_extraction import StanceExtraction, ScoreBasedStance
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from tornado import gen
