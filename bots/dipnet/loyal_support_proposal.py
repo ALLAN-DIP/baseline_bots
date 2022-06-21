@@ -274,6 +274,9 @@ class LSP_DipBot(DipnetBot):
             return True
         return False
 
+    def is_valid_support(self, support, orders):
+
+
     def generate_support_proposals(self, comms_obj):
         final_messages = defaultdict(list)
 
@@ -350,12 +353,13 @@ class LSP_DipBot(DipnetBot):
         # Only if it is the first comms round, do this
         if self.curr_msg_round == 1:
             #assume that ally = self
+            ally = self.allies
             sim_game = self.game.__deepcopy__(None) 
-            if self.power_name == 'RUSSIA' and 'TURKEY' not in self.allies:
-                self.allies.append('TURKEY')
-            if self.power_name == 'TURKEY' and 'RUSSIA' not in self.allies:
-                self.allies.append('RUSSIA')
-            for power in self.allies:
+            if self.power_name == 'RUSSIA' and 'TURKEY' not in ally:
+                ally.append('TURKEY')
+            if self.power_name == 'TURKEY' and 'RUSSIA' not in ally:
+                ally.append('RUSSIA')
+            for power in ally:
                 sim_game.set_centers(self.power_name, self.game.get_centers(power))
                 sim_game.set_units(self.power_name, self.game.get_units(power))
             # Fetch list of orders from DipNet
