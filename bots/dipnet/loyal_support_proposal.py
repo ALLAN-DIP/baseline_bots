@@ -273,6 +273,7 @@ class LSP_DipBot(DipnetBot):
                 return_val = self.game._valid_order(self.power_name, unit, order_part)
                 if return_val: # if valid - return 1
                     continue
+                print(order)
                 flag = flag and False
                 self.orders.add_orders([self.find_best_move(unit)], overwrite=True) 
 
