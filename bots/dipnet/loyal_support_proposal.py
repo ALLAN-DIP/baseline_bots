@@ -388,6 +388,7 @@ class LSP_DipBot(DipnetBot):
                     ally_order.append(order)
             for order in ally_order:
                 orders.remove(order)
+            print(ally_order)
             self.orders.add_orders(orders, overwrite=True)
 
             # filter out aggressive actions to ally
