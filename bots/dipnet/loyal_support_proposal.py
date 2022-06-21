@@ -260,24 +260,24 @@ class LSP_DipBot(DipnetBot):
                 return order  
         return loc_unit + ' H' 
 
-    def are_current_orders_valid(self):
-        flag = False
-        while not flag:
-            flag = True
-            for loc in self.orders.orders:
-                order = self.orders.orders[loc]
-                order_token = get_order_tokens(order)
-                unit = order_token[0]
-                order_part = ' '.join(order_token[1:])
-                print(unit)
-                print(order_part)
+    # def are_current_orders_valid(self):
+    #     flag = False
+    #     while not flag:
+    #         flag = True
+    #         for loc in self.orders.orders:
+    #             order = self.orders.orders[loc]
+    #             order_token = get_order_tokens(order)
+    #             unit = order_token[0]
+    #             order_part = ' '.join(order_token[1:])
+    #             print(unit)
+    #             print(order_part)
 
-                return_val = self.game._valid_order(self.power_name, unit, order_part)
-                print(self.game.error[-1])
-                if return_val: # if valid - return 1
-                    continue
-                flag = flag and False
-                self.orders.add_orders([self.find_best_move(unit)], overwrite=True) 
+    #             return_val = self.game._valid_order(self.power_name, unit, order_part)
+    #             print(self.game.error[-1])
+    #             if return_val: # if valid - return 1
+    #                 continue
+    #             flag = flag and False
+    #             self.orders.add_orders([self.find_best_move(unit)], overwrite=True) 
 
     def is_support_for_selected_orders(self, support_order):
         """Determine if selected support order for neighbour corresponds to a self order selected"""
@@ -429,7 +429,7 @@ class LSP_DipBot(DipnetBot):
                         new_order = self.find_best_move(unit)
                         self.orders.add_orders([new_order], overwrite=True)   
             # check if all assigned orders are valid    
-            self.are_current_orders_valid()
+            # self.are_current_orders_valid()
 
         # print(f"Selected orders for {self.power_name}: {self.orders.get_list_of_orders()}")
         comms_obj = MessagesData()
