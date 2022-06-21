@@ -271,6 +271,7 @@ class LSP_DipBot(DipnetBot):
                 order_part = ' '.join(order_token[1:])
 
                 return_val = self.game._valid_order(self.power_name, unit, order_part)
+                print(return_val)
                 if return_val: # if valid - return 1
                     continue
                 print(order)
