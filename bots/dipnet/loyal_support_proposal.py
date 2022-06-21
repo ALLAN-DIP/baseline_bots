@@ -273,7 +273,7 @@ class LSP_DipBot(DipnetBot):
                 print(order_part)
 
                 return_val = self.game._valid_order(self.power_name, unit, order_part)
-                print(self.game.errors[-1])
+                print(self.game.error[-1])
                 if return_val: # if valid - return 1
                     continue
                 flag = flag and False
