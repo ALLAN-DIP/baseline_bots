@@ -260,6 +260,9 @@ class LSP_DipBot(DipnetBot):
                 return order  
         return loc_unit + ' H' 
 
+    # def are_orders_valid(self, game):
+    #     # check for only support order
+
 
     def is_support_for_selected_orders(self, support_order):
         """Determine if selected support order for neighbour corresponds to a self order selected"""
@@ -273,9 +276,6 @@ class LSP_DipBot(DipnetBot):
             # Hold move
             return True
         return False
-
-    def is_valid_support(self, support, orders):
-
 
     def generate_support_proposals(self, comms_obj):
         final_messages = defaultdict(list)
