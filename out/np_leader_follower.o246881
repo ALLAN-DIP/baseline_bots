@@ -1,0 +1,7 @@
+Namespace(filename='Analysis/LSP_RUSTUR_w_baselines_0.json', powers='AUSTRIA,ITALY,ENGLAND,FRANCE,GERMANY,RUSSIA,TURKEY', types='push,np,tbt,stbt,np,rlspm,rlsp')
+2022-06-20 21:39:10,206 - diplomacy_research.utils.process - INFO - Downloading image from https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-sl_model.zip
+2022-06-20 21:39:18,393 - diplomacy_research.utils.process - INFO - Done downloading image from https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-sl_model.zip
+2022-06-20 21:39:30,216 - diplomacy_research.players.benchmark_player - INFO - Configuration set successfully.
+2022-06-20 21:39:34,492 - diplomacy_research.utils.process - INFO - Downloading image from https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-rl_model.zip
+2022-06-20 21:39:41,190 - diplomacy_research.utils.process - INFO - Done downloading image from https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-rl_model.zip
+2022-06-20 21:39:52,455 - diplomacy_research.players.benchmark_player - INFO - Configuration set successfully.

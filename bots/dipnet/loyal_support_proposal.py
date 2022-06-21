@@ -267,6 +267,7 @@ class LSP_DipBot(DipnetBot):
         return distance
 
     def is_move_for_ally(self, order):
+
         order_token = get_order_tokens(order)
         # print(order_token)
         is_ally_shortest = [False, []]
@@ -295,12 +296,28 @@ class LSP_DipBot(DipnetBot):
             [is_move_for_ally, allies] = self.is_move_for_ally(order)
             if not is_move_for_ally and len(allies)==0:
                 return order
-        for order in self.possible_orders[loc_unit]:
-            [is_move_for_ally, allies] = self.is_move_for_ally(order)
             if not is_move_for_ally:
                 return order  
         return loc_unit + ' H' 
 
+    # def are_current_support_orders_valid(self):
+    #     flag = False
+    #     while not flag:
+    #         flag = True
+    #         for loc in self.orders.orders:
+    #             order = self.orders.orders[loc]
+    #             order_token = get_order_tokens(order)
+    #             unit = order_token[0]
+    #             order_part = ' '.join(order_token[1:])
+    #             print(unit)
+    #             print(order_part)
+
+    #             return_val = self.game._valid_order(self.power_name, unit, order_part)
+    #             print(self.game.error[-1])
+    #             if return_val: # if valid - return 1
+    #                 continue
+    #             flag = flag and False
+    #             self.orders.add_orders([self.find_best_move(unit)], overwrite=True) 
 
     def is_support_for_selected_orders(self, support_order):
         """Determine if selected support order for neighbour corresponds to a self order selected"""
@@ -389,13 +406,20 @@ class LSP_DipBot(DipnetBot):
     def gen_messages(self, rcvd_messages):
         # self.possible_orders = self.game.get_all_possible_orders()
         # Only if it is the first comms round, do this
+        # print(self.power_name)
         if self.curr_msg_round == 1:
             #assume that ally = self
             sim_game = self.game.__deepcopy__(None) 
+
+            # for first phase
             if self.power_name == 'RUSSIA' and 'TURKEY' not in self.allies:
-                self.allies.append('TURKEY')
+                sim_game.set_centers(self.power_name, self.game.get_centers('TURKEY'))
+                sim_game.set_units(self.power_name, self.game.get_units('TURKEY'))
+
             if self.power_name == 'TURKEY' and 'RUSSIA' not in self.allies:
-                self.allies.append('RUSSIA')
+                sim_game.set_centers(self.power_name, self.game.get_centers('RUSSIA'))
+                sim_game.set_units(self.power_name, self.game.get_units('RUSSIA'))
+                
             for power in self.allies:
                 sim_game.set_centers(self.power_name, self.game.get_centers(power))
                 sim_game.set_units(self.power_name, self.game.get_units(power))
@@ -413,22 +437,17 @@ class LSP_DipBot(DipnetBot):
                 orders.remove(order)
             self.orders.add_orders(orders, overwrite=True)
 
+            # orders = yield from self.brain.get_orders(self.game, self.power_name)
+
             # filter out aggressive actions to ally
             if self.allies:
-
                 agg_orders = []
                 units=[]  
                 for order in orders:
                     if self.is_order_aggressive_to_allies(order, self.power_name, self.game):
                         agg_orders.append(order)
 
-                if agg_orders:
-                    sim_game = self.game.__deepcopy__(None) 
-                    for power in self.allies:
-                        sim_game.set_centers(self.power_name, self.game.get_centers(power))
-                        sim_game.set_units(self.power_name, self.game.get_units(power))
-
-                     
+                if agg_orders:     
                     for agg_order in agg_orders:
                         orders.remove(agg_order)
                         order_token = get_order_tokens(agg_order)    
@@ -449,16 +468,17 @@ class LSP_DipBot(DipnetBot):
 
                 for order in orders:
                     order_token = get_order_tokens(order) 
-                    # print('check move if this is for ally or other power')
-                    # print(order)
-                    # print(self.is_move_for_ally(order))
+                    print('check move if this is for ally or other power')
+                    print(order)
+                    print(self.is_move_for_ally(order))
                     if order_token[0] not in units and self.is_move_for_ally(order)[0]:
                         unit = order_token[0]
                         # print('add new best move')
                         new_order = self.find_best_move(unit)
                         self.orders.add_orders([new_order], overwrite=True)   
+            # check if all assigned orders are valid    
+            # self.are_current_orders_valid()
 
-            
         # print(f"Selected orders for {self.power_name}: {self.orders.get_list_of_orders()}")
         comms_obj = MessagesData()
 

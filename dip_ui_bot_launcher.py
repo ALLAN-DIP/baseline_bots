@@ -1,3 +1,5 @@
+
+#!/usr/bin/env python3
 # python dip_ui_bot_launcher.py -H shade.tacc.utexas.edu -p AUSTRIA,ITALY,ENGLAND,GERMANY,FRANCE -B np -g kshenoy-test10
 # python dip_ui_bot_launcher.py -H shade.tacc.utexas.edu -p RUSSIA -B rlspm -g kshenoy-test10
 # python dip_ui_bot_launcher.py -H shade.tacc.utexas.edu -p TURKEY -B rlsp -g kshenoy-test10
