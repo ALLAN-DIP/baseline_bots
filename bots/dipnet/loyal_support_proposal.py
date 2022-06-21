@@ -254,8 +254,6 @@ class LSP_DipBot(DipnetBot):
             [is_move_for_ally, allies] = self.is_move_for_ally(order)
             if not is_move_for_ally and len(allies)==0:
                 return order
-        for order in self.possible_orders[loc_unit]:
-            [is_move_for_ally, allies] = self.is_move_for_ally(order)
             if not is_move_for_ally:
                 return order  
         return loc_unit + ' H' 
