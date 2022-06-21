@@ -249,6 +249,7 @@ class LSP_DipBot(DipnetBot):
         return is_ally_shortest     
 
     def find_best_move(self, unit):
+        print(unit)
         loc_unit = unit[2:]
         for order in self.possible_orders[loc_unit]:
             [is_move_for_ally, allies] = self.is_move_for_ally(order)
