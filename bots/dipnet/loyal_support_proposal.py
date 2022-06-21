@@ -369,27 +369,27 @@ class LSP_DipBot(DipnetBot):
         # print(self.power_name)
         if self.curr_msg_round == 1:
             #assume that ally = self
-            ally = self.allies
-            sim_game = self.game.__deepcopy__(None) 
-            if self.power_name == 'RUSSIA' and 'TURKEY' not in ally:
-                ally.append('TURKEY')
-            if self.power_name == 'TURKEY' and 'RUSSIA' not in ally:
-                ally.append('RUSSIA')
-            for power in ally:
-                sim_game.set_centers(self.power_name, self.game.get_centers(power))
-                sim_game.set_units(self.power_name, self.game.get_units(power))
-            # Fetch list of orders from DipNet
-            orders = yield from self.brain.get_orders(sim_game, self.power_name)
+            # ally = self.allies
+            # sim_game = self.game.__deepcopy__(None) 
+            # if self.power_name == 'RUSSIA' and 'TURKEY' not in ally:
+            #     ally.append('TURKEY')
+            # if self.power_name == 'TURKEY' and 'RUSSIA' not in ally:
+            #     ally.append('RUSSIA')
+            # for power in ally:
+            #     sim_game.set_centers(self.power_name, self.game.get_centers(power))
+            #     sim_game.set_units(self.power_name, self.game.get_units(power))
+            # # Fetch list of orders from DipNet
+            # orders = yield from self.brain.get_orders(sim_game, self.power_name)
 
-            #delete order for ally's units
-            ally_order = []
-            for order in orders:
-                order_token = get_order_tokens(order) 
-                if order_token[0] not in self.game.get_units(self.power_name):
-                    ally_order.append(order)
-            for order in ally_order:
-                orders.remove(order)
-            self.orders.add_orders(orders, overwrite=True)
+            # #delete order for ally's units
+            # ally_order = []
+            # for order in orders:
+            #     order_token = get_order_tokens(order) 
+            #     if order_token[0] not in self.game.get_units(self.power_name):
+            #         ally_order.append(order)
+            # for order in ally_order:
+            #     orders.remove(order)
+            # self.orders.add_orders(orders, overwrite=True)
 
             # filter out aggressive actions to ally
             if self.allies:
