@@ -1,0 +1,2006 @@
+
+The following have been reloaded with a version change:
+  1) python3/3.9.7 => python3/3.7.13
+
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+  0%|          | 0/146 [00:00<?, ?it/s]  1%|          | 1/146 [00:00<00:40,  3.58it/s]  1%|▏         | 2/146 [00:00<00:26,  5.54it/s]  3%|▎         | 4/146 [00:00<00:14,  9.87it/s]  7%|▋         | 10/146 [00:00<00:07, 18.64it/s]  8%|▊         | 12/146 [00:00<00:07, 17.75it/s] 10%|█         | 15/146 [00:00<00:06, 20.15it/s] 12%|█▏        | 18/146 [00:01<00:06, 21.29it/s] 16%|█▌        | 23/146 [00:01<00:05, 20.94it/s] 20%|█▉        | 29/146 [00:01<00:04, 26.34it/s] 22%|██▏       | 32/146 [00:01<00:07, 16.00it/s] 24%|██▍       | 35/146 [00:02<00:06, 17.56it/s] 27%|██▋       | 40/146 [00:02<00:04, 22.57it/s] 30%|███       | 44/146 [00:02<00:04, 24.43it/s] 34%|███▍      | 50/146 [00:02<00:03, 29.29it/s] 37%|███▋      | 54/146 [00:02<00:02, 31.21it/s] 40%|███▉      | 58/146 [00:02<00:02, 31.25it/s] 42%|████▏     | 62/146 [00:03<00:04, 20.75it/s] 45%|████▍     | 65/146 [00:03<00:03, 21.74it/s] 47%|████▋     | 68/146 [00:03<00:04, 16.78it/s] 49%|████▊     | 71/146 [00:03<00:04, 18.17it/s] 51%|█████     | 74/146 [00:03<00:04, 15.92it/s] 55%|█████▍    | 80/146 [00:03<00:03, 21.74it/s] 57%|█████▋    | 83/146 [00:04<00:03, 18.71it/s] 60%|█████▉    | 87/146 [00:04<00:03, 15.94it/s] 63%|██████▎   | 92/146 [00:04<00:02, 19.08it/s] 65%|██████▌   | 95/146 [00:04<00:02, 18.55it/s] 67%|██████▋   | 98/146 [00:04<00:02, 20.47it/s] 71%|███████   | 103/146 [00:05<00:02, 19.54it/s] 74%|███████▍  | 108/146 [00:05<00:02, 18.68it/s] 77%|███████▋  | 112/146 [00:05<00:01, 21.51it/s] 79%|███████▉  | 116/146 [00:05<00:01, 21.02it/s] 84%|████████▍ | 123/146 [00:05<00:00, 29.32it/s] 87%|████████▋ | 127/146 [00:06<00:00, 21.61it/s] 89%|████████▉ | 130/146 [00:06<00:00, 22.77it/s] 94%|█████████▍| 137/146 [00:06<00:00, 29.63it/s] 97%|█████████▋| 141/146 [00:06<00:00, 27.99it/s]100%|██████████| 146/146 [00:06<00:00, 21.62it/s]
+  0%|          | 0/147 [00:00<?, ?it/s]  1%|          | 1/147 [00:00<00:39,  3.67it/s]  2%|▏         | 3/147 [00:00<00:15,  9.14it/s]  6%|▌         | 9/147 [00:00<00:06, 22.82it/s]  8%|▊         | 12/147 [00:00<00:05, 23.50it/s] 12%|█▏        | 17/147 [00:00<00:04, 28.56it/s] 14%|█▍        | 21/147 [00:00<00:04, 26.00it/s] 17%|█▋        | 25/147 [00:01<00:04, 28.76it/s] 20%|█▉        | 29/147 [00:01<00:03, 30.31it/s] 22%|██▏       | 33/147 [00:01<00:04, 27.72it/s] 28%|██▊       | 41/147 [00:01<00:02, 37.65it/s] 31%|███       | 45/147 [00:01<00:03, 33.02it/s] 35%|███▍      | 51/147 [00:01<00:02, 35.28it/s] 37%|███▋      | 55/147 [00:02<00:03, 25.16it/s] 41%|████▏     | 61/147 [00:02<00:03, 27.45it/s] 45%|████▍     | 66/147 [00:02<00:02, 29.65it/s] 48%|████▊     | 70/147 [00:02<00:02, 27.29it/s] 52%|█████▏    | 76/147 [00:02<00:02, 28.34it/s] 55%|█████▌    | 81/147 [00:02<00:02, 30.60it/s] 58%|█████▊    | 85/147 [00:03<00:01, 32.42it/s] 61%|██████    | 89/147 [00:03<00:01, 32.60it/s] 63%|██████▎   | 93/147 [00:03<00:01, 29.36it/s] 67%|██████▋   | 98/147 [00:03<00:01, 31.84it/s] 69%|██████▉   | 102/147 [00:03<00:01, 28.33it/s] 72%|███████▏  | 106/147 [00:03<00:01, 30.66it/s] 75%|███████▍  | 110/147 [00:03<00:01, 30.39it/s] 78%|███████▊  | 114/147 [00:04<00:01, 27.72it/s] 81%|████████  | 119/147 [00:04<00:00, 30.36it/s] 84%|████████▎ | 123/147 [00:04<00:00, 32.05it/s] 86%|████████▋ | 127/147 [00:04<00:00, 32.44it/s] 89%|████████▉ | 131/147 [00:04<00:00, 31.75it/s] 92%|█████████▏| 135/147 [00:04<00:00, 31.12it/s] 95%|█████████▌| 140/147 [00:04<00:00, 31.04it/s] 98%|█████████▊| 144/147 [00:04<00:00, 31.99it/s]100%|██████████| 147/147 [00:05<00:00, 29.13it/s]
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14fbb4d58490>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14919ca39550>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x147bf3270510>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x147aec149450>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x1468b80386d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14ff585654d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14a2c0d82650>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14ce3119d490>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14c1ab1a7550>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14d2a6f65590>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x153dae63d590>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x153dbddec410>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14bd7f2ac590>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14c0b23db750>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x1506a2bfe810>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x150a05fdd5d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x1536e691b490>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x15461902c750>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x154dfd149450>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14ae24060450>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14a37d84b390>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14e119457590>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x15041c50a510>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14703ab444d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14ac77de24d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x149797857550>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x154f2b9e0710>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14dd611754d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x149527ff0550>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x151fe72556d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x147948331610>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x1471909a9490>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x1491857e7450>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x1500aab7f710>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14ccbd675710>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14dae92ed790>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x150a94e02650>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14b28f9d6650>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14fae45705d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x15172c45a4d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14e9221e1710>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x151076f82550>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14f033f70450>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14be0f4be810>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14df304385d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14e68e6a0450>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x1456650b1650>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x151a9a962490>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x150d9bcf2590>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x1485f22042d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x150f8279d710>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14ffb8f12610>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x1530693fc590>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x145c81d3b290>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x148066596550>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x148371a134d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14f04ea7d5d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x145af081c4d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x150e4dc45650>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x148691492610>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x149e56bdd4d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x150f228147d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x1483394615d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x146ef00564d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14e75c672210>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x152285c4e4d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x1470004a95d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x1507ec09d5d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14568e29d490>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14daa6dc15d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14a7a2180410>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x1489653fb510>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14a07a35e4d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14921e1d6590>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14e49d69c650>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14994d387410>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14994551d710>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14fdfca59610>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14dff9271650>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x15543ade26d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x151e88eb15d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x150e20a2b410>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x148c33662650>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x1525b2f9e5d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x1523f9eb8450>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14d90d46f650>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x1537a13a6650>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x145d6da47650>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x15251fca74d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14b9f6e276d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x1516f973d450>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14da6e779490>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x153e10dfc690>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14c3ebb215d0>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x15294c81a850>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x14ef80a05550>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x150bc4241350>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x148fed075490>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x1522feda3510>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
+WARNING:root:The PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION variable should be set to "cpp".
+ERROR:tornado.application:Exception in callback functools.partial(<bound method IOLoop._discard_future_result of <tornado.platform.asyncio.AsyncIOMainLoop object at 0x1474fa9f6550>>, <Future finished exception=IndexError('list index out of range')>)
+Traceback (most recent call last):
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 741, in _run_callback
+    ret = callback()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/ioloop.py", line 765, in _discard_future_result
+    future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 769, in run
+    yielded = self.gen.throw(*exc_info)  # type: ignore
+  File "botgame_launcher_dipnet.py", line 163, in bot_loop
+    return_obj = yield bot(rcvd_messages)
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 762, in run
+    value = future.result()
+  File "/opt/apps/intel19/python3/3.7.13/lib/python3.7/site-packages/tornado/gen.py", line 216, in wrapper
+    result = ctx_run(func, *args, **kwargs)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 84, in __call__
+    return super().__call__(rcvd_messages)
+  File "/work/08801/wwongkam/ls6/baseline_bots/bots/pushover_bot.py", line 41, in __call__
+    last_message = sorted_rcvd_messages[0]
+IndexError: list index out of range
