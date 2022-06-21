@@ -31,7 +31,9 @@ class TransparentBot(DipnetBot):
         press_msgs = [msg[1] for msg in rcvd_messages if "FCT" in msg[1].message]
         parsed_orders = []
         for msg in press_msgs:
+            print(msg.message)
             parsed_orders += parse_orr_xdo(parse_FCT(msg.message))
+            print(parse_orr_xdo(parse_FCT(msg.message)))
         return parsed_orders
 
     @gen.coroutine
