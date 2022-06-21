@@ -366,6 +366,7 @@ class LSP_DipBot(DipnetBot):
     def gen_messages(self, rcvd_messages):
         # self.possible_orders = self.game.get_all_possible_orders()
         # Only if it is the first comms round, do this
+        print(self.power_name)
         if self.curr_msg_round == 1:
             #assume that ally = self
             ally = self.allies
