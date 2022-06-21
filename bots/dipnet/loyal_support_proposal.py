@@ -373,7 +373,6 @@ class LSP_DipBot(DipnetBot):
 
             # filter out aggressive actions to ally
             if self.allies:
-
                 agg_orders = []
                 units=[]  
                 for order in orders:
