@@ -225,7 +225,7 @@ class LSP_DipBot(DipnetBot):
         # print('distance for '+ power +': '+str(distance))
         return distance
 
-    def is_move_for_ally(self, order):
+    def is_move_for_powers(self, order, powers):
 
         order_token = get_order_tokens(order)
         # print(order_token)
@@ -241,7 +241,7 @@ class LSP_DipBot(DipnetBot):
             is_ally_shortest = [True, []]
             for power, dist in dist_powers.items():
                 if dist == min_dist:
-                    if power in self.allies:
+                    if power in self.powers:
                         is_ally_shortest[0] = is_ally_shortest[0] and True
                         is_ally_shortest[1].append(power)
                     else:
@@ -252,7 +252,7 @@ class LSP_DipBot(DipnetBot):
     def find_best_move(self, unit):
         loc_unit = unit[2:]
         for order in self.possible_orders[loc_unit]:
-            [is_move_for_ally, allies] = self.is_move_for_ally(order)
+            [is_move_for_ally, allies] = self.is_move_for_powers(order)
             if not is_move_for_ally and len(allies)==0:
                 return order
             if not is_move_for_ally:
@@ -398,45 +398,45 @@ class LSP_DipBot(DipnetBot):
             self.orders.add_orders(orders, overwrite=True)
 
             # orders = yield from self.brain.get_orders(self.game, self.power_name)
+            if self.allies + ally:
+                # filter out aggressive actions to ally
+                agg_orders = []
+                units=[]  
+                for order in orders:
+                    if self.is_order_aggressive_to_powers(order, self.power_name, self.allies + ally ,self.game):
+                        agg_orders.append(order)
 
-            # filter out aggressive actions to ally
-            agg_orders = []
-            units=[]  
-            for order in orders:
-                if self.is_order_aggressive_to_powers(order, self.power_name, self.allies + ally ,self.game):
-                    agg_orders.append(order)
+                if agg_orders:     
+                    for agg_order in agg_orders:
+                        orders.remove(agg_order)
+                        order_token = get_order_tokens(agg_order)    
+                        units.append(order_token[0])
 
-            if agg_orders:     
-                for agg_order in agg_orders:
-                    orders.remove(agg_order)
-                    order_token = get_order_tokens(agg_order)    
-                    units.append(order_token[0])
+                    #replace order if those new orders are doable
+                    for unit in units: 
 
-                #replace order if those new orders are doable
-                for unit in units: 
+                        for order in orders:
+                            order_token = get_order_tokens(order) 
+                            #support self order
+                        
+                            if order_token[0] not in order and unit + ' S ' + order in self.possible_orders[unit[2:]]:
+                                self.orders.add_orders([unit + ' S ' + order], overwrite=True)   
+                                print('new order to replace agg: ', unit + ' S ' + order)
+                                break
+                        #hold if no better option
+                        self.orders.add_orders([unit + ' H'], overwrite=True)        
 
-                    for order in orders:
-                        order_token = get_order_tokens(order) 
-                        #support self order
-                    
-                        if order_token[0] not in order and unit + ' S ' + order in self.possible_orders[unit[2:]]:
-                            self.orders.add_orders([unit + ' S ' + order], overwrite=True)   
-                            print('new order to replace agg: ', unit + ' S ' + order)
-                            break
-                    #hold if no better option
-                    self.orders.add_orders([unit + ' H'], overwrite=True)        
-
-            for order in orders:
-                order_token = get_order_tokens(order) 
-                # print('check move if this is for ally or other power')
-                # print(order)
-                # print(self.is_move_for_ally(order))
-                if order_token[0] not in units and self.is_move_for_ally(order)[0]:
-                    unit = order_token[0]
-                    # print('add new best move')
-                    new_order = self.find_best_move(unit)
-                    print('new order to move-for-ally: ', new_order)
-                    self.orders.add_orders([new_order], overwrite=True)   
+                for order in orders:
+                    order_token = get_order_tokens(order) 
+                    # print('check move if this is for ally or other power')
+                    # print(order)
+                    # print(self.is_move_for_ally(order))
+                    if order_token[0] not in units and self.is_move_for_powers(order, self.allies + ally)[0]:
+                        unit = order_token[0]
+                        # print('add new best move')
+                        new_order = self.find_best_move(unit)
+                        print('new order to move-for-ally: ', new_order)
+                        self.orders.add_orders([new_order], overwrite=True)   
             # check if all assigned orders are valid    
             # self.are_current_orders_valid()
 
