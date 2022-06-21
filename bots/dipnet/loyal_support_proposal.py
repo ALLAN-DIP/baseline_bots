@@ -273,7 +273,7 @@ class LSP_DipBot(DipnetBot):
                 if return_val: # if valid - return 1
                     continue
                 flag = flag and False
-                self.orders.add_orders([self.find_best_move()], overwrite=True) 
+                self.orders.add_orders([self.find_best_move(unit)], overwrite=True) 
 
     def is_support_for_selected_orders(self, support_order):
         """Determine if selected support order for neighbour corresponds to a self order selected"""
