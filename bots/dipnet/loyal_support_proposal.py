@@ -369,15 +369,15 @@ class LSP_DipBot(DipnetBot):
         # print(self.power_name)
         if self.curr_msg_round == 1:
             #assume that ally = self
-            ally = self.allies.__deepcopy__()
-            sim_game = self.game.__deepcopy__(None) 
-            if self.power_name == 'RUSSIA' and 'TURKEY' not in ally:
-                ally.append('TURKEY')
-            if self.power_name == 'TURKEY' and 'RUSSIA' not in ally:
-                ally.append('RUSSIA')
-            for power in ally:
-                sim_game.set_centers(self.power_name, self.game.get_centers(power))
-                sim_game.set_units(self.power_name, self.game.get_units(power))
+            # ally = self.allies
+            # sim_game = self.game.__deepcopy__(None) 
+            # if self.power_name == 'RUSSIA' and 'TURKEY' not in ally:
+            #     ally.append('TURKEY')
+            # if self.power_name == 'TURKEY' and 'RUSSIA' not in ally:
+            #     ally.append('RUSSIA')
+            # for power in ally:
+            #     sim_game.set_centers(self.power_name, self.game.get_centers(power))
+            #     sim_game.set_units(self.power_name, self.game.get_units(power))
             # Fetch list of orders from DipNet
             orders = yield from self.brain.get_orders(sim_game, self.power_name)
 
