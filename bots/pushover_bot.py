@@ -33,9 +33,9 @@ class PushoverBot(baseline_bot.BaselineBot):
         if len(rcvd_messages) == 0:
             self.orders = ret_obj
             return {"orders":ret_obj, "messages": reply_obj}
-        print(len(rcvd_messages))
+        # print(len(rcvd_messages))
         sorted_rcvd_messages = sort_messages_by_most_recent(rcvd_messages)
-        print(sorted_rcvd_messages)
+        # print(sorted_rcvd_messages)
         last_message = sorted_rcvd_messages[0]
         while 'FCT' in last_message.message:
             sorted_rcvd_messages.pop(0)
