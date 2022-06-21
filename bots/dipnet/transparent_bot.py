@@ -44,6 +44,7 @@ class TransparentBot(DipnetBot):
         comms_obj = MessagesData()
 
         parsed_orders = self.parse_messages(rcvd_messages)
+        print(parsed_orders)
 
         # My orders' messages if not already sent
         if not self.my_orders_informed:
