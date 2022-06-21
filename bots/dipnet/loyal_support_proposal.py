@@ -263,6 +263,7 @@ class LSP_DipBot(DipnetBot):
 
     def are_current_orders_valid(self):
         flag = False
+        print(self.orders.orders)
         while not flag:
             flag = True
             for order in self.orders.orders:
