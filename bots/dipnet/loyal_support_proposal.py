@@ -369,7 +369,7 @@ class LSP_DipBot(DipnetBot):
         # print(self.power_name)
         if self.curr_msg_round == 1:
             #assume that ally = self
-            ally = self.allies
+            ally = self.allies.__deepcopy__()
             sim_game = self.game.__deepcopy__(None) 
             if self.power_name == 'RUSSIA' and 'TURKEY' not in ally:
                 ally.append('TURKEY')
