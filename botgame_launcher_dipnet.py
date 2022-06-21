@@ -183,6 +183,9 @@ def bot_loop():
     # to_saved_game_format(game, output_path=args.filename)
     with open(args.filename, 'w') as file:
         file.write(json.dumps(to_saved_game_format(game)))
+    results = to_saved_game_format(game)
+    winners = [pow1.strip() for pow1 in results['phases'][-1]['state']['note'].split(":")[-1].split(",")]
+    print(f"Winners: {winners}")
 
     stop_io_loop()
 

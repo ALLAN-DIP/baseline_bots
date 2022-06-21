@@ -4,6 +4,9 @@ __email__ = "kartik.shenoyy@gmail.com"
 import random
 from collections import defaultdict
 import sys
+from datetime import datetime
+import json
+import os
 sys.path.append("..")
 
 from diplomacy import Message
@@ -33,6 +36,43 @@ class LSP_DipBot(DipnetBot):
         self.alliance_all_in = alliance_all_in
         self.my_influence = set()
         self.possible_orders = {}
+
+        today = datetime.today()
+        suffix = today.strftime("%Y_%m_%d-%H:%M:%S")
+        self.moves_tracker_file = f"BotMovesAnalysis/LSP_orders_set_{power_name}_{suffix}.json"
+    
+    def record_orders(self, move_type='dipnet', orders=None):
+        if os.path.exists(self.moves_tracker_file):
+            orders_executed = json.load(open(self.moves_tracker_file,'r'))
+        else:
+            orders_executed = defaultdict(dict)
+        if self.game.get_current_phase() not in orders_executed:
+            orders_executed[self.game.get_current_phase()] = defaultdict(list)
+        if move_type == 'dipnet' or move_type == 'final':
+            orders_executed[self.game.get_current_phase()][move_type] = orders
+        elif move_type == 'support_proposal':
+            orders_executed[self.game.get_current_phase()][move_type] = orders
+        if move_type == 'final':
+            if 'support_proposal' not in orders_executed[self.game.get_current_phase()]:
+                orders_executed[self.game.get_current_phase()]['support_proposal'] = []
+            orders_executed[self.game.get_current_phase()]['support_proposal_count'] = len(orders_executed[self.game.get_current_phase()]['support_proposal'])
+            prop_acc_count = 0
+            for ord in orders_executed[self.game.get_current_phase()]['support_proposal']:
+                if ord in orders_executed[self.game.get_current_phase()]['final']:
+                    prop_acc_count += 1
+            orders_executed[self.game.get_current_phase()]['support_proposal_acceptance_count'] = prop_acc_count
+
+            new_ord_count = 0
+            for ord in orders_executed[self.game.get_current_phase()]['final']:
+                if ord not in orders_executed[self.game.get_current_phase()]['dipnet']:
+                    new_ord_count += 1
+            orders_executed[self.game.get_current_phase()]['new_order_count'] = new_ord_count
+
+        json.dump(orders_executed, open(self.moves_tracker_file,'w'))
+            
+            
+
+
 
     def set_leader(self):
         """Sets this bot as the leader"""
@@ -99,6 +139,7 @@ class LSP_DipBot(DipnetBot):
             for msg in order_msgs:
                 if msg.sender == self.my_leader:
                     rcvd_orders += parse_orr_xdo(msg.message)
+                    print(f"Orders received: {rcvd_orders}")
 
         return {
             'alliance_proposer': alliance_proposer,
@@ -360,6 +401,7 @@ class LSP_DipBot(DipnetBot):
                 sim_game.set_units(self.power_name, self.game.get_units(power))
             # Fetch list of orders from DipNet
             orders = yield from self.brain.get_orders(sim_game, self.power_name)
+            self.record_orders(move_type='dipnet', orders=orders)
 
             #delete order for ally's units
             ally_order = []
@@ -458,6 +500,7 @@ class LSP_DipBot(DipnetBot):
 
         # Update all received proposed orders
         self.orders.add_orders(comms_rcvd['orders_proposed'], overwrite=True)
+        self.record_orders(move_type='support_proposal', orders=comms_rcvd['orders_proposed'])
         self.curr_msg_round += 1
         return comms_obj
 
@@ -468,7 +511,7 @@ class LSP_DipBot(DipnetBot):
             # Fetch list of orders from DipNet
             orders = yield from self.brain.get_orders(self.game, self.power_name)
             self.orders.add_orders(orders, overwrite=True)
-
+        self.record_orders(move_type='final', orders=self.orders.get_list_of_orders())
         return self.orders.get_list_of_orders()
 
 if __name__ == "__main__":
