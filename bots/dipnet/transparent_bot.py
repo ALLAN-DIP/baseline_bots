@@ -63,6 +63,7 @@ class TransparentBot(DipnetBot):
             if final_orders:
                 msg = FCT(ORR(XDO(final_orders)))
                 comms_obj.add_message( other_power, msg )
+                print(msg)
         
         self.curr_msg_round += 1
         return comms_obj
