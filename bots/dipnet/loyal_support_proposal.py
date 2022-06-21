@@ -226,6 +226,7 @@ class LSP_DipBot(DipnetBot):
         return distance
 
     def is_move_for_ally(self, order):
+
         order_token = get_order_tokens(order)
         # print(order_token)
         is_ally_shortest = [False, []]
@@ -373,11 +374,10 @@ class LSP_DipBot(DipnetBot):
             if self.power_name == 'RUSSIA' and 'TURKEY' not in self.allies:
                 sim_game.set_centers(self.power_name, self.game.get_centers('TURKEY'))
                 sim_game.set_units(self.power_name, self.game.get_units('TURKEY'))
-                print("in this")
+
             if self.power_name == 'TURKEY' and 'RUSSIA' not in self.allies:
                 sim_game.set_centers(self.power_name, self.game.get_centers('RUSSIA'))
                 sim_game.set_units(self.power_name, self.game.get_units('RUSSIA'))
-                print("in this")
                 
             for power in self.allies:
                 sim_game.set_centers(self.power_name, self.game.get_centers(power))
@@ -426,9 +426,9 @@ class LSP_DipBot(DipnetBot):
 
                 for order in orders:
                     order_token = get_order_tokens(order) 
-                    # print('check move if this is for ally or other power')
-                    # print(order)
-                    # print(self.is_move_for_ally(order))
+                    print('check move if this is for ally or other power')
+                    print(order)
+                    print(self.is_move_for_ally(order))
                     if order_token[0] not in units and self.is_move_for_ally(order)[0]:
                         unit = order_token[0]
                         # print('add new best move')
