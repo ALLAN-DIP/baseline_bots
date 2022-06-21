@@ -241,7 +241,7 @@ class LSP_DipBot(DipnetBot):
             is_ally_shortest = [True, []]
             for power, dist in dist_powers.items():
                 if dist == min_dist:
-                    if power in self.powers:
+                    if power in powers:
                         is_ally_shortest[0] = is_ally_shortest[0] and True
                         is_ally_shortest[1].append(power)
                     else:
