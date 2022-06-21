@@ -264,7 +264,7 @@ class LSP_DipBot(DipnetBot):
         flag = False
         while not flag:
             flag = True
-            for order in self.order.orders:
+            for order in self.orders.orders:
                 order_token = get_order_tokens(order)
                 unit = order_token[0]
                 order_part = ' '.join(order_token[1:])
