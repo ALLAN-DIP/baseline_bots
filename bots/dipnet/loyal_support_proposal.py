@@ -379,18 +379,18 @@ class LSP_DipBot(DipnetBot):
             #     sim_game.set_centers(self.power_name, self.game.get_centers(power))
             #     sim_game.set_units(self.power_name, self.game.get_units(power))
             # Fetch list of orders from DipNet
-            orders = yield from self.brain.get_orders(sim_game, self.power_name)
+            # orders = yield from self.brain.get_orders(sim_game, self.power_name)
 
             #delete order for ally's units
-            ally_order = []
-            for order in orders:
-                order_token = get_order_tokens(order) 
-                if order_token[0] not in self.game.get_units(self.power_name):
-                    ally_order.append(order)
-            for order in ally_order:
-                orders.remove(order)
-            self.orders.add_orders(orders, overwrite=True)
-
+            # ally_order = []
+            # for order in orders:
+            #     order_token = get_order_tokens(order) 
+            #     if order_token[0] not in self.game.get_units(self.power_name):
+            #         ally_order.append(order)
+            # for order in ally_order:
+            #     orders.remove(order)
+            # self.orders.add_orders(orders, overwrite=True)
+            orders = yield from self.brain.get_orders(self.game, self.power_name)
             # filter out aggressive actions to ally
             if self.allies:
                 agg_orders = []
