@@ -401,13 +401,7 @@ class LSP_DipBot(DipnetBot):
                     if self.is_order_aggressive_to_allies(order, self.power_name, self.game):
                         agg_orders.append(order)
 
-                if agg_orders:
-                    sim_game = self.game.__deepcopy__(None) 
-                    for power in self.allies:
-                        sim_game.set_centers(self.power_name, self.game.get_centers(power))
-                        sim_game.set_units(self.power_name, self.game.get_units(power))
-
-                     
+                if agg_orders:     
                     for agg_order in agg_orders:
                         orders.remove(agg_order)
                         order_token = get_order_tokens(agg_order)    
