@@ -375,10 +375,12 @@ class LSP_DipBot(DipnetBot):
             if self.power_name == 'RUSSIA' and 'TURKEY' not in self.allies:
                 sim_game.set_centers(self.power_name, self.game.get_centers('TURKEY'))
                 sim_game.set_units(self.power_name, self.game.get_units('TURKEY'))
+                print("in this")
             if self.power_name == 'TURKEY' and 'RUSSIA' not in self.allies:
                 sim_game.set_centers(self.power_name, self.game.get_centers('RUSSIA'))
                 sim_game.set_units(self.power_name, self.game.get_units('RUSSIA'))
-
+                print("in this")
+                
             for power in self.allies:
                 sim_game.set_centers(self.power_name, self.game.get_centers(power))
                 sim_game.set_units(self.power_name, self.game.get_units(power))
@@ -396,7 +398,7 @@ class LSP_DipBot(DipnetBot):
             self.orders.add_orders(orders, overwrite=True)
 
             # orders = yield from self.brain.get_orders(self.game, self.power_name)
-            
+
             # filter out aggressive actions to ally
             if self.allies:
                 agg_orders = []
