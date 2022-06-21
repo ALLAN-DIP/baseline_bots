@@ -107,7 +107,7 @@ class LSP_DipBot(DipnetBot):
             'yes_allies_proposed': yes_allies,
             'orders_proposed': rcvd_orders
         }
-    def is_order_aggressive_to_allies(self, order, sender, game):
+    def is_order_aggressive_to_powers(self, order, sender, powers, game):
         """
         check if the order is aggressive by 
         1. to attack allies unit
@@ -124,7 +124,7 @@ class LSP_DipBot(DipnetBot):
             if order_token[1][0] == '-':
                 #get location - add order_token[0] ('A' or 'F') at front to check if it collides with other powers' units
                 order_unit = order_token[0][0] + order_token[1][1:]
-                for power in self.allies:
+                for power in powers:
                     if sender != power:
                         #if the order is to attack allies' units
                         if order_unit in game.powers[power].units:
@@ -138,7 +138,7 @@ class LSP_DipBot(DipnetBot):
                 if len(order_token)==3: #['A BUD', 'S', 'A VIE']
                     return False
                 order_unit = order_token[2][0] + order_token[3][1:]
-                for power in self.allies:
+                for power in powers:
                     if sender != power:
                         #if the order is to attack allies' units
                         if order_unit in game.powers[power].units:
@@ -369,15 +369,17 @@ class LSP_DipBot(DipnetBot):
         if self.curr_msg_round == 1:
             #assume that ally = self
             sim_game = self.game.__deepcopy__(None) 
-
+            ally = []
             # for first phase
             if self.power_name == 'RUSSIA' and 'TURKEY' not in self.allies:
                 sim_game.set_centers(self.power_name, self.game.get_centers('TURKEY'))
                 sim_game.set_units(self.power_name, self.game.get_units('TURKEY'))
+                ally.append('TURKEY')
 
             if self.power_name == 'TURKEY' and 'RUSSIA' not in self.allies:
                 sim_game.set_centers(self.power_name, self.game.get_centers('RUSSIA'))
                 sim_game.set_units(self.power_name, self.game.get_units('RUSSIA'))
+                ally.append('TURKEY')
                 
             for power in self.allies:
                 sim_game.set_centers(self.power_name, self.game.get_centers(power))
@@ -398,42 +400,43 @@ class LSP_DipBot(DipnetBot):
             # orders = yield from self.brain.get_orders(self.game, self.power_name)
 
             # filter out aggressive actions to ally
-            if self.allies:
-                agg_orders = []
-                units=[]  
-                for order in orders:
-                    if self.is_order_aggressive_to_allies(order, self.power_name, self.game):
-                        agg_orders.append(order)
+            agg_orders = []
+            units=[]  
+            for order in orders:
+                if self.is_order_aggressive_to_powers(order, self.power_name, self.allies + ally ,self.game):
+                    agg_orders.append(order)
 
-                if agg_orders:     
-                    for agg_order in agg_orders:
-                        orders.remove(agg_order)
-                        order_token = get_order_tokens(agg_order)    
-                        units.append(order_token[0])
+            if agg_orders:     
+                for agg_order in agg_orders:
+                    orders.remove(agg_order)
+                    order_token = get_order_tokens(agg_order)    
+                    units.append(order_token[0])
 
-                    #replace order if those new orders are doable
-                    for unit in units: 
+                #replace order if those new orders are doable
+                for unit in units: 
 
-                        for order in orders:
-                            order_token = get_order_tokens(order) 
-                            #support self order
-                        
-                            if order_token[0] not in order and unit + ' S ' + order in self.possible_orders[unit[2:]]:
-                                self.orders.add_orders([unit + ' S ' + order], overwrite=True)   
-                                break
-                        #hold if no better option
-                        self.orders.add_orders([unit + ' H'], overwrite=True)        
+                    for order in orders:
+                        order_token = get_order_tokens(order) 
+                        #support self order
+                    
+                        if order_token[0] not in order and unit + ' S ' + order in self.possible_orders[unit[2:]]:
+                            self.orders.add_orders([unit + ' S ' + order], overwrite=True)   
+                            print('new order to replace agg: ', unit + ' S ' + order)
+                            break
+                    #hold if no better option
+                    self.orders.add_orders([unit + ' H'], overwrite=True)        
 
-                for order in orders:
-                    order_token = get_order_tokens(order) 
-                    print('check move if this is for ally or other power')
-                    print(order)
-                    print(self.is_move_for_ally(order))
-                    if order_token[0] not in units and self.is_move_for_ally(order)[0]:
-                        unit = order_token[0]
-                        # print('add new best move')
-                        new_order = self.find_best_move(unit)
-                        self.orders.add_orders([new_order], overwrite=True)   
+            for order in orders:
+                order_token = get_order_tokens(order) 
+                # print('check move if this is for ally or other power')
+                # print(order)
+                # print(self.is_move_for_ally(order))
+                if order_token[0] not in units and self.is_move_for_ally(order)[0]:
+                    unit = order_token[0]
+                    # print('add new best move')
+                    new_order = self.find_best_move(unit)
+                    print('new order to move-for-ally: ', new_order)
+                    self.orders.add_orders([new_order], overwrite=True)   
             # check if all assigned orders are valid    
             # self.are_current_orders_valid()
 
