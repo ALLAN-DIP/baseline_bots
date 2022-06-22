@@ -254,7 +254,7 @@ class LSP_DipBot(DipnetBot):
     
     def find_best_move_for_units(self, units, ally_orders, powers):
         # self best move for each unit in units to avoid attacking or too close to certain powers
-        # print(units)
+        print(units)
         # build a dict foc each location of ally, proposed_order 
         final_orders = {unit: order for unit, order in self.orders.orders.items()}
         for order in ally_orders:
@@ -288,7 +288,7 @@ class LSP_DipBot(DipnetBot):
                         found =True
                         break
             new_orders.append(new_order)
-        # print(new_orders)
+        print(new_orders)
         return new_orders
             
     # def is_convoyed_from_given_orders(self, via_order, orders):
