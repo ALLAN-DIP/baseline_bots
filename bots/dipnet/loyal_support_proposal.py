@@ -10,7 +10,7 @@ from diplomacy import Message
 
 from bots.dipnet.dipnet_bot import DipnetBot
 from utils import parse_orr_xdo, parse_alliance_proposal, YES, \
-    get_other_powers, ALY, MessagesData, OrdersData, get_order_tokens, ORR, XDO
+    get_other_powers, ALY, MessagesData, OrdersData, get_order_tokens, ORR, XDO, is_support_order
 from tornado import gen
 
 class LSP_DipBot(DipnetBot):
@@ -158,7 +158,7 @@ class LSP_DipBot(DipnetBot):
                 return True
         elif len(order_tokens) == 4 and order_tokens[1] == 'S':
             # Support move
-            if order_tokens[3].split()[-1] in self.my_influence:
+            if order_tokens[1].split()[-1] in self.my_influence:
                 return True
 
         return False
@@ -252,31 +252,14 @@ class LSP_DipBot(DipnetBot):
     def find_best_move_for_powers(self, unit, powers):
         loc_unit = unit[2:]
         for order in self.possible_orders[loc_unit]:
+            if is_support_order(order) and not self.is_support_for_selected_orders(order):
+                continue
             [is_move_for_ally, allies] = self.is_move_for_powers(order, powers)
             if not is_move_for_ally and len(allies)==0:
                 return order
             if not is_move_for_ally:
                 return order  
         return loc_unit + ' H' 
-
-    # def are_current_support_orders_valid(self):
-    #     flag = False
-    #     while not flag:
-    #         flag = True
-    #         for loc in self.orders.orders:
-    #             order = self.orders.orders[loc]
-    #             order_token = get_order_tokens(order)
-    #             unit = order_token[0]
-    #             order_part = ' '.join(order_token[1:])
-    #             print(unit)
-    #             print(order_part)
-
-    #             return_val = self.game._valid_order(self.power_name, unit, order_part)
-    #             print(self.game.error[-1])
-    #             if return_val: # if valid - return 1
-    #                 continue
-    #             flag = flag and False
-    #             self.orders.add_orders([self.find_best_move(unit)], overwrite=True) 
 
     def is_support_for_selected_orders(self, support_order):
         """Determine if selected support order for neighbour corresponds to a self order selected"""
@@ -379,7 +362,7 @@ class LSP_DipBot(DipnetBot):
             if self.power_name == 'TURKEY' and 'RUSSIA' not in self.allies:
                 sim_game.set_centers(self.power_name, self.game.get_centers('RUSSIA'))
                 sim_game.set_units(self.power_name, self.game.get_units('RUSSIA'))
-                ally.append('TURKEY')
+                ally.append('RUSSIA')
                 
             for power in self.allies:
                 sim_game.set_centers(self.power_name, self.game.get_centers(power))
