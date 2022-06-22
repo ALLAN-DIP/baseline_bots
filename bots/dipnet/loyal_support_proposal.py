@@ -372,7 +372,7 @@ class LSP_DipBot(DipnetBot):
                 sim_game.set_units(self.power_name, self.game.get_units(power))
             # Fetch list of orders from DipNet
             orders = yield from self.brain.get_orders(sim_game, self.power_name)
-
+            print(orders)
             #delete order for ally's units
             ally_order = []
             for order in orders:
@@ -381,6 +381,7 @@ class LSP_DipBot(DipnetBot):
                     ally_order.append(order)
             for order in ally_order:
                 orders.remove(order)
+            print(ally_order)
             self.orders.add_orders(orders, overwrite=True)
 
             # orders = yield from self.brain.get_orders(self.game, self.power_name)
