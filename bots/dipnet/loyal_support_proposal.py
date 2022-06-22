@@ -274,7 +274,7 @@ class LSP_DipBot(DipnetBot):
                     continue
                 if is_convoyed_order(order) and not self.is_convoyed_from_given_orders(order, final_orders):
                     continue
-                if is_move_order(order) and not self.is_safe_move_from_given_orders(order, final_orders + new_orders):
+                if is_move_order(order) and not self.is_safe_move_from_given_orders(order, final_orders):
                     continue
                 [is_move_for_ally, min_diff] = self.is_move_for_powers(order, powers)
                 if not is_move_for_ally and min_diff==0:
@@ -293,6 +293,7 @@ class LSP_DipBot(DipnetBot):
                         found =True
                         break
             new_orders.append(new_order)
+            final_orders[unit] = new_order
         print(new_orders)
         return new_orders
 
