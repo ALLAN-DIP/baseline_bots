@@ -268,7 +268,7 @@ class LSP_DipBot(DipnetBot):
         order_tokens = get_order_tokens(support_order)
         print(order_tokens)
         selected_order = get_order_tokens(self.orders.orders[order_tokens[2].split()[1]])
-
+        print(selected_order)
         if len(order_tokens[2:]) == len(selected_order) and order_tokens[2:] == selected_order:
             # Attack move
             return True
