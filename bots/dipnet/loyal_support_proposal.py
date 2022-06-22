@@ -248,17 +248,12 @@ class LSP_DipBot(DipnetBot):
         return is_ally_shortest     
 
     
-    def find_best_move_for_units(self, units, ally_orders, proposed_orders, powers):
+    def find_best_move_for_units(self, units, ally_orders, powers):
         # self best move for each unit in units to avoid attacking or too close to certain powers
         
         # build a dict foc each location of ally, proposed_order 
         final_orders = {unit: order for unit, order in self.orders.orders}
         for order in ally_orders:
-            order_tokens = get_order_tokens(order)
-            final_orders[order_tokens[1].split()[-1]] = order
-
-        # if we are leader, replace ally_orders with what we proposed
-        for order in proposed_orders:
             order_tokens = get_order_tokens(order)
             final_orders[order_tokens[1].split()[-1]] = order
         
@@ -419,7 +414,6 @@ class LSP_DipBot(DipnetBot):
 
             # orders = yield from self.brain.get_orders(self.game, self.power_name)
             if self.allies or ally:
-                print("in this ally")
                 # filter out aggressive actions to ally
                 agg_orders = []
                 units=[]  
@@ -432,6 +426,8 @@ class LSP_DipBot(DipnetBot):
                         orders.remove(agg_order)
                         order_token = get_order_tokens(agg_order)    
                         units.append(order_token[0])
+                new_orders = self.find_best_move_for_units(self, units, ally_order, self.allies + ally)
+                self.orders.add_orders(new_orders, overwrite=True)
 
         # print(f"Selected orders for {self.power_name}: {self.orders.get_list_of_orders()}")
         comms_obj = MessagesData()
@@ -475,12 +471,10 @@ class LSP_DipBot(DipnetBot):
                 for recip in support_orders:
                     all_support_orders += support_orders[recip]
 
-                new_orders = self.find_best_move_for_units(self, units, ally_order, all_support_orders,self.allies + ally)
+                new_orders = self.find_best_move_for_units(self, units, all_support_orders,self.allies)
                 self.orders.add_orders(new_orders, overwrite=True)
 
-            else:
-                new_orders = self.find_best_move_for_units(self, units, ally_order, [], self.allies + ally)
-                self.orders.add_orders(new_orders, overwrite=True)
+
 
         # Update all received proposed orders
         self.orders.add_orders(comms_rcvd['orders_proposed'], overwrite=True)
