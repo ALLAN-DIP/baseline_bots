@@ -226,7 +226,7 @@ class LSP_DipBot(DipnetBot):
         return distance
 
     def is_move_for_powers(self, order, powers):
-        print(order)
+        # print(order)
         order_token = get_order_tokens(order)
         # print(order_token)
         is_ally_shortest = [False, 50]
@@ -246,14 +246,14 @@ class LSP_DipBot(DipnetBot):
                     else:
                         is_ally_shortest[0] = is_ally_shortest[0] and False
                         is_ally_shortest[1] = min(abs(min_dist-dist), is_ally_shortest[1])
-        print(dist_powers)
-        print(is_ally_shortest)
+        # print(dist_powers)
+        # print(is_ally_shortest)
         return is_ally_shortest     
 
     
     def find_best_move_for_units(self, units, ally_orders, powers):
         # self best move for each unit in units to avoid attacking or too close to certain powers
-        
+        print(units)
         # build a dict foc each location of ally, proposed_order 
         final_orders = {unit: order for unit, order in self.orders.orders.items()}
         for order in ally_orders:
@@ -297,6 +297,7 @@ class LSP_DipBot(DipnetBot):
                             new_order = order
                             break
             new_orders.append(new_order)
+        print(new_orders)
         return new_orders
             
         
