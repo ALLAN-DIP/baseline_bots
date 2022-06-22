@@ -137,9 +137,10 @@ class LSP_DipBot(DipnetBot):
         if order_msgs:
             # Follower
             for msg in order_msgs:
+                # print(msg.sender, self.my_leader)
                 if msg.sender == self.my_leader:
                     rcvd_orders += parse_orr_xdo(msg.message)
-                    print(f"Orders received: {rcvd_orders}")
+                    # print(f"Orders received: {rcvd_orders}")
 
         return {
             'alliance_proposer': alliance_proposer,
