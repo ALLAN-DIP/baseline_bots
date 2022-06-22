@@ -226,9 +226,10 @@ class LSP_DipBot(DipnetBot):
         return distance
 
     def is_move_for_powers(self, order, powers):
-        # print(order)
+        print(order)
         order_token = get_order_tokens(order)
-        # print(order_token)
+        print(order_token)
+        print(order_token[1][2:])
         is_ally_shortest = [False, 50]
         # check if it is move order
         game_powers = list(self.game.powers.keys())
