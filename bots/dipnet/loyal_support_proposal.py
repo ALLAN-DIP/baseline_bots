@@ -233,7 +233,7 @@ class LSP_DipBot(DipnetBot):
         # check if it is move order
         game_powers = list(self.game.powers.keys())
         game_powers.remove(self.power_name)
-        dist_powers = {power: 100 for power in game_powers}
+        dist_powers = {power: 50 for power in game_powers}
         if order_token[1][0] == '-':
             for power in game_powers:
                 dist_powers[power] = min(self.get_shortest_distance(order_token[1][2:], power),dist_powers[power])
@@ -264,33 +264,38 @@ class LSP_DipBot(DipnetBot):
         for unit in units:
             loc_unit = unit[2:]
             new_order = loc_unit + ' H'
+            found = False
             for order in self.possible_orders[loc_unit]:
                 order_tokens = get_order_tokens(order)
                 #if support self or ally unit, check if it's valid
                 if is_support_order(order) and order_tokens[2] in self.game.get_units(self.power_name) and not self.is_support_for_given_orders(order, final_orders):
                     continue
                 [is_move_for_ally, min_diff] = self.is_move_for_powers(order, powers)
-                if not is_move_for_ally and min_diff<=2:
+                if not is_move_for_ally and min_diff==0:
                     new_order = order
+                    found =True
                     break
-            for order in self.possible_orders[loc_unit]:
-                order_tokens = get_order_tokens(order)
-                #if support self or ally unit, check if it's valid
-                if is_support_order(order) and order_tokens[2] in self.game.get_units(self.power_name) and not self.is_support_for_given_orders(order, final_orders):
-                    continue
-                [is_move_for_ally, min_diff] = self.is_move_for_powers(order, powers)
-                if not is_move_for_ally:
-                    new_order = order
-                    break
-            for order in self.possible_orders[loc_unit]:
-                order_tokens = get_order_tokens(order)
-                #if support self or ally unit, check if it's valid
-                if is_support_order(order) and order_tokens[2] in self.game.get_units(self.power_name) and not self.is_support_for_given_orders(order, final_orders):
-                    continue
-                [is_move_for_ally, min_diff] = self.is_move_for_powers(order, powers)
-                if min_diff==1:
-                    new_order = order
-                    break
+            if not found:        
+                for order in self.possible_orders[loc_unit]:
+                    order_tokens = get_order_tokens(order)
+                    #if support self or ally unit, check if it's valid
+                    if is_support_order(order) and order_tokens[2] in self.game.get_units(self.power_name) and not self.is_support_for_given_orders(order, final_orders):
+                        continue
+                    [is_move_for_ally, min_diff] = self.is_move_for_powers(order, powers)
+                    if not is_move_for_ally:
+                        new_order = order
+                        found =True
+                        break
+                if not found:
+                    for order in self.possible_orders[loc_unit]:
+                        order_tokens = get_order_tokens(order)
+                        #if support self or ally unit, check if it's valid
+                        if is_support_order(order) and order_tokens[2] in self.game.get_units(self.power_name) and not self.is_support_for_given_orders(order, final_orders):
+                            continue
+                        [is_move_for_ally, min_diff] = self.is_move_for_powers(order, powers)
+                        if min_diff==1:
+                            new_order = order
+                            break
             new_orders.append(new_order)
         return new_orders
             
