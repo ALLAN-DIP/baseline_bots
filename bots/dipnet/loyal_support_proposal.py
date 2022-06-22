@@ -252,8 +252,9 @@ class LSP_DipBot(DipnetBot):
     def find_best_move_for_powers(self, unit, powers):
         loc_unit = unit[2:]
         for order in self.possible_orders[loc_unit]:
-            if is_support_order(order) and not self.is_support_for_selected_orders(order):
-                continue
+            if is_support_order(order): 
+                if not self.is_support_for_selected_orders(order):
+                    continue
             [is_move_for_ally, allies] = self.is_move_for_powers(order, powers)
             if not is_move_for_ally and len(allies)==0:
                 return order
