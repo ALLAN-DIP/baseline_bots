@@ -419,6 +419,7 @@ class LSP_DipBot(DipnetBot):
 
             # orders = yield from self.brain.get_orders(self.game, self.power_name)
             if self.allies or ally:
+                print("in this ally")
                 # filter out aggressive actions to ally
                 agg_orders = []
                 units=[]  
