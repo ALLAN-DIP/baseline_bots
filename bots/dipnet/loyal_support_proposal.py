@@ -266,6 +266,7 @@ class LSP_DipBot(DipnetBot):
     def is_support_for_selected_orders(self, support_order):
         """Determine if selected support order for neighbour corresponds to a self order selected"""
         order_tokens = get_order_tokens(support_order)
+        print(order_tokens)
         selected_order = get_order_tokens(self.orders.orders[order_tokens[2].split()[1]])
 
         if len(order_tokens[2:]) == len(selected_order) and order_tokens[2:] == selected_order:
