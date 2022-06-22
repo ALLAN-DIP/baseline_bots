@@ -260,7 +260,7 @@ class LSP_DipBot(DipnetBot):
         print(ally_orders)
         for order in ally_orders:
             order_tokens = get_order_tokens(order)
-            final_orders[order_tokens[1].split()[-1]] = order
+            final_orders[order_tokens[0].split()[-1]] = order
         
         new_orders = []
         for unit in units:
