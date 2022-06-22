@@ -226,15 +226,15 @@ class LSP_DipBot(DipnetBot):
         return distance
 
     def is_move_for_powers(self, order, powers):
-        print(order)
+        # print(order)
         order_token = get_order_tokens(order)
-        print(order_token)
-        print(order_token[1][2:])
+        # print(order_token)
+        # print(order_token[1][2:])
         is_ally_shortest = [False, 50]
         # check if it is move order
         game_powers = list(self.game.powers.keys())
         game_powers.remove(self.power_name)
-        dist_powers = {power: 50 for power in game_powers}
+        dist_powers = {power: 100 for power in game_powers}
         if order_token[1][0] == '-':
             for power in game_powers:
                 dist_powers[power] = min(self.get_shortest_distance(order_token[1][2:], power),dist_powers[power])
@@ -254,7 +254,7 @@ class LSP_DipBot(DipnetBot):
     
     def find_best_move_for_units(self, units, ally_orders, powers):
         # self best move for each unit in units to avoid attacking or too close to certain powers
-        print(units)
+        # print(units)
         # build a dict foc each location of ally, proposed_order 
         final_orders = {unit: order for unit, order in self.orders.orders.items()}
         for order in ally_orders:
@@ -288,10 +288,14 @@ class LSP_DipBot(DipnetBot):
                         found =True
                         break
             new_orders.append(new_order)
-        print(new_orders)
+        # print(new_orders)
         return new_orders
             
-        
+    # def is_convoyed_from_given_orders(self, via_order, orders):
+    #     order_token = get_order_tokens(via_order)
+    #     for order in orders:
+
+    #     return False
         
     def is_support_for_given_orders(self, support_order, orders):
         """Determine if selected support order for neighbour corresponds to given list of orders"""
