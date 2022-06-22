@@ -426,7 +426,7 @@ class LSP_DipBot(DipnetBot):
                         orders.remove(agg_order)
                         order_token = get_order_tokens(agg_order)    
                         units.append(order_token[0])
-                new_orders = self.find_best_move_for_units(self, units, ally_order, self.allies + ally)
+                new_orders = self.find_best_move_for_units(units, ally_order, self.allies + ally)
                 self.orders.add_orders(new_orders, overwrite=True)
 
         # print(f"Selected orders for {self.power_name}: {self.orders.get_list_of_orders()}")
@@ -471,7 +471,7 @@ class LSP_DipBot(DipnetBot):
                 for recip in support_orders:
                     all_support_orders += support_orders[recip]
 
-                new_orders = self.find_best_move_for_units(self, units, all_support_orders,self.allies)
+                new_orders = self.find_best_move_for_units(units, all_support_orders,self.allies)
                 self.orders.add_orders(new_orders, overwrite=True)
 
 
