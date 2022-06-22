@@ -257,6 +257,7 @@ class LSP_DipBot(DipnetBot):
         print(units)
         # build a dict foc each location of ally, proposed_order 
         final_orders = {unit: order for unit, order in self.orders.orders.items()}
+        print(ally_orders)
         for order in ally_orders:
             order_tokens = get_order_tokens(order)
             final_orders[order_tokens[1].split()[-1]] = order
