@@ -249,10 +249,10 @@ class LSP_DipBot(DipnetBot):
         # print(dist_powers)
         return is_ally_shortest     
 
-    def find_best_move(self, unit):
+    def find_best_move_for_powers(self, unit, powers):
         loc_unit = unit[2:]
         for order in self.possible_orders[loc_unit]:
-            [is_move_for_ally, allies] = self.is_move_for_powers(order)
+            [is_move_for_ally, allies] = self.is_move_for_powers(order, powers)
             if not is_move_for_ally and len(allies)==0:
                 return order
             if not is_move_for_ally:
@@ -434,7 +434,7 @@ class LSP_DipBot(DipnetBot):
                     if order_token[0] not in units and self.is_move_for_powers(order, self.allies + ally)[0]:
                         unit = order_token[0]
                         # print('add new best move')
-                        new_order = self.find_best_move(unit)
+                        new_order = self.find_best_move_for_powers(unit, self.allies + ally)
                         print('new order to move-for-ally: ', new_order)
                         self.orders.add_orders([new_order], overwrite=True)   
             # check if all assigned orders are valid    
