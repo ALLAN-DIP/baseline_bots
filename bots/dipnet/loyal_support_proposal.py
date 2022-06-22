@@ -10,7 +10,7 @@ from diplomacy import Message
 
 from bots.dipnet.dipnet_bot import DipnetBot
 from utils import parse_orr_xdo, parse_alliance_proposal, YES, \
-    get_other_powers, ALY, MessagesData, OrdersData, get_order_tokens, ORR, XDO, is_support_order
+    get_other_powers, ALY, MessagesData, OrdersData, get_order_tokens, ORR, XDO, is_support_order, is_convoyed_order, is_move_order
 from tornado import gen
 
 class LSP_DipBot(DipnetBot):
@@ -269,7 +269,11 @@ class LSP_DipBot(DipnetBot):
             for order in self.possible_orders[loc_unit]:
                 order_tokens = get_order_tokens(order)
                 #if support self or ally unit, check if it's valid
-                if is_support_order(order) and order_tokens[2] in self.game.get_units(self.power_name) and not self.is_support_for_given_orders(order, final_orders):
+                if is_support_order(order) and not self.is_support_for_given_orders(order, final_orders):
+                    continue
+                if is_convoyed_order(order) and not self.is_convoyed_from_given_orders(order, final_orders):
+                    continue
+                if is_move_order(order) and not self.is_safe_move_from_given_orders(order, final_orders + new_orders):
                     continue
                 [is_move_for_ally, min_diff] = self.is_move_for_powers(order, powers)
                 if not is_move_for_ally and min_diff==0:
@@ -290,12 +294,29 @@ class LSP_DipBot(DipnetBot):
             new_orders.append(new_order)
         print(new_orders)
         return new_orders
-            
-    # def is_convoyed_from_given_orders(self, via_order, orders):
-    #     order_token = get_order_tokens(via_order)
-    #     for order in orders:
 
-    #     return False
+    def is_safe_move_from_given_orders(self, move_order, orders):
+        """ Determine if A-B collides with B-A """
+        order_token1 = get_order_tokens(move_order)
+        move_1_src = order_token1[0].split()[-1]
+        move_1_dest = order_token1[1].split()[-1]
+        for order in orders:
+            if not is_move_order(order):
+                continue
+            order_token2 = get_order_tokens(order)
+            move_2_src = order_token2[0].split()[-1]
+            move_2_dest = order_token2[1].split()[-1]
+            if move_1_src == move_2_dest and move_1_dest == move_2_src:
+                return False
+        return True
+
+    def is_convoyed_from_given_orders(self, via_order, orders):
+        # order_token = get_order_tokens(via_order)
+        for order in orders:
+            order_token = get_order_tokens(order)
+            if len(order_token[2:]) == len(via_order) and order_token[2:] == via_order:
+                return True
+        return False
         
     def is_support_for_given_orders(self, support_order, orders):
         """Determine if selected support order for neighbour corresponds to given list of orders"""
