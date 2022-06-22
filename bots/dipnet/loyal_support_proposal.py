@@ -264,7 +264,7 @@ class LSP_DipBot(DipnetBot):
                 new_order = loc_unit + ' H'
                 order_tokens = get_order_tokens(order)
                 #if support self or ally unit, check if it's valid
-                if is_support_order(order) and order_tokens[2] in self.game.get_units(self.power_name) and not self.is_support_for_selected_orders(order, final_orders):
+                if is_support_order(order) and order_tokens[2] in self.game.get_units(self.power_name) and not self.is_support_for_given_orders(order, final_orders):
                     continue
                 [is_move_for_ally, min_diff] = self.is_move_for_powers(order, powers)
                 if not is_move_for_ally:
