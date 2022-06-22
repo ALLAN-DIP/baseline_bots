@@ -323,6 +323,8 @@ class LSP_DipBot(DipnetBot):
     def is_support_for_given_orders(self, support_order, orders):
         """Determine if selected support order for neighbour corresponds to given list of orders"""
         order_tokens = get_order_tokens(support_order)
+        if order_tokens[2].split()[1] not in orders:
+            return True # it's okay to support other power than allies 
         selected_order = get_order_tokens(orders[order_tokens[2].split()[1]])
 
         if len(order_tokens[2:]) == len(selected_order) and order_tokens[2:] == selected_order:
