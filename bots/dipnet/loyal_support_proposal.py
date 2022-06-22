@@ -252,10 +252,10 @@ class LSP_DipBot(DipnetBot):
     def find_best_move_for_powers(self, unit, powers):
         loc_unit = unit[2:]
         for order in self.possible_orders[loc_unit]:
-            print(order)
-            if is_support_order(order): 
-                if not self.is_support_for_selected_orders(order):
-                    continue
+            order_tokens = get_order_tokens(order)
+            #if support self unit, check if it's valid
+            if is_support_order(order) and order_tokens[2] in self.game.get_units(self.power_name) and not self.is_support_for_selected_orders(order):
+                continue
             [is_move_for_ally, allies] = self.is_move_for_powers(order, powers)
             if not is_move_for_ally and len(allies)==0:
                 return order
@@ -266,9 +266,8 @@ class LSP_DipBot(DipnetBot):
     def is_support_for_selected_orders(self, support_order):
         """Determine if selected support order for neighbour corresponds to a self order selected"""
         order_tokens = get_order_tokens(support_order)
-        print(order_tokens)
         selected_order = get_order_tokens(self.orders.orders[order_tokens[2].split()[1]])
-        print(selected_order)
+        
         if len(order_tokens[2:]) == len(selected_order) and order_tokens[2:] == selected_order:
             # Attack move
             return True
