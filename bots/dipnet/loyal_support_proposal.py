@@ -260,8 +260,17 @@ class LSP_DipBot(DipnetBot):
         new_orders = []
         for unit in units:
             loc_unit = unit[2:]
+            new_order = loc_unit + ' H'
             for order in self.possible_orders[loc_unit]:
-                new_order = loc_unit + ' H'
+                order_tokens = get_order_tokens(order)
+                #if support self or ally unit, check if it's valid
+                if is_support_order(order) and order_tokens[2] in self.game.get_units(self.power_name) and not self.is_support_for_given_orders(order, final_orders):
+                    continue
+                [is_move_for_ally, min_diff] = self.is_move_for_powers(order, powers)
+                if not is_move_for_ally and min_diff==0:
+                    new_order = order
+                    break
+            for order in self.possible_orders[loc_unit]:
                 order_tokens = get_order_tokens(order)
                 #if support self or ally unit, check if it's valid
                 if is_support_order(order) and order_tokens[2] in self.game.get_units(self.power_name) and not self.is_support_for_given_orders(order, final_orders):
@@ -270,7 +279,13 @@ class LSP_DipBot(DipnetBot):
                 if not is_move_for_ally:
                     new_order = order
                     break
-                elif min_diff==1:
+            for order in self.possible_orders[loc_unit]:
+                order_tokens = get_order_tokens(order)
+                #if support self or ally unit, check if it's valid
+                if is_support_order(order) and order_tokens[2] in self.game.get_units(self.power_name) and not self.is_support_for_given_orders(order, final_orders):
+                    continue
+                [is_move_for_ally, min_diff] = self.is_move_for_powers(order, powers)
+                if min_diff==1:
                     new_order = order
                     break
             new_orders.append(new_order)
