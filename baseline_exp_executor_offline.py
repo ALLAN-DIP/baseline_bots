@@ -2,7 +2,7 @@ from subprocess import PIPE, run
 import json
 from tqdm import tqdm
 import time
-no_of_games = 10
+no_of_games = 100
 
 # prefix = 'np'
 
