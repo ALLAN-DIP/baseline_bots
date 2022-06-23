@@ -521,7 +521,7 @@ class LSP_DipBot(DipnetBot):
                 support_orders = self.generate_support_proposals(comms_obj)
                 self.support_proposals_sent = True
                 all_support_orders = []
-                for recip in support_orders:
+                for recip in self.allies:
                     all_support_orders += support_orders[recip]
 
                 new_orders = self.find_best_move_for_units(units, all_support_orders,self.allies)
