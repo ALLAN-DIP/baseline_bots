@@ -97,9 +97,10 @@ def bot_loop():
         bots.append(bot)
     start = time()
     stance = ScoreBasedStance('', powers)
+    dict_support_count = {power: 0 for power in game.powers}
+    dict_support_count['total']=0
     while not game.is_game_done:   
-        dict_support_count = {power: 0 for power in game.powers}
-        dict_support_count['total']=0
+
         print(game.get_current_phase())
         for bot in bots:
             # if not game.powers[bot.power_name].is_eliminated():
