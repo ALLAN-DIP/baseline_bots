@@ -181,6 +181,13 @@ def is_support_order(order):
         return True
     else:
         return False
+def is_cross_support(order, power, game):
+    order_tokens = get_order_tokens(order)
+    unit_power = game._unit_owner(order_tokens[2]) 
+    if power!= unit_power:
+        return True
+    else:
+        return False
 
 def is_convoyed_order(order):
     order_tokens = get_order_tokens(order)

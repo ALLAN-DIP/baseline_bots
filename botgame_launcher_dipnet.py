@@ -26,6 +26,7 @@ from bots.pushover_bot import PushoverBot_AsyncBot
 # from bots.RL.DiplomacyEnv import DiplomacyEnv
 from stance.stance_extraction import StanceExtraction, ScoreBasedStance
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
+from utils import is_cross_support
 from tornado import gen
 import asyncio
 
@@ -172,6 +173,12 @@ def bot_loop():
             
             # Orders round
             orders = yield bot.gen_orders()
+            support_count = 0
+            for order in orders:
+                if is_cross_support(order, bot.power_name, game):
+                    support_count +=1
+                print(order)    
+            print(bot.power_name +': '+ str(support_count))
             
             # messages, orders = bot_state.messages, bot_state.orders
             if orders is not None:
