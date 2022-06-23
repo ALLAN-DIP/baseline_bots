@@ -177,7 +177,7 @@ def bot_loop():
             for order in orders:
                 if is_cross_support(order, bot.power_name, game):
                     support_count +=1
-                print(order)    
+                    print(order)    
             print(bot.power_name +': '+ str(support_count))
             
             # messages, orders = bot_state.messages, bot_state.orders
