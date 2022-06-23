@@ -97,7 +97,9 @@ def bot_loop():
         bots.append(bot)
     start = time()
     stance = ScoreBasedStance('', powers)
-    while not game.is_game_done:
+    while not game.is_game_done:   
+        dict_support_count = {power: 0 for power in game.powers}
+        dict_support_count = {'total': 0}
         print(game.get_current_phase())
         for bot in bots:
             # if not game.powers[bot.power_name].is_eliminated():
@@ -144,7 +146,7 @@ def bot_loop():
                             phase=game.get_current_phase(),
                         )
                         game.add_message(message=msg_obj)
-
+            dict_support_count['total'] +=1
         for bot in bots:
             # if not game.powers[bot.power_name].is_eliminated():
             #     # Orders round
@@ -173,19 +175,18 @@ def bot_loop():
             
             # Orders round
             orders = yield bot.gen_orders()
-            support_count = 0
-            if bot.power_name == 'TURKEY':
-                for order in orders:
-                    if is_cross_support(order, bot.power_name, game):
-                        support_count +=1
-                        print(order)    
-                print(bot.power_name +': '+ str(support_count))
+            for order in orders:
+                if is_cross_support(order, bot.power_name, game):
+                    dict_support_count[bot.power_name] +=1
+                    print(order)    
+                
             
             # messages, orders = bot_state.messages, bot_state.orders
             if orders is not None:
                 game.set_orders(power_name=bot.power_name, orders=orders)
 
         game.process()
+    print(dict_support_count)    
 
     print(time() - start)
     # to_saved_game_format(game, output_path=args.filename)
