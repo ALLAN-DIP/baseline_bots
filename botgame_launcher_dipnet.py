@@ -174,11 +174,12 @@ def bot_loop():
             # Orders round
             orders = yield bot.gen_orders()
             support_count = 0
-            for order in orders:
-                if is_cross_support(order, bot.power_name, game):
-                    support_count +=1
-                    print(order)    
-            print(bot.power_name +': '+ str(support_count))
+            if bot.power_name == 'TURKEY':
+                for order in orders:
+                    if is_cross_support(order, bot.power_name, game):
+                        support_count +=1
+                        print(order)    
+                print(bot.power_name +': '+ str(support_count))
             
             # messages, orders = bot_state.messages, bot_state.orders
             if orders is not None:

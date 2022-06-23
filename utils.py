@@ -182,10 +182,12 @@ def is_support_order(order):
     else:
         return False
 def is_cross_support(order, power, game):
+    print(power)
     if not is_support_order(order):
         return False
     order_tokens = get_order_tokens(order)
     unit_power = game._unit_owner(order_tokens[2]) 
+    print(unit_power)
     if power!= unit_power:
         return True
     else:
