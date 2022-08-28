@@ -1,0 +1,16 @@
+Lmod has detected the following error: The following module(s) are unknown:
+"python3/3.7.13"
+
+Please check the spelling or version number. Also try "module spider ..."
+It is also possible your cache file is out-of-date; it may help to try:
+  $ module --ignore_cache load "python3/3.7.13"
+
+Also make sure that all modulefiles written in TCL start with the string
+#%Module
+
+
+
+Traceback (most recent call last):
+  File "baseline_exp_executor_offline.py", line 3, in <module>
+    from tqdm import tqdm
+ModuleNotFoundError: No module named 'tqdm'

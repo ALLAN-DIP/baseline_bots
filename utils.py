@@ -168,9 +168,32 @@ def get_non_aggressive_orders(orders: List[str], sender:str, game: Game) -> List
     """
     return [order for order in orders if not is_order_aggressive(order, sender, game)]
 
+def is_move_order(order):
+    order_tokens = get_order_tokens(order)
+    if len(order_tokens) ==2 and order_tokens[1][0] =='-':
+        return True
+    else:
+        return False
+
 def is_support_order(order):
     order_tokens = get_order_tokens(order)
     if 3 <= len(order_tokens) <= 4 and order_tokens[1] == 'S':
+        return True
+    else:
+        return False
+def is_cross_support(order, power, game):
+    if not is_support_order(order):
+        return False
+    order_tokens = get_order_tokens(order)
+    for power2 in game.powers:
+        if power!= power2 and order_tokens[2] in game.powers[power2].units:
+            return True
+        else:
+            return False
+
+def is_convoyed_order(order):
+    order_tokens = get_order_tokens(order)
+    if len(order_tokens) == 3 and order_tokens[-1] == 'VIA':
         return True
     else:
         return False
