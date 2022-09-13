@@ -31,7 +31,7 @@ class RealPolitik(DipnetBot):
         self.stance= None
         self.accum_messages = []
         self.rollout_length = 5
-        self.rollout_n_order = 2
+        self.rollout_n_order = 5
 
     def phase_init(self) -> None:
         super().phase_init()
@@ -85,7 +85,9 @@ class RealPolitik(DipnetBot):
                     # print(game_msg.message)
                     proposal_order[game_msg.sender] = parse_orr_xdo(game_msg.message)
                     # print(proposal_order[game_msg.sender])
-
+           
+            #include dipnet order
+            proposal_order[self.power_name] = yield self.brain.get_orders(self.game, self.power_name)
             proposed = False
 
             # for each xdo order set (max at 6 for now) -> simulate worlds by execute all of shared orders + xdo order set
@@ -103,14 +105,15 @@ class RealPolitik(DipnetBot):
                             simulated_game.set_orders(power_name=other_power, orders=power_orders)
                     simulated_game.process()
                     state_value[proposer] = yield self.get_state_value(simulated_game, self.power_name)
-
-            if not proposed:
+            
+            best_proposer = max(state_value, key=state_value.get) 
+            
+            if not proposed and best_proposer != self.power_name:
                 # if there is no proposal orders, set orders execute by dipnet
                 orders = yield self.brain.get_orders(self.game, self.power_name)
                 self.orders.add_orders(orders, overwrite=True)
-            # else:
-                # else, set proposal order that return maximum state value
-            best_proposer = max(state_value, key=state_value.get)
+                return ret_obj
+                      
             self.orders.add_orders(proposal_order[best_proposer], overwrite=True)
             for proposer, orders in proposal_order.items():
                 if orders: 
