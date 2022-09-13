@@ -110,7 +110,7 @@ class RealPolitik(DipnetBot):
             
             if not proposed and best_proposer != self.power_name:
                 # if there is no proposal orders, set orders execute by dipnet
-                orders = yield self.brain.get_orders(self.game, self.power_name)
+                orders = proposal_order[self.power_name]
                 self.orders.add_orders(orders, overwrite=True)
                 return ret_obj
                       
