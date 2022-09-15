@@ -6,8 +6,8 @@ import random
 from diplomacy import Message
 from DAIDE import ORR, XDO, YES
 
-from bots.baseline_bot import BaselineMsgRoundBot
-from utils import parse_orr_xdo, get_non_aggressive_orders, OrdersData, MessagesData
+from baseline_bots.bots.baseline_bot import BaselineMsgRoundBot
+from baseline_bots.utils import parse_orr_xdo, get_non_aggressive_orders, OrdersData, MessagesData
 
 class RandomHonestOrderAccepterBot(BaselineMsgRoundBot):
     """

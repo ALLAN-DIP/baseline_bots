@@ -9,10 +9,10 @@ from DAIDE import ParseError
 from DAIDE.utils.exceptions import ParseError
 from DAIDE import YES, ALY, ORR, XDO
 
-from utils import parse_orr_xdo, get_non_aggressive_orders, MessagesData, OrdersData, sort_messages_by_most_recent
-import bots.baseline_bot as baseline_bot
+from baseline_bots.utils import parse_orr_xdo, get_non_aggressive_orders, MessagesData, OrdersData, sort_messages_by_most_recent
+from baseline_bots.bots.baseline_bot import BaselineBot
 
-class LoyalBot(baseline_bot.BaselineBot):
+class LoyalBot(BaselineBot):
     """
     Accepts first alliance it receives. 
     Then only accepts orders bots in that alliance.

@@ -7,10 +7,10 @@ from DAIDE import ParseError, ALY, ORR, XDO
 import DAIDE 
 DAIDE.config.ORDERS_DAIDE = False
 
-from . import baseline_bot
-from utils import YES, REJ, parse_orr_xdo, get_non_aggressive_orders, MessagesData, OrdersData, sort_messages_by_most_recent
+from baseline_bots.bots.baseline_bot import BaselineBot
+from baseline_bots.utils import YES, REJ, parse_orr_xdo, get_non_aggressive_orders, MessagesData, OrdersData, sort_messages_by_most_recent
 
-class PushoverBot(baseline_bot.BaselineBot):
+class PushoverBot(BaselineBot):
     """
     Does whatever the last message/bot told it to do
     NOTE: only executes non-aggressive action

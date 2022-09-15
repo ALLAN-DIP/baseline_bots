@@ -6,8 +6,8 @@ import random
 from diplomacy import Message
 from DAIDE import FCT
 
-from bots.baseline_bot import BaselineMsgRoundBot
-from utils import MessagesData, OrdersData
+from baseline_bots.bots.baseline_bot import BaselineMsgRoundBot
+from baseline_bots.utils import MessagesData, OrdersData
 
 class RandomHonestBot(BaselineMsgRoundBot):
     """

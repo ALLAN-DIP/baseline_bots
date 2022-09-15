@@ -4,11 +4,10 @@ __email__ = "sanderschulhoff@gmail.com"
 import random
 
 from diplomacy import Message
-from baseline_bot import BaselineBot
-from DAIDE ORR, XDO, YES
+from baseline_bots.bots.baseline_bot import BaselineBot
+from DAIDE import ORR, XDO, YES
 
-from utils import parse_orr_xdo, get_non_aggressive_orders, get_other_powers, BotReturnData
-
+from baseline_bots.utils import parse_orr_xdo, get_non_aggressive_orders, get_other_powers, BotReturnData
 
 # TODO: Upgrade to new design layout
 class RandomStanceBot(BaselineBot):

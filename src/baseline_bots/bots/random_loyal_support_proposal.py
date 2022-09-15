@@ -1,16 +1,14 @@
 __author__ = "Kartik Shenoy"
 __email__ = "kartik.shenoyy@gmail.com"
 
-import sys
-sys.path.append("..")
 import random
 from collections import defaultdict
 
 from diplomacy import Message
 from DAIDE import YES, ALY, ORR, XDO
 
-from bots.baseline_bot import BaselineMsgRoundBot
-from utils import parse_orr_xdo, parse_alliance_proposal, get_non_aggressive_orders, \
+from baseline_bots.bots.baseline_bot import BaselineMsgRoundBot
+from baseline_bots.utils import parse_orr_xdo, parse_alliance_proposal, get_non_aggressive_orders, \
     get_other_powers, MessagesData, OrdersData, get_order_tokens
 
 

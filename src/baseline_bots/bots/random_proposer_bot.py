@@ -8,11 +8,11 @@ sys.path.append("..")
 from diplomacy import Message
 from DAIDE import ORR, XDO
 
-from . import baseline_bot
-from utils import get_other_powers, MessagesData
+from baseline_bots.bots.baseline_bot import BaselineBot
+from baseline_bots.utils import get_other_powers, MessagesData
 from tornado import gen
 
-class RandomProposerBot(baseline_bot.BaselineBot):
+class RandomProposerBot(BaselineBot):
     """
     Just sends random order proposals to other bots.
     """

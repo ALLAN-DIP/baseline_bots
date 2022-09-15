@@ -1,16 +1,13 @@
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
-import sys
-sys.path.append("..")
-
 from diplomacy import Message
 from DAIDE import ALY, PRP
 
-from . import random_proposer_bot
-from utils import get_other_powers, MessagesData, OrdersData
+from baseline_bots.bots.random_proposer_bot import RandomProposerBot
+from baseline_bots.utils import get_other_powers, MessagesData, OrdersData
 
-class RandomAllierProposerBot(random_proposer_bot.RandomProposerBot):
+class RandomAllierProposerBot(RandomProposerBot):
     """
     The first time this bot acts, it sends an alliance message to 
     all other bots. Otherwise, it just sends random order proposals to 

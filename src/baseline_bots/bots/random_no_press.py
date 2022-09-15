@@ -8,8 +8,8 @@ sys.path.append("..")
 
 from diplomacy import Message
 
-from bots.baseline_bot import BaselineBot
-from utils import get_other_powers, OrdersData
+from baseline_bots.bots.baseline_bot import BaselineBot
+from baseline_bots.utils import get_other_powers, OrdersData
 from tornado import gen
 
 class RandomNoPressBot(BaselineBot):
