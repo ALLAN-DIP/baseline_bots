@@ -31,3 +31,6 @@ After changing the documentation, you can build the documentation by running:
 .. code::bash
 
     sphinx-build -b html docs/ docs/build/html
+
+Open the resultant html file at docs/build/html/index.html 
+in your browser to view the documentation.
