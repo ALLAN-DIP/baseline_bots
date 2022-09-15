@@ -1,1 +1,0 @@
-from bots.baseline_bot import BaselineBot
