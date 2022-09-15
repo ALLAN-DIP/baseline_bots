@@ -1,7 +1,7 @@
 Development 
 ================
 
-Here are some instructions for setting up your development environment:
+Setting up your development environment:
 ***********************************************************************
 
 1. Create a conda environment:
@@ -23,7 +23,7 @@ Here are some instructions for setting up your development environment:
 
     pip install -e .
 
-Here are some instructions for modifying documentation:
+Modifying documentation:
 ***********************************************************************
 
 After changing the documentation, you can build the documentation by running:
@@ -35,7 +35,7 @@ After changing the documentation, you can build the documentation by running:
 Open the resultant html file at docs/build/html/index.html 
 in your browser to view the documentation.
 
-Here are some instructions for running tests:
+Running tests:
 **********************************************************************************************************************************************
 The following runs all tests in the tests directory. Look up pytest documentation to see 
 how to run tests individually.
@@ -43,14 +43,14 @@ how to run tests individually.
 
     pytest tests/
 
-Here are some instructions for pushing code:
+Pushing code:
 ************************************************
 
 1. When beginning a new feature, checkout into a new branch
 2. Use conventional commits
-3. Always run the Makefile before pushing
+3. Always run the Makefile before pushing (it performs code styling)
 
-Here are some instructions for development on TACC and using diplomacy_research:
+Development on TACC and using diplomacy_research:
 **********************************************************************************************************************************************
 
 .. code-block:: bash
