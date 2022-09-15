@@ -1,1 +1,1 @@
-from .baseline_bot import BaselineBot
+from baseline_bots import BaselineBot
