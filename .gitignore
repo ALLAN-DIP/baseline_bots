@@ -4,3 +4,6 @@ __pycache__
 ./GameAnalysisFiles/*
 launch.json
 myjob.*
+_build
+*.egg*
+test.ipynb
