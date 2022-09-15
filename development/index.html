@@ -108,11 +108,11 @@
                                 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Development</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#here-are-some-instructions-for-setting-up-your-development-environment">Here are some instructions for setting up your development environment:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#here-are-some-instructions-for-modifying-documentation">Here are some instructions for modifying documentation:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#here-are-some-instructions-for-running-tests">Here are some instructions for running tests:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#here-are-some-instructions-for-pushing-code">Here are some instructions for pushing code:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#here-are-some-instructions-for-development-on-tacc-and-using-diplomacy-research">Here are some instructions for development on TACC and using diplomacy_research:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-your-development-environment">Setting up your development environment:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#modifying-documentation">Modifying documentation:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-tests">Running tests:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pushing-code">Pushing code:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#development-on-tacc-and-using-diplomacy-research">Development on TACC and using diplomacy_research:</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../bots/">Bots</a></li>
@@ -128,8 +128,8 @@
                             
   <section id="development">
 <h1>Development<a class="headerlink" href="#development" title="Permalink to this heading">¶</a></h1>
-<section id="here-are-some-instructions-for-setting-up-your-development-environment">
-<h2>Here are some instructions for setting up your development environment:<a class="headerlink" href="#here-are-some-instructions-for-setting-up-your-development-environment" title="Permalink to this heading">¶</a></h2>
+<section id="setting-up-your-development-environment">
+<h2>Setting up your development environment:<a class="headerlink" href="#setting-up-your-development-environment" title="Permalink to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>Create a conda environment:</p></li>
 </ol>
@@ -150,8 +150,8 @@
 </pre></div>
 </div>
 </section>
-<section id="here-are-some-instructions-for-modifying-documentation">
-<h2>Here are some instructions for modifying documentation:<a class="headerlink" href="#here-are-some-instructions-for-modifying-documentation" title="Permalink to this heading">¶</a></h2>
+<section id="modifying-documentation">
+<h2>Modifying documentation:<a class="headerlink" href="#modifying-documentation" title="Permalink to this heading">¶</a></h2>
 <p>After changing the documentation, you can build the documentation by running:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sphinx-build -b html docs/ docs/build/html
 </pre></div>
@@ -159,8 +159,8 @@
 <p>Open the resultant html file at docs/build/html/index.html
 in your browser to view the documentation.</p>
 </section>
-<section id="here-are-some-instructions-for-running-tests">
-<h2>Here are some instructions for running tests:<a class="headerlink" href="#here-are-some-instructions-for-running-tests" title="Permalink to this heading">¶</a></h2>
+<section id="running-tests">
+<h2>Running tests:<a class="headerlink" href="#running-tests" title="Permalink to this heading">¶</a></h2>
 <p>The following runs all tests in the tests directory. Look up pytest documentation to see
 how to run tests individually.
 .. code-block:: bash</p>
@@ -168,16 +168,16 @@ how to run tests individually.
 <div><p>pytest tests/</p>
 </div></blockquote>
 </section>
-<section id="here-are-some-instructions-for-pushing-code">
-<h2>Here are some instructions for pushing code:<a class="headerlink" href="#here-are-some-instructions-for-pushing-code" title="Permalink to this heading">¶</a></h2>
+<section id="pushing-code">
+<h2>Pushing code:<a class="headerlink" href="#pushing-code" title="Permalink to this heading">¶</a></h2>
 <ol class="arabic simple">
 <li><p>When beginning a new feature, checkout into a new branch</p></li>
 <li><p>Use conventional commits</p></li>
-<li><p>Always run the Makefile before pushing</p></li>
+<li><p>Always run the Makefile before pushing (it performs code styling)</p></li>
 </ol>
 </section>
-<section id="here-are-some-instructions-for-development-on-tacc-and-using-diplomacy-research">
-<h2>Here are some instructions for development on TACC and using diplomacy_research:<a class="headerlink" href="#here-are-some-instructions-for-development-on-tacc-and-using-diplomacy-research" title="Permalink to this heading">¶</a></h2>
+<section id="development-on-tacc-and-using-diplomacy-research">
+<h2>Development on TACC and using diplomacy_research:<a class="headerlink" href="#development-on-tacc-and-using-diplomacy-research" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>idev -m <span class="m">60</span>
 <span class="nb">export</span> <span class="nv">WORKING_DIR</span><span class="o">=</span>~/dipnet_press/WORKING_DIR/
 module load tacc-singularity
