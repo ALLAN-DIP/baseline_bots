@@ -1,14 +1,8 @@
-import sys
-sys.path.append("..")
-
-from utils import OrdersData, sort_messages_by_most_recent
-
-
-
+from baseline_bots.utils import OrdersData, sort_messages_by_most_recent
+from diplomacy import Game, Message
 
 EXAMPLE_ORDER = 'A VIE S A BUD - GAL'
 EXAMPLE_ORDER_2 = 'A VIE H'
-
 
 orders_data = OrdersData()
 
