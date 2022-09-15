@@ -7,3 +7,4 @@ myjob.*
 _build
 *.egg*
 test.ipynb
+build
