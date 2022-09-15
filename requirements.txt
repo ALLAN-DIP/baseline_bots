@@ -1,2 +1,3 @@
 diplomacy
 sphinx
+pytest
