@@ -1,8 +1,5 @@
-
-import torch as th
-
 import numpy as np
-
+import torch as th
 from pytorch_DRL.common.Memory import ReplayMemory
 from pytorch_DRL.common.utils import identity
 
@@ -22,16 +19,33 @@ class Agent(object):
     - value: evaluate value for a state-action pair
     - evaluation: evaluation a learned agent
     """
-    def __init__(self, env, state_dim, action_dim,
-                 memory_capacity=10000, max_steps=10000,
-                 reward_gamma=0.99, reward_scale=1., done_penalty=None,
-                 actor_hidden_size=32, critic_hidden_size=32,
-                 actor_output_act=identity, critic_loss="mse",
-                 actor_lr=0.01, critic_lr=0.01,
-                 optimizer_type="rmsprop", entropy_reg=0.01,
-                 max_grad_norm=0.5, batch_size=100, episodes_before_train=100,
-                 epsilon_start=0.9, epsilon_end=0.01, epsilon_decay=200,
-                 use_cuda=True):
+
+    def __init__(
+        self,
+        env,
+        state_dim,
+        action_dim,
+        memory_capacity=10000,
+        max_steps=10000,
+        reward_gamma=0.99,
+        reward_scale=1.0,
+        done_penalty=None,
+        actor_hidden_size=32,
+        critic_hidden_size=32,
+        actor_output_act=identity,
+        critic_loss="mse",
+        actor_lr=0.01,
+        critic_lr=0.01,
+        optimizer_type="rmsprop",
+        entropy_reg=0.01,
+        max_grad_norm=0.5,
+        batch_size=100,
+        episodes_before_train=100,
+        epsilon_start=0.9,
+        epsilon_end=0.01,
+        epsilon_decay=200,
+        use_cuda=True,
+    ):
 
         self.env = env
         self.state_dim = state_dim
@@ -139,8 +153,7 @@ class Agent(object):
     # soft update the actor target network or critic target network
     def _soft_update_target(self, target, source):
         for t, s in zip(target.parameters(), source.parameters()):
-            t.data.copy_(
-                (1. - self.target_tau) * t.data + self.target_tau * s.data)
+            t.data.copy_((1.0 - self.target_tau) * t.data + self.target_tau * s.data)
 
     # train on a sample batch
     def train(self):
@@ -168,7 +181,9 @@ class Agent(object):
             state = env.reset()
             state = self.agentdict_to_arr(state)
             action = self.action(state)
-            action_dict = {agent_id: action[agent_id] for agent_id in range(self.n_agents)}
+            action_dict = {
+                agent_id: action[agent_id] for agent_id in range(self.n_agents)
+            }
             state, reward, done, info = env.step(action_dict)
             state = self.agentdict_to_arr(state)
             reward = self.agentdict_to_arr(reward)
@@ -179,7 +194,9 @@ class Agent(object):
             infos_i.append(info)
             while not done:
                 action = self.action(state)
-                action_dict = {agent_id: action[agent_id] for agent_id in range(self.n_agents)}
+                action_dict = {
+                    agent_id: action[agent_id] for agent_id in range(self.n_agents)
+                }
                 state, reward, done, info = env.step(action_dict)
                 state = self.agentdict_to_arr(state)
                 reward = self.agentdict_to_arr(reward)
@@ -191,4 +208,3 @@ class Agent(object):
             rewards.append(rewards_i)
             infos.append(infos_i)
         return rewards, infos
-

@@ -8,16 +8,18 @@ from typing import List
 
 from diplomacy import Game, Message
 
-from baseline_bots.utils import OrdersData, MessagesData, get_order_tokens
+from baseline_bots.utils import MessagesData, OrdersData, get_order_tokens
+
 
 class BaselineBot(ABC):
     """Abstract Base Class for baselines bots"""
-    def __init__(self, power_name:str, game:Game) -> None:
+
+    def __init__(self, power_name: str, game: Game) -> None:
         self.power_name = power_name
         self.game = game
-        
+
     @abstractmethod
-    def gen_messages(self, rcvd_messages:List[Message]) -> MessagesData:
+    def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
         """
         :return: messages to be sent
         """
@@ -30,7 +32,7 @@ class BaselineBot(ABC):
         """
         raise NotImplementedError()
 
-    def __call__(self, rcvd_messages:List[Message]) -> dict:
+    def __call__(self, rcvd_messages: List[Message]) -> dict:
         """
         :return: dict containing messages and orders
         """
@@ -40,13 +42,15 @@ class BaselineBot(ABC):
         self.orders = orders
         return {"messages": messages, "orders": orders}
 
+
 class BaselineMsgRoundBot(BaselineBot, ABC):
     """
     Abstract Base Class for bots which execute
     multiple rounds of communication before setting
     orders
     """
-    def __init__(self, power_name:str, game:Game, total_msg_rounds=3) -> None:
+
+    def __init__(self, power_name: str, game: Game, total_msg_rounds=3) -> None:
         """
         :param num_msg_rounds: the number of communication rounds the bot
         will go through
@@ -54,7 +58,7 @@ class BaselineMsgRoundBot(BaselineBot, ABC):
         super().__init__(power_name, game)
         self.total_msg_rounds = total_msg_rounds
         self.orders = OrdersData()
-    
+
     def gen_orders(self) -> OrdersData:
         """finalizes moves"""
         return self.orders

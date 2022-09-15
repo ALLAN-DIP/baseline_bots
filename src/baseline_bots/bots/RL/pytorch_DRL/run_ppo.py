@@ -1,12 +1,10 @@
-
-from PPO import PPO
-from common.utils import agg_double_list
-
 import sys
-import gym
-import numpy as np
-import matplotlib.pyplot as plt
 
+import gym
+import matplotlib.pyplot as plt
+import numpy as np
+from common.utils import agg_double_list
+from PPO import PPO
 
 MAX_EPISODES = 5000
 EPISODES_BEFORE_TRAIN = 0
@@ -26,7 +24,7 @@ TARGET_TAU = 1.0
 REWARD_DISCOUNTED_GAMMA = 0.99
 ENTROPY_REG = 0.00
 #
-DONE_PENALTY = -10.
+DONE_PENALTY = -10.0
 
 CRITIC_LOSS = "mse"
 MAX_GRAD_NORM = None
@@ -50,34 +48,43 @@ def run(env_id="CartPole-v0"):
     else:
         action_dim = env.action_space.n
 
-    ppo = PPO(env=env, memory_capacity=MEMORY_CAPACITY,
-              state_dim=state_dim, action_dim=action_dim,
-              batch_size=BATCH_SIZE, entropy_reg=ENTROPY_REG,
-              done_penalty=DONE_PENALTY, roll_out_n_steps=ROLL_OUT_N_STEPS,
-              target_update_steps=TARGET_UPDATE_STEPS, target_tau=TARGET_TAU,
-              reward_gamma=REWARD_DISCOUNTED_GAMMA,
-              epsilon_start=EPSILON_START, epsilon_end=EPSILON_END,
-              epsilon_decay=EPSILON_DECAY, max_grad_norm=MAX_GRAD_NORM,
-              episodes_before_train=EPISODES_BEFORE_TRAIN,
-              critic_loss=CRITIC_LOSS)
+    ppo = PPO(
+        env=env,
+        memory_capacity=MEMORY_CAPACITY,
+        state_dim=state_dim,
+        action_dim=action_dim,
+        batch_size=BATCH_SIZE,
+        entropy_reg=ENTROPY_REG,
+        done_penalty=DONE_PENALTY,
+        roll_out_n_steps=ROLL_OUT_N_STEPS,
+        target_update_steps=TARGET_UPDATE_STEPS,
+        target_tau=TARGET_TAU,
+        reward_gamma=REWARD_DISCOUNTED_GAMMA,
+        epsilon_start=EPSILON_START,
+        epsilon_end=EPSILON_END,
+        epsilon_decay=EPSILON_DECAY,
+        max_grad_norm=MAX_GRAD_NORM,
+        episodes_before_train=EPISODES_BEFORE_TRAIN,
+        critic_loss=CRITIC_LOSS,
+    )
 
-    episodes =[]
-    eval_rewards =[]
+    episodes = []
+    eval_rewards = []
     while ppo.n_episodes < MAX_EPISODES:
         ppo.interact()
         if ppo.n_episodes >= EPISODES_BEFORE_TRAIN:
             ppo.train()
-        if ppo.episode_done and ((ppo.n_episodes+1)%EVAL_INTERVAL == 0):
+        if ppo.episode_done and ((ppo.n_episodes + 1) % EVAL_INTERVAL == 0):
             rewards, _ = ppo.evaluation(env_eval, EVAL_EPISODES)
             rewards_mu, rewards_std = agg_double_list(rewards)
-            print("Episode %d, Average Reward %.2f" % (ppo.n_episodes+1, rewards_mu))
-            episodes.append(ppo.n_episodes+1)
+            print("Episode %d, Average Reward %.2f" % (ppo.n_episodes + 1, rewards_mu))
+            episodes.append(ppo.n_episodes + 1)
             eval_rewards.append(rewards_mu)
 
     episodes = np.array(episodes)
     eval_rewards = np.array(eval_rewards)
-    np.savetxt("./output/%s_ppo_episodes.txt"%env_id, episodes)
-    np.savetxt("./output/%s_ppo_eval_rewards.txt"%env_id, eval_rewards)
+    np.savetxt("./output/%s_ppo_episodes.txt" % env_id, episodes)
+    np.savetxt("./output/%s_ppo_eval_rewards.txt" % env_id, eval_rewards)
 
     plt.figure()
     plt.plot(episodes, eval_rewards)
@@ -85,7 +92,7 @@ def run(env_id="CartPole-v0"):
     plt.xlabel("Episode")
     plt.ylabel("Average Reward")
     plt.legend(["PPO"])
-    plt.savefig("./output/%s_ppo.png"%env_id)
+    plt.savefig("./output/%s_ppo.png" % env_id)
 
 
 if __name__ == "__main__":

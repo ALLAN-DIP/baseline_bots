@@ -3,11 +3,17 @@ __email__ = "sanderschulhoff@gmail.com"
 
 import random
 
-from diplomacy import Message
 from DAIDE import ORR, XDO, YES
+from diplomacy import Message
 
 from baseline_bots.bots.baseline_bot import BaselineMsgRoundBot
-from baseline_bots.utils import parse_orr_xdo, get_non_aggressive_orders, OrdersData, MessagesData
+from baseline_bots.utils import (
+    MessagesData,
+    OrdersData,
+    get_non_aggressive_orders,
+    parse_orr_xdo,
+)
+
 
 class RandomHonestOrderAccepterBot(BaselineMsgRoundBot):
     """
@@ -17,9 +23,10 @@ class RandomHonestOrderAccepterBot(BaselineMsgRoundBot):
     NOTE: It will only execute non-aggressive moves
     NOTE: Only selects/sends messages on the last communication round
     """
+
     def __init__(self, power_name, game) -> None:
         super().__init__(power_name, game)
-        
+
     def phase_init(self):
         super().phase_init()
         self.cur_msg_round = 0
@@ -33,13 +40,13 @@ class RandomHonestOrderAccepterBot(BaselineMsgRoundBot):
         return self.orders
 
     def __call__(self, rcvd_messages):
-        self.cur_msg_round+=1
+        self.cur_msg_round += 1
         # only generate messages/orders on final message round
         if self.cur_msg_round == self.total_msg_rounds:
             pass
         else:
             return {"messages": MessagesData(), "orders": OrdersData()}
-        
+
         proposed_orders = []
         proposed_orders_by_country = {}
         for message in rcvd_messages:
@@ -50,17 +57,17 @@ class RandomHonestOrderAccepterBot(BaselineMsgRoundBot):
                 proposed_orders_by_country[message.sender] = parsed
             except:
                 pass
-        
+
         # remove aggressive orders
         orders = get_non_aggressive_orders(proposed_orders, self.power_name, self.game)
-        
+
         # keep ~3/4 of the remaining orders at random
         orders = [order for order in proposed_orders if random.random() > 0.25]
-        
+
         orders_data = OrdersData()
         orders_data.add_orders(orders)
         messages_data = MessagesData()
-        # send messages to other powers if this bot has taken some 
+        # send messages to other powers if this bot has taken some
         # of their messages
         for other_power in proposed_orders_by_country:
             # construct list of orders which other_power proposed
@@ -70,12 +77,11 @@ class RandomHonestOrderAccepterBot(BaselineMsgRoundBot):
                 order = orders_data.orders[destination]
                 if order in proposed_orders_by_country[other_power]:
                     orders_taken.append(order)
-            
+
             # if none of the country's suggested orders were taken
             if not orders_taken:
                 break
-            
-            
+
             # encode orders taken with daide syntax
             msg = YES(ORR([XDO(order) for order in orders_taken]))
 
@@ -86,10 +92,12 @@ class RandomHonestOrderAccepterBot(BaselineMsgRoundBot):
 
         return {"messages": messages_data, "orders": orders_data}
 
+
 if __name__ == "__main__":
     from diplomacy import Game
     from diplomacy.utils.export import to_saved_game_format
     from random_allier_proposer_bot import RandomAllierProposerBot
+
     # game instance
     game = Game()
     powers = list(game.get_map_power_names())
@@ -114,8 +122,8 @@ if __name__ == "__main__":
                 for msg in messages:
                     msg_obj = Message(
                         sender=bot.power_name,
-                        recipient=msg['recipient'],
-                        message=msg['message'],
+                        recipient=msg["recipient"],
+                        message=msg["message"],
                         phase=game.get_current_phase(),
                     )
                     game.add_message(message=msg_obj)
@@ -126,4 +134,4 @@ if __name__ == "__main__":
 
         break
 
-    to_saved_game_format(game, output_path='RandomHonestOrderAccepterBotGame.json')
+    to_saved_game_format(game, output_path="RandomHonestOrderAccepterBotGame.json")

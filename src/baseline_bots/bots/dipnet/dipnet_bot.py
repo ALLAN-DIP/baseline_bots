@@ -4,32 +4,34 @@ __authors__ = ["Sander Schulhoff", "Kartik Shenoy"]
 __email__ = "sanderschulhoff@gmail.com"
 
 import sys
+
 sys.path.append("..")
 sys.path.append("../dipnet_press")
+import random
 from abc import ABC, abstractmethod
 from typing import List
-import random
-
 
 from diplomacy import Game, Message
-from diplomacy_research.players.benchmark_player import DipNetSLPlayer, DipNetRLPlayer
+from diplomacy_research.players.benchmark_player import DipNetRLPlayer, DipNetSLPlayer
 
-
-from baseline_bots.src.utils import OrdersData, MessagesData, get_order_tokens
 from baseline_bots.bots.baseline_bot import BaselineMsgRoundBot
+from baseline_bots.src.utils import MessagesData, OrdersData, get_order_tokens
+
 
 class DipnetBot(BaselineMsgRoundBot, ABC):
     """Abstract Base Class for dipnet derivitive bots"""
-    def __init__(self, power_name:str, game:Game, total_msg_rounds=3, dipnet_type='slp') -> None:
+
+    def __init__(
+        self, power_name: str, game: Game, total_msg_rounds=3, dipnet_type="slp"
+    ) -> None:
         super().__init__(power_name, game, total_msg_rounds)
-        if dipnet_type == 'slp':
+        if dipnet_type == "slp":
             self.brain = DipNetSLPlayer()
         else:
             self.brain = DipNetRLPlayer()
-        
-        
+
     @abstractmethod
-    def gen_messages(self, rcvd_messages:List[Message]) -> MessagesData:
+    def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
         """sets messages to be sent"""
         raise NotImplementedError()
 

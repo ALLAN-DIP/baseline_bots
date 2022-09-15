@@ -1,7 +1,6 @@
-
+import numpy as np
 import torch as th
 from torch.autograd import Variable
-import numpy as np
 
 
 def identity(x):
@@ -13,16 +12,16 @@ def entropy(p):
 
 
 def kl_log_probs(log_p1, log_p2):
-    return -th.sum(th.exp(log_p1)*(log_p2 - log_p1), 1)
+    return -th.sum(th.exp(log_p1) * (log_p2 - log_p1), 1)
 
 
 def index_to_one_hot(index, dim):
     if isinstance(index, np.int) or isinstance(index, np.int64):
         one_hot = np.zeros(dim)
-        one_hot[index] = 1.
+        one_hot[index] = 1.0
     else:
         one_hot = np.zeros((len(index), dim))
-        one_hot[np.arange(len(index)), index] = 1.
+        one_hot[np.arange(len(index)), index] = 1.0
     return one_hot
 
 
@@ -64,11 +63,13 @@ def ma_agg_double_list(l):
     s_std = np.std(np.array(s), axis=0)
     return s_mu, s_std
 
+
 def arr_dict_to_arr(arr, n):
     new_arr = []
     while len(arr):
         new_arr.append(dict_to_arr(arr.pop(0), n))
     return new_arr
+
 
 def dict_to_arr(dct, n):
     arr = []

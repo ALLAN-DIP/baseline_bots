@@ -1,14 +1,12 @@
-
-import torch as th
-import torch.nn as nn
-from torch.optim import Adam, RMSprop
-
-import numpy as np
 from copy import deepcopy
 
+import numpy as np
+import torch as th
+import torch.nn as nn
 from common.Memory import ReplayMemory
 from common.Model import ActorNetwork, CriticNetwork
 from common.utils import to_tensor_var
+from torch.optim import Adam, RMSprop
 
 
 class MADDPG(object):
@@ -17,6 +15,7 @@ class MADDPG(object):
     - Actor takes state as input
     - Critic takes both state and action as input
     """
+
     def __init__(self):
         """
         TODO

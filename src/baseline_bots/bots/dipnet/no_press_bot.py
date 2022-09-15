@@ -3,23 +3,24 @@ __email__ = "sanderschulhoff@gmail.com"
 
 import random
 import sys
+from typing import List
 
 from bots.dipnet.dipnet_bot import DipnetBot
 from diplomacy import Game, Message
-from utils import OrdersData, MessagesData, get_order_tokens
-from typing import List
 from tornado import gen
+from utils import MessagesData, OrdersData, get_order_tokens
 
 sys.path.append("..")
 sys.path.append("../..")
 
 from utils import get_order_tokens
 
+
 class NoPressDipBot(DipnetBot):
     """just execute orders computed by dipnet"""
 
     @gen.coroutine
-    def gen_messages(self, rcvd_messages:List[Message]) -> MessagesData:
+    def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
         """query dipnet for orders"""
         return None
 

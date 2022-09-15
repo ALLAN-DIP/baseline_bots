@@ -2,15 +2,17 @@ __author__ = "Kartik Shenoy"
 __email__ = "kartik.shenoyy@gmail.com"
 
 import random
+import sys
 from time import time
-import sys 
+
 sys.path.append("..")
 
 from diplomacy import Message
+from tornado import gen
 
 from baseline_bots.bots.baseline_bot import BaselineBot
-from baseline_bots.utils import get_other_powers, OrdersData
-from tornado import gen
+from baseline_bots.utils import OrdersData, get_other_powers
+
 
 class RandomNoPressBot(BaselineBot):
     """
@@ -28,16 +30,20 @@ class RandomNoPressBot(BaselineBot):
         self.orders = OrdersData()
         possible_orders = self.game.get_all_possible_orders()
 
-        orders = [random.choice([ord for ord in possible_orders[loc]]) for loc in
-                             self.game.get_orderable_locations(self.power_name)
-                             if possible_orders[loc]]
+        orders = [
+            random.choice([ord for ord in possible_orders[loc]])
+            for loc in self.game.get_orderable_locations(self.power_name)
+            if possible_orders[loc]
+        ]
 
         self.orders.add_orders(orders)
 
         return self.orders.get_list_of_orders()
 
+
 class RandomNoPress_AsyncBot(RandomNoPressBot):
     """Wrapper to RandomNoPressBot with tornado decorators for async calls"""
+
     @gen.coroutine
     def gen_messages(self, rcvd_messages):
         return super().gen_messages(rcvd_messages)
@@ -77,4 +83,4 @@ if __name__ == "__main__":
                 game.set_orders(power_name=bot.power_name, orders=orders)
         game.process()
     print(time() - start)
-    to_saved_game_format(game, output_path='RandomNoPressBotGame.json')
+    to_saved_game_format(game, output_path="RandomNoPressBotGame.json")

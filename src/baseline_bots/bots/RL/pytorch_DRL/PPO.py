@@ -1,14 +1,12 @@
-
-import torch as th
-from torch import nn
-from torch.optim import Adam, RMSprop
-
-import numpy as np
 from copy import deepcopy
 
+import numpy as np
+import torch as th
 from common.Agent import Agent
 from common.Model import ActorNetwork, CriticNetwork
 from common.utils import index_to_one_hot, to_tensor_var
+from torch import nn
+from torch.optim import Adam, RMSprop
 
 
 class PPO(Agent):
@@ -20,37 +18,77 @@ class PPO(Agent):
     - agent training with experience to update policy
     - adam seems better than rmsprop for ppo
     """
-    def __init__(self, env, state_dim, action_dim,
-                 memory_capacity=10000, max_steps=None,
-                 roll_out_n_steps=1, target_tau=1.,
-                 target_update_steps=5, clip_param=0.2,
-                 reward_gamma=0.99, reward_scale=1., done_penalty=None,
-                 actor_hidden_size=32, critic_hidden_size=32,
-                 actor_output_act=nn.functional.log_softmax, critic_loss="mse",
-                 actor_lr=0.001, critic_lr=0.001,
-                 optimizer_type="adam", entropy_reg=0.01,
-                 max_grad_norm=0.5, batch_size=100, episodes_before_train=100,
-                 epsilon_start=0.9, epsilon_end=0.01, epsilon_decay=200,
-                 use_cuda=True):
-        super(PPO, self).__init__(env, state_dim, action_dim,
-                 memory_capacity, max_steps,
-                 reward_gamma, reward_scale, done_penalty,
-                 actor_hidden_size, critic_hidden_size,
-                 actor_output_act, critic_loss,
-                 actor_lr, critic_lr,
-                 optimizer_type, entropy_reg,
-                 max_grad_norm, batch_size, episodes_before_train,
-                 epsilon_start, epsilon_end, epsilon_decay,
-                 use_cuda)
+
+    def __init__(
+        self,
+        env,
+        state_dim,
+        action_dim,
+        memory_capacity=10000,
+        max_steps=None,
+        roll_out_n_steps=1,
+        target_tau=1.0,
+        target_update_steps=5,
+        clip_param=0.2,
+        reward_gamma=0.99,
+        reward_scale=1.0,
+        done_penalty=None,
+        actor_hidden_size=32,
+        critic_hidden_size=32,
+        actor_output_act=nn.functional.log_softmax,
+        critic_loss="mse",
+        actor_lr=0.001,
+        critic_lr=0.001,
+        optimizer_type="adam",
+        entropy_reg=0.01,
+        max_grad_norm=0.5,
+        batch_size=100,
+        episodes_before_train=100,
+        epsilon_start=0.9,
+        epsilon_end=0.01,
+        epsilon_decay=200,
+        use_cuda=True,
+    ):
+        super(PPO, self).__init__(
+            env,
+            state_dim,
+            action_dim,
+            memory_capacity,
+            max_steps,
+            reward_gamma,
+            reward_scale,
+            done_penalty,
+            actor_hidden_size,
+            critic_hidden_size,
+            actor_output_act,
+            critic_loss,
+            actor_lr,
+            critic_lr,
+            optimizer_type,
+            entropy_reg,
+            max_grad_norm,
+            batch_size,
+            episodes_before_train,
+            epsilon_start,
+            epsilon_end,
+            epsilon_decay,
+            use_cuda,
+        )
 
         self.roll_out_n_steps = roll_out_n_steps
         self.target_tau = target_tau
         self.target_update_steps = target_update_steps
         self.clip_param = clip_param
 
-        self.actor = ActorNetwork(self.state_dim, self.actor_hidden_size,
-                                  self.action_dim, self.actor_output_act)
-        self.critic = CriticNetwork(self.state_dim, self.action_dim, self.critic_hidden_size, 1)
+        self.actor = ActorNetwork(
+            self.state_dim,
+            self.actor_hidden_size,
+            self.action_dim,
+            self.actor_output_act,
+        )
+        self.critic = CriticNetwork(
+            self.state_dim, self.action_dim, self.critic_hidden_size, 1
+        )
         # to ensure target network and learning network has the same weights
         self.actor_target = deepcopy(self.actor)
         self.critic_target = deepcopy(self.critic)
@@ -80,7 +118,9 @@ class PPO(Agent):
         batch = self.memory.sample(self.batch_size)
         states_var = to_tensor_var(batch.states, self.use_cuda).view(-1, self.state_dim)
         one_hot_actions = index_to_one_hot(batch.actions, self.action_dim)
-        actions_var = to_tensor_var(one_hot_actions, self.use_cuda).view(-1, self.action_dim)
+        actions_var = to_tensor_var(one_hot_actions, self.use_cuda).view(
+            -1, self.action_dim
+        )
         rewards_var = to_tensor_var(batch.rewards, self.use_cuda).view(-1, 1)
 
         # update actor network
@@ -95,7 +135,9 @@ class PPO(Agent):
         old_action_log_probs = th.sum(old_action_log_probs * actions_var, 1)
         ratio = th.exp(action_log_probs - old_action_log_probs)
         surr1 = ratio * advantages
-        surr2 = th.clamp(ratio, 1.0 - self.clip_param, 1.0 + self.clip_param) * advantages
+        surr2 = (
+            th.clamp(ratio, 1.0 - self.clip_param, 1.0 + self.clip_param) * advantages
+        )
         # PPO's pessimistic surrogate (L^CLIP)
         actor_loss = -th.mean(th.min(surr1, surr2))
         actor_loss.backward()
@@ -134,8 +176,9 @@ class PPO(Agent):
     # choose an action based on state with random noise added for exploration in training
     def exploration_action(self, state):
         softmax_action = self._softmax_action(state)
-        epsilon = self.epsilon_end + (self.epsilon_start - self.epsilon_end) * \
-                                  np.exp(-1. * self.n_steps / self.epsilon_decay)
+        epsilon = self.epsilon_end + (self.epsilon_start - self.epsilon_end) * np.exp(
+            -1.0 * self.n_steps / self.epsilon_decay
+        )
         if np.random.rand() < epsilon:
             action = np.random.choice(self.action_dim)
         else:

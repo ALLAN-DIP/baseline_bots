@@ -3,22 +3,37 @@ __email__ = "sanderschulhoff@gmail.com"
 
 import random
 import sys
+
 sys.path.append("..")
 sys.path.append("../..")
 
-from baseline_bots.src.utils import MessagesData, parse_orr_xdo, parse_FCT, ORR, XDO, FCT, get_other_powers, is_order_aggressive
-from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
 from collections import defaultdict
+
 from DAIDE import config
+
+from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
+from baseline_bots.src.utils import (
+    FCT,
+    ORR,
+    XDO,
+    MessagesData,
+    get_other_powers,
+    is_order_aggressive,
+    parse_FCT,
+    parse_orr_xdo,
+)
+
 config.ORDERS_DAIDE = False
-from DAIDE import parse, FCT, ORR, XDO, Order
+from DAIDE import FCT, ORR, XDO, Order, parse
 from tornado import gen
+
 
 class SelectivelyTransparentBot(TransparentBot):
     """
     Execute orders computed by dipnet
-    Sends out non-aggressive actions 
+    Sends out non-aggressive actions
     """
+
     def __init__(self, power_name, game, total_msg_rounds=3):
         super().__init__(power_name, game, total_msg_rounds)
 
@@ -32,11 +47,18 @@ class SelectivelyTransparentBot(TransparentBot):
             if type(parsed_message) == FCT:
                 arrangement = parsed_message.arrangement
                 if type(arrangement) == ORR:
-                    xdo_arrangements = arrangement.arrangements 
+                    xdo_arrangements = arrangement.arrangements
                     peaceful_orders = []
                     for xdo_arrangement in xdo_arrangements:
-                        if type(xdo_arrangement) == XDO and type(xdo_arrangement.arrangement) == Order:
-                            if not is_order_aggressive(str(xdo_arrangement.arrangement), self.power_name, self.game):
+                        if (
+                            type(xdo_arrangement) == XDO
+                            and type(xdo_arrangement.arrangement) == Order
+                        ):
+                            if not is_order_aggressive(
+                                str(xdo_arrangement.arrangement),
+                                self.power_name,
+                                self.game,
+                            ):
                                 peaceful_orders.append(xdo_arrangement.arrangement)
 
                     # reconstruct message
@@ -47,4 +69,3 @@ class SelectivelyTransparentBot(TransparentBot):
                     # print(message["message"])
 
         return messages
-

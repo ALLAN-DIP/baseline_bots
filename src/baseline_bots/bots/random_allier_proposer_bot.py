@@ -1,16 +1,17 @@
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
-from diplomacy import Message
 from DAIDE import ALY, PRP
+from diplomacy import Message
 
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
-from baseline_bots.utils import get_other_powers, MessagesData, OrdersData
+from baseline_bots.utils import MessagesData, OrdersData, get_other_powers
+
 
 class RandomAllierProposerBot(RandomProposerBot):
     """
-    The first time this bot acts, it sends an alliance message to 
-    all other bots. Otherwise, it just sends random order proposals to 
+    The first time this bot acts, it sends an alliance message to
+    all other bots. Otherwise, it just sends random order proposals to
     other bots.
     """
 
@@ -36,7 +37,7 @@ class RandomAllierProposerBot(RandomProposerBot):
 
             # dont sent alliance props again
             self.alliance_props_sent = True
-            
+
         return ret_msgs
 
     def gen_orders(self):

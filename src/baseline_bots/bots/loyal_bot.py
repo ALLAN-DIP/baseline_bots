@@ -2,22 +2,30 @@ __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
 import sys
+
 sys.path.append("..")
 
-from diplomacy import Message
-from DAIDE import ParseError
+from DAIDE import ALY, ORR, XDO, YES, ParseError
 from DAIDE.utils.exceptions import ParseError
-from DAIDE import YES, ALY, ORR, XDO
+from diplomacy import Message
 
-from baseline_bots.utils import parse_orr_xdo, get_non_aggressive_orders, MessagesData, OrdersData, sort_messages_by_most_recent
 from baseline_bots.bots.baseline_bot import BaselineBot
+from baseline_bots.utils import (
+    MessagesData,
+    OrdersData,
+    get_non_aggressive_orders,
+    parse_orr_xdo,
+    sort_messages_by_most_recent,
+)
+
 
 class LoyalBot(BaselineBot):
     """
-    Accepts first alliance it receives. 
+    Accepts first alliance it receives.
     Then only accepts orders bots in that alliance.
     NOTE: only executes non-aggressive actions
     """
+
     def __init__(self, power_name, game) -> None:
         super().__init__(power_name, game)
         # will always follow this country's orders
@@ -40,9 +48,11 @@ class LoyalBot(BaselineBot):
             # ensure message sender is an ally
             if last_message.sender in self.allies:
                 try:
-                    orders = get_non_aggressive_orders(parse_orr_xdo(last_message.message), self.power_name, self.game)
+                    orders = get_non_aggressive_orders(
+                        parse_orr_xdo(last_message.message), self.power_name, self.game
+                    )
                     self.orders.add_orders(orders)
-                     
+
                 except ParseError as e:
                     pass
         else:

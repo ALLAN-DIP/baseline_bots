@@ -1,13 +1,11 @@
-
-import torch.nn as nn
-from torch.optim import Adam, RMSprop
-
-import numpy as np
 from copy import deepcopy
 
+import numpy as np
+import torch.nn as nn
 from common.Agent import Agent
 from common.Model import ActorNetwork, CriticNetwork
 from common.utils import to_tensor_var
+from torch.optim import Adam, RMSprop
 
 
 class DDPG(Agent):
@@ -17,33 +15,73 @@ class DDPG(Agent):
     - Critic takes both state and action as input
     - Critic uses gradient temporal-difference learning
     """
-    def __init__(self, env, state_dim, action_dim,
-                 memory_capacity=10000, max_steps=None,
-                 target_tau=0.01, target_update_steps=5,
-                 reward_gamma=0.99, reward_scale=1., done_penalty=None,
-                 actor_hidden_size=32, critic_hidden_size=32,
-                 actor_output_act=nn.functional.tanh, critic_loss="mse",
-                 actor_lr=0.001, critic_lr=0.001,
-                 optimizer_type="adam", entropy_reg=0.01,
-                 max_grad_norm=0.5, batch_size=100, episodes_before_train=100,
-                 epsilon_start=0.9, epsilon_end=0.01, epsilon_decay=200,
-                 use_cuda=True):
-        super(DDPG, self).__init__(env, state_dim, action_dim,
-                 memory_capacity, max_steps,
-                 reward_gamma, reward_scale, done_penalty,
-                 actor_hidden_size, critic_hidden_size,
-                 actor_output_act, critic_loss,
-                 actor_lr, critic_lr,
-                 optimizer_type, entropy_reg,
-                 max_grad_norm, batch_size, episodes_before_train,
-                 epsilon_start, epsilon_end, epsilon_decay,
-                 use_cuda)
+
+    def __init__(
+        self,
+        env,
+        state_dim,
+        action_dim,
+        memory_capacity=10000,
+        max_steps=None,
+        target_tau=0.01,
+        target_update_steps=5,
+        reward_gamma=0.99,
+        reward_scale=1.0,
+        done_penalty=None,
+        actor_hidden_size=32,
+        critic_hidden_size=32,
+        actor_output_act=nn.functional.tanh,
+        critic_loss="mse",
+        actor_lr=0.001,
+        critic_lr=0.001,
+        optimizer_type="adam",
+        entropy_reg=0.01,
+        max_grad_norm=0.5,
+        batch_size=100,
+        episodes_before_train=100,
+        epsilon_start=0.9,
+        epsilon_end=0.01,
+        epsilon_decay=200,
+        use_cuda=True,
+    ):
+        super(DDPG, self).__init__(
+            env,
+            state_dim,
+            action_dim,
+            memory_capacity,
+            max_steps,
+            reward_gamma,
+            reward_scale,
+            done_penalty,
+            actor_hidden_size,
+            critic_hidden_size,
+            actor_output_act,
+            critic_loss,
+            actor_lr,
+            critic_lr,
+            optimizer_type,
+            entropy_reg,
+            max_grad_norm,
+            batch_size,
+            episodes_before_train,
+            epsilon_start,
+            epsilon_end,
+            epsilon_decay,
+            use_cuda,
+        )
 
         self.target_tau = target_tau
         self.target_update_steps = target_update_steps
 
-        self.actor = ActorNetwork(self.state_dim, self.actor_hidden_size, self.action_dim, self.actor_output_act)
-        self.critic = CriticNetwork(self.state_dim, self.action_dim, self.critic_hidden_size, 1)
+        self.actor = ActorNetwork(
+            self.state_dim,
+            self.actor_hidden_size,
+            self.action_dim,
+            self.actor_output_act,
+        )
+        self.critic = CriticNetwork(
+            self.state_dim, self.action_dim, self.critic_hidden_size, 1
+        )
         # to ensure target network and learning network has the same weights
         self.actor_target = deepcopy(self.actor)
         self.critic_target = deepcopy(self.critic)
@@ -73,15 +111,21 @@ class DDPG(Agent):
 
         batch = self.memory.sample(self.batch_size)
         state_var = to_tensor_var(batch.states, self.use_cuda).view(-1, self.state_dim)
-        action_var = to_tensor_var(batch.actions, self.use_cuda).view(-1, self.action_dim)
+        action_var = to_tensor_var(batch.actions, self.use_cuda).view(
+            -1, self.action_dim
+        )
         reward_var = to_tensor_var(batch.rewards, self.use_cuda).view(-1, 1)
-        next_state_var = to_tensor_var(batch.next_states, self.use_cuda).view(-1, self.state_dim)
+        next_state_var = to_tensor_var(batch.next_states, self.use_cuda).view(
+            -1, self.state_dim
+        )
         done_var = to_tensor_var(batch.dones, self.use_cuda).view(-1, 1)
 
         # estimate the target q with actor_target network and critic_target network
         next_action_var = self.actor_target(next_state_var)
         next_q = self.critic_target(next_state_var, next_action_var).detach()
-        target_q = self.reward_scale * reward_var + self.reward_gamma * next_q * (1. - done_var)
+        target_q = self.reward_scale * reward_var + self.reward_gamma * next_q * (
+            1.0 - done_var
+        )
 
         # update critic network
         self.critic_optimizer.zero_grad()
@@ -102,7 +146,7 @@ class DDPG(Agent):
         # the accurate action prediction
         action = self.actor(state_var)
         # actor_loss is used to maximize the Q value for the predicted action
-        actor_loss = - self.critic(state_var, action)
+        actor_loss = -self.critic(state_var, action)
         actor_loss = actor_loss.mean()
         actor_loss.backward()
         if self.max_grad_norm is not None:
@@ -117,8 +161,9 @@ class DDPG(Agent):
     # choose an action based on state with random noise added for exploration in training
     def exploration_action(self, state):
         action = self.action(state)
-        epsilon = self.epsilon_end + (self.epsilon_start - self.epsilon_end) * \
-                                  np.exp(-1. * self.n_steps / self.epsilon_decay)
+        epsilon = self.epsilon_end + (self.epsilon_start - self.epsilon_end) * np.exp(
+            -1.0 * self.n_steps / self.epsilon_decay
+        )
         # add noise
         noise = np.random.randn(self.action_dim) * epsilon
         action += noise

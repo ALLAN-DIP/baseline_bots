@@ -4,10 +4,11 @@ __email__ = "kartik.shenoyy@gmail.com"
 import random
 from collections import defaultdict
 
-from diplomacy import Message
-from baseline_bots.bots.baseline_bot import BaselineBot
-from baseline_bots.utils import get_order_tokens, BotReturnData
 from DAIDE import ORR, XDO
+from diplomacy import Message
+
+from baseline_bots.bots.baseline_bot import BaselineBot
+from baseline_bots.utils import BotReturnData, get_order_tokens
 
 
 class RandomSupportProposerBot(BaselineBot):
@@ -20,63 +21,92 @@ class RandomSupportProposerBot(BaselineBot):
         super().__init__(power_name, game)
 
     def act(self):
-        
+
         # Return data initialization
         ret_obj = BotReturnData()
 
-        #TODO: Ensure that supporting province and province to be attacked are not owned by the same power
-        #TODO: Ensure that attack should not be to a province that the power already owns
+        # TODO: Ensure that supporting province and province to be attacked are not owned by the same power
+        # TODO: Ensure that attack should not be to a province that the power already owns
         final_messages = defaultdict(list)
         messages = []
         possible_orders = game.get_all_possible_orders()
 
-        #TODO: Some scenario is getting missed out | Sanity check: If current phase fetched is not matching with server phase, skip execution
-        if self.game.get_current_phase()[0] != 'W':
-            #TODO: Replace orderable locations with all possible units of a power if needed
+        # TODO: Some scenario is getting missed out | Sanity check: If current phase fetched is not matching with server phase, skip execution
+        if self.game.get_current_phase()[0] != "W":
+            # TODO: Replace orderable locations with all possible units of a power if needed
             possible_orders = self.game.get_all_possible_orders()
-            provs = [loc.upper() for loc in self.game.get_orderable_locations(self.power_name)]
+            provs = [
+                loc.upper()
+                for loc in self.game.get_orderable_locations(self.power_name)
+            ]
 
             n_provs = set()
             for prov in provs:
-                n_provs.update(set([prov2.upper() for prov2 in self.game.map.abut_list(prov) if prov2.upper().split('/')[0] not in provs]))
+                n_provs.update(
+                    set(
+                        [
+                            prov2.upper()
+                            for prov2 in self.game.map.abut_list(prov)
+                            if prov2.upper().split("/")[0] not in provs
+                        ]
+                    )
+                )
             n2n_provs = set()
             for prov in n_provs:
                 n2n_provs.update(
-                    set([prov2.upper() for prov2 in self.game.map.abut_list(prov) if prov2.upper().split('/')[0] not in provs and prov2.upper().split('/')[0] not in n_provs]))
+                    set(
+                        [
+                            prov2.upper()
+                            for prov2 in self.game.map.abut_list(prov)
+                            if prov2.upper().split("/")[0] not in provs
+                            and prov2.upper().split("/")[0] not in n_provs
+                        ]
+                    )
+                )
 
             possible_support_proposals = defaultdict(list)
             for n2n_p in n2n_provs:
-                if not(possible_orders[n2n_p]):
+                if not (possible_orders[n2n_p]):
                     continue
                 possible_orders = possible_orders[n2n_p]
 
                 for order in possible_orders:
                     order_tokens = get_order_tokens(order)
-                    if len(order_tokens) <= 1 or order_tokens[1] != 'S':
+                    if len(order_tokens) <= 1 or order_tokens[1] != "S":
                         continue
-                    if len(order_tokens) != 4 or order_tokens[2].split()[1] not in provs or order_tokens[3].split()[1] not in n_provs:
+                    if (
+                        len(order_tokens) != 4
+                        or order_tokens[2].split()[1] not in provs
+                        or order_tokens[3].split()[1] not in n_provs
+                    ):
                         continue
-                    possible_support_proposals[(order_tokens[2].split()[1], order_tokens[3].split()[1])].append((order_tokens[0], order))
+                    possible_support_proposals[
+                        (order_tokens[2].split()[1], order_tokens[3].split()[1])
+                    ].append((order_tokens[0], order))
 
             for attack_key in possible_support_proposals:
                 selected_order = random.choice(possible_support_proposals[attack_key])
                 if self.game._unit_owner(selected_order[0]) is None:
                     raise "Coding Error"
-                final_messages[self.game._unit_owner(selected_order[0]).name].append(selected_order[1])
-
+                final_messages[self.game._unit_owner(selected_order[0]).name].append(
+                    selected_order[1]
+                )
 
         for recipient in final_messages:
             suggested_proposals = ORR(XDO(final_messages[recipient]))
             ret_obj.add_message(recipient, str(suggested_proposals))
         possible_orders = game.get_all_possible_orders()
 
-        orders = [random.choice(possible_orders[loc]) for loc in
-                         self.game.get_orderable_locations(self.power_name)
-                         if possible_orders[loc]]
+        orders = [
+            random.choice(possible_orders[loc])
+            for loc in self.game.get_orderable_locations(self.power_name)
+            if possible_orders[loc]
+        ]
 
         ret_obj.add_orders(orders)
 
         return ret_obj
+
 
 if __name__ == "__main__":
     from diplomacy import Game
@@ -98,8 +128,8 @@ if __name__ == "__main__":
                 for msg in messages:
                     msg_obj = Message(
                         sender=bot.power_name,
-                        recipient=msg['recipient'],
-                        message=msg['message'],
+                        recipient=msg["recipient"],
+                        message=msg["message"],
                         phase=game.get_current_phase(),
                     )
                     game.add_message(message=msg_obj)
@@ -108,4 +138,4 @@ if __name__ == "__main__":
                 game.set_orders(power_name=bot.power_name, orders=orders)
         game.process()
 
-    to_saved_game_format(game, output_path='RandomSupportProposerBot.json')
+    to_saved_game_format(game, output_path="RandomSupportProposerBot.json")

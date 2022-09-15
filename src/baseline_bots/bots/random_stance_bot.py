@@ -3,11 +3,17 @@ __email__ = "sanderschulhoff@gmail.com"
 
 import random
 
-from diplomacy import Message
-from baseline_bots.bots.baseline_bot import BaselineBot
 from DAIDE import ORR, XDO, YES
+from diplomacy import Message
 
-from baseline_bots.utils import parse_orr_xdo, get_non_aggressive_orders, get_other_powers, BotReturnData
+from baseline_bots.bots.baseline_bot import BaselineBot
+from baseline_bots.utils import (
+    BotReturnData,
+    get_non_aggressive_orders,
+    get_other_powers,
+    parse_orr_xdo,
+)
+
 
 # TODO: Upgrade to new design layout
 class RandomStanceBot(BaselineBot):
@@ -20,7 +26,11 @@ class RandomStanceBot(BaselineBot):
 
     def __init__(self, power_name, game) -> None:
         super().__init__(power_name, game)
-        self.stance = {other_power: 0 for other_power in get_other_powers([self.power_name], self.game)}
+        self.stance = {
+            other_power: 0
+            for other_power in get_other_powers([self.power_name], self.game)
+        }
+
     def set_stance(self, stance):
         self.stance = stance
         print("Updated stance", self.power_name, self.stance)
@@ -33,7 +43,9 @@ class RandomStanceBot(BaselineBot):
         ret_obj = BotReturnData()
 
         # get proposed orders sent by other countries
-        messages = game.filter_messages(messages=game.messages, game_role=self.power_name)
+        messages = game.filter_messages(
+            messages=game.messages, game_role=self.power_name
+        )
         # proposed_orders = []
         proposed_orders_by_country = {}
         for key in messages:
@@ -88,9 +100,11 @@ class RandomStanceBot(BaselineBot):
         # for all other powers
         for other_power in get_other_powers([self.power_name], self.game):
             # generate some random moves to suggest to them
-            suggested_random_orders = [random.choice(possible_orders[loc]) for loc in
-                                       self.game.get_orderable_locations(other_power)
-                                       if possible_orders[loc]]
+            suggested_random_orders = [
+                random.choice(possible_orders[loc])
+                for loc in self.game.get_orderable_locations(other_power)
+                if possible_orders[loc]
+            ]
             if suggested_random_orders:
                 suggested_random_orders = ORR(XDO(suggested_random_orders))
 
@@ -110,13 +124,13 @@ if __name__ == "__main__":
     powers = list(game.get_map_power_names())
 
     friend_mappings = {
-        'ENGLAND': ['FRANCE', 'ITALY'],
-        'FRANCE': ['ITALY'],
-        'GERMANY': ['AUSTRIA'],
-        'RUSSIA': ['ENGLAND', 'FRANCE', 'ITALY', 'TURKEY'],
-        'TURKEY': ['RUSSIA'],
-        'ITALY': ['FRANCE', 'ENGLAND'],
-        'AUSTRIA': ['GERMANY']
+        "ENGLAND": ["FRANCE", "ITALY"],
+        "FRANCE": ["ITALY"],
+        "GERMANY": ["AUSTRIA"],
+        "RUSSIA": ["ENGLAND", "FRANCE", "ITALY", "TURKEY"],
+        "TURKEY": ["RUSSIA"],
+        "ITALY": ["FRANCE", "ENGLAND"],
+        "AUSTRIA": ["GERMANY"],
     }
 
     bots = []
@@ -139,8 +153,8 @@ if __name__ == "__main__":
                 for msg in messages:
                     msg_obj = Message(
                         sender=bot.power_name,
-                        recipient=msg['recipient'],
-                        message=msg['message'],
+                        recipient=msg["recipient"],
+                        message=msg["message"],
                         phase=game.get_current_phase(),
                     )
                     game.add_message(message=msg_obj)
@@ -151,4 +165,4 @@ if __name__ == "__main__":
         game.process()
         bots = bots[::-1]
 
-    to_saved_game_format(game, output_path='RandomStanceBotGame.json')
+    to_saved_game_format(game, output_path="RandomStanceBotGame.json")

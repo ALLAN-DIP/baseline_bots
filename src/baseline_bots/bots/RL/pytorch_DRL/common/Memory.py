@@ -1,16 +1,16 @@
-
 import random
 from collections import namedtuple
 
-
-Experience = namedtuple("Experience",
-                        ("states", "actions", "rewards", "next_states", "dones"))
+Experience = namedtuple(
+    "Experience", ("states", "actions", "rewards", "next_states", "dones")
+)
 
 
 class ReplayMemory(object):
     """
     Replay memory buffer
     """
+
     def __init__(self, capacity):
         self.capacity = capacity
         self.memory = []
@@ -25,10 +25,12 @@ class ReplayMemory(object):
     def push(self, states, actions, rewards, next_states=None, dones=None):
         if isinstance(states, list):
             if next_states is not None and len(next_states) > 0:
-                for s,a,r,n_s,d in zip(states, actions, rewards, next_states, dones):
+                for s, a, r, n_s, d in zip(
+                    states, actions, rewards, next_states, dones
+                ):
                     self._push_one(s, a, r, n_s, d)
             else:
-                for s,a,r in zip(states, actions, rewards):
+                for s, a, r in zip(states, actions, rewards):
                     self._push_one(s, a, r)
         else:
             self._push_one(states, actions, rewards, next_states, dones)

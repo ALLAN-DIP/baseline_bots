@@ -1,13 +1,10 @@
-
-import torch as th
-from torch import nn
-from torch.optim import Adam, RMSprop
-
 import numpy as np
-
+import torch as th
 from common.Agent import Agent
 from common.Model import ActorNetwork, CriticNetwork
 from common.utils import entropy, index_to_one_hot, to_tensor_var
+from torch import nn
+from torch.optim import Adam, RMSprop
 
 
 class A2C(Agent):
@@ -18,34 +15,71 @@ class A2C(Agent):
     - agent interact with environment to collect experience
     - agent training with experience to update policy
     """
-    def __init__(self, env, state_dim, action_dim,
-                 memory_capacity=10000, max_steps=None,
-                 roll_out_n_steps=10,
-                 reward_gamma=0.99, reward_scale=1., done_penalty=None,
-                 actor_hidden_size=32, critic_hidden_size=32,
-                 actor_output_act=nn.functional.log_softmax, critic_loss="mse",
-                 actor_lr=0.001, critic_lr=0.001,
-                 optimizer_type="rmsprop", entropy_reg=0.01,
-                 max_grad_norm=0.5, batch_size=100, episodes_before_train=100,
-                 epsilon_start=0.9, epsilon_end=0.01, epsilon_decay=200,
-                 use_cuda=True):
-        super(A2C, self).__init__(env, state_dim, action_dim,
-                 memory_capacity, max_steps,
-                 reward_gamma, reward_scale, done_penalty,
-                 actor_hidden_size, critic_hidden_size,
-                 actor_output_act, critic_loss,
-                 actor_lr, critic_lr,
-                 optimizer_type, entropy_reg,
-                 max_grad_norm, batch_size, episodes_before_train,
-                 epsilon_start, epsilon_end, epsilon_decay,
-                 use_cuda)
+
+    def __init__(
+        self,
+        env,
+        state_dim,
+        action_dim,
+        memory_capacity=10000,
+        max_steps=None,
+        roll_out_n_steps=10,
+        reward_gamma=0.99,
+        reward_scale=1.0,
+        done_penalty=None,
+        actor_hidden_size=32,
+        critic_hidden_size=32,
+        actor_output_act=nn.functional.log_softmax,
+        critic_loss="mse",
+        actor_lr=0.001,
+        critic_lr=0.001,
+        optimizer_type="rmsprop",
+        entropy_reg=0.01,
+        max_grad_norm=0.5,
+        batch_size=100,
+        episodes_before_train=100,
+        epsilon_start=0.9,
+        epsilon_end=0.01,
+        epsilon_decay=200,
+        use_cuda=True,
+    ):
+        super(A2C, self).__init__(
+            env,
+            state_dim,
+            action_dim,
+            memory_capacity,
+            max_steps,
+            reward_gamma,
+            reward_scale,
+            done_penalty,
+            actor_hidden_size,
+            critic_hidden_size,
+            actor_output_act,
+            critic_loss,
+            actor_lr,
+            critic_lr,
+            optimizer_type,
+            entropy_reg,
+            max_grad_norm,
+            batch_size,
+            episodes_before_train,
+            epsilon_start,
+            epsilon_end,
+            epsilon_decay,
+            use_cuda,
+        )
 
         self.roll_out_n_steps = roll_out_n_steps
 
-        self.actor = ActorNetwork(self.state_dim, self.actor_hidden_size,
-                                  self.action_dim, self.actor_output_act)
-        self.critic = CriticNetwork(self.state_dim, self.action_dim,
-                                    self.critic_hidden_size, 1)
+        self.actor = ActorNetwork(
+            self.state_dim,
+            self.actor_hidden_size,
+            self.action_dim,
+            self.actor_output_act,
+        )
+        self.critic = CriticNetwork(
+            self.state_dim, self.action_dim, self.critic_hidden_size, 1
+        )
         if self.optimizer_type == "adam":
             self.actor_optimizer = Adam(self.actor.parameters(), lr=self.actor_lr)
             self.critic_optimizer = Adam(self.critic.parameters(), lr=self.critic_lr)
@@ -67,7 +101,9 @@ class A2C(Agent):
         batch = self.memory.sample(self.batch_size)
         states_var = to_tensor_var(batch.states, self.use_cuda).view(-1, self.state_dim)
         one_hot_actions = index_to_one_hot(batch.actions, self.action_dim)
-        actions_var = to_tensor_var(one_hot_actions, self.use_cuda).view(-1, self.action_dim)
+        actions_var = to_tensor_var(one_hot_actions, self.use_cuda).view(
+            -1, self.action_dim
+        )
         rewards_var = to_tensor_var(batch.rewards, self.use_cuda).view(-1, 1)
 
         # update actor network
@@ -109,8 +145,9 @@ class A2C(Agent):
     # choose an action based on state with random noise added for exploration in training
     def exploration_action(self, state):
         softmax_action = self._softmax_action(state)
-        epsilon = self.epsilon_end + (self.epsilon_start - self.epsilon_end) * \
-                                  np.exp(-1. * self.n_steps / self.epsilon_decay)
+        epsilon = self.epsilon_end + (self.epsilon_start - self.epsilon_end) * np.exp(
+            -1.0 * self.n_steps / self.epsilon_decay
+        )
         if np.random.rand() < epsilon:
             action = np.random.choice(self.action_dim)
         else:
