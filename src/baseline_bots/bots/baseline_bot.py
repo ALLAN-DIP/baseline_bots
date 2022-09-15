@@ -3,14 +3,12 @@
 __authors__ = ["Sander Schulhoff", "Kartik Shenoy"]
 __email__ = "sanderschulhoff@gmail.com"
 
-import sys
-sys.path.append("..")
 from abc import ABC, abstractmethod
 from typing import List
 
 from diplomacy import Game, Message
 
-from baseline_bots.src.utils import OrdersData, MessagesData, get_order_tokens
+from baseline_bots.utils import OrdersData, MessagesData, get_order_tokens
 
 class BaselineBot(ABC):
     """Abstract Base Class for baselines bots"""
