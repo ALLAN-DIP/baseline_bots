@@ -24,4 +24,5 @@ jobs:
 
     - name: "Run tests"
       run: |
-        pytest tests
+        pytest tests/utils_test.py
+        pytest tests/bot_tests/bot_tests.py
