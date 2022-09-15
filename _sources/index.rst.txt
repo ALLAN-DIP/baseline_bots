@@ -11,9 +11,10 @@ This website contains the documentation for the ALLAN Baseline Bots.
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-   
+
    development.rst
    bots.rst
+   utils.rst
 
 
 

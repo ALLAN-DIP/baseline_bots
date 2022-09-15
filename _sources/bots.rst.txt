@@ -17,7 +17,7 @@ Bots
    :members: 
    :undoc-members:
 
-.. automodule:: baseline_bots.bots.honest_bot
+.. automodule:: baseline_bots.bots.smart_order_accepter_bot
     :members: 
     :undoc-members:
 
