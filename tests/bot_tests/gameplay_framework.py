@@ -2,8 +2,6 @@ __authors__ = ["Sander Schulhoff", "Kartik Shenoy"]
 __email__ = "sanderschulhoff@gmail.com"
 
 from typing import List
-import sys
-sys.path.append("..")
 
 from diplomacy import Game, Message
 from diplomacy.utils.export import to_saved_game_format
