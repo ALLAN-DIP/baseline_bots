@@ -1,13 +1,13 @@
 """unit tests for bots"""
 from gameplay_framework import GamePlay
 
-from baseline_bot import BaselineBot
-from baseline_bot.random_proposer_bot import RandomProposerBot
-from baseline_bot.pushover_bot import PushoverBot
-from baseline_bot.random_allier_proposer_bot import RandomAllierProposerBot
-from baseline_bot.random_honest_bot import RandomHonestBot
-from baseline_bot.random_honest_order_accepter_bot import RandomHonestOrderAccepterBot
-from baseline_bot.loyal_bot import LoyalBot
+from baseline_bots import BaselineBot
+from baseline_bots.random_proposer_bot import RandomProposerBot
+from baseline_bots.pushover_bot import PushoverBot
+from baseline_bots.random_allier_proposer_bot import RandomAllierProposerBot
+from baseline_bots.random_honest_bot import RandomHonestBot
+from baseline_bots.random_honest_order_accepter_bot import RandomHonestOrderAccepterBot
+from baseline_bots.loyal_bot import LoyalBot
 
 class TestRPBot():
     def test(self):
