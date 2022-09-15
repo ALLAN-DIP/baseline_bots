@@ -34,3 +34,16 @@ After changing the documentation, you can build the documentation by running:
 
 Open the resultant html file at docs/build/html/index.html 
 in your browser to view the documentation.
+
+Here are some instructions for development on TACC and using diplomacy_research:
+**********************************************************************************************************************************************
+
+.. code-block:: bash
+
+    idev -m 60
+    export WORKING_DIR=~/dipnet_press/WORKING_DIR/
+    module load tacc-singularity
+    # activate conda environment
+    conda activate shade
+    # add path to diplomacy_research to PYTHONPATH--your path should be different
+    export PYTHONPATH=$PYTHONPATH:/home1/08764/trigaten/research/diplomacy_research
