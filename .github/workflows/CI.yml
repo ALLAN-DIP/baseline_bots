@@ -1,0 +1,27 @@
+name: CI test
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  testbuild:
+    runs-on: ubuntu-latest
+    steps:
+    - name: "Checkout"
+      uses: actions/checkout@v2
+
+    - name: "Setup Python"
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.7'
+
+    - name: "Build"
+      run: |
+        pip install -r requirements.txt
+        pip install -e .
+
+    - name: "Run tests"
+      run: |
+        pytest tests
