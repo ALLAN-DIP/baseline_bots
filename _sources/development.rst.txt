@@ -35,6 +35,21 @@ After changing the documentation, you can build the documentation by running:
 Open the resultant html file at docs/build/html/index.html 
 in your browser to view the documentation.
 
+Here are some instructions for running tests:
+**********************************************************************************************************************************************
+The following runs all tests in the tests directory. Look up pytest documentation to see 
+how to run tests individually.
+.. code-block:: bash
+
+    pytest tests/
+
+Here are some instructions for pushing code:
+************************************************
+
+1. When beginning a new feature, checkout into a new branch
+2. Use conventional commits
+3. Always run the Makefile before pushing
+
 Here are some instructions for development on TACC and using diplomacy_research:
 **********************************************************************************************************************************************
 
