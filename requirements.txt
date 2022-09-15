@@ -2,3 +2,4 @@ diplomacy
 sphinx
 pytest
 git+https://github.com/trigaten/DAIDE.git
+karma-sphinx-theme
