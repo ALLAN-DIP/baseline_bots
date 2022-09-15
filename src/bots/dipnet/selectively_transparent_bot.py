@@ -6,7 +6,7 @@ import sys
 sys.path.append("..")
 sys.path.append("../..")
 
-from baseline_bots.utils import MessagesData, parse_orr_xdo, parse_FCT, ORR, XDO, FCT, get_other_powers, is_order_aggressive
+from baseline_bots.src.utils import MessagesData, parse_orr_xdo, parse_FCT, ORR, XDO, FCT, get_other_powers, is_order_aggressive
 from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
 from collections import defaultdict
 from DAIDE import config

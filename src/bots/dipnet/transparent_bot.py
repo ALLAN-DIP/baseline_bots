@@ -6,7 +6,7 @@ import sys
 sys.path.append("..")
 sys.path.append("../..")
 
-from baseline_bots.utils import MessagesData, parse_orr_xdo, parse_FCT, ORR, XDO, FCT, get_other_powers
+from baseline_bots.src.utils import MessagesData, parse_orr_xdo, parse_FCT, ORR, XDO, FCT, get_other_powers
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from collections import defaultdict
 from tornado import gen
