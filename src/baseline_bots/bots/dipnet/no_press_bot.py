@@ -2,16 +2,12 @@ __authors__ = ["Sander Schulhoff", "Kartik Shenoy"]
 __email__ = "sanderschulhoff@gmail.com"
 
 import random
-import sys
 from typing import List
 
 from bots.dipnet.dipnet_bot import DipnetBot
 from diplomacy import Game, Message
 from tornado import gen
 from utils import MessagesData, OrdersData, get_order_tokens
-
-sys.path.append("..")
-sys.path.append("../..")
 
 from utils import get_order_tokens
 
