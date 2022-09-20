@@ -5,12 +5,6 @@ __email__ = "w.wongkamjan@gmail.com"
 import random
 import sys
 
-sys.path.append("..")
-sys.path.append("../..")
-sys.path.append("../../..")
-sys.path.append("../../../dipnet_press")
-sys.path.append("../dipnet_press")
-
 from typing import List
 
 from bots.dipnet.dipnet_bot import DipnetBot
