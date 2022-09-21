@@ -4,7 +4,6 @@ __email__ = "w.wongkamjan@gmail.com"
 
 import random
 import sys
-
 from typing import List
 
 from bots.dipnet.dipnet_bot import DipnetBot
@@ -20,6 +19,7 @@ from utils import (
     get_non_aggressive_orders,
     get_order_tokens,
     get_other_powers,
+    get_state_value,
     parse_FCT,
     parse_orr_xdo,
 )
@@ -41,23 +41,6 @@ class RealPolitik(DipnetBot):
     def phase_init(self) -> None:
         super().phase_init()
         self.accum_messages = []
-
-    @gen.coroutine
-    def get_state_value(self, game, power_name):
-        # rollout the game --- orders in rollout are from dipnet
-        # state value
-        for i in range(self.rollout_length):
-            # print('rollout: ', i)
-            for power in game.powers:
-                orders = yield self.brain.get_orders(game, power)
-                # print(power + ': ')
-                # print(orders)
-                game.set_orders(
-                    power_name=power,
-                    orders=orders[: min(self.rollout_n_order, len(orders))],
-                )
-            game.process()
-        return len(game.get_centers(power_name))
 
     @gen.coroutine
     def gen_messages(self, rcvd_messages):
@@ -128,8 +111,8 @@ class RealPolitik(DipnetBot):
                                 power_name=other_power, orders=power_orders
                             )
                     simulated_game.process()
-                    state_value[proposer] = yield self.get_state_value(
-                        simulated_game, self.power_name
+                    state_value[proposer] = yield get_state_value(
+                        self, simulated_game, self.power_name
                     )
 
             best_proposer = max(state_value, key=state_value.get)
