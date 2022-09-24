@@ -13,6 +13,7 @@ from typing import List
 
 from DAIDE.utils.exceptions import ParseError
 from diplomacy import Game, Message
+from tornado import gen
 
 
 def get_order_tokens(order):
@@ -278,6 +279,24 @@ class OrdersData:
 def sort_messages_by_most_recent(messages: List[Message]):
     messages.sort(key=lambda msg: msg.time_sent)
     return messages
+
+
+@gen.coroutine
+def get_state_value(bot, game, power_name):
+    # rollout the game --- orders in rollout are from dipnet
+    # state value
+    for i in range(bot.rollout_length):
+        # print('rollout: ', i)
+        for power in game.powers:
+            orders = yield bot.brain.get_orders(game, power)
+            # print(power + ': ')
+            # print(orders)
+            game.set_orders(
+                power_name=power,
+                orders=orders[: min(bot.rollout_n_order, len(orders))],
+            )
+        game.process()
+    return len(game.get_centers(power_name))
 
 
 if __name__ == "__main__":

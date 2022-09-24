@@ -15,7 +15,7 @@ class SmartOrderAccepterBot(RandomProposerBot):
     When it receives messages, it will check if any of them are proposed orders.
     Then, it will use a rollout policy to decide whether to accept or reject the order.
 
-    If the order is accepted, it will be added to the orders that the bot will 
+    If the order is accepted, it will be added to the orders that the bot will
     execute and a positive response will be sent to the proposer.
 
     If the order is rejected, a negative response will be sent to the proposer.
@@ -31,6 +31,7 @@ class SmartOrderAccepterBot(RandomProposerBot):
         return ret_msgs
 
     def gen_orders(self):
+        # from dipnet
         return None
 
     def __call__(self, rcvd_messages):

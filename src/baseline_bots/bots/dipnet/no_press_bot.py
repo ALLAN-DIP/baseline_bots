@@ -9,8 +9,6 @@ from diplomacy import Game, Message
 from tornado import gen
 from utils import MessagesData, OrdersData, get_order_tokens
 
-from utils import get_order_tokens
-
 
 class NoPressDipBot(DipnetBot):
     """just execute orders computed by dipnet"""
