@@ -14,7 +14,7 @@ from typing import List
 from DAIDE.utils.exceptions import ParseError
 from diplomacy import Game, Message
 from tornado import gen
-from bots.baseline_bot import BaselineBot
+from src.baseline_bots.bots.baseline_bot import BaselineBot
 
 
 def get_order_tokens(order):
