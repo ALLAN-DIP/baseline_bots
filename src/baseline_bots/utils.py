@@ -328,7 +328,7 @@ def get_best_orders(bot, proposal_order, shared_order):
                 bot, simulated_game, bot.power_name
             )
     best_proposer = max(state_value, key=state_value.get)
-    return best_proposer
+    return best_proposer, proposal_order[best_proposer]
 
 
 if __name__ == "__main__":

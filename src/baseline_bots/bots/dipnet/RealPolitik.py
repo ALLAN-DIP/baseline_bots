@@ -85,7 +85,7 @@ class RealPolitik(DipnetBot):
                     proposal_order[game_msg.sender] = parse_orr_xdo(game_msg.message)
                     # print(proposal_order[game_msg.sender])
 
-            best_proposer = get_best_orders(self, proposal_order, shared_order)
+            best_proposer, _ = get_best_orders(self, proposal_order, shared_order)
 
             if best_proposer == self.power_name:
                 # if there is no proposal orders, set orders execute by dipnet
