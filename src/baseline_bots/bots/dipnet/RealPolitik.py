@@ -6,12 +6,12 @@ import random
 import sys
 from typing import List
 
-from bots.dipnet.dipnet_bot import DipnetBot
+from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from DAIDE import FCT, ORR, XDO
 from diplomacy import Game, Message
 from diplomacy_research.players.benchmark_player import DipNetRLPlayer
 from tornado import gen
-from utils import (
+from baseline_bots.utils import (
     REJ,
     YES,
     MessagesData,
@@ -20,6 +20,7 @@ from utils import (
     get_order_tokens,
     get_other_powers,
     get_state_value,
+    get_best_orders,
     parse_FCT,
     parse_orr_xdo,
 )
@@ -84,40 +85,9 @@ class RealPolitik(DipnetBot):
                     proposal_order[game_msg.sender] = parse_orr_xdo(game_msg.message)
                     # print(proposal_order[game_msg.sender])
 
-            # include dipnet order
-            proposal_order[self.power_name] = yield self.brain.get_orders(
-                self.game, self.power_name
-            )
-            proposed = False
+            best_proposer = get_best_orders(self, proposal_order, shared_order)
 
-            # for each xdo order set (max at 6 for now) -> simulate worlds by execute all of shared orders + xdo order set
-            state_value = {
-                other_power: -10000
-                for other_power in get_other_powers([self.power_name], self.game)
-            }
-            for proposer, orders in proposal_order.items():
-                if orders:
-                    proposed = True
-                    simulated_game = self.game.__deepcopy__(None)
-                    orders = get_non_aggressive_orders(
-                        orders, self.power_name, self.game
-                    )
-                    # print('from: ', proposer)
-                    # print(orders)
-                    simulated_game.set_orders(power_name=self.power_name, orders=orders)
-                    for other_power, power_orders in shared_order.items():
-                        if power_orders:
-                            simulated_game.set_orders(
-                                power_name=other_power, orders=power_orders
-                            )
-                    simulated_game.process()
-                    state_value[proposer] = yield get_state_value(
-                        self, simulated_game, self.power_name
-                    )
-
-            best_proposer = max(state_value, key=state_value.get)
-
-            if not proposed and best_proposer != self.power_name:
+            if best_proposer == self.power_name:
                 # if there is no proposal orders, set orders execute by dipnet
                 orders = proposal_order[self.power_name]
                 self.orders.add_orders(orders, overwrite=True)
