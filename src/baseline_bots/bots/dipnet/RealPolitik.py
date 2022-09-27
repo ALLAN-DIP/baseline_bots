@@ -6,21 +6,22 @@ import random
 import sys
 from typing import List
 
-from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from DAIDE import FCT, ORR, XDO
 from diplomacy import Game, Message
 from diplomacy_research.players.benchmark_player import DipNetRLPlayer
 from tornado import gen
+
+from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from baseline_bots.utils import (
     REJ,
     YES,
     MessagesData,
     OrdersData,
+    get_best_orders,
     get_non_aggressive_orders,
     get_order_tokens,
     get_other_powers,
     get_state_value,
-    get_best_orders,
     parse_FCT,
     parse_orr_xdo,
 )

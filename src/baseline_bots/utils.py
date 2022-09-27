@@ -298,15 +298,15 @@ def get_state_value(bot, game, power_name):
         game.process()
     return len(game.get_centers(power_name))
 
+
 @gen.coroutine
-def get_best_orders(bot, proposal_order, shared_order):
-    # input: sender power, dipnet_order + incoming proposals {power: [orders]}, shared_orders, Diplomacy game
-    # output: [orders] a list of orders (with best value) 
+def get_best_orders(bot: BaselineBot, proposal_order: dict, shared_order: dict):
+    """
+    input: sender power, dipnet_order + incoming proposals {power: [orders]}, shared_orders, Diplomacy game
+    output: [orders] a list of orders (with best value)
                 # for each xdo order set (max at 6 for now) -> simulate worlds by execute all of shared orders + xdo order set
-    state_value = {
-        power: -10000
-        for power in bot.game.powers
-    }
+    """
+    state_value = {power: -10000 for power in bot.game.powers}
     for proposer, unit_orders in proposal_order.items():
         if unit_orders:
             proposed = True
@@ -314,8 +314,6 @@ def get_best_orders(bot, proposal_order, shared_order):
             unit_orders = get_non_aggressive_orders(
                 unit_orders, bot.power_name, bot.game
             )
-            # print('from: ', proposer)
-            # print(orders)
             simulated_game.set_orders(power_name=bot.power_name, orders=unit_orders)
             for other_power, power_orders in shared_order.items():
                 # if they are not sharing any info about their orders then assume that they are dipnet
