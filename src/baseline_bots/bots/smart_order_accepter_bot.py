@@ -7,7 +7,7 @@ from diplomacy import Message
 
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
 from baseline_bots.utils import MessagesData, OrdersData, get_other_powers, get_best_orders
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 from daidepp import create_daide_grammar, daide_visitor
 
@@ -31,7 +31,7 @@ class SmartOrderAccepterBot(RandomProposerBot):
         self.alliance_props_sent = False
         self.stance = ScoreBasedStance(power_name, game)
 
-    def get_proposals(self, rcvd_messages: List[List[int, Message]]) -> Dict[str, str]:
+    def get_proposals(self, rcvd_messages: List[Tuple[int, Message]]) -> Dict[str, str]:
         """
         Extract proposal messages from received messages and checks for valid syntax before returning it
         """
