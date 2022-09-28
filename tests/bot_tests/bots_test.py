@@ -8,7 +8,7 @@ from baseline_bots import RandomAllierProposerBot
 from baseline_bots import RandomHonestBot
 from baseline_bots import RandomHonestOrderAccepterBot
 from baseline_bots import LoyalBot
-from baseline_bots import RealPolitik
+from baseline_bots.bots.dipnet.RealPolitik import RealPolitik
 
 class TestRPBot():
     def test(self):
