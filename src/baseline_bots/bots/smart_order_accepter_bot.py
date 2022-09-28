@@ -53,7 +53,7 @@ class SmartOrderAccepterBot(RandomProposerBot):
 
         return proposals
 
-    def gen_pos_stance_messages(self, game_rec, ret_msgs):
+    def gen_pos_stance_messages(self, game_rec, ret_msgs) -> None:
         """
         Add messages to be sent to powers with positive stance. 
         These messages would contain factual information about the orders that current power would execute in current round
