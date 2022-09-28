@@ -14,7 +14,7 @@ from typing import List
 from DAIDE.utils.exceptions import ParseError
 from diplomacy import Game, Message
 from tornado import gen
-from bots.baseline_bot import BaselineBot
+from baseline_bots.bots.baseline_bot import BaselineBot
 
 
 def get_order_tokens(order):
@@ -305,7 +305,7 @@ def get_best_orders(bot: BaselineBot, proposal_order: dict, shared_order: dict):
     """
     input: sender power, dipnet_order + incoming proposals {power: [orders]}, shared_orders, Diplomacy game
     output: [orders] a list of orders (with best value)
-                # for each xdo order set (max at 6 for now) -> simulate worlds by execute all of shared orders + xdo order set
+                for each xdo order set (max at 6 for now) -> simulate worlds by execute all of shared orders + xdo order set
     """
     state_value = {power: -10000 for power in bot.game.powers}
     for proposer, unit_orders in proposal_order.items():
