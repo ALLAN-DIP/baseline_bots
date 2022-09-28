@@ -7,6 +7,7 @@ from diplomacy import Message
 
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
 from baseline_bots.utils import MessagesData, OrdersData, get_other_powers, get_best_orders
+from typing import List, Dict
 
 from daidepp import create_daide_grammar, daide_visitor
 
