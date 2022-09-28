@@ -1,6 +1,7 @@
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
+import json
 from DAIDE import FCT, XDO, ORR
 from diplomacy import Message
 
@@ -8,7 +9,6 @@ from baseline_bots.bots.random_proposer_bot import RandomProposerBot
 from baseline_bots.utils import MessagesData, OrdersData, get_other_powers
 from baseline_bots.stance import stance_extraction
 
-# Using library https://github.com/SHADE-AI/daidepp
 from daidepp import create_daide_grammar, daide_visitor
 
 class SmartOrderAccepterBot(RandomProposerBot):
@@ -29,7 +29,7 @@ class SmartOrderAccepterBot(RandomProposerBot):
         self.alliance_props_sent = False
         self.stance = stance_extraction.ScoreBasedStance()
 
-    def get_proposals(self, rcvd_messages) -> Dict[str, str]:
+    def get_proposals(self, rcvd_messages: List[int, Message]) -> Dict[str, str]:
         """
         Extract proposal messages from received messages and checks for valid syntax before returning it
         """
@@ -53,7 +53,7 @@ class SmartOrderAccepterBot(RandomProposerBot):
 
         return proposals
 
-    def gen_pos_stance_messages(self, game_rec, ret_msgs) -> None:
+    def gen_pos_stance_messages(self, game_rec: json, ret_msgs: MessagesData) -> None:
         """
         Add messages to be sent to powers with positive stance. 
         These messages would contain factual information about the orders that current power would execute in current round

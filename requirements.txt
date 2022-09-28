@@ -5,3 +5,4 @@ git+https://github.com/trigaten/DAIDE.git
 karma-sphinx-theme
 black
 isort
+git+https://github.com/SHADE-AI/daidepp.git

@@ -8,6 +8,7 @@ from baseline_bots import RandomAllierProposerBot
 from baseline_bots import RandomHonestBot
 from baseline_bots import RandomHonestOrderAccepterBot
 from baseline_bots import LoyalBot
+from baseline_bots import SmartOrderAccepterBot
 
 class TestRPBot():
     def test(self):
@@ -28,3 +29,10 @@ class TestRPBot():
 
 # game_play = GamePlay(None, [RandomProposerBot, RandomHonestOrderAccepterBot], 3)
 # game_play.play()
+
+class TestSOABot():
+    def test(self):
+        from diplomacy import Game
+
+        soa_bot = SmartOrderAccepterBot('AUS', Game())
+        assert soa_bot.get_proposals([[0, "PRP (ORR (XDO (F KIE - DEN) XDO (A BER - KIE) (XDO A MUN RUH))"]])
