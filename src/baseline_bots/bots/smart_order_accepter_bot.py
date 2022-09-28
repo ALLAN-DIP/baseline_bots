@@ -7,6 +7,8 @@ from diplomacy import Message
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
 from baseline_bots.utils import MessagesData, OrdersData, get_other_powers
 
+# Using library https://github.com/SHADE-AI/daidepp
+from daidepp import create_daide_grammar, daide_visitor
 
 class SmartOrderAccepterBot(RandomProposerBot):
     """
@@ -24,6 +26,28 @@ class SmartOrderAccepterBot(RandomProposerBot):
     def __init__(self, power_name, game) -> None:
         super().__init__(power_name, game)
         self.alliance_props_sent = False
+
+    def get_proposals(rcvd_messages) -> Dict[str, str]:
+        """Extract proposal messages from receieved messages and checks for valid syntax before returning it"""
+        grammar = create_daide_grammar(level=130)
+        
+        # Extract messages containing PRP string
+        order_msgs = [msg[1] for msg in rcvd_messages if "PRP" in msg[1].message]
+
+        proposals = {}
+        for order_msg in order_msgs:
+            try:
+                # Parse using DAIDEPP functions
+                parse_tree = grammar.parse(order_msg.message)
+                output = daide_visitor.visit(parse_tree)
+                
+                if output[0] == 'PRP':
+                    proposals[order_msg.sender] = order_msg.message
+            except Exception as e:
+                print(e)
+                pass
+
+        return proposals
 
     def gen_messages(self, rcvd_messages):
         ret_msgs = MessagesData()
