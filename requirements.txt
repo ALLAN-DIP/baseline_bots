@@ -7,3 +7,4 @@ black
 isort
 git+https://github.com/SHADE-AI/daidepp.git
 git+https://github.com/ALLAN-DIP/stance_vector.git
+numpy
