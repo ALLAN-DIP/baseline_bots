@@ -11,6 +11,8 @@ from baseline_bots.stance import stance_extraction
 
 from daidepp import create_daide_grammar, daide_visitor
 
+from stance_vector import ScoreBasedStance
+
 class SmartOrderAccepterBot(RandomProposerBot):
     """
     This bot uses dipnet to generate orders.
@@ -27,7 +29,7 @@ class SmartOrderAccepterBot(RandomProposerBot):
     def __init__(self, power_name, game) -> None:
         super().__init__(power_name, game)
         self.alliance_props_sent = False
-        self.stance = stance_extraction.ScoreBasedStance()
+        self.stance = ScoreBasedStance(power_name, game)
 
     def get_proposals(self, rcvd_messages: List[int, Message]) -> Dict[str, str]:
         """
@@ -53,21 +55,31 @@ class SmartOrderAccepterBot(RandomProposerBot):
 
         return proposals
 
-    def gen_pos_stance_messages(self, game_rec: json, ret_msgs: MessagesData) -> None:
+    def gen_pos_stance_messages(self, msgs_data: MessagesData) -> None:
         """
         Add messages to be sent to powers with positive stance. 
         These messages would contain factual information about the orders that current power would execute in current round
         """
-        stance_vec = self.stance.get_stance(game_rec)
         orders_decided = FCT(ORR(XDO(self.orders.get_list_of_orders())))
-        for pow in stance_vec[self.power_name]:
-            if stance_vec[self.power_name][pow] > 0:
-                ret_msgs.add_message(pow, str(orders_decided))
+        for pow in self.stance.stance[self.power_name]:
+            if self.stance.stance[self.power_name][pow] > 0:
+                msgs_data.add_message(pow, str(orders_decided))
 
     def gen_messages(self, rcvd_messages):
-        ret_msgs = MessagesData()
+        msgs_data = MessagesData()
 
-        return ret_msgs
+        # extract only the proposed orders from the messages the bot has just received
+        prp_orders = self.get_proposals(rcvd_messages)
+
+        # get pos/neg stance on other bots using Tony's stance vector (resolve this issue first: https://github.com/ALLAN-DIP/stance_vector/issues/1)
+        self.stance.get_stance()
+
+        # TODO: decide orders here
+
+        # generate messages: we should  be sending our true orders to allies (positive stance)
+        self.gen_pos_stance_messages(msgs_data)
+
+        return msgs_data
 
     def gen_orders(self):
         # from dipnet
