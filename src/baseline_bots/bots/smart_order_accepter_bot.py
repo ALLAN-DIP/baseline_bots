@@ -5,7 +5,7 @@ from DAIDE import ALY, PRP
 from diplomacy import Message
 
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
-from baseline_bots.utils import MessagesData, OrdersData, get_other_powers
+from baseline_bots.utils import MessagesData, OrdersData, get_other_powers, get_best_orders
 
 
 class SmartOrderAccepterBot(RandomProposerBot):
@@ -36,4 +36,5 @@ class SmartOrderAccepterBot(RandomProposerBot):
 
     def __call__(self, rcvd_messages):
         messages = self.gen_messages(rcvd_messages)
+        best_proposer, best_orders = get_best_orders(self,proposal_order, shared_order)
         return {"messages": messages, "orders": self.gen_orders()}
