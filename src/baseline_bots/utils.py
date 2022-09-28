@@ -14,7 +14,6 @@ from typing import List
 from DAIDE.utils.exceptions import ParseError
 from diplomacy import Game, Message
 from tornado import gen
-from baseline_bots import BaselineBot
 
 
 def get_order_tokens(order):
@@ -301,7 +300,7 @@ def get_state_value(bot, game, power_name):
 
 
 @gen.coroutine
-def get_best_orders(bot: BaselineBot, proposal_order: dict, shared_order: dict):
+def get_best_orders(bot, proposal_order: dict, shared_order: dict):
     """
     input: sender power, dipnet_order + incoming proposals {power: [orders]}, shared_orders, Diplomacy game
     output: [orders] a list of orders (with best value)
