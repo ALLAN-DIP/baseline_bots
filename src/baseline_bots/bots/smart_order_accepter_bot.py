@@ -31,7 +31,7 @@ class SmartOrderAccepterBot(RandomProposerBot):
         self.alliance_props_sent = False
         self.stance = ScoreBasedStance(power_name, game)
 
-    def get_proposals(self, rcvd_messages: List[int, Message]) -> Dict[str, str]:
+    def get_proposals(self, rcvd_messages: List[List[int, Message]]) -> Dict[str, str]:
         """
         Extract proposal messages from received messages and checks for valid syntax before returning it
         """
