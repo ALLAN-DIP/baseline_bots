@@ -23,8 +23,7 @@ jobs:
         pip install -e .
         # install diplomacy_research requirements
         git clone https://github.com/diplomacy/research
-        cd research
-        pip install -r requirements.txt
+        pip install -r research/requirements.txt
 
     - name: "Run tests"
       run: |
