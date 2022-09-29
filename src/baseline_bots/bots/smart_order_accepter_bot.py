@@ -1,7 +1,6 @@
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
-import json
 from DAIDE import FCT, XDO, ORR
 from diplomacy import Message
 
@@ -55,29 +54,21 @@ class SmartOrderAccepterBot(RandomProposerBot):
 
         return proposals
 
-    def gen_pos_stance_messages(self, msgs_data: MessagesData) -> None:
+    def gen_pos_stance_messages(self, msgs_data: MessagesData, orders_list: List[str]) -> None:
         """
         Add messages to be sent to powers with positive stance. 
         These messages would contain factual information about the orders that current power would execute in current round
         """
-        orders_decided = FCT(ORR(XDO(self.orders.get_list_of_orders())))
+        orders_decided = FCT(ORR(XDO(orders_list)))
         for pow in self.stance.stance[self.power_name]:
             if self.stance.stance[self.power_name][pow] > 0:
                 msgs_data.add_message(pow, str(orders_decided))
 
-    def gen_messages(self, rcvd_messages):
+    def gen_messages(self, orders_list: List[str]):
         msgs_data = MessagesData()
 
-        # extract only the proposed orders from the messages the bot has just received
-        prp_orders = self.get_proposals(rcvd_messages)
-
-        # get pos/neg stance on other bots using Tony's stance vector (resolve this issue first: https://github.com/ALLAN-DIP/stance_vector/issues/1)
-        self.stance.get_stance()
-
-        # TODO: decide orders here
-
         # generate messages: we should  be sending our true orders to allies (positive stance)
-        self.gen_pos_stance_messages(msgs_data)
+        self.gen_pos_stance_messages(msgs_data, orders_list)
 
         return msgs_data
 
@@ -85,7 +76,19 @@ class SmartOrderAccepterBot(RandomProposerBot):
         # from dipnet
         return None
 
-    def __call__(self, rcvd_messages):
-        messages = self.gen_messages(rcvd_messages)
-        best_proposer, best_orders = get_best_orders(self,proposal_order, shared_order)
-        return {"messages": messages, "orders": self.gen_orders()}
+    def __call__(self, rcvd_messages: List[Tuple[int, Message]]):
+        # compute pos/neg stance on other bots using Tony's stance vector
+        self.stance.get_stance()
+
+        # extract only the proposed orders from the messages the bot has just received
+        prp_orders = self.get_proposals(rcvd_messages)
+
+        best_proposer, best_orders = get_best_orders(self,prp_orders, shared_order)
+
+        # add orders
+        orders_data = OrdersData()
+        orders_data.add_orders(best_orders)
+
+        # generate messages
+        messages = self.gen_messages(orders_data)
+        return {"messages": messages, "orders": orders_data.get_list_of_orders()}
