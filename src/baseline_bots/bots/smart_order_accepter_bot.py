@@ -5,10 +5,8 @@ from DAIDE import FCT, XDO, ORR
 from diplomacy import Message
 
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
-from baseline_bots.utils import MessagesData, OrdersData, get_other_powers, get_best_orders
+from baseline_bots.utils import MessagesData, OrdersData, get_other_powers, get_best_orders, parse_PRP, parse_orr_xdo
 from typing import List, Dict, Tuple
-
-from daidepp import create_daide_grammar, daide_visitor
 
 from stance_vector import ScoreBasedStance
 
@@ -33,21 +31,14 @@ class SmartOrderAccepterBot(RandomProposerBot):
     def get_proposals(self, rcvd_messages: List[Tuple[int, Message]]) -> Dict[str, str]:
         """
         Extract proposal messages from received messages and checks for valid syntax before returning it
-        """
-        grammar = create_daide_grammar(level=130)
-        
+        """        
         # Extract messages containing PRP string
         order_msgs = [msg[1] for msg in rcvd_messages if "PRP" in msg[1].message]
 
         proposals = {}
         for order_msg in order_msgs:
             try:
-                # Parse using DAIDEPP functions
-                parse_tree = grammar.parse(order_msg.message)
-                output = daide_visitor.visit(parse_tree)
-
-                if output[0] == 'PRP':
-                    proposals[order_msg.sender] = order_msg.message
+                proposals[order_msg.sender] = parse_PRP(parse_orr_xdo(order_msg.message))
             except Exception as e:
                 print(e)
                 pass

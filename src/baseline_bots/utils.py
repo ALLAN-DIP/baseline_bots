@@ -104,7 +104,16 @@ def parse_FCT(msg) -> str:
     try:
         return msg[5:-1]
     except Exception:
-        raise ParseError(f"Cant parse ORR XDO msg {msg}")
+        raise ParseError(f"Cant parse FCT msg {msg}")
+
+def parse_PRP(msg) -> str:
+    """Detaches PRP from main arrangement"""
+    if "PRP" not in msg:
+        raise ParseError("This is not an PRP message")
+    try:
+        return msg[5:-1]
+    except Exception:
+        raise ParseError(f"Cant parse PRP msg {msg}")
 
 
 def parse_orr_xdo(msg: str) -> List[str]:
