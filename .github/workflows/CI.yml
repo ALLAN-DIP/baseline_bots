@@ -19,11 +19,13 @@ jobs:
 
     - name: "Build"
       run: |
-        pip install -r requirements.txt
-        pip install -e .
         # install diplomacy_research requirements
         git clone https://github.com/diplomacy/research
         pip install -r research/requirements.txt
+        # install requirements for baseline_bots
+        pip install -r requirements.txt
+        pip install -e .
+        
 
     - name: "Run tests"
       run: |
