@@ -1,6 +1,7 @@
 """unit tests for bots"""
 from gameplay_framework import GamePlay
-
+import diplomacy_research
+print(diplomacy_research)
 from baseline_bots import BaselineBot
 from baseline_bots import RandomProposerBot
 from baseline_bots import PushoverBot
