@@ -63,10 +63,6 @@ class SmartOrderAccepterBot(RandomProposerBot):
 
         return msgs_data
 
-    def gen_orders(self):
-        # from dipnet
-        return None
-
     def __call__(self, rcvd_messages: List[Tuple[int, Message]]):
         # compute pos/neg stance on other bots using Tony's stance vector
         self.stance.get_stance()
