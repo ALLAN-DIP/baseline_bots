@@ -22,6 +22,7 @@ jobs:
         # install diplomacy_research requirements
         git clone https://github.com/diplomacy/research
         pip install -r research/requirements.txt
+        pip install -r research/requirements_dev.txt
         # install requirements for baseline_bots
         pip install -r requirements.txt
         pip install -e .
