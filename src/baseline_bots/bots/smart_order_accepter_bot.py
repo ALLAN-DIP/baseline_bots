@@ -1,14 +1,22 @@
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
-from DAIDE import FCT, XDO, ORR
+from typing import Dict, List, Tuple
+
+from DAIDE import FCT, ORR, XDO
 from diplomacy import Message
+from stance_vector import ScoreBasedStance
 
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
-from baseline_bots.utils import MessagesData, OrdersData, get_other_powers, get_best_orders, parse_PRP, parse_orr_xdo
-from typing import List, Dict, Tuple
+from baseline_bots.utils import (
+    MessagesData,
+    OrdersData,
+    get_best_orders,
+    get_other_powers,
+    parse_orr_xdo,
+    parse_PRP,
+)
 
-from stance_vector import ScoreBasedStance
 
 class SmartOrderAccepterBot(RandomProposerBot):
     """
@@ -28,26 +36,32 @@ class SmartOrderAccepterBot(RandomProposerBot):
         self.alliance_props_sent = False
         self.stance = ScoreBasedStance(power_name, game)
 
-    def get_proposals(self, rcvd_messages: List[Tuple[int, Message]]) -> Dict[str, List[str]]:
+    def get_proposals(
+        self, rcvd_messages: List[Tuple[int, Message]]
+    ) -> Dict[str, List[str]]:
         """
         Extract proposal messages from received messages and checks for valid syntax before returning it
-        """        
+        """
         # Extract messages containing PRP string
         order_msgs = [msg[1] for msg in rcvd_messages if "PRP" in msg[1].message]
 
         proposals = {}
         for order_msg in order_msgs:
             try:
-                proposals[order_msg.sender] = parse_PRP(parse_orr_xdo(order_msg.message))
+                proposals[order_msg.sender] = parse_PRP(
+                    parse_orr_xdo(order_msg.message)
+                )
             except Exception as e:
                 print(e)
                 pass
 
         return proposals
 
-    def gen_pos_stance_messages(self, msgs_data: MessagesData, orders_list: List[str]) -> None:
+    def gen_pos_stance_messages(
+        self, msgs_data: MessagesData, orders_list: List[str]
+    ) -> None:
         """
-        Add messages to be sent to powers with positive stance. 
+        Add messages to be sent to powers with positive stance.
         These messages would contain factual information about the orders that current power would execute in current round
         """
         orders_decided = FCT(ORR(XDO(orders_list)))
@@ -70,7 +84,7 @@ class SmartOrderAccepterBot(RandomProposerBot):
         # extract only the proposed orders from the messages the bot has just received
         prp_orders = self.get_proposals(rcvd_messages)
 
-        best_proposer, best_orders = get_best_orders(self,prp_orders, shared_order)
+        best_proposer, best_orders = get_best_orders(self, prp_orders, shared_order)
 
         # add orders
         orders_data = OrdersData()
