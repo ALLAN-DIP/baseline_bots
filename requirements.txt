@@ -1,9 +1,12 @@
 diplomacy
 sphinx
 pytest
-git+https://github.com/trigaten/DAIDE.git
 karma-sphinx-theme
 black
 isort
-git+https://github.com/ALLAN-DIP/stance_vector.git
 numpy
+# Sander's DAIDE parser/constructor
+git+https://github.com/trigaten/DAIDE.git
+git+https://github.com/ALLAN-DIP/stance_vector.git
+# diplomacy_research
+git+https://github.com/diplomacy/research.git
