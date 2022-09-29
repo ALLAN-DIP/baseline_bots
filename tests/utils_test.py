@@ -1,4 +1,4 @@
-from baseline_bots.utils import OrdersData, sort_messages_by_most_recent
+from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, random_orders
 from diplomacy import Game, Message
 
 class TestUtils:
@@ -42,3 +42,21 @@ class TestUtils:
         msgs = [msg_obj2, msg_obj1]
 
         assert sort_messages_by_most_recent(msgs)[0].message == "HELLO"
+
+        ord =  [(('FRA', "AMY", 'PAR'), 'BLD')]
+        assert ord == random_orders(ord)
+
+        ord =  [(('FRA', "AMY", 'PAR'), 'DSB')]
+        assert ord == random_orders(ord)
+
+        ord =  [(('FRA', "AMY", 'PAR'), 'REM')]
+        assert ord == random_orders(ord)
+
+        orders = [(("FRA", "FLT", "NTH"), "CVY", ('FRA', 'AMY', 'HOL'), 'CTO', "NWY"), (("FRA", "AMY", "HOL"), "CTO", 'NWY',"VIA", ('NTH')), (("FRA", "AMY", "BER"), "HLD")]
+        assert(random_orders(orders) != orders)    
+
+        orders = [(("FRA", "AMY", "PIC"), "MTO", "PAR"), (("FRA", "AMY", "BUR"), "HLD"), (("FRA", "AMY", "BER"), "HLD")]
+        assert random_orders(orders) != orders
+
+        orders = [(("FRA", "AMY", "PIC"), "MTO", "PAR"), (("FRA", "AMY", "BUR"), "SUP", ('FRA', 'AMY', "PIC"),"MTO", "PAR"), (("FRA", "AMY", "BER"), "HLD")]
+        assert random_orders(orders) != orders
