@@ -106,6 +106,7 @@ def parse_FCT(msg) -> str:
     except Exception:
         raise ParseError(f"Cant parse FCT msg {msg}")
 
+
 def parse_PRP(msg) -> str:
     """Detaches PRP from main arrangement"""
     if "PRP" not in msg:
