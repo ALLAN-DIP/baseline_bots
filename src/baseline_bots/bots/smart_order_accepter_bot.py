@@ -4,11 +4,11 @@ __email__ = "sanderschulhoff@gmail.com"
 from DAIDE import ALY, PRP
 from diplomacy import Message
 
-from baseline_bots.bots.random_proposer_bot import RandomProposerBot
+from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from baseline_bots.utils import MessagesData, OrdersData, get_other_powers, get_best_orders
 
 
-class SmartOrderAccepterBot(RandomProposerBot):
+class SmartOrderAccepterBot(DipnetBot):
     """
     This bot uses dipnet to generate orders.
 
@@ -34,7 +34,9 @@ class SmartOrderAccepterBot(RandomProposerBot):
         # from dipnet
         return None
 
+    @gen.coroutine
     def __call__(self, rcvd_messages):
+        orders = yield self.brain.get_orders(self.game, self.power_name) 
         messages = self.gen_messages(rcvd_messages)
         best_proposer, best_orders = get_best_orders(self,proposal_order, shared_order)
         return {"messages": messages, "orders": self.gen_orders()}
