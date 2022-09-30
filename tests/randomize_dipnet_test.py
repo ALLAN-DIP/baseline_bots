@@ -1,4 +1,5 @@
-from baseline_bots import randomize_dipnet
+from baseline_bots.randomize_dipnet import random_orders
+import daidepp
 
 class TestUtils:
     def test(self):
@@ -25,3 +26,6 @@ class TestUtils:
 
         orders = [(("FRA", "AMY", "PIC"), "MTO", "PAR"), (("FRA", "AMY", "BUR"), "SUP", ('FRA', 'AMY', "PIC"),"MTO", "PAR"), (("FRA", "AMY", "BER"), "HLD")]
         assert random_orders(orders) != orders
+
+
+print("daide")

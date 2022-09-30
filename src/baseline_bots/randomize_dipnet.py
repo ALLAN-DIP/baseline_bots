@@ -17,6 +17,9 @@ COMBOS = {
     "FLT" : {"FLT": {"WATER", "COAST"}, "AMY": {"COAST"}},
     "AMY" : {"FLT": {"COAST"}, "AMY": {"LAND", "COAST"}}
 }
+
+joiners = {'AND', 'ORR'}
+
 # fmt: on
 
 
