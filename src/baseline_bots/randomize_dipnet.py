@@ -263,8 +263,14 @@ def randomize_joiner(order: str) -> str:
     This function only takes in non-nested ANDs or ORRs and returns a randomized version
     of those orders.
     '''
-    joiner = re.match(r"AND|ORR")
+    joiner = re.match(r"AND|ORR", order)
+
     order_tuple = string_to_tuple(order)
     assert order_tuple and order_tuple[0] in joiners
 
     return (order)
+
+order = "AND ((FRA, AMY, BUR), CTO, BAR, VIA, (NTH, NEA))"
+joiner = re.match(r"[/s+]?AND|ORR", order)
+print(joiner)
+    
