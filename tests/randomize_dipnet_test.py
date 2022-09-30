@@ -26,6 +26,3 @@ class TestUtils:
 
         orders = [(("FRA", "AMY", "PIC"), "MTO", "PAR"), (("FRA", "AMY", "BUR"), "SUP", ('FRA', 'AMY', "PIC"),"MTO", "PAR"), (("FRA", "AMY", "BER"), "HLD")]
         assert random_orders(orders) != orders
-
-
-print("daide")
