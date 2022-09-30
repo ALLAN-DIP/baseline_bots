@@ -312,9 +312,6 @@ def get_state_value(bot, game, power_name):
 @gen.coroutine
 def get_best_orders(bot, proposal_order: dict, shared_order: dict):
     """
-    input: sender power, dipnet_order + incoming proposals {power: [orders]}, shared_orders (info about other power), Diplomacy game
-    output: [orders] a list of orders (with best value)
-                for each xdo order set (max at 6 for now) -> simulate worlds by execute all of shared orders + xdo order set
     input: 
         bot: A bot instance e.g. RealPolitik
         proposal_order: a dictionary of key=power name of proposer, value=list of orders. This can include self base order 
