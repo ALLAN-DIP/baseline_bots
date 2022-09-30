@@ -315,27 +315,57 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
     input: sender power, dipnet_order + incoming proposals {power: [orders]}, shared_orders (info about other power), Diplomacy game
     output: [orders] a list of orders (with best value)
                 for each xdo order set (max at 6 for now) -> simulate worlds by execute all of shared orders + xdo order set
+    input: 
+        bot: A bot instance e.g. RealPolitik
+        proposal_order: a dictionary of key=power name of proposer, value=list of orders. This can include self base order 
+                        i.e. if a bot is RealPolitik, its base order is from DipNet
+        shared_order: a dictionary of key=power name of proposer, value=list of orders. The proposers share info (or orders) about the current turn, 
+                    where we can use these shared order to our current turn in a simulated game to roll out with most correct info.
+    output: 
+        best_proposer: best power that propose the best orders to a bot, this can be itself
+        proposal_order[best_proposer]: the orders from the best proposer
     """
+
+    # initialize state value for each proposal
     state_value = {power: -10000 for power in bot.game.powers}
+
+    # get state value for each proposal
     for proposer, unit_orders in proposal_order.items():
+
+        # if there is a proposal from this power
         if unit_orders:
             proposed = True
+            
+            # simulate game by copying the current one
             simulated_game = bot.game.__deepcopy__(None)
+
+            # censor aggressive orders
             unit_orders = get_non_aggressive_orders(
                 unit_orders, bot.power_name, bot.game
             )
+
+            # set orders as a proposal order
             simulated_game.set_orders(power_name=bot.power_name, orders=unit_orders)
+
+            # consider shared orders in a simulated game
             for other_power, power_orders in shared_order.items():
-                # if they are not sharing any info about their orders then assume that they are dipnet
+
+                # if they are not sharing any info about their orders then assume that they are DipNet-based
                 if not power_orders:
                     power_orders = yield bot.brain.get_orders(game, other_power)
                 simulated_game.set_orders(power_name=other_power, orders=power_orders)
-
+            
+            # process current turn
             simulated_game.process()
+
+            # rollout and get state value
             state_value[proposer] = yield get_state_value(
                 bot, simulated_game, bot.power_name
             )
+
+    # get power name that gives the max state value         
     best_proposer = max(state_value, key=state_value.get)
+
     return best_proposer, proposal_order[best_proposer]
 
 
