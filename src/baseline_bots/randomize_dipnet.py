@@ -112,8 +112,10 @@ def random_convoy_to(order: tuple) -> tuple:
     """
     This takes a convoy order and returns the longest alternate convoy.
     """
+    print(order)
     (_, _, amy_loc), _, province, _, (sea_provinces) = order
-    reversed(sea_provinces)
+    sea_provinces = list(reversed(sea_provinces))
+    print(sea_provinces)
     for i, sea in enumerate(sea_provinces):
         valid = [
             loc
@@ -123,8 +125,7 @@ def random_convoy_to(order: tuple) -> tuple:
             and loc not in ADJACENCY[amy_loc]
         ]
         if valid:
-            route = sea_provinces[i:]
-            reversed(route)
+            route = tuple((reversed(sea_provinces[i:])))
             return (order[0], "CTO", random.choice(valid), "VIA", route)
     return order
 
@@ -263,14 +264,16 @@ def randomize_joiner(order: str) -> str:
     This function only takes in non-nested ANDs or ORRs and returns a randomized version
     of those orders.
     '''
-    joiner = re.match(r"AND|ORR", order)
 
-    order_tuple = string_to_tuple(order)
-    assert order_tuple and order_tuple[0] in joiners
+    joiner = re.sub(r"[\s+]?(AND|ORR)", r"\1", order)
+    just_moves = joiner[3:] # removes the "AND" or "ORR" with all preceding whitespace
+    with_inner_commas = re.sub(r"(.*?[^(])\s+?([^)].*?)", r"\1, \2", just_moves)
+    with_outer_commas = re.sub(r"(\(\(.+\)\)|\(.+?WVE\)) ", r"\1,", with_inner_commas)
+    with_quotes = re.sub(r"([(, ])([A-Z]+)([), ])", r"\1'\2'\3", with_outer_commas)
+    order_list = eval('[' + with_quotes + ']')
+    rand = random_orders(order_list)
+    return rand
 
-    return (order)
-
-order = "AND ((FRA, AMY, BUR), CTO, BAR, VIA, (NTH, NEA))"
-joiner = re.match(r"[/s+]?AND|ORR", order)
-print(joiner)
+order = "AND ((FRA AMY BUR) MTO BEL) ((FRA AMY PIC) CTO FIN VIA (NTH SKA DEN BAL BOT))"
+print(randomize_joiner(order))
     
