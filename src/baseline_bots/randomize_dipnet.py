@@ -6,6 +6,7 @@ an already existing order / list of orders.
 __author__ = "Konstantine Kahadze"
 __email__ = "konstantinekahadze@gmail.com"
 
+import re
 import random
 from typing import List
 
@@ -232,3 +233,38 @@ def random_hold(order: tuple, chance_of_move=0.8) -> tuple:
 
 def random_build(order: tuple) -> tuple:
     return order
+
+def tuple_to_string(order: tuple) -> str:
+    '''
+    Takes in a tuple representing an order and returns a string
+    representing the same order in DAIDE format
+    Ex. tuple_to_string((('FRA', 'AMY', 'BUR'), 'MTO', 'PAR'))  -> "((FRA AMY BUR) MTO PAR)"
+    '''
+    for i, sub in enumerate(order):
+        if isinstance(sub, tuple):
+            return ','.join(str(item) for item in order[:i]) + tuple_to_string(sub) + tuple_to_string(order[i+1:])
+    
+    return ','.join(str(item) for item in order)
+    
+
+def string_to_tuple(orders: str) -> tuple:
+    '''
+    Takes as string representing an order in DAIDE format and 
+    returns a tuple representing the same order.
+    Ex. -> string_to_tuple( "((FRA AMY BUR) MTO PAR)" ) -> (('FRA', 'AMY', 'BUR'), 'MTO', 'PAR')
+    '''
+    with_commas = re.sub(r"(.*?[^(])\s+?([^)].*?)", r"\1, \2",  orders)
+    with_parens = re.sub(r"([(, ])([A-Z]+)([), ])", r"\1'\2'\3", with_commas)
+    return eval(with_parens)
+ 
+
+def randomize_joiner(order: str) -> str:
+    '''
+    This function only takes in non-nested ANDs or ORRs and returns a randomized version
+    of those orders.
+    '''
+    joiner = re.match(r"AND|ORR")
+    order_tuple = string_to_tuple(order)
+    assert order_tuple and order_tuple[0] in joiners
+
+    return (order)
