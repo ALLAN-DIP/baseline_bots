@@ -28,7 +28,7 @@ def string_to_tuple(orders: str) -> Tuple:
     '''
     Takes as string representing an order in DAIDE format and 
     returns a tuple representing the same order.
-    Ex. -> string_to_tuple( "((FRA AMY BUR) MTO PAR)" ) -> (('FRA', 'AMY', 'BUR'), 'MTO', 'PAR')
+    Ex. string_to_tuple( "((FRA AMY BUR) MTO PAR)" ) -> (('FRA', 'AMY', 'BUR'), 'MTO', 'PAR')
     '''
     with_commas = re.sub(r"(.*?[^(])\s+?([^)].*?)", r"\1, \2",  orders) # inserts commas in between tuples and strings
     with_quotes = re.sub(r"([(, ])([A-Z]+)([), ])", r"\1'\2'\3", with_commas) # inserts quotes around strings
