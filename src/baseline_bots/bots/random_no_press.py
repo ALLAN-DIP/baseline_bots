@@ -2,10 +2,7 @@ __author__ = "Kartik Shenoy"
 __email__ = "kartik.shenoyy@gmail.com"
 
 import random
-import sys
 from time import time
-
-sys.path.append("..")
 
 from diplomacy import Message
 from tornado import gen
