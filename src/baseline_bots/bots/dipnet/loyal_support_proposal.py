@@ -4,9 +4,10 @@ __email__ = "kartik.shenoyy@gmail.com"
 import random
 from collections import defaultdict
 
-from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from diplomacy import Message
 from tornado import gen
+
+from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from baseline_bots.utils import (
     ALY,
     ORR,

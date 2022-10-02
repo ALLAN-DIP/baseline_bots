@@ -4,12 +4,11 @@ __email__ = "sanderschulhoff@gmail.com"
 import random
 from typing import List
 
-from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from diplomacy import Game, Message
 from tornado import gen
-from baseline_bots.utils import MessagesData, OrdersData, get_order_tokens
 
-from baseline_bots.utils import get_order_tokens
+from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
+from baseline_bots.utils import MessagesData, OrdersData, get_order_tokens
 
 
 class NoPressDipBot(DipnetBot):
