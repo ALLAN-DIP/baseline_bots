@@ -6,7 +6,7 @@ It would be preferrable to use a real DAIDE parser in prod
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
-from diplomacy_research.models.state_space import get_order_tokens
+# from diplomacy_research.models.state_space import get_order_tokens
 import re
 from collections import defaultdict
 from typing import List
