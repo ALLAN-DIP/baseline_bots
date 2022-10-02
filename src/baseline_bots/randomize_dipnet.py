@@ -126,10 +126,10 @@ def randomize(order: Tuple) -> Tuple:
         "SUP": random_support,
         "CVY": random_convoy,
         "CTO": random_convoy_to,
-        "WVE": {lambda order: order},
-        "BLD": {lambda order: order},
-        "REM": {lambda order: order},
-        "DSB": {lambda order: order},
+        "WVE": lambda order: order,
+        "BLD": lambda order: order,
+        "REM": lambda order: order,
+        "DSB": lambda order: order,
     }
 
     return tag_to_func[tag](order)
