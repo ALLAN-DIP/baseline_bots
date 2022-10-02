@@ -1,42 +1,72 @@
 FROM ubuntu:18.04
-RUN mkdir research
-RUN mkdir baseline_bots
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-RUN apt-get update
-RUN apt-get -y upgrade
-RUN apt-get -y install python3.7
-RUN touch ~/.bash_profile && echo "alias python='/usr/bin/python3.7'" > ~/.bash_profile && source ~/.bash_profile
-RUN apt -y install software-properties-common
-RUN add-apt-repository ppa:deadsnakes/ppa -y
-RUN apt-get -y install git
-RUN apt-get -y install python3-pip
-RUN apt-get install wget
-RUN apt-get install -y build-essential libssl-dev uuid-dev libgpgme11-dev libseccomp-dev pkg-config squashfs-tools
-RUN pip3 install --upgrade setuptools
-RUN git clone https://github.com/SHADE-AI/research.git && cd research && pip3 install -r requirements.txt
-COPY . /research/ 
-RUN cd $HOME
-RUN git clone https://github.com/ALLAN-DIP/baseline_bots.git && cd baseline_bots
-ADD . baseline_bots/
-RUN cd $HOME
-ENV PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp
-ENV PYTHONIOENCODING=utf-8
-ENV LANG=en_CA.UTF-8
-ENV PYTHONUNBUFFERED=1
-ENV PATH=/data/env3.7/bin:$PATH
 
-ENV VERSION=v3.2.0
-ENV GO_VERSION=1.12.5 OS=linux ARCH=amd64
-ENV GOPATH=$HOME/.go
-ENV PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin
-RUN wget -nv https://dl.google.com/go/go$GO_VERSION.$OS-$ARCH.tar.gz && tar -C /usr/local -xzf go$GO_VERSION.$OS-$ARCH.tar.gz && rm -f go$GO_VERSION.$OS-$ARCH.tar.gz && mkdir -p $GOPATH && go get github.com/golang/dep/cmd/dep && mkdir -p $GOPATH/src/github.com/sylabs && cd $GOPATH/src/github.com/sylabs && git clone https://github.com/sylabs/singularity.git && cd singularity && git checkout v3.2.0 &&./mconfig -p /usr/local &&cd ./builddir && make && make install
-
-RUN cd $HOME/baseline_bots
-RUN pip3 install git+https://github.com/trigaten/DAIDE
-
-RUN chmod 777 dip_ui_bot_launcher.py
-ENV PATH=/baseline_bots/:$PATH
-ENV PYTHONPATH=$PYTHONPATH:$ROOT/research/
+# install updates
+RUN apt-get update && \
+apt-get upgrade -y && \
+# install python3
+apt-get install -y python3.7 && \
+# install pip3
+apt-get install -y python3-pip && \
+# install git
+apt-get install -y git 
+# clone dip research repo
+# git clone https://github.com/diplomacy/research.git && \
+# # install requirements
+# pip3 install -r research/requirements.txt && \
+# pip3 install -r research/requirements_dev.txt
 
 
-ENTRYPOINT ["python", "dip_ui_bot_launcher.py","-H","hostname","-p","powers","-B", "bots", "-g", "gameid"]
+
+
+apt-get install -y python
+apt-get install -y python3.7
+apt-get install wget
+
+# https://stackoverflow.com/questions/28852841/install-anaconda-on-ubuntu-or-linux-via-command-line
+wget https://repo.anaconda.com/archive/Anaconda3-2020.07-Linux-x86_64.sh
+bash Anaconda3-2020.07-Linux-x86_64.sh
+bash
+
+# should use conda env with python version 3.6
+then run dip research installs
+
+apt-get install -y python-pip
+
+# seems pip is needed instead of pip3
+
+# /but pip3 is needed for ujson? can use anaconda instead
+apt-get install build-essential python3 python-dev python3-dev
+
+conda install -c anaconda ujson
+
+conda install python=3.6
+
+then run installs
+
+
+# need to install locale for weird utc8 string stuff
+echo "LC_ALL=en_US.UTF-8" >> /etc/environment
+echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+echo "LANG=en_US.UTF-8" > /etc/locale.conf
+locale-gen en_US.UTF-8 # fails
+
+apt-get install locales
+
+locale-gen en_US.UTF-8
+
+
+apt-get install vim
+
+# then run redis/singularities installs but without sudo
+
+
+# install docker, no sudo commands
+https://docs.docker.com/engine/install/ubuntu/
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+echo   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null 
+
+
+service docker start
