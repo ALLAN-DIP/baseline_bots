@@ -8,9 +8,13 @@ on:
 jobs:
   testbuild:
     runs-on: ubuntu-latest
+    
     steps:
     - name: "Checkout"
       uses: actions/checkout@v2
+      
+    - name: "Build Docker Image"
+      run: docker build . --file Dockerfile
 
     - name: "Setup Python"
       uses: actions/setup-python@v2
