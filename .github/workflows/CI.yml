@@ -26,4 +26,4 @@ jobs:
       run: |
         pytest tests/utils_test.py
         pytest tests/bot_tests/bots_test.py
-        pytest tests/bot_tests/randomize_dipnet.py
+        pytest tests/randomize_dipnet.py
