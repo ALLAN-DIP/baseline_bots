@@ -3,11 +3,8 @@
 __authors__ = ["Sander Schulhoff", "Kartik Shenoy"]
 __email__ = "sanderschulhoff@gmail.com"
 
-import sys
-
-sys.path.append("..")
-sys.path.append("../dipnet_press")
 import random
+import sys
 from abc import ABC, abstractmethod
 from typing import List
 
@@ -15,7 +12,7 @@ from diplomacy import Game, Message
 from diplomacy_research.players.benchmark_player import DipNetRLPlayer, DipNetSLPlayer
 
 from baseline_bots.bots.baseline_bot import BaselineMsgRoundBot
-from baseline_bots.src.utils import MessagesData, OrdersData, get_order_tokens
+from baseline_bots.utils import MessagesData, OrdersData, get_order_tokens
 
 
 class DipnetBot(BaselineMsgRoundBot, ABC):

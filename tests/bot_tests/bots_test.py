@@ -8,6 +8,7 @@ from baseline_bots import RandomAllierProposerBot
 from baseline_bots import RandomHonestBot
 from baseline_bots import RandomHonestOrderAccepterBot
 from baseline_bots import LoyalBot
+# from baseline_bots.bots.dipnet.RealPolitik import RealPolitik
 
 class TestRPBot():
     def test(self):
@@ -16,6 +17,8 @@ class TestRPBot():
         print(actions)
         game_play = GamePlay(None, [LoyalBot, RandomProposerBot], 3)
         game_play.play()
+        # game_play = GamePlay(None, [RealPolitik, RandomProposerBot], 3)
+        # game_play.play()
 
 # game_play = GamePlay(None, [PushoverBot, RandomProposerBot], 3)
 # game_play.play()

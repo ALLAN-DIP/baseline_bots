@@ -104,7 +104,17 @@ def parse_FCT(msg) -> str:
     try:
         return msg[5:-1]
     except Exception:
-        raise ParseError(f"Cant parse ORR XDO msg {msg}")
+        raise ParseError(f"Cant parse FCT msg {msg}")
+
+
+def parse_PRP(msg) -> str:
+    """Detaches PRP from main arrangement"""
+    if "PRP" not in msg:
+        raise ParseError("This is not an PRP message")
+    try:
+        return msg[5:-1]
+    except Exception:
+        raise ParseError(f"Cant parse PRP msg {msg}")
 
 
 def parse_orr_xdo(msg: str) -> List[str]:
@@ -297,6 +307,36 @@ def get_state_value(bot, game, power_name):
             )
         game.process()
     return len(game.get_centers(power_name))
+
+
+@gen.coroutine
+def get_best_orders(bot, proposal_order: dict, shared_order: dict):
+    """
+    input: sender power, dipnet_order + incoming proposals {power: [orders]}, shared_orders (info about other power), Diplomacy game
+    output: [orders] a list of orders (with best value)
+                for each xdo order set (max at 6 for now) -> simulate worlds by execute all of shared orders + xdo order set
+    """
+    state_value = {power: -10000 for power in bot.game.powers}
+    for proposer, unit_orders in proposal_order.items():
+        if unit_orders:
+            proposed = True
+            simulated_game = bot.game.__deepcopy__(None)
+            unit_orders = get_non_aggressive_orders(
+                unit_orders, bot.power_name, bot.game
+            )
+            simulated_game.set_orders(power_name=bot.power_name, orders=unit_orders)
+            for other_power, power_orders in shared_order.items():
+                # if they are not sharing any info about their orders then assume that they are dipnet
+                if not power_orders:
+                    power_orders = yield bot.brain.get_orders(game, other_power)
+                simulated_game.set_orders(power_name=other_power, orders=power_orders)
+
+            simulated_game.process()
+            state_value[proposer] = yield get_state_value(
+                bot, simulated_game, bot.power_name
+            )
+    best_proposer = max(state_value, key=state_value.get)
+    return best_proposer, proposal_order[best_proposer]
 
 
 if __name__ == "__main__":
