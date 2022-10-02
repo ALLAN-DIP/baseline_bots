@@ -8,9 +8,13 @@ on:
 jobs:
   testbuild:
     runs-on: ubuntu-latest
+    
     steps:
     - name: "Checkout"
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
+      
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
 
     - name: "Setup Python"
       uses: actions/setup-python@v2
@@ -21,6 +25,10 @@ jobs:
       run: |
         # install diplomacy_research requirements
         git clone https://github.com/diplomacy/research
+        export PYTHONPATH="research/diplomacy_research/players:$PYTHONPATH"
+        echo "HERERERE"
+        echo $(ls)
+        echo $PYTHONPATH
         pip install -r research/requirements.txt
         pip install -r research/requirements_dev.txt
         # install requirements for baseline_bots
