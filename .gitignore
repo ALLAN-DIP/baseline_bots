@@ -9,3 +9,5 @@ _build
 test.ipynb
 build
 .vscode
+./joblogs/*
+./jobs/*
