@@ -12,8 +12,8 @@ RUN apt-get -y install git
 RUN apt-get -y install python3-pip
 RUN apt-get install wget
 RUN apt-get install -y build-essential libssl-dev uuid-dev libgpgme11-dev libseccomp-dev pkg-config squashfs-tools
-RUN pip3 install --upgrade setuptools
-RUN git clone https://github.com/SHADE-AI/research.git && cd research && pip3 install -r requirements.txt
+RUN pip install --upgrade setuptools
+RUN git clone https://github.com/SHADE-AI/research.git && cd research && pip install -r requirements.txt
 COPY . /research/ 
 RUN cd $HOME
 RUN git clone https://github.com/ALLAN-DIP/baseline_bots.git && cd baseline_bots
@@ -32,7 +32,7 @@ ENV PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin
 RUN wget -nv https://dl.google.com/go/go$GO_VERSION.$OS-$ARCH.tar.gz && tar -C /usr/local -xzf go$GO_VERSION.$OS-$ARCH.tar.gz && rm -f go$GO_VERSION.$OS-$ARCH.tar.gz && mkdir -p $GOPATH && go get github.com/golang/dep/cmd/dep && mkdir -p $GOPATH/src/github.com/sylabs && cd $GOPATH/src/github.com/sylabs && git clone https://github.com/sylabs/singularity.git && cd singularity && git checkout v3.2.0 &&./mconfig -p /usr/local &&cd ./builddir && make && make install
 
 RUN cd $HOME/baseline_bots
-RUN pip3 install git+https://github.com/trigaten/DAIDE
+RUN pip install git+https://github.com/trigaten/DAIDE
 
 RUN chmod 777 dip_ui_bot_launcher.py
 ENV PATH=/baseline_bots/:$PATH
