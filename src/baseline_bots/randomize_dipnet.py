@@ -32,11 +32,12 @@ joiners = {'AND', 'ORR'} # This represents the DAIDE commands that join orders w
 
 def random_orders(orders: List) -> List:
     """
-    Takes in a list of orders in the following form:
+    Generates a randomly deviant orders in the same form.
 
-    [(("FRA", "AMY", "PIC"), "MTO", "PAR"), (("FRA", "AMY", "BUR"), "SUP", ('FRA', 'AMY', "PIC"),"MTO", "PAR")]
-
-    and returns randomly deviant orders in the same form.
+    :param orders: A list of DAIDE orders in the following format. [((FRA AMY PIC) MTO BRE), ((FRA AMY PIC) HLD), ((FRA AMY BUR) HLD)]
+    :type orders: List[Tuple]
+    :return: The list of deviant orders
+    :rtype: List[Tuple]
     """
     correspondences = orders_correspondence(
         orders
@@ -83,6 +84,11 @@ def orders_correspondence(orders: List) -> List:
     takes in. Corresponding orders are orders such as (x SUP y MTO LIV)
     and (y MTO LIV). The same principle applies to supported holds and
     convoys.
+
+    :param orders: A list of DAIDE orders in the following format. [((FRA AMY PIC) MTO BRE), ((FRA AMY PIC) HLD), ((FRA AMY BUR) HLD)]
+    :type orders: List[Tuple]
+    :return: The list of all sets (as tuples) of corresponding orders.
+    :rtype: List[Tuple]
     """
     correspondences = []  # a list of tuples represing all correspondences
     for i, order in enumerate(orders):
@@ -103,22 +109,27 @@ def orders_correspondence(orders: List) -> List:
     return correspondences
 
 
-def randomize(order: tuple) -> tuple:
+def randomize(order: Tuple) -> Tuple:
     """
     Takes in an order and returns a randomly deviant verson of it.
+
+    :param order: A DAIDE order
+    :type order: Tuple
+    :return: A deviant order (with some chance of being the same order).
+    :rtype: Tuple
     """
     tag = order[1]
     tag_to_func = {
-        "WVE": {lambda: order},
-        "BLD": random_build,
-        "REM": random_build,
-        "DSB": random_build,
         "MTO": random_movement,
         "RTO": random_movement,
         "HLD": random_hold,
         "SUP": random_support,
         "CVY": random_convoy,
         "CTO": random_convoy_to,
+        "WVE": {lambda order: order},
+        "BLD": {lambda order: order},
+        "REM": {lambda order: order},
+        "DSB": {lambda order: order},
     }
 
     return tag_to_func[tag](order)
@@ -127,6 +138,11 @@ def randomize(order: tuple) -> tuple:
 def random_convoy_to(order: Tuple) -> Tuple:
     """
     This takes a convoy order and returns the longest alternate convoy.
+
+    :param order: A "convoy to" (CTO) order
+    :type order: Tuple
+    :return: A deviant order (with some chance of being the same order).
+    :rtype: Tuple
     """
     (_, _, amy_loc), _, province, _, (sea_provinces) = order
     sea_provinces = list(reversed(sea_provinces))
@@ -155,6 +171,11 @@ def random_convoy(order: Tuple) -> Tuple:
     This takes in the order and produces a convoy to a different destination if it is possible
     and believable. An unbelievable convoy would be one that convoys a unit to a province the
     unit can move to by itself.
+
+    :param order: A "convoy" (CVY) order
+    :type order: Tuple
+    :return: A deviant order (with some chance of being the same order).
+    :rtype: Tuple
     """
     # fmt: off
     tag = order[1]
@@ -173,6 +194,11 @@ def random_convoy(order: Tuple) -> Tuple:
 def random_support(order: Tuple) -> Tuple:
     """
     Takes in a support order and returns a believable but randomized version of it.
+
+    :param order: A "support" (SUP) order
+    :type order: Tuple
+    :return: A deviant order (with some chance of being the same order).
+    :rtype: Tuple
     """
     tag = order[1]
     if len(order) <= 3:  # if it is supporting to hold
@@ -223,6 +249,11 @@ def random_movement(order: Tuple, chance_of_move=0.5):
     """
     Takes in a movement order and returns a similar but randomly different version of it.
     This may turn a movement order into a hold order.
+
+    :param order: A "move to" (MTO) or "retreat to" (RTO) order
+    :type order: Tuple
+    :return: A deviant order (with some chance of being the same order).
+    :rtype: Tuple
     """
     (country, unit_type, loc), tag, dest = order
     if (
@@ -242,7 +273,13 @@ def random_hold(order: Tuple, chance_of_move=0.8) -> Tuple:
     """
     Takes in a hold order and returns a move from the same location or possibly
     the same hold order.
+
+    :param order: A "hold" (HLD) order
+    :type order: Tuple
+    :return: A deviant order (with some chance of being the same order).
+    :rtype: Tuple
     """
+
     if (
         random.random() < chance_of_move
     ):  # The chance of changing the hold to a move is high
@@ -255,15 +292,16 @@ def random_hold(order: Tuple, chance_of_move=0.8) -> Tuple:
         return order
 
 
-def random_build(order: Tuple) -> Tuple:
-    return order
-
-
 def tuple_to_string(order: Tuple) -> str:
     """
     Takes in a tuple representing an order and returns a string
     representing the same order in DAIDE format
     Ex. tuple_to_string((('FRA', 'AMY', 'BUR'), 'MTO', 'PAR'))  -> "(FRA AMY BUR) MTO PAR"
+
+    :param order: A Tuple with the format: (('FRA', 'AMY', 'BUR'), 'MTO', 'PAR')
+    :type order: Tuple
+    :return: The same order converted to a string in DAIDE format: (FRA AMY BUR) MTO PAR
+    :rtype: str
     """
     # fmt: off
     for i, sub in enumerate(order):
@@ -282,7 +320,11 @@ def string_to_tuple(orders: str) -> Tuple:
     """
     Takes as string representing an order in DAIDE format and
     returns a tuple representing the same order.
-    Ex. string_to_tuple( "((FRA AMY BUR) MTO PAR)" ) -> (('FRA', 'AMY', 'BUR'), 'MTO', 'PAR')
+
+    :param order: A string with the format: "((FRA AMY BUR) MTO PAR)"
+    :type order: str
+    :return: A Tuple that captures the structure of the DAIDE syntax through nesting.
+    :rtype: Tuple
     """
     with_commas = re.sub(
         r"(.*?[^(])\s+?([^)].*?)", r"\1, \2", orders
@@ -295,8 +337,13 @@ def string_to_tuple(orders: str) -> Tuple:
 
 def randomize_joiner(order: str) -> str:
     """
-    This function only takes in non-nested ANDs or ORRs and returns a randomized version
+    This function only takes in non-nested ANDs or ORRs (joiners) and returns a randomized version
     of those orders.
+
+    :param order: A string that contains an joiner followed by orders: "AND ((FRA AMY BUR) MTO PAR) ((FRA AMY PIC) HLD)"
+    :type order: str
+    :return: A string in the same format as the input with deviant orders.
+    :rtype: str
     """
     with_joiner = re.sub(r"[\s+]?(AND|ORR)", r"\1", order)
     joiner = with_joiner[0:3]  # extracts the "AND" or "ORR" string
