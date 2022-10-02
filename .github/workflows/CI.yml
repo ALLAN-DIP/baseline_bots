@@ -22,6 +22,8 @@ jobs:
         # install diplomacy_research requirements
         git clone https://github.com/diplomacy/research
         export PYTHONPATH="research/diplomacy_research/players:$PYTHONPATH"
+        echo "HERERERE"
+        echo $PYTHONPATH
         pip install -r research/requirements.txt
         pip install -r research/requirements_dev.txt
         # install requirements for baseline_bots
