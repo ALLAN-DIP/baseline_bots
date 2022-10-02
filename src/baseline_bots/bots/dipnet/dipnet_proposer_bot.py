@@ -11,8 +11,8 @@ from baseline_bots.bots.baseline_bot import BaselineMsgRoundBot
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from DAIDE import ORR, XDO
 from diplomacy import Game, Message
-# from diplomacy_research.players.benchmark_player import DipNetRLPlayer
-# from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
+from diplomacy_research.players.benchmark_player import DipNetRLPlayer
+from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from baseline_bots.stance.stance_extraction import ScoreBasedStance, StanceExtraction
 from tornado import gen
 from baseline_bots.utils import MessagesData, OrdersData, get_order_tokens, get_other_powers
