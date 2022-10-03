@@ -3,7 +3,6 @@ __email__ = "w.wongkamjan@gmail.com"
 
 
 import random
-import sys
 from typing import List
 
 from DAIDE import FCT, ORR, XDO

@@ -3,26 +3,24 @@ __email__ = "w.wongkamjan@gmail.com"
 
 
 import random
-import sys
-
-import ujson as json
-
-sys.path.append("..")
-sys.path.append("../..")
-sys.path.append("../../..")
-sys.path.append("../../../dipnet_press")
-
 from typing import List
 
-from bots.baseline_bot import BaselineMsgRoundBot
-from bots.dipnet.dipnet_bot import DipnetBot
+import ujson as json
 from DAIDE import ORR, XDO
 from diplomacy import Game, Message
 from diplomacy_research.players.benchmark_player import DipNetRLPlayer
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
-from stance.stance_extraction import ScoreBasedStance, StanceExtraction
 from tornado import gen
-from utils import MessagesData, OrdersData, get_order_tokens, get_other_powers
+
+from baseline_bots.bots.baseline_bot import BaselineMsgRoundBot
+from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
+from baseline_bots.stance.stance_extraction import ScoreBasedStance, StanceExtraction
+from baseline_bots.utils import (
+    MessagesData,
+    OrdersData,
+    get_order_tokens,
+    get_other_powers,
+)
 
 
 class ProposerDipBot(DipnetBot):

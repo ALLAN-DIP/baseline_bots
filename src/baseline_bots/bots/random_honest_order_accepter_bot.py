@@ -104,7 +104,7 @@ if __name__ == "__main__":
     # select the first name in the list of powers
     bot_power = powers[0]
     # instantiate proposed random honest bot
-    bot = RandomHonestAccepterBot(bot_power, game)
+    bot = RandomHonestOrderAccepterBot(bot_power, game)
     proposer_1 = RandomAllierProposerBot(powers[1], game)
     proposer_2 = RandomAllierProposerBot(powers[2], game)
 
