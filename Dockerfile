@@ -28,6 +28,8 @@ git clone https://github.com/diplomacy/research.git
 # RUN conda create -n diplomacy python=3.6 anaconda && \ 
 # /bin/bash -c ". activate diplomacy" && \
 RUN ["pip3", "install", "ujson"]
+RUN ls -al
+RUN pwd
 RUN ["pip3", "install", "-r", "requirements.txt"]
 # # need to install locale for weird utc8 string stuff
 # apt-get install locales  && \
