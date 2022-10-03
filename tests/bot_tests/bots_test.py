@@ -16,6 +16,8 @@ class TestRPBot():
         print(actions)
         game_play = GamePlay(None, [LoyalBot, RandomProposerBot], 3)
         game_play.play()
+        # game_play = GamePlay(None, [RealPolitik, RandomProposerBot], 3)
+        # game_play.play()
 
 # game_play = GamePlay(None, [PushoverBot, RandomProposerBot], 3)
 # game_play.play()
