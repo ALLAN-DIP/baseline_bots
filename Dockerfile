@@ -1,20 +1,24 @@
+ARG PYTHON_VERSION
+FROM python:$PYTHON_VERSION
 # how to instructions here: https://containers-at-tacc.readthedocs.io/en/latest/containerize-your-code/build_from_dockerfile.html
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 # install updates
 RUN apt-get update && \
 apt-get upgrade -y && \
 apt-get install -y vim && \
 # install python3
-apt-get install -y python3.6 && \
+apt-get install -y python3.7 && \
 # install pip
-apt-get install -y python-pip && \
+apt-get install -y python3-pip && \
 # install git
 apt-get install -y git && \
 # install wget
 apt-get install -y wget && \
 # clone dip research repo
-git clone https://github.com/diplomacy/research.git
+git clone https://github.com/diplomacy/research.git && \
+git clone https://github.com/ALLAN-DIP/baseline_bots.git && \
+cd baseline_bots && pip3 install -r requirements.txt
 # Install miniconda
 # ENV CONDA_DIR /opt/conda
 # RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
@@ -25,7 +29,7 @@ git clone https://github.com/diplomacy/research.git
 # SHELL ["/bin/bash", "--login", "-c"]
 # RUN conda create -n diplomacy python=3.6 anaconda && \ 
 # /bin/bash -c ". activate diplomacy" && \
-RUN python3 -m pip install ujson
+RUN ["pip3", "install", "ujson"]
 # # need to install locale for weird utc8 string stuff
 # apt-get install locales  && \
 # locale-gen en_US.UTF-8  && \

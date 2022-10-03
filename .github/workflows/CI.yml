@@ -8,35 +8,9 @@ on:
 jobs:
   testbuild:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: "Checkout"
-      uses: actions/checkout@v3
-      
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
-
-    - name: "Setup Python"
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.7'
-
-    - name: "Build"
-      run: |
-        # install diplomacy_research requirements
-        git clone https://github.com/diplomacy/research
-        export PYTHONPATH="research/diplomacy_research/players:$PYTHONPATH"
-        echo "HERERERE"
-        echo $(ls)
-        echo $PYTHONPATH
-        pip install -r research/requirements.txt
-        pip install -r research/requirements_dev.txt
-        # install requirements for baseline_bots
-        pip install -r requirements.txt
-        pip install -e .
-        
-
-    - name: "Run tests"
-      run: |
-        pytest tests/utils_test.py
-        pytest tests/bot_tests/bots_test.py
+      - uses: actions/checkout@v2
+      - run: | 
+           docker build -f Dockerfile \
+             --build-arg PYTHON_VERSION=3.7 \
+             --tag baseline-bots-docker .
