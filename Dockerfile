@@ -8,7 +8,7 @@ RUN apt-get update && \
 apt-get upgrade -y && \
 apt-get install -y vim && \
 # install python3
-apt-get install -y python3.6 && \
+apt-get install -y python3.7 && \
 # install pip
 apt-get install -y python3-pip && \
 # install git
