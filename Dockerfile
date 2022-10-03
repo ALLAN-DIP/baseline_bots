@@ -18,7 +18,8 @@ apt-get install -y wget && \
 # clone dip research repo
 git clone https://github.com/diplomacy/research.git && \
 git clone https://github.com/ALLAN-DIP/baseline_bots.git && \
-cd baseline_bots && pip3 install -r requirements.txt
+cd baseline_bots && pip3 install -r requirements.txt && \
+cd ../research && pip3 install -r requirements.txt && pip3 install -r requirements_dev.txt
 # Install miniconda
 # ENV CONDA_DIR /opt/conda
 # RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
