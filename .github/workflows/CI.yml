@@ -12,5 +12,5 @@ jobs:
       - uses: actions/checkout@v2
       - run: | 
            docker build -f Dockerfile \
-             --build-arg PYTHON_VERSION=3.6 \
+             --build-arg PYTHON_VERSION=3.7 \
              --tag baseline-bots-docker .
