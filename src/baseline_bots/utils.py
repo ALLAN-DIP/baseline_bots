@@ -236,7 +236,98 @@ def get_province_from_order(order):
     else:
         return order_tokens[0]
 
+def dipnet_to_daide_parsing(dipnet_style_order_str, game=Game()):
+    dipnet_order_tokens = get_order_tokens(dipnet_style_order_str)
+    unit_game_mapping = {}
+    for power in list(game.powers.keys()):
+        for unit in game.get_units(power):
+            unit_game_mapping[unit] = power[:3]
+    def daidefy_suborder(dipnet_suborder):
+        """
+        Translates dipnet style units to DAIDE style units
+        E.g. for initial game state
+        A BUD       --> AUS AMY BUD
+        F TRI       --> AUS FLT TRI
+        A PAR       --> FRA AMY PAR
+        A MAR       --> FRA AMY MAR
+        """
+        if dipnet_suborder not in unit_game_mapping:
+            raise f"error from utils.dipnet_to_daide_parsing: unit {dipnet_suborder} not present in unit_game_mapping"
+        return "(" + (" ".join(
+            [
+                unit_game_mapping[dipnet_suborder],
+                "AMY" if dipnet_suborder[0] == "A" else "FLT",
+                dipnet_suborder.split()[-1]
+            ]
+        ) ) + ")"
+    
+    # def bfs_fleets(src, dest, game):
+        
 
+    daide_order = []
+
+    daide_order.append(daidefy_suborder(dipnet_order_tokens[0]))
+    if dipnet_order_tokens[1] == "S":
+        daide_order.append("SUP")
+        daide_order.append(daidefy_suborder(dipnet_order_tokens[2]))
+        if len(dipnet_order_tokens) == 4 and dipnet_order_tokens[3] != "H":
+            daide_order.append("MTO")
+            daide_order.append(dipnet_order_tokens[3].split()[-1])
+        elif len(dipnet_order_tokens) > 4:
+            raise f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
+    elif dipnet_order_tokens[1] == "H":
+        daide_order.append("HLD")
+    else:
+        daide_order.append("MTO")
+        daide_order.append(dipnet_order_tokens[1].split()[-1])
+        if len(dipnet_order_tokens) > 2:
+            raise f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
+
+    return " ".join(daide_order)
+
+def daide_to_dipnet_parsing(daide_style_order_str):
+    def split_into_groups(daide_style_order_str):
+        open_brack = False
+        stack = ""
+        grouped_order = []
+        for char in daide_style_order_str:
+            if (not(open_brack) and char == ' ') or char == ')':
+                if stack:
+                    grouped_order.append(stack)
+                    stack = ""
+                    open_brack = False
+            elif char == '(':
+                open_brack = True
+            else:
+                stack += char
+        if stack:
+            grouped_order.append(stack)
+        return grouped_order
+    daide_style_order_groups = split_into_groups(daide_style_order_str)
+
+    def dipnetify_suborder(suborder):
+        suborder_tokens = suborder.split()
+        return suborder_tokens[1][0] + " " + suborder_tokens[2]
+
+    dipnet_order = []
+    dipnet_order.append(dipnetify_suborder(daide_style_order_groups[0]))
+    if daide_style_order_groups[1] == "SUP":
+        dipnet_order.append("S")
+        dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2]))
+        if len(daide_style_order_groups) == 5 and daide_style_order_groups[3] == "MTO":
+            dipnet_order.append("-")
+            dipnet_order.append(daide_style_order_groups[4])
+        elif len(daide_style_order_groups) > 5:
+            raise f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
+    elif daide_style_order_groups[1] == "HLD":
+        dipnet_order.append("H")
+    else:
+        dipnet_order.append("-")
+        dipnet_order.append(daide_style_order_groups[2])
+        if len(daide_style_order_groups) > 3:
+            raise f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
+
+    return " ".join(dipnet_order)
 class MessagesData:
     def __init__(self):
         self.messages = []

@@ -1,4 +1,4 @@
-from baseline_bots.utils import OrdersData, sort_messages_by_most_recent
+from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, dipnet_to_daide_parsing, daide_to_dipnet_parsing
 from diplomacy import Game, Message
 
 class TestUtils:
@@ -42,3 +42,17 @@ class TestUtils:
         msgs = [msg_obj2, msg_obj1]
 
         assert sort_messages_by_most_recent(msgs)[0].message == "HELLO"
+
+        # Tests for utils.dipnet_to_daide_parsing
+        PARSING_TEST_CASES = [
+            ("A PAR H", "(FRA AMY PAR) HLD"),
+            ("A PAR - MAR", "(FRA AMY PAR) MTO MAR"),
+            ("A PAR R MAR", "(FRA AMY PAR) MTO MAR"),
+            ("A BUD S F TRI", "(AUS AMY BUD) SUP (AUS FLT TRI)"),
+            ("A PAR S A MAR - BUR", "(FRA AMY PAR) SUP (FRA AMY MAR) MTO BUR"),
+        ]
+
+        for tc_ip, tc_op in PARSING_TEST_CASES:
+            print(tc_ip + " --> " + tc_op)
+            assert dipnet_to_daide_parsing(tc_ip) == tc_op
+            assert daide_to_dipnet_parsing(tc_op) == tc_ip.replace(" R ", " - "), daide_to_dipnet_parsing(tc_op)
