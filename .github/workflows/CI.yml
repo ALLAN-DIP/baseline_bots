@@ -40,3 +40,21 @@ jobs:
       run: |
         pytest tests/utils_test.py
         pytest tests/bot_tests/bots_test.py
+
+
+name: CI test
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main, test_CI ]
+
+jobs:
+  testbuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: | 
+           docker build -f Dockerfile \
+             --build-arg PYTHON_VERSION=3.6 \
+             --tag baseline-bots-docker

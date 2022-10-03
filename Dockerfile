@@ -1,3 +1,5 @@
+ARG PYTHON_VERSION
+FROM python:$PYTHON_VERSION
 # how to instructions here: https://containers-at-tacc.readthedocs.io/en/latest/containerize-your-code/build_from_dockerfile.html
 FROM ubuntu:18.04
 
@@ -8,7 +10,7 @@ apt-get install -y vim && \
 # install python3
 apt-get install -y python3.6 && \
 # install pip
-apt-get install -y python-pip && \
+apt-get install -y python3-pip && \
 # install git
 apt-get install -y git && \
 # install wget
@@ -25,7 +27,8 @@ git clone https://github.com/diplomacy/research.git
 # SHELL ["/bin/bash", "--login", "-c"]
 # RUN conda create -n diplomacy python=3.6 anaconda && \ 
 # /bin/bash -c ". activate diplomacy" && \
-RUN python3 -m pip install ujson
+RUN ["pip3", "install", "ujson"]
+RUN ["pip3", "install", "-r", "requirements.txt"]
 # # need to install locale for weird utc8 string stuff
 # apt-get install locales  && \
 # locale-gen en_US.UTF-8  && \
