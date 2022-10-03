@@ -13,4 +13,4 @@ jobs:
       - run: | 
            docker build -f Dockerfile \
              --build-arg PYTHON_VERSION=3.6 \
-             --tag baseline-bots-docker
+             --tag baseline-bots-docker .
