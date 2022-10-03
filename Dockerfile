@@ -1,7 +1,7 @@
 ARG PYTHON_VERSION
 FROM python:$PYTHON_VERSION
 # how to instructions here: https://containers-at-tacc.readthedocs.io/en/latest/containerize-your-code/build_from_dockerfile.html
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 # install updates
 RUN apt-get update && \
