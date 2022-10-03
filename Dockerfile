@@ -16,8 +16,8 @@ apt-get install -y git && \
 # install wget
 apt-get install -y wget && \
 # clone dip research repo
-git clone https://github.com/diplomacy/research.git \
-git clone https://github.com/ALLAN-DIP/baseline_bots.git \
+git clone https://github.com/diplomacy/research.git && \
+git clone https://github.com/ALLAN-DIP/baseline_bots.git && \
 cd baseline_bots && pip3 install -r requirements.txt
 # Install miniconda
 # ENV CONDA_DIR /opt/conda
