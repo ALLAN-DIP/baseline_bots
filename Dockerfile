@@ -28,6 +28,7 @@ git clone https://github.com/diplomacy/research.git
 # RUN conda create -n diplomacy python=3.6 anaconda && \ 
 # /bin/bash -c ". activate diplomacy" && \
 RUN ["pip3", "install", "ujson"]
+RUN cd usr
 RUN ls -al
 RUN pwd
 RUN ["pip3", "install", "-r", "requirements.txt"]
