@@ -16,22 +16,22 @@ apt-get install -y wget && \
 # clone dip research repo
 git clone https://github.com/diplomacy/research.git
 # Install miniconda
-ENV CONDA_DIR /opt/conda
-RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
-/bin/bash ~/miniconda.sh -b -p /opt/conda
-# Put conda in path so we can use conda activate
-ENV PATH=$CONDA_DIR/bin:$PATH
+# ENV CONDA_DIR /opt/conda
+# RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
+# /bin/bash ~/miniconda.sh -b -p /opt/conda
+# # Put conda in path so we can use conda activate
+# ENV PATH=$CONDA_DIR/bin:$PATH
 # needed for conda activate: https://kevalnagda.github.io/conda-docker-tutorial
 # SHELL ["/bin/bash", "--login", "-c"]
 # RUN conda create -n diplomacy python=3.6 anaconda && \ 
 # /bin/bash -c ". activate diplomacy" && \
-RUN python -m pip install ujson && \
+RUN python3 -m pip install ujson
 # # need to install locale for weird utc8 string stuff
-apt-get install locales  && \
-locale-gen en_US.UTF-8  && \
-pip install tensorflow && \
-pip install -r research/requirements.txt && \
-pip install -r research/requirements_dev.txt
+# apt-get install locales  && \
+# locale-gen en_US.UTF-8  && \
+# pip install tensorflow && \
+# pip install -r research/requirements.txt && \
+# pip install -r research/requirements_dev.txt
 
 # should use conda env with python version 3.6
 # then run dip research installs
