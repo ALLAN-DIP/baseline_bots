@@ -29,6 +29,7 @@ COMBOS = {
 joiners = {'AND', 'ORR'} # This represents the DAIDE commands that join orders which are handled in this file
 # fmt: on
 
+
 def randomize_order(order: str) -> str:
     """
     This function only takes in non-nested ANDs or ORRs (joiners) and returns a randomized version
@@ -364,4 +365,3 @@ def string_to_tuple(orders: str) -> Tuple:
         r"([(, ])([A-Z]+)([), ])", r"\1'\2'\3", with_commas
     )  # inserts quotes around strings
     return eval(with_quotes)
-
