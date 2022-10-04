@@ -264,17 +264,24 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> L
             ]
         ) ) + ")"
     
-    if type(dipnet_style_order_strs) == list:
+    if type(dipnet_style_order_strs) != list:
         dipnet_style_order_strs = [dipnet_style_order_strs]
     
     convoy_map = defaultdict(list)
+    dipnet_style_order_strs_tokens = [None for _ in range(len(dipnet_style_order_strs))]
+
+    # Convert strings to order tokens and store a dictionary mapping of armies to be convoyed and fleets helping to convoy
     for i in range(len(dipnet_style_order_strs)):
-        dipnet_style_order_strs[i] = get_order_tokens(dipnet_style_order_strs[i])
-        if dipnet_style_order_strs[i][1] == 'C':
+        dipnet_style_order_strs_tokens[i] = get_order_tokens(dipnet_style_order_strs[i])
+        if dipnet_style_order_strs_tokens[i][1] == 'C':
             convoy_map[dipnet_style_order_strs[i][2] + dipnet_style_order_strs[i][3]].append(dipnet_style_order_strs[i][0].split()[-1])
     
     daide_orders = []
-    for dipnet_order_tokens in dipnet_style_order_strs:
+
+    # For each order
+    for dipnet_order_tokens in dipnet_style_order_strs_tokens:
+
+        # Create unit to power mapping for constructing DAIDE tokens
         unit_game_mapping = {}
         for power in list(game.powers.keys()):
             for unit in game.get_units(power):
@@ -284,8 +291,10 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> L
 
         daide_order = []
 
+        # Daidefy and add source unit as it is
         daide_order.append(daidefy_suborder(dipnet_order_tokens[0]))
         if dipnet_order_tokens[1] == "S":
+            # Support orders
             daide_order.append("SUP")
             daide_order.append(daidefy_suborder(dipnet_order_tokens[2]))
             if len(dipnet_order_tokens) == 4 and dipnet_order_tokens[3] != "H":
@@ -294,13 +303,16 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> L
             elif len(dipnet_order_tokens) > 4:
                 raise f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
         elif dipnet_order_tokens[1] == "H":
+            # Hold orders
             daide_order.append("HLD")
         elif dipnet_order_tokens[1] == "C":
+            # Convoy orders
             daide_order.append("CVY")
             daide_order.append(daidefy_suborder(dipnet_order_tokens[2]))
             daide_order.append("CTO")
             daide_order.append(dipnet_order_tokens[3].split()[-1])
-        elif dipnet_order_tokens[2] == "VIA":
+        elif len(dipnet_order_tokens) >= 3 and dipnet_order_tokens[2] == "VIA":
+            # VIA/CTO orders
             daide_order.append("CTO")
             daide_order.append(dipnet_order_tokens[1].split()[-1])
             daide_order.append("VIA")
@@ -309,11 +321,12 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> L
             else:
                 print(f"unexpected situation at utils.dipnet_to_daide_parsing. Found order {dipnet_order_tokens} which doesn't have convoying fleet in its own set of orders")
         else:
+            # Move orders
             daide_order.append("MTO")
             daide_order.append(dipnet_order_tokens[1].split()[-1])
             if len(dipnet_order_tokens) > 2:
                 raise f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
-        daide_order.append(" ".join(daide_order))
+        daide_orders.append(" ".join(daide_order))
 
     return daide_orders
 
@@ -358,8 +371,11 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> str:
         return suborder_tokens[1][0] + " " + suborder_tokens[2]
 
     dipnet_order = []
+
+    # Dipnetify source unit
     dipnet_order.append(dipnetify_suborder(daide_style_order_groups[0]))
     if daide_style_order_groups[1] == "SUP":
+        # Support order
         dipnet_order.append("S")
         dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2]))
         if len(daide_style_order_groups) == 5 and daide_style_order_groups[3] == "MTO":
@@ -368,21 +384,27 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> str:
         elif len(daide_style_order_groups) > 5:
             raise f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
     elif daide_style_order_groups[1] == "HLD":
+        # Hold order
         dipnet_order.append("H")
     elif daide_style_order_groups[1] == "CTO":
+        # CTO order
         dipnet_order.append("-")
         dipnet_order.append(daide_style_order_groups[2])
         dipnet_order.append("VIA")
     elif daide_style_order_groups[1] == "CVY":
+        # Convoy order
         dipnet_order.append("C")
         dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2]))
         dipnet_order.append("CTO")
         dipnet_order.append(daide_style_order_groups[4])
-    else:
+    elif daide_style_order_groups[1] == "MTO":
+        # Move orders
         dipnet_order.append("-")
         dipnet_order.append(daide_style_order_groups[2])
         if len(daide_style_order_groups) > 3:
             raise f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
+    else:
+        raise f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
 
     return " ".join(dipnet_order)
 class MessagesData:
