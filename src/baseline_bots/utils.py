@@ -236,7 +236,7 @@ def get_province_from_order(order):
     else:
         return order_tokens[0]
 
-def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game):
+def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> List[str]:
     """
     Convert dipnet style single order to DAIDE style order. Needs game instance to determine the powers owning the units
     * dipnet_style_order_strs: dipnet style list of orders to be converted to DAIDE
@@ -245,7 +245,7 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game):
     Returns:
     * DAIDE style order string
     """
-    def daidefy_suborder(dipnet_suborder):
+    def daidefy_suborder(dipnet_suborder: str) -> str:
         """
         Translates dipnet style units to DAIDE style units
         E.g. for initial game state
@@ -318,7 +318,7 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game):
     return daide_orders
 
 
-def daide_to_dipnet_parsing(daide_style_order_str):
+def daide_to_dipnet_parsing(daide_style_order_str: str) -> str:
     """
     Convert DAIDE style single order to dipnet style order
     * daide_style_order_str: DAIDE style string to be converted to dipnet style
@@ -326,7 +326,7 @@ def daide_to_dipnet_parsing(daide_style_order_str):
     Returns:
     * dipnet style order string
     """
-    def split_into_groups(daide_style_order_str):
+    def split_into_groups(daide_style_order_str: str) -> List[str]:
         """
         Split the string based on parenthesis or spaces
         E.g.
@@ -350,7 +350,7 @@ def daide_to_dipnet_parsing(daide_style_order_str):
         return grouped_order
     daide_style_order_groups = split_into_groups(daide_style_order_str)
 
-    def dipnetify_suborder(suborder):
+    def dipnetify_suborder(suborder: str) -> str:
         """
         Translates DAIDE style units to dipnet style units
         """
