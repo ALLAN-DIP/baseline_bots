@@ -7,7 +7,7 @@ from DAIDE import FCT, ORR, XDO
 from diplomacy import Message
 from stance_vector import ScoreBasedStance
 
-from baseline_bots.bots.random_proposer_bot import RandomProposerBot
+from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from baseline_bots.utils import (
     MessagesData,
     OrdersData,
@@ -18,7 +18,7 @@ from baseline_bots.utils import (
 )
 
 
-class SmartOrderAccepterBot(RandomProposerBot):
+class SmartOrderAccepterBot(DipnetBot):
     """
     This bot uses dipnet to generate orders.
 
@@ -81,8 +81,17 @@ class SmartOrderAccepterBot(RandomProposerBot):
         # compute pos/neg stance on other bots using Tony's stance vector
         self.stance.get_stance()
 
+        # get dipnet order
+        orders = yield self.brain.get_orders(self.game, self.power_name)
+
         # extract only the proposed orders from the messages the bot has just received
         prp_orders = self.get_proposals(rcvd_messages)
+
+        # include base order to prp_orders.
+        # This is to avoid having double calculation for the best list of orders between (self-generated) base orders vs proposal orders
+        # e.g. if we are playing as ENG and the base orders are generated from DipNet, we would want to consider
+        # if there is any better proposal orders that has a state value more than ours, then do it. If not, just follow the base orders.
+        prp_orders[bot.power_name] = orders
 
         best_proposer, best_orders = get_best_orders(self, prp_orders, shared_order)
 
