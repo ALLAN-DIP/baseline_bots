@@ -6,6 +6,8 @@ from diplomacy_research.players.benchmark_player import DipNetSLPlayer
 class TestUtils:
     def test_dipnet(self):
         player = DipNetSLPlayer()
+        # intentionally fail
+        print(0/0)
         
     def test(self):
         EXAMPLE_ORDER = 'A VIE S A BUD - GAL'
