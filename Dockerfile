@@ -10,5 +10,6 @@ apt-get install -y wget && \
 git clone https://github.com/diplomacy/research.git && \
 git clone https://github.com/ALLAN-DIP/baseline_bots.git && \
 pip3 install -r baseline_bots/requirements.txt
-RUN pip3 install -r research/requirements.txt && \
-pip3 install -r research/requirements_dev.txt
+RUN cd research && \ 
+pip3 install -r requirements.txt && \
+pip3 install -r requirements_dev.txt
