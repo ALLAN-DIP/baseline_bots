@@ -1,13 +1,10 @@
-ARG PYTHON_VERSION
-FROM python:$PYTHON_VERSION
-# how to instructions here: https://containers-at-tacc.readthedocs.io/en/latest/containerize-your-code/build_from_dockerfile.html
 FROM ubuntu:20.04
 
 # install updates
 RUN apt-get update && \
 apt-get upgrade -y && \
 apt-get install -y vim && \
-apt-get install -y build-essential python3 python-dev python3-dev python3-pip  && \
+apt-get install -y build-essential python3.6 python-dev python3-dev python3-pip  && \
 # install python3
 #apt-get install -y python3.6 && \
 # install pip
