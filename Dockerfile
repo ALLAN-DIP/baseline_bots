@@ -4,7 +4,7 @@ FROM ubuntu:20.04
 RUN apt list --installed && apt-get update && \
 apt-get upgrade -y && \
 apt-get install -y python3.6 python3-dev python3-pip
-RUN python --version
+RUN python3 --version
 # apt-get install -y python3.6 python-dev python3-dev python3-pip && \
 # apt-get install -y git && \
 # apt-get install -y wget && \
