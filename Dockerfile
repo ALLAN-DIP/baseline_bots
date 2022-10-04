@@ -1,8 +1,7 @@
-FROM ubuntu:20.04
+FROM ubuntu:18.04
 
 # install updates
 RUN apt-get update -y && \
-apt-get purge -y python3.8 && \
 apt-get install -y python3.6 python3-pip
 RUN python3 --version
 # apt-get install -y python3.6 python-dev python3-dev python3-pip && \
