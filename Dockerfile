@@ -14,6 +14,6 @@ RUN cd research && \
 pip3 install -r requirements.txt && \
 pip3 install -r requirements_dev.txt
 RUN cd ../baseline_bots && \
-pytest tests/utils_test.py && \
-pytest tests/bot_tests/bots_test.py && \
-pytest tests/randomize_order_test.py
+python3 -m pytest tests/utils_test.py && \
+python3 -m pytest tests/bot_tests/bots_test.py && \
+python3 -m pytest tests/randomize_order_test.py
