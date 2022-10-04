@@ -15,6 +15,8 @@ from baseline_bots.utils import (
     get_other_powers,
     parse_orr_xdo,
     parse_PRP,
+    dipnet_to_daide_parsing,
+    daide_to_dipnet_parsing
 )
 
 
@@ -48,8 +50,8 @@ class SmartOrderAccepterBot(DipnetBot):
         proposals = {}
         for order_msg in order_msgs:
             try:
-                proposals[order_msg.sender] = parse_PRP(
-                    parse_orr_xdo(order_msg.message)
+                proposals[order_msg.sender] = (
+                    [daide_to_dipnet_parsing(order) for order in parse_orr_xdo(parse_PRP(order_msg.message))]
                 )
             except Exception as e:
                 print(e)
@@ -64,7 +66,7 @@ class SmartOrderAccepterBot(DipnetBot):
         Add messages to be sent to powers with positive stance.
         These messages would contain factual information about the orders that current power would execute in current round
         """
-        orders_decided = FCT(ORR(XDO(orders_list)))
+        orders_decided = FCT(ORR(XDO(dipnet_to_daide_parsing(orders_list))))
         for pow in self.stance.stance[self.power_name]:
             if self.stance.stance[self.power_name][pow] > 0:
                 msgs_data.add_message(pow, str(orders_decided))
