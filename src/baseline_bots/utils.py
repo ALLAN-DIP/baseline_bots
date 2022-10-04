@@ -271,7 +271,7 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> L
     for i in range(len(dipnet_style_order_strs)):
         dipnet_style_order_strs_tokens[i] = get_order_tokens(dipnet_style_order_strs[i])
         if dipnet_style_order_strs_tokens[i][1] == 'C':
-            convoy_map[dipnet_style_order_strs[i][2] + dipnet_style_order_strs[i][3]].append(dipnet_style_order_strs[i][0].split()[-1])
+            convoy_map[dipnet_style_order_strs_tokens[i][2] + dipnet_style_order_strs_tokens[i][3]].append(dipnet_style_order_strs_tokens[i][0].split()[-1])
     
     daide_orders = []
 
@@ -390,7 +390,7 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> str:
         # Convoy order
         dipnet_order.append("C")
         dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2]))
-        dipnet_order.append("CTO")
+        dipnet_order.append("-")
         dipnet_order.append(daide_style_order_groups[4])
     elif daide_style_order_groups[1] == "MTO":
         # Move orders
