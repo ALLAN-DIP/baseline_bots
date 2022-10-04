@@ -12,7 +12,7 @@ git clone https://github.com/ALLAN-DIP/baseline_bots.git && \
 pip3 install -r baseline_bots/requirements.txt
 RUN cd research && \ 
 pip3 install -r requirements.txt && \
-pip3 install -r requirements_dev.txt && \
+pip3 install -r requirements_dev.txt
 RUN cd ../baseline_bots && \
 pip3 install -e . && \
 python3 -m pytest tests/utils_test.py && \
