@@ -239,11 +239,10 @@ def get_province_from_order(order):
 def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> List[str]:
     """
     Convert dipnet style single order to DAIDE style order. Needs game instance to determine the powers owning the units
-    * dipnet_style_order_strs: dipnet style list of orders to be converted to DAIDE
-    * game: game instance
 
-    Returns:
-    * DAIDE style order string
+    :param dipnet_style_order_strs: dipnet style list of orders to be converted to DAIDE
+    :param game: game instance
+    :return: DAIDE style order string
     """
     def daidefy_suborder(dipnet_suborder: str) -> str:
         """
@@ -253,6 +252,9 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> L
         F TRI       --> AUS FLT TRI
         A PAR       --> FRA AMY PAR
         A MAR       --> FRA AMY MAR
+
+        :param dipnet_suborder: dipnet suborder to be encoded
+        :return: DAIDE-style suborder
         """
         if dipnet_suborder not in unit_game_mapping:
             raise f"error from utils.dipnet_to_daide_parsing: unit {dipnet_suborder} not present in unit_game_mapping"
@@ -329,16 +331,18 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> L
 def daide_to_dipnet_parsing(daide_style_order_str: str) -> str:
     """
     Convert DAIDE style single order to dipnet style order
-    * daide_style_order_str: DAIDE style string to be converted to dipnet style
 
-    Returns:
-    * dipnet style order string
+    :param daide_style_order_str: DAIDE style string to be converted to dipnet style
+    :return: dipnet style order string
     """
     def split_into_groups(daide_style_order_str: str) -> List[str]:
         """
         Split the string based on parenthesis or spaces
         E.g.
         "(FRA AMY PAR) SUP (FRA AMY MAR) MTO BUR" --> "(FRA AMY PAR)", "SUP", "(FRA AMY MAR)", "MTO", "BUR"
+
+        :param daide_style_order_str: DAIDE style string
+        :return: list of strings containing components of the order which makes it easy to convert to dipnet-style order
         """
         open_brack = False
         stack = ""
@@ -361,6 +365,9 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> str:
     def dipnetify_suborder(suborder: str) -> str:
         """
         Translates DAIDE style units to dipnet style units
+
+        :param suborder: DAIDE-style suborder to be encoded
+        :return: dipnet suborder
         """
         suborder_tokens = suborder.split()
         return suborder_tokens[1][0] + " " + suborder_tokens[2]
@@ -402,6 +409,7 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> str:
         raise f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
 
     return " ".join(dipnet_order)
+    
 class MessagesData:
     def __init__(self):
         self.messages = []
