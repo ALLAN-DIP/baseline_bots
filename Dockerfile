@@ -33,9 +33,9 @@ SHELL ["/bin/bash", "--login", "-c"]
 RUN conda create -n diplomacy python=3.6 anaconda && \ 
 /bin/bash -c ". activate diplomacy" && \
 # # need to install locale for weird utc8 string stuff
+conda install -c conda-forge tensorflow=1.13.1 && \
 apt-get install locales  && \
-locale-gen en_US.UTF-8  && \
-pip3 install tensorflow && \
+locale-gen en_US.UTF-8 && \
 pip3 install -r research/requirements.txt && \
 pip3 install -r research/requirements_dev.txt
 
