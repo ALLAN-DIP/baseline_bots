@@ -236,20 +236,15 @@ def get_province_from_order(order):
     else:
         return order_tokens[0]
 
-def dipnet_to_daide_parsing(dipnet_style_order_str, game=Game()):
+def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game):
     """
     Convert dipnet style single order to DAIDE style order. Needs game instance to determine the powers owning the units
-    * dipnet_style_order_str: dipnet style string to be converted to DAIDE
+    * dipnet_style_order_strs: dipnet style list of orders to be converted to DAIDE
     * game: game instance
 
     Returns:
     * DAIDE style order string
     """
-    dipnet_order_tokens = get_order_tokens(dipnet_style_order_str)
-    unit_game_mapping = {}
-    for power in list(game.powers.keys()):
-        for unit in game.get_units(power):
-            unit_game_mapping[unit] = power[:3]
     def daidefy_suborder(dipnet_suborder):
         """
         Translates dipnet style units to DAIDE style units
@@ -269,29 +264,59 @@ def dipnet_to_daide_parsing(dipnet_style_order_str, game=Game()):
             ]
         ) ) + ")"
     
-    # def bfs_fleets(src, dest, game):
-        
+    if type(dipnet_style_order_strs) == list:
+        dipnet_style_order_strs = [dipnet_style_order_strs]
+    
+    convoy_map = defaultdict(list)
+    for i in range(len(dipnet_style_order_strs)):
+        dipnet_style_order_strs[i] = get_order_tokens(dipnet_style_order_strs[i])
+        if dipnet_style_order_strs[i][1] == 'C':
+            convoy_map[dipnet_style_order_strs[i][2] + dipnet_style_order_strs[i][3]].append(dipnet_style_order_strs[i][0].split()[-1])
+    
+    daide_orders = []
+    for dipnet_order_tokens in dipnet_style_order_strs:
+        unit_game_mapping = {}
+        for power in list(game.powers.keys()):
+            for unit in game.get_units(power):
+                unit_game_mapping[unit] = power[:3]
+        # def bfs_fleets(src, dest, game):
+            
 
-    daide_order = []
+        daide_order = []
 
-    daide_order.append(daidefy_suborder(dipnet_order_tokens[0]))
-    if dipnet_order_tokens[1] == "S":
-        daide_order.append("SUP")
-        daide_order.append(daidefy_suborder(dipnet_order_tokens[2]))
-        if len(dipnet_order_tokens) == 4 and dipnet_order_tokens[3] != "H":
-            daide_order.append("MTO")
+        daide_order.append(daidefy_suborder(dipnet_order_tokens[0]))
+        if dipnet_order_tokens[1] == "S":
+            daide_order.append("SUP")
+            daide_order.append(daidefy_suborder(dipnet_order_tokens[2]))
+            if len(dipnet_order_tokens) == 4 and dipnet_order_tokens[3] != "H":
+                daide_order.append("MTO")
+                daide_order.append(dipnet_order_tokens[3].split()[-1])
+            elif len(dipnet_order_tokens) > 4:
+                raise f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
+        elif dipnet_order_tokens[1] == "H":
+            daide_order.append("HLD")
+        elif dipnet_order_tokens[1] == "C":
+            daide_order.append("CVY")
+            daide_order.append(daidefy_suborder(dipnet_order_tokens[2]))
+            daide_order.append("CTO")
             daide_order.append(dipnet_order_tokens[3].split()[-1])
-        elif len(dipnet_order_tokens) > 4:
-            raise f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
-    elif dipnet_order_tokens[1] == "H":
-        daide_order.append("HLD")
-    else:
-        daide_order.append("MTO")
-        daide_order.append(dipnet_order_tokens[1].split()[-1])
-        if len(dipnet_order_tokens) > 2:
-            raise f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
+        elif dipnet_order_tokens[2] == "VIA":
+            daide_order.append("CTO")
+            daide_order.append(dipnet_order_tokens[1].split()[-1])
+            daide_order.append("VIA")
+            if dipnet_order_tokens[0] + dipnet_order_tokens[1] in convoy_map:
+                daide_order.append(f"({' '.join(convoy_map[dipnet_order_tokens[0] + dipnet_order_tokens[1]])})")
+            else:
+                print(f"unexpected situation at utils.dipnet_to_daide_parsing. Found order {dipnet_order_tokens} which doesn't have convoying fleet in its own set of orders")
+        else:
+            daide_order.append("MTO")
+            daide_order.append(dipnet_order_tokens[1].split()[-1])
+            if len(dipnet_order_tokens) > 2:
+                raise f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
+        daide_order.append(" ".join(daide_order))
 
-    return " ".join(daide_order)
+    return daide_orders
+
 
 def daide_to_dipnet_parsing(daide_style_order_str):
     """
@@ -344,6 +369,15 @@ def daide_to_dipnet_parsing(daide_style_order_str):
             raise f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
     elif daide_style_order_groups[1] == "HLD":
         dipnet_order.append("H")
+    elif daide_style_order_groups[1] == "CTO":
+        dipnet_order.append("-")
+        dipnet_order.append(daide_style_order_groups[2])
+        dipnet_order.append("VIA")
+    elif daide_style_order_groups[1] == "CVY":
+        dipnet_order.append("C")
+        dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2]))
+        dipnet_order.append("CTO")
+        dipnet_order.append(daide_style_order_groups[4])
     else:
         dipnet_order.append("-")
         dipnet_order.append(daide_style_order_groups[2])
