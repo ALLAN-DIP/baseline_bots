@@ -2,9 +2,6 @@ __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
 import random
-import sys
-
-sys.path.append("..")
 
 from DAIDE import ORR, XDO
 from diplomacy import Message

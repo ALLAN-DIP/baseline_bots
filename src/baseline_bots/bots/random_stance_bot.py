@@ -8,7 +8,6 @@ from diplomacy import Message
 
 from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.utils import (
-    BotReturnData,
     get_non_aggressive_orders,
     get_other_powers,
     parse_orr_xdo,
