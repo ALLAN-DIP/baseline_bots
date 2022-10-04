@@ -5,6 +5,7 @@ RUN apt-get update -y && \
 apt-get upgrade -y && \
 apt-get install -y python3.7 python3-pip && \
 cd /usr/bin && ls -lrth python* && \
+unlink python && ln -s /usr/bin/python3.7 python3 && \
 python3 --version
 # RUN pip3 install --upgrade pip && \
 # apt-get install -y git && \
