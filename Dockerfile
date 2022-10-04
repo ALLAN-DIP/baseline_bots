@@ -8,7 +8,7 @@ RUN apt-get update && \
 apt-get upgrade -y && \
 apt-get install -y vim && \
 # install python3
-apt-get install -y python3.7 && \
+apt-get install -y python3.6 && \
 # install pip
 apt-get install -y python3-pip && \
 # install git
@@ -19,7 +19,7 @@ apt-get install -y wget && \
 git clone https://github.com/diplomacy/research.git && \
 git clone https://github.com/ALLAN-DIP/baseline_bots.git && \
 cd baseline_bots && pip3 install -r requirements.txt && \
-cd ../research && pip3 install -r requirements.txt && pip3 install -r requirements_dev.txt
+cd ../research && pip3 install -r requirements_dev.txt
 # Install miniconda
 # ENV CONDA_DIR /opt/conda
 # RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
@@ -30,7 +30,6 @@ cd ../research && pip3 install -r requirements.txt && pip3 install -r requiremen
 # SHELL ["/bin/bash", "--login", "-c"]
 # RUN conda create -n diplomacy python=3.6 anaconda && \ 
 # /bin/bash -c ". activate diplomacy" && \
-RUN ["pip3", "install", "ujson"]
 # # need to install locale for weird utc8 string stuff
 # apt-get install locales  && \
 # locale-gen en_US.UTF-8  && \
