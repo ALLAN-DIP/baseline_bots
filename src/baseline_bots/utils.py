@@ -264,9 +264,6 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> L
             ]
         ) ) + ")"
     
-    if type(dipnet_style_order_strs) != list:
-        dipnet_style_order_strs = [dipnet_style_order_strs]
-    
     convoy_map = defaultdict(list)
     dipnet_style_order_strs_tokens = [None for _ in range(len(dipnet_style_order_strs))]
 
@@ -286,8 +283,6 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> L
         for power in list(game.powers.keys()):
             for unit in game.get_units(power):
                 unit_game_mapping[unit] = power[:3]
-        # def bfs_fleets(src, dest, game):
-            
 
         daide_order = []
 
