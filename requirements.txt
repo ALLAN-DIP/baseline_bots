@@ -9,4 +9,4 @@ numpy
 git+https://github.com/trigaten/DAIDE.git
 git+https://github.com/ALLAN-DIP/stance_vector.git
 # diplomacy_research
-git+https://github.com/diplomacy/research.git
+# git+https://github.com/diplomacy/research.git
