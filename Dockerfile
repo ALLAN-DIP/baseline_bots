@@ -16,7 +16,7 @@ pip3 install -r baseline_bots/requirements.txt
 RUN cd research && \ 
 pip3 install -r requirements.txt && \
 pip3 install -r requirements_dev.txt
-RUN cd ../baseline_bots && \ git checkout test_CI && \
+RUN cd ../baseline_bots && git checkout test_CI && \
 pip3 install -e . && \
 python3 -m pytest tests/utils_test.py && \
 python3 -m pytest tests/bot_tests/bots_test.py && \
