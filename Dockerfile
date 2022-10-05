@@ -12,7 +12,10 @@ apt-get install -y git && \
 apt-get install -y wget && \
 git clone https://github.com/diplomacy/research.git && \
 git clone https://github.com/ALLAN-DIP/baseline_bots.git && \
-pip3 install -r baseline_bots/requirements.txt
+cd baseline_bots && \
+git checkout -b test_CI remotes/origin/test_CI && \
+pip3 install -r requirements.txt && \
+cd ..
 RUN cd research && \ 
 pip3 install -r requirements.txt && \
 pip3 install -r requirements_dev.txt
