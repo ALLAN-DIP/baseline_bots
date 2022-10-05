@@ -8,7 +8,7 @@ from DAIDE import ORR, XDO
 from diplomacy import Message
 
 from baseline_bots.bots.baseline_bot import BaselineBot
-from baseline_bots.utils import get_order_tokens
+from baseline_bots.utils import get_order_tokens, OrdersData, MessagesData
 
 
 class RandomSupportProposerBot(BaselineBot):
@@ -19,17 +19,18 @@ class RandomSupportProposerBot(BaselineBot):
 
     def __init__(self, power_name, game) -> None:
         super().__init__(power_name, game)
+        self.orders_obj = None
 
-    def act(self):
+    def gen_messages(self):
 
         # Return data initialization
-        ret_obj = BotReturnData()
+        messages_obj, self.orders_obj = MessagesData(), OrdersData()
 
         # TODO: Ensure that supporting province and province to be attacked are not owned by the same power
         # TODO: Ensure that attack should not be to a province that the power already owns
         final_messages = defaultdict(list)
         messages = []
-        possible_orders = game.get_all_possible_orders()
+        possible_orders = self.game.get_all_possible_orders()
 
         # TODO: Some scenario is getting missed out | Sanity check: If current phase fetched is not matching with server phase, skip execution
         if self.game.get_current_phase()[0] != "W":
@@ -94,8 +95,8 @@ class RandomSupportProposerBot(BaselineBot):
 
         for recipient in final_messages:
             suggested_proposals = ORR(XDO(final_messages[recipient]))
-            ret_obj.add_message(recipient, str(suggested_proposals))
-        possible_orders = game.get_all_possible_orders()
+            messages_obj.add_message(recipient, str(suggested_proposals))
+        possible_orders = self.game.get_all_possible_orders()
 
         orders = [
             random.choice(possible_orders[loc])
@@ -103,9 +104,12 @@ class RandomSupportProposerBot(BaselineBot):
             if possible_orders[loc]
         ]
 
-        ret_obj.add_orders(orders)
+        self.orders_obj.add_orders(orders)
 
-        return ret_obj
+        return messages_obj
+    
+    def gen_orders(self):
+        return self.orders_obj.get_list_of_orders()
 
 
 if __name__ == "__main__":

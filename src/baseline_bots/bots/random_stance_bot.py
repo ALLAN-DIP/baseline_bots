@@ -11,6 +11,8 @@ from baseline_bots.utils import (
     get_non_aggressive_orders,
     get_other_powers,
     parse_orr_xdo,
+    OrdersData,
+    MessagesData
 )
 
 
@@ -29,6 +31,7 @@ class RandomStanceBot(BaselineBot):
             other_power: 0
             for other_power in get_other_powers([self.power_name], self.game)
         }
+        self.orders_obj = None
 
     def set_stance(self, stance):
         self.stance = stance
@@ -37,9 +40,9 @@ class RandomStanceBot(BaselineBot):
     def get_stance(self, stance):
         return self.stance
 
-    def act(self):
+    def gen_messages(self):
         # Return data initialization
-        ret_obj = BotReturnData()
+        messages_obj, self.orders_obj = MessagesData(), OrdersData()
 
         # get proposed orders sent by other countries
         messages = game.filter_messages(
@@ -53,7 +56,7 @@ class RandomStanceBot(BaselineBot):
             try:
                 parsed = parse_orr_xdo(message.message)
                 if self.stance[message.sender] > 0:
-                    ret_obj.add_orders(parsed)
+                    self.orders_obj.add_orders(parsed)
                     proposed_orders_by_country[message.sender] = parsed
             except:
                 pass
@@ -62,17 +65,15 @@ class RandomStanceBot(BaselineBot):
         #           self.game.get_orderable_locations(self.power_name)
         #           if self.possible_orders[loc]]
         # # Add random orders for all other provinces with no orders
-        # ret_obj.add_orders(orders)
+        # self.orders_obj.add_orders(orders)
 
         # set orders
-        # print(ret_obj.orders)
-        self.game.set_orders(self.power_name, ret_obj.orders)
+        # print(self.orders_obj.orders)
+        self.game.set_orders(self.power_name, self.orders_obj.get_list_of_orders)
 
         # not all intended orders can be set at the same time: some overlap
         # thus, get the orders that are currently set
         orders_set = self.game.get_orders(self.power_name)
-
-        ret_obj = BotReturnData()
 
         # send messages to other powers if this bot has taken some
         # of their messages
@@ -92,7 +93,7 @@ class RandomStanceBot(BaselineBot):
             msg = YES(ORR(XDO(orders_taken)))
 
             # send messages
-            ret_obj.add_message(other_power, str(msg))
+            messages_obj.add_message(other_power, str(msg))
 
         possible_orders = game.get_all_possible_orders()
 
@@ -108,10 +109,12 @@ class RandomStanceBot(BaselineBot):
                 suggested_random_orders = ORR(XDO(suggested_random_orders))
 
                 # send the other power a message containing the orders
-                ret_obj.add_message(other_power, str(suggested_random_orders))
+                messages_obj.add_message(other_power, str(suggested_random_orders))
 
-        return ret_obj
+        return messages_obj
 
+    def gen_orders(self):
+        return self.orders_obj.get_list_of_orders()
 
 if __name__ == "__main__":
     from diplomacy import Game
