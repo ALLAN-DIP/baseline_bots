@@ -9,7 +9,7 @@ __email__ = "sanderschulhoff@gmail.com"
 # from diplomacy_research.models.state_space import get_order_tokens
 import re
 from collections import defaultdict
-from typing import List
+from typing import Dict, List, Tuple
 
 from DAIDE.utils.exceptions import ParseError
 from diplomacy import Game, Message
@@ -370,7 +370,12 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> str:
         :return: dipnet suborder
         """
         suborder_tokens = suborder.split()
-        return suborder_tokens[1][0] + " " + suborder_tokens[2]
+        try:
+            ans = suborder_tokens[1][0] + " " + suborder_tokens[2]
+        except Exception as e:
+            print(f"Failed for suborder: {suborder_tokens}")
+            raise e
+        return ans
 
     dipnet_order = []
 
@@ -384,7 +389,8 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> str:
             dipnet_order.append("-")
             dipnet_order.append(daide_style_order_groups[4])
         elif len(daide_style_order_groups) > 5:
-            raise f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
+            print(f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!")
+            raise Exception
     elif daide_style_order_groups[1] == "HLD":
         # Hold order
         dipnet_order.append("H")
@@ -404,11 +410,55 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> str:
         dipnet_order.append("-")
         dipnet_order.append(daide_style_order_groups[2])
         if len(daide_style_order_groups) > 3:
-            raise f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
+            print(f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!")
+            raise Exception
     else:
-        raise f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
+        print(f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!")
+        raise Exception
 
     return " ".join(dipnet_order)
+
+def get_proposals(
+        rcvd_messages: List[Tuple[int, Message]],
+        game: Game = None, 
+        power_name: str = None
+    ) -> Tuple[Dict[str, List[str]], Dict[str, List[str]]]:
+        """
+        From received messages, extract the proposals. If game state and power_name are specified, check for validity of moves
+
+        :param rcvd_messages: list of messages received from other players
+        :param game: Game state
+        :param power_name: power name against which the validity of moves need to be checked
+        :return: dictionary of valid and invalid proposals
+        """
+        # Extract messages containing PRP string
+        # print(rcvd_messages)
+        order_msgs = [msg for msg in rcvd_messages.values() if "PRP" in msg.message]
+
+        proposals = {}
+        for order_msg in order_msgs:
+            try:
+                proposals[order_msg.sender] = (
+                    [daide_to_dipnet_parsing(order) for order in parse_orr_xdo(parse_PRP(order_msg.message))]
+                )
+            except Exception as e:
+                print(f"Exception raised for {order_msg.message}")
+                raise(e)
+        
+        invalid_proposals = {}
+        if game is not None and power_name is not None:
+            orderable_locs = game.get_orderable_locations(power_name)
+            all_possible_orders = game.get_all_possible_orders()
+            possible_orders = set([ord for ord_key in all_possible_orders for ord in all_possible_orders[ord_key] if ord_key in orderable_locs])
+            for sender in proposals:
+                inval_proposals_list = [order for order in proposals[sender] if order not in possible_orders]
+                if inval_proposals_list:
+                    invalid_proposals[sender] = inval_proposals_list
+                val_proposals_list = [order for order in proposals[sender] if order in possible_orders]
+                if val_proposals_list:
+                    proposals[sender] = val_proposals_list
+
+        return proposals, invalid_proposals
     
 class MessagesData:
     def __init__(self):

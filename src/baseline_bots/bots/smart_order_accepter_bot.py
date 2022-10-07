@@ -38,27 +38,6 @@ class SmartOrderAccepterBot(DipnetBot):
         self.alliance_props_sent = False
         self.stance = ScoreBasedStance(power_name, game)
 
-    def get_proposals(
-        self, rcvd_messages: List[Tuple[int, Message]]
-    ) -> Dict[str, List[str]]:
-        """
-        Extract proposal messages from received messages and checks for valid syntax before returning it
-        """
-        # Extract messages containing PRP string
-        order_msgs = [msg[1] for msg in rcvd_messages if "PRP" in msg[1].message]
-
-        proposals = {}
-        for order_msg in order_msgs:
-            try:
-                proposals[order_msg.sender] = (
-                    [daide_to_dipnet_parsing(order) for order in parse_orr_xdo(parse_PRP(order_msg.message))]
-                )
-            except Exception as e:
-                print(e)
-                pass
-
-        return proposals
-
     def gen_pos_stance_messages(
         self, msgs_data: MessagesData, orders_list: List[str]
     ) -> None:
@@ -87,7 +66,7 @@ class SmartOrderAccepterBot(DipnetBot):
         orders = yield self.brain.get_orders(self.game, self.power_name)
 
         # extract only the proposed orders from the messages the bot has just received
-        prp_orders = self.get_proposals(rcvd_messages)
+        prp_orders = self.get_proposals(rcvd_messages, self.game, self.power_name)
 
         # include base order to prp_orders.
         # This is to avoid having double calculation for the best list of orders between (self-generated) base orders vs proposal orders
