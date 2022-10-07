@@ -1,4 +1,4 @@
-from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, dipnet_to_daide_parsing, daide_to_dipnet_parsing
+from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, dipnet_to_daide_parsing, daide_to_dipnet_parsing, get_proposals
 from diplomacy import Game, Message
 
 class TestUtils:
@@ -70,3 +70,43 @@ class TestUtils:
             print(tc_ip, " --> ", tc_op)
             for tc_ip_ord, tc_op_ord in zip(tc_ip, tc_op):
                 assert daide_to_dipnet_parsing(tc_op_ord) == tc_ip_ord.replace(" R ", " - "), daide_to_dipnet_parsing(tc_op_ord)
+        
+
+        # Tests for get_proposals
+        GET_PROPOSALS_TC = [
+            [
+                "RUSSIA",
+                {
+                    "GERMANY": "PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (XDO ((RUS FLT SEV) MTO RUM)) (XDO ((RUS AMY PRU) MTO LVN)))",
+                    "AUSTRIA": "PRP (XDO ((RUS AMY MOS) SUP (RUS FLT STP/SC) MTO LVN)))"
+                }, 
+                [
+                    {
+                        "GERMANY": ["A WAR - PRU", "F SEV - RUM"],
+                        "AUSTRIA": ["A MOS S F STP/SC - LVN"]
+                    },
+                    {
+                        "GERMANY": ["A PRU - LVN"]
+                    }
+                ]
+            ]
+        ]
+        game_GTP = Game()
+        for power_name, tc_ip, tc_op in GET_PROPOSALS_TC:
+            for sender in tc_ip:
+                msg_obj = Message(
+                    sender=sender,
+                    recipient=power_name,
+                    message=tc_ip[sender],
+                    phase=game_GTP.get_current_phase(),
+                )
+                game_GTP.add_message(message=msg_obj)
+            valid_proposals, invalid_proposals = get_proposals(game_GTP.filter_messages(messages=game_GTP.messages, game_role=power_name), game_GTP, power_name)
+            assert set(valid_proposals.keys()) == set(tc_op[0].keys()), (set(valid_proposals.keys()), set(tc_op[0].keys()))
+            assert set(invalid_proposals.keys()) == set(tc_op[1].keys()), (set(invalid_proposals.keys()), set(tc_op[1].keys()))
+            
+            for key in valid_proposals:
+                assert set(valid_proposals[key]) == set(tc_op[0][key])
+            
+            for key in invalid_proposals:
+                assert set(invalid_proposals[key]) == set(tc_op[1][key])
