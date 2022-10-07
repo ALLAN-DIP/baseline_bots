@@ -432,9 +432,9 @@ def get_proposals(
         :return: dictionary of valid and invalid proposals
         """
         # Extract messages containing PRP string
-        # print(rcvd_messages)
         order_msgs = [msg for msg in rcvd_messages.values() if "PRP" in msg.message]
 
+        # Generate a dictionary of sender to list of orders (dipnet-style) for this sender
         proposals = {}
         for order_msg in order_msgs:
             try:
@@ -446,19 +446,25 @@ def get_proposals(
                 raise(e)
         
         invalid_proposals = {}
+        valid_proposals = {}
         if game is not None and power_name is not None:
+            # Generate set of possible orders for the given power
             orderable_locs = game.get_orderable_locations(power_name)
             all_possible_orders = game.get_all_possible_orders()
             possible_orders = set([ord for ord_key in all_possible_orders for ord in all_possible_orders[ord_key] if ord_key in orderable_locs])
+
+            # For the set of proposed moves from each sender, check if the specified orders would be allowed. If not, mark them as invalid.
             for sender in proposals:
                 inval_proposals_list = [order for order in proposals[sender] if order not in possible_orders]
                 if inval_proposals_list:
                     invalid_proposals[sender] = inval_proposals_list
                 val_proposals_list = [order for order in proposals[sender] if order in possible_orders]
                 if val_proposals_list:
-                    proposals[sender] = val_proposals_list
+                    valid_proposals[sender] = val_proposals_list
+        else:
+            valid_proposals = proposals
 
-        return proposals, invalid_proposals
+        return valid_proposals, invalid_proposals
     
 class MessagesData:
     def __init__(self):

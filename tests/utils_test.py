@@ -78,7 +78,8 @@ class TestUtils:
                 "RUSSIA",
                 {
                     "GERMANY": "PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (XDO ((RUS FLT SEV) MTO RUM)) (XDO ((RUS AMY PRU) MTO LVN)))",
-                    "AUSTRIA": "PRP (XDO ((RUS AMY MOS) SUP (RUS FLT STP/SC) MTO LVN)))"
+                    "AUSTRIA": "PRP (XDO ((RUS AMY MOS) SUP (RUS FLT STP/SC) MTO LVN)))",
+                    "ENGLAND": "PRP (XDO ((RUS AMY PRU) MTO LVN)))"
                 }, 
                 [
                     {
@@ -86,7 +87,8 @@ class TestUtils:
                         "AUSTRIA": ["A MOS S F STP/SC - LVN"]
                     },
                     {
-                        "GERMANY": ["A PRU - LVN"]
+                        "GERMANY": ["A PRU - LVN"],
+                        "ENGLAND": ["A PRU - LVN"]
                     }
                 ]
             ]
