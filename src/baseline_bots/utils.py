@@ -134,7 +134,17 @@ def parse_orr_xdo(msg: str) -> List[str]:
         # split the message at )( points
         parts = re.split(r"\)\s*\(", msg)
 
-        def extract_suborder(part: str) -> str:
+        def extract_suborder_indices(part: str) -> str:
+            """
+            Finds the start and end indices of suborder in an XDO message
+            For instance, 
+            "XDO (F BLK - CON)" returns (4, 16)
+            "XDO(F BLK - CON)" returns (3, 15)
+            "XDO ((RUS AMY WAR) MTO PRU)" returns (4, 26)
+
+            :param part: part of the message representing an arrangement for 1 unit
+            :return: the actual order after excluding XDO
+            """
             start_in = part.find("(", part.find("XDO"))
             parenthesis_cnt = 0
             for i in range(start_in, len(part)):
@@ -148,7 +158,7 @@ def parse_orr_xdo(msg: str) -> List[str]:
         
         ans = []
         for part in parts:
-            start, end = extract_suborder(part)
+            start, end = extract_suborder_indices(part)
             ans.append(part[start+1:end])
         return ans
 
@@ -347,12 +357,12 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> L
     return daide_orders
 
 
-def daide_to_dipnet_parsing(daide_style_order_str: str) -> str:
+def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
     """
     Convert DAIDE style single order to dipnet style order
 
     :param daide_style_order_str: DAIDE style string to be converted to dipnet style
-    :return: dipnet style order string
+    :return: dipnet style order string and unit's power name
     """
     def split_into_groups(daide_style_order_str: str) -> List[str]:
         """
@@ -394,16 +404,17 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> str:
         except Exception as e:
             print(f"Failed for suborder: {suborder_tokens}")
             raise e
-        return ans
+        return ans, suborder_tokens[0]
 
     dipnet_order = []
 
     # Dipnetify source unit
-    dipnet_order.append(dipnetify_suborder(daide_style_order_groups[0]))
+    suborder, unit_power = dipnetify_suborder(daide_style_order_groups[0])
+    dipnet_order.append(suborder)
     if daide_style_order_groups[1] == "SUP":
         # Support order
         dipnet_order.append("S")
-        dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2]))
+        dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2])[0])
         if len(daide_style_order_groups) == 5 and daide_style_order_groups[3] == "MTO":
             dipnet_order.append("-")
             dipnet_order.append(daide_style_order_groups[4])
@@ -421,7 +432,7 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> str:
     elif daide_style_order_groups[1] == "CVY":
         # Convoy order
         dipnet_order.append("C")
-        dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2]))
+        dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2])[0])
         dipnet_order.append("-")
         dipnet_order.append(daide_style_order_groups[4])
     elif daide_style_order_groups[1] == "MTO":
@@ -435,20 +446,20 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> str:
         print(f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!")
         raise Exception
 
-    return " ".join(dipnet_order)
+    return " ".join(dipnet_order), unit_power
 
 def get_proposals(
         rcvd_messages: List[Tuple[int, Message]],
-        game: Game = None, 
-        power_name: str = None
-    ) -> Tuple[Dict[str, List[str]], Dict[str, List[str]]]:
+        game: Game, 
+        power_name: str
+    ) -> Tuple[Dict[str, List[str]], Dict[str, List[str]], Dict[str, List[str]], Dict[str, List[str]]]:
         """
         From received messages, extract the proposals. If game state and power_name are specified, check for validity of moves
 
         :param rcvd_messages: list of messages received from other players
         :param game: Game state
         :param power_name: power name against which the validity of moves need to be checked
-        :return: dictionary of valid and invalid proposals
+        :return: dictionary of valid proposals, invalid proposals, shared orders (orders that the other power said it would execute), other orders (orders that the other power shared as gossip)
         """
         # Extract messages containing PRP string
         order_msgs = [msg for msg in rcvd_messages.values() if "PRP" in msg.message]
@@ -457,34 +468,43 @@ def get_proposals(
         proposals = {}
         for order_msg in order_msgs:
             try:
-                proposals[order_msg.sender] = (
-                    [daide_to_dipnet_parsing(order) for order in parse_orr_xdo(parse_PRP(order_msg.message))]
-                )
+                if "AND" in order_msg.message:
+                    proposals[order_msg.sender] = [daide_to_dipnet_parsing(order_1) for order in (parse_PRP(order_msg.message)).split("AND") for order_1 in parse_orr_xdo(order.strip())]
+                else: # works for cases where ORR is present in PRP or nothing is present
+                    proposals[order_msg.sender] = [daide_to_dipnet_parsing(order) for order in parse_orr_xdo(parse_PRP(order_msg.message))]
             except Exception as e:
                 print(f"Exception raised for {order_msg.message}")
                 raise(e)
         
-        invalid_proposals = {}
-        valid_proposals = {}
-        if game is not None and power_name is not None:
-            # Generate set of possible orders for the given power
-            orderable_locs = game.get_orderable_locations(power_name)
-            all_possible_orders = game.get_all_possible_orders()
-            possible_orders = set([ord for ord_key in all_possible_orders for ord in all_possible_orders[ord_key] if ord_key in orderable_locs])
+        invalid_proposals = defaultdict(list)
+        valid_proposals = defaultdict(list)
+        shared_orders = defaultdict(list)
+        other_orders = defaultdict(list)
+        # Generate set of possible orders for the given power
+        orderable_locs = game.get_orderable_locations(power_name)
+        all_possible_orders = game.get_all_possible_orders()
+        possible_orders = set([ord for ord_key in all_possible_orders for ord in all_possible_orders[ord_key] if ord_key in orderable_locs])
 
-            # For the set of proposed moves from each sender, check if the specified orders would be allowed. If not, mark them as invalid.
-            for sender in proposals:
-                inval_proposals_list = [order for order in proposals[sender] if order not in possible_orders]
-                if inval_proposals_list:
-                    invalid_proposals[sender] = inval_proposals_list
-                val_proposals_list = [order for order in proposals[sender] if order in possible_orders]
-                if val_proposals_list:
-                    valid_proposals[sender] = val_proposals_list
-        else:
-            valid_proposals = proposals
+        # For the set of proposed moves from each sender, check if the specified orders would be allowed. If not, mark them as invalid.
+        for sender in proposals:
+            for order, unit_power_name in proposals[sender]:
+                if unit_power_name == power_name[:3]: # These are supposed to be proposal messages to me
+                    if order in possible_orders:
+                        valid_proposals[sender].append(order)
+                    else:
+                        invalid_proposals[sender].append(order)
+                elif unit_power_name == sender[:3]: # These are supposed to be conditional orders that the sender is going to execute
+                    shared_orders[sender].append(order)
+                else:
+                    other_orders[sender].append(order)
 
-        return valid_proposals, invalid_proposals
-    
+        if other_orders:
+            print("Found other orders while extracting proposal messages:")
+            print([msg.message for msg in order_msgs])
+            print("Other orders found:")
+            print(other_orders)
+        
+        return valid_proposals, invalid_proposals, shared_orders, other_orders
 class MessagesData:
     def __init__(self):
         self.messages = []
