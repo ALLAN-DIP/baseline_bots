@@ -1,4 +1,4 @@
-from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, dipnet_to_daide_parsing, daide_to_dipnet_parsing, get_proposals, parse_FCT, parse_PRP, parse_orr_xdo
+from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, dipnet_to_daide_parsing, daide_to_dipnet_parsing, parse_proposal_messages, parse_FCT, parse_PRP, parse_orr_xdo
 from diplomacy import Game, Message
 
 class TestUtils:
@@ -72,8 +72,8 @@ class TestUtils:
                 assert daide_to_dipnet_parsing(tc_op_ord)[0] == tc_ip_ord.replace(" R ", " - "), daide_to_dipnet_parsing(tc_op_ord)
         
 
-        # Tests for get_proposals
-        GET_PROPOSALS_TC = [
+        # Tests for parse_proposal_messages
+        PARSE_PROPOSALS_TC = [
             [
                 "RUSSIA",
                 {
@@ -114,7 +114,7 @@ class TestUtils:
             ]
         ]
         game_GTP = Game()
-        for power_name, tc_ip, tc_op in GET_PROPOSALS_TC:
+        for power_name, tc_ip, tc_op in PARSE_PROPOSALS_TC:
             for sender in tc_ip:
                 msg_obj = Message(
                     sender=sender,
@@ -123,7 +123,7 @@ class TestUtils:
                     phase=game_GTP.get_current_phase(),
                 )
                 game_GTP.add_message(message=msg_obj)
-            valid_proposals, invalid_proposals, shared_orders, other_orders = get_proposals(game_GTP.filter_messages(messages=game_GTP.messages, game_role=power_name), game_GTP, power_name)
+            valid_proposals, invalid_proposals, shared_orders, other_orders = parse_proposal_messages(game_GTP.filter_messages(messages=game_GTP.messages, game_role=power_name), game_GTP, power_name)
             # print(valid_proposals)
             # print(invalid_proposals)
             # print(shared_orders)

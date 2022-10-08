@@ -16,7 +16,8 @@ from baseline_bots.utils import (
     parse_orr_xdo,
     parse_PRP,
     dipnet_to_daide_parsing,
-    daide_to_dipnet_parsing
+    daide_to_dipnet_parsing,
+    parse_proposal_messages
 )
 
 
@@ -66,15 +67,15 @@ class SmartOrderAccepterBot(DipnetBot):
         orders = yield self.brain.get_orders(self.game, self.power_name)
 
         # extract only the proposed orders from the messages the bot has just received
-        prp_orders = self.get_proposals(rcvd_messages, self.game, self.power_name)
+        valid_proposal_orders, invalid_proposal_orders, shared_orders, other_orders = parse_proposal_messages(rcvd_messages, self.game, self.power_name)
 
         # include base order to prp_orders.
         # This is to avoid having double calculation for the best list of orders between (self-generated) base orders vs proposal orders
         # e.g. if we are playing as ENG and the base orders are generated from DipNet, we would want to consider
         # if there is any better proposal orders that has a state value more than ours, then do it. If not, just follow the base orders.
-        prp_orders[bot.power_name] = orders
+        valid_proposal_orders[self.power_name] = orders
 
-        best_proposer, best_orders = get_best_orders(self, prp_orders, shared_order)
+        best_proposer, best_orders = get_best_orders(self, valid_proposal_orders, shared_orders)
 
         # add orders
         orders_data = OrdersData()

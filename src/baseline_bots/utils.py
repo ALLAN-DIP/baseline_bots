@@ -448,13 +448,13 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
 
     return " ".join(dipnet_order), unit_power
 
-def get_proposals(
+def parse_proposal_messages(
         rcvd_messages: List[Tuple[int, Message]],
         game: Game, 
         power_name: str
     ) -> Tuple[Dict[str, List[str]], Dict[str, List[str]], Dict[str, List[str]], Dict[str, List[str]]]:
         """
-        From received messages, extract the proposals. If game state and power_name are specified, check for validity of moves
+        From received messages, extract the proposals (categorize as valid and invalid), shared orders and other orders. Use specified game state and power_name to check for validity of moves
 
         :param rcvd_messages: list of messages received from other players
         :param game: Game state
