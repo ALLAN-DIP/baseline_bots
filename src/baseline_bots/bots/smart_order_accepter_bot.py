@@ -14,11 +14,13 @@ from baseline_bots.utils import (
     get_best_orders,
     get_other_powers,
     parse_orr_xdo,
-    parse_PRP,
+    parse_PRP
+)
+from baseline_bots.parsing_utils import {
     dipnet_to_daide_parsing,
     daide_to_dipnet_parsing,
     parse_proposal_messages
-)
+}
 
 
 class SmartOrderAccepterBot(DipnetBot):
