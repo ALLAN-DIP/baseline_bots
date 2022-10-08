@@ -102,7 +102,7 @@ def parse_FCT(msg) -> str:
     if "FCT" not in msg:
         raise ParseError("This is not an FCT message")
     try:
-        return msg[5:-1]
+        return msg[msg.find("(") + 1:-1]
     except Exception:
         raise ParseError(f"Cant parse FCT msg {msg}")
 
@@ -112,7 +112,7 @@ def parse_PRP(msg) -> str:
     if "PRP" not in msg:
         raise ParseError("This is not an PRP message")
     try:
-        return msg[5:-1]
+        return msg[msg.find("(") + 1:-1]
     except Exception:
         raise ParseError(f"Cant parse PRP msg {msg}")
 
@@ -126,13 +126,13 @@ def parse_orr_xdo(msg: str) -> List[str]:
         raise ParseError("This looks an ally message")
     try:
         if "ORR" in msg:
-            msg = msg[5:-1]
+            msg = msg[msg.find("(") + 1:-1]
         # else:
         #     # remove else since it is a bug to 'XDO (order)'
         #     msg = msg[1:-1]
-        parts = msg.split(") (")
+        parts = re.split(r"\)\s*\(", msg)
 
-        return [part[5:-1] for part in parts]
+        return [part[part.rfind("(") + 1:part.find(")")] for part in parts]
     except Exception:
         raise ParseError("Cant parse ORR XDO msg")
 

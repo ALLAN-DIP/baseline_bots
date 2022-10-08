@@ -1,4 +1,4 @@
-from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, dipnet_to_daide_parsing, daide_to_dipnet_parsing, get_proposals
+from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, dipnet_to_daide_parsing, daide_to_dipnet_parsing, get_proposals, parse_FCT, parse_PRP, parse_orr_xdo
 from diplomacy import Game, Message
 
 class TestUtils:
@@ -112,3 +112,56 @@ class TestUtils:
             
             for key in invalid_proposals:
                 assert set(invalid_proposals[key]) == set(tc_op[1][key])
+
+        # Tests for orders extraction
+        FCT_TCS = [
+            [
+                "FCT (XDO (F BLK - CON))", 
+                "XDO (F BLK - CON)"
+            ],
+            [
+                "FCT(XDO (F BLK - CON))", 
+                "XDO (F BLK - CON)"
+            ]
+        ]
+        for tc_ip, tc_op in FCT_TCS:
+            assert parse_FCT(tc_ip) == tc_op, parse_FCT(tc_ip)
+            
+        PRP_TCS = [
+            [
+                "PRP (XDO (F BLK - CON))", 
+                "XDO (F BLK - CON)"
+            ],
+            [
+                "PRP(XDO (F BLK - CON))", 
+                "XDO (F BLK - CON)"
+            ]
+        ]
+        for tc_ip, tc_op in PRP_TCS:
+            assert parse_PRP(tc_ip) == tc_op, parse_PRP(tc_ip)
+
+        XDO_ORR_TCS = [
+            [
+                "XDO (F BLK - CON)",
+                ["F BLK - CON"]
+            ], 
+            [
+                "XDO (F BLK - CON)",
+                ["F BLK - CON"]
+            ],
+            [
+                "XDO(F BLK - CON)",
+                ["F BLK - CON"]
+            ],
+            [
+                "ORR((XDO(F BLK - CON))(XDO(A RUM - BUD))(XDO(F BLK - BUD)))",
+                ["F BLK - CON", "A RUM - BUD", "F BLK - BUD"]
+            ],
+            [
+                "ORR ( (XDO (F BLK - CON)) (XDO (A RUM - BUD)))",
+                ["F BLK - CON", "A RUM - BUD"]
+            ]
+        ]
+        
+        for tc_ip, tc_op in XDO_ORR_TCS:
+            assert parse_orr_xdo(tc_ip) == tc_op, parse_orr_xdo(tc_ip)
