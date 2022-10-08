@@ -104,7 +104,7 @@ def parse_FCT(msg) -> str:
     try:
         return msg[msg.find("(") + 1:-1]
     except Exception:
-        raise ParseError(f"Cant parse FCT msg {msg}")
+        raise Exception(f"Cant parse FCT msg {msg}")
 
 
 def parse_PRP(msg) -> str:
@@ -114,7 +114,7 @@ def parse_PRP(msg) -> str:
     try:
         return msg[msg.find("(") + 1:-1]
     except Exception:
-        raise ParseError(f"Cant parse PRP msg {msg}")
+        raise Exception(f"Cant parse PRP msg {msg}")
 
 
 def parse_orr_xdo(msg: str) -> List[str]:
@@ -288,7 +288,7 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> L
         :return: DAIDE-style suborder
         """
         if dipnet_suborder not in unit_game_mapping:
-            raise f"error from utils.dipnet_to_daide_parsing: unit {dipnet_suborder} not present in unit_game_mapping"
+            raise Exception(f"error from utils.dipnet_to_daide_parsing: unit {dipnet_suborder} not present in unit_game_mapping")
         return "(" + (" ".join(
             [
                 unit_game_mapping[dipnet_suborder],
@@ -329,7 +329,7 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> L
                 daide_order.append("MTO")
                 daide_order.append(dipnet_order_tokens[3].split()[-1])
             elif len(dipnet_order_tokens) > 4:
-                raise f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
+                raise Exception(f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!")
         elif dipnet_order_tokens[1] == "H":
             # Hold orders
             daide_order.append("HLD")
@@ -353,7 +353,7 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> L
             daide_order.append("MTO")
             daide_order.append(dipnet_order_tokens[1].split()[-1])
             if len(dipnet_order_tokens) > 2:
-                raise f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
+                raise Exception(f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!")
         daide_orders.append(" ".join(daide_order))
 
     return daide_orders
@@ -405,9 +405,8 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
         suborder_tokens = suborder.split()
         try:
             ans = suborder_tokens[1][0] + " " + suborder_tokens[2]
-        except Exception as e:
-            print(f"Failed for suborder: {suborder_tokens}")
-            raise e
+        except Exception:
+            raise Exception(f"Failed for suborder: {suborder_tokens}")
         return ans, suborder_tokens[0]
 
     dipnet_order = []
@@ -423,8 +422,7 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
             dipnet_order.append("-")
             dipnet_order.append(daide_style_order_groups[4])
         elif len(daide_style_order_groups) > 5:
-            print(f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!")
-            raise Exception
+            raise Exception(f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!")
     elif daide_style_order_groups[1] == "HLD":
         # Hold order
         dipnet_order.append("H")
@@ -444,11 +442,9 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
         dipnet_order.append("-")
         dipnet_order.append(daide_style_order_groups[2])
         if len(daide_style_order_groups) > 3:
-            print(f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!")
-            raise Exception
+            raise Exception(f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!")
     else:
-        print(f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!")
-        raise Exception
+        raise Exception(f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!")
 
     return " ".join(dipnet_order), unit_power
 
@@ -477,9 +473,8 @@ def parse_proposal_messages(
                     proposals[order_msg.sender] = [daide_to_dipnet_parsing(order) for order in daide_style_orders]
                 else: # works for cases where ORR is present in PRP or nothing is present: ORR ( (XDO()) (XDO()))
                     proposals[order_msg.sender] = [daide_to_dipnet_parsing(order) for order in parse_orr_xdo(parse_PRP(order_msg.message))]
-            except Exception as e:
-                print(f"Exception raised for {order_msg.message}")
-                raise(e)
+            except Exception:
+                raise Exception(f"Exception raised for {order_msg.message}")
         
         invalid_proposals = defaultdict(list)
         valid_proposals = defaultdict(list)
