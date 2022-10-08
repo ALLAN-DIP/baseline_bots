@@ -1,4 +1,5 @@
-from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, dipnet_to_daide_parsing, daide_to_dipnet_parsing, parse_proposal_messages, parse_FCT, parse_PRP, parse_orr_xdo
+from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, parse_FCT, parse_PRP, parse_orr_xdo
+from baseline_bots.parsing_utils import dipnet_to_daide_parsing, daide_to_dipnet_parsing, parse_proposal_messages
 from diplomacy import Game, Message
 
 class TestUtils:
