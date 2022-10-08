@@ -468,9 +468,10 @@ def parse_proposal_messages(
         proposals = {}
         for order_msg in order_msgs:
             try:
-                if "AND" in order_msg.message:
-                    proposals[order_msg.sender] = [daide_to_dipnet_parsing(order_1) for order in (parse_PRP(order_msg.message)).split("AND") for order_1 in parse_orr_xdo(order.strip())]
-                else: # works for cases where ORR is present in PRP or nothing is present
+                if "AND" in order_msg.message: # works when AND is present in this format: XDO () AND XDO () AND XDO()
+                    daide_style_orders = [order_1 for order in (parse_PRP(order_msg.message)).split("AND") for order_1 in parse_orr_xdo(order.strip())]
+                    proposals[order_msg.sender] = [daide_to_dipnet_parsing(order) for order in daide_style_orders]
+                else: # works for cases where ORR is present in PRP or nothing is present: ORR ( (XDO()) (XDO()))
                     proposals[order_msg.sender] = [daide_to_dipnet_parsing(order) for order in parse_orr_xdo(parse_PRP(order_msg.message))]
             except Exception as e:
                 print(f"Exception raised for {order_msg.message}")
@@ -489,9 +490,9 @@ def parse_proposal_messages(
         for sender in proposals:
             for order, unit_power_name in proposals[sender]:
                 if unit_power_name == power_name[:3]: # These are supposed to be proposal messages to me
-                    if order in possible_orders:
+                    if order in possible_orders: # These would be valid proposals to me
                         valid_proposals[sender].append(order)
-                    else:
+                    else: # These would be invalid proposals
                         invalid_proposals[sender].append(order)
                 elif unit_power_name == sender[:3]: # These are supposed to be conditional orders that the sender is going to execute
                     shared_orders[sender].append(order)
