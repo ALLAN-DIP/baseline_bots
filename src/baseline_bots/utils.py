@@ -269,6 +269,8 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> L
     """
     Convert dipnet style single order to DAIDE style order. Needs game instance to determine the powers owning the units
 
+    More details here: https://docs.google.com/document/d/16RODa6KDX7vNNooBdciI4NqSVN31lToto3MLTNcEHk0/edit?usp=sharing
+
     :param dipnet_style_order_strs: dipnet style list of orders to be converted to DAIDE
     :param game: game instance
     :return: DAIDE style order string
@@ -360,6 +362,8 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> L
 def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
     """
     Convert DAIDE style single order to dipnet style order
+
+    More details here: https://docs.google.com/document/d/16RODa6KDX7vNNooBdciI4NqSVN31lToto3MLTNcEHk0/edit?usp=sharing
 
     :param daide_style_order_str: DAIDE style string to be converted to dipnet style
     :return: dipnet style order string and unit's power name
