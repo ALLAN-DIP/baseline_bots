@@ -130,9 +130,28 @@ def parse_orr_xdo(msg: str) -> List[str]:
         # else:
         #     # remove else since it is a bug to 'XDO (order)'
         #     msg = msg[1:-1]
+
+        # split the message at )( points
         parts = re.split(r"\)\s*\(", msg)
 
-        return [part[part.rfind("(") + 1:part.find(")")] for part in parts]
+        def extract_suborder(part: str) -> str:
+            start_in = part.find("(", part.find("XDO"))
+            parenthesis_cnt = 0
+            for i in range(start_in, len(part)):
+                if part[i] == '(':
+                    parenthesis_cnt += 1
+                elif part[i] == ')':
+                    parenthesis_cnt -= 1
+                if parenthesis_cnt == 0:
+                    return start_in, i
+            return start_in, -1
+        
+        ans = []
+        for part in parts:
+            start, end = extract_suborder(part)
+            ans.append(part[start+1:end])
+        return ans
+
     except Exception:
         raise ParseError("Cant parse ORR XDO msg")
 
