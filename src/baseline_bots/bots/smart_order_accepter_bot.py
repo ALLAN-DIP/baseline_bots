@@ -79,7 +79,7 @@ class SmartOrderAccepterBot(DipnetBot):
 
         return msgs_data
 
-    def gen_proposal_reply(self, best_proposer: str, prp_orders: dict, messages: MessagesData):
+    def gen_proposal_reply(self, best_proposer: str, prp_orders: dict, messages: MessagesData) -> MessagesData: 
         """
         Reply back to allies regarding their proposals whether we follow or not follow
         """
@@ -96,6 +96,7 @@ class SmartOrderAccepterBot(DipnetBot):
                 messages.add_message(
                     proposer, str(msg)
                 )
+        return messages
 
     def __call__(self, rcvd_messages: List[Tuple[int, Message]]):
         # compute pos/neg stance on other bots using Tony's stance vector
