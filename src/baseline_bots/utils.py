@@ -9,7 +9,7 @@ __email__ = "sanderschulhoff@gmail.com"
 # from diplomacy_research.models.state_space import get_order_tokens
 import re
 from collections import defaultdict
-from typing import List
+from typing import Dict, List, Tuple
 
 from DAIDE.utils.exceptions import ParseError
 from diplomacy import Game, Message
@@ -102,9 +102,9 @@ def parse_FCT(msg) -> str:
     if "FCT" not in msg:
         raise ParseError("This is not an FCT message")
     try:
-        return msg[5:-1]
+        return msg[msg.find("(") + 1:-1]
     except Exception:
-        raise ParseError(f"Cant parse FCT msg {msg}")
+        raise Exception(f"Cant parse FCT msg {msg}")
 
 
 def parse_PRP(msg) -> str:
@@ -112,9 +112,9 @@ def parse_PRP(msg) -> str:
     if "PRP" not in msg:
         raise ParseError("This is not an PRP message")
     try:
-        return msg[5:-1]
+        return msg[msg.find("(") + 1:-1]
     except Exception:
-        raise ParseError(f"Cant parse PRP msg {msg}")
+        raise Exception(f"Cant parse PRP msg {msg}")
 
 
 def parse_orr_xdo(msg: str) -> List[str]:
@@ -126,13 +126,42 @@ def parse_orr_xdo(msg: str) -> List[str]:
         raise ParseError("This looks an ally message")
     try:
         if "ORR" in msg:
-            msg = msg[5:-1]
+            msg = msg[msg.find("(") + 1:-1]
         # else:
         #     # remove else since it is a bug to 'XDO (order)'
         #     msg = msg[1:-1]
-        parts = msg.split(") (")
 
-        return [part[5:-1] for part in parts]
+        # split the message at )( points
+        parts = re.split(r"\)\s*\(", msg)
+
+        def extract_suborder_indices(part: str) -> str:
+            """
+            Finds the start and end indices of suborder in an XDO message
+            For instance, 
+            "XDO (F BLK - CON)" returns (4, 16)
+            "XDO(F BLK - CON)" returns (3, 15)
+            "XDO ((RUS AMY WAR) MTO PRU)" returns (4, 26)
+
+            :param part: part of the message representing an arrangement for 1 unit
+            :return: the actual order after excluding XDO
+            """
+            start_in = part.find("(", part.find("XDO"))
+            parenthesis_cnt = 0
+            for i in range(start_in, len(part)):
+                if part[i] == '(':
+                    parenthesis_cnt += 1
+                elif part[i] == ')':
+                    parenthesis_cnt -= 1
+                if parenthesis_cnt == 0:
+                    return start_in, i
+            return start_in, -1
+        
+        ans = []
+        for part in parts:
+            start, end = extract_suborder_indices(part)
+            ans.append(part[start+1:end])
+        return ans
+
     except Exception:
         raise ParseError("Cant parse ORR XDO msg")
 
@@ -235,181 +264,6 @@ def get_province_from_order(order):
         return parts[1]
     else:
         return order_tokens[0]
-
-def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> List[str]:
-    """
-    Convert dipnet style single order to DAIDE style order. Needs game instance to determine the powers owning the units
-
-    :param dipnet_style_order_strs: dipnet style list of orders to be converted to DAIDE
-    :param game: game instance
-    :return: DAIDE style order string
-    """
-    def daidefy_suborder(dipnet_suborder: str) -> str:
-        """
-        Translates dipnet style units to DAIDE style units
-        E.g. for initial game state
-        A BUD       --> AUS AMY BUD
-        F TRI       --> AUS FLT TRI
-        A PAR       --> FRA AMY PAR
-        A MAR       --> FRA AMY MAR
-
-        :param dipnet_suborder: dipnet suborder to be encoded
-        :return: DAIDE-style suborder
-        """
-        if dipnet_suborder not in unit_game_mapping:
-            raise f"error from utils.dipnet_to_daide_parsing: unit {dipnet_suborder} not present in unit_game_mapping"
-        return "(" + (" ".join(
-            [
-                unit_game_mapping[dipnet_suborder],
-                "AMY" if dipnet_suborder[0] == "A" else "FLT",
-                dipnet_suborder.split()[-1]
-            ]
-        ) ) + ")"
-    
-    convoy_map = defaultdict(list)
-    dipnet_style_order_strs_tokens = [None for _ in range(len(dipnet_style_order_strs))]
-
-    # Convert strings to order tokens and store a dictionary mapping of armies to be convoyed and fleets helping to convoy
-    for i in range(len(dipnet_style_order_strs)):
-        dipnet_style_order_strs_tokens[i] = get_order_tokens(dipnet_style_order_strs[i])
-        if dipnet_style_order_strs_tokens[i][1] == 'C':
-            convoy_map[dipnet_style_order_strs_tokens[i][2] + dipnet_style_order_strs_tokens[i][3]].append(dipnet_style_order_strs_tokens[i][0].split()[-1])
-    
-    daide_orders = []
-
-    # For each order
-    for dipnet_order_tokens in dipnet_style_order_strs_tokens:
-
-        # Create unit to power mapping for constructing DAIDE tokens
-        unit_game_mapping = {}
-        for power in list(game.powers.keys()):
-            for unit in game.get_units(power):
-                unit_game_mapping[unit] = power[:3]
-
-        daide_order = []
-
-        # Daidefy and add source unit as it is
-        daide_order.append(daidefy_suborder(dipnet_order_tokens[0]))
-        if dipnet_order_tokens[1] == "S":
-            # Support orders
-            daide_order.append("SUP")
-            daide_order.append(daidefy_suborder(dipnet_order_tokens[2]))
-            if len(dipnet_order_tokens) == 4 and dipnet_order_tokens[3] != "H":
-                daide_order.append("MTO")
-                daide_order.append(dipnet_order_tokens[3].split()[-1])
-            elif len(dipnet_order_tokens) > 4:
-                raise f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
-        elif dipnet_order_tokens[1] == "H":
-            # Hold orders
-            daide_order.append("HLD")
-        elif dipnet_order_tokens[1] == "C":
-            # Convoy orders
-            daide_order.append("CVY")
-            daide_order.append(daidefy_suborder(dipnet_order_tokens[2]))
-            daide_order.append("CTO")
-            daide_order.append(dipnet_order_tokens[3].split()[-1])
-        elif len(dipnet_order_tokens) >= 3 and dipnet_order_tokens[2] == "VIA":
-            # VIA/CTO orders
-            daide_order.append("CTO")
-            daide_order.append(dipnet_order_tokens[1].split()[-1])
-            daide_order.append("VIA")
-            if dipnet_order_tokens[0] + dipnet_order_tokens[1] in convoy_map:
-                daide_order.append(f"({' '.join(convoy_map[dipnet_order_tokens[0] + dipnet_order_tokens[1]])})")
-            else:
-                print(f"unexpected situation at utils.dipnet_to_daide_parsing. Found order {dipnet_order_tokens} which doesn't have convoying fleet in its own set of orders")
-        else:
-            # Move orders
-            daide_order.append("MTO")
-            daide_order.append(dipnet_order_tokens[1].split()[-1])
-            if len(dipnet_order_tokens) > 2:
-                raise f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
-        daide_orders.append(" ".join(daide_order))
-
-    return daide_orders
-
-
-def daide_to_dipnet_parsing(daide_style_order_str: str) -> str:
-    """
-    Convert DAIDE style single order to dipnet style order
-
-    :param daide_style_order_str: DAIDE style string to be converted to dipnet style
-    :return: dipnet style order string
-    """
-    def split_into_groups(daide_style_order_str: str) -> List[str]:
-        """
-        Split the string based on parenthesis or spaces
-        E.g.
-        "(FRA AMY PAR) SUP (FRA AMY MAR) MTO BUR" --> "(FRA AMY PAR)", "SUP", "(FRA AMY MAR)", "MTO", "BUR"
-
-        :param daide_style_order_str: DAIDE style string
-        :return: list of strings containing components of the order which makes it easy to convert to dipnet-style order
-        """
-        open_brack = False
-        stack = ""
-        grouped_order = []
-        for char in daide_style_order_str:
-            if (not(open_brack) and char == ' ') or char == ')':
-                if stack:
-                    grouped_order.append(stack)
-                    stack = ""
-                    open_brack = False
-            elif char == '(':
-                open_brack = True
-            else:
-                stack += char
-        if stack:
-            grouped_order.append(stack)
-        return grouped_order
-    daide_style_order_groups = split_into_groups(daide_style_order_str)
-
-    def dipnetify_suborder(suborder: str) -> str:
-        """
-        Translates DAIDE style units to dipnet style units
-
-        :param suborder: DAIDE-style suborder to be encoded
-        :return: dipnet suborder
-        """
-        suborder_tokens = suborder.split()
-        return suborder_tokens[1][0] + " " + suborder_tokens[2]
-
-    dipnet_order = []
-
-    # Dipnetify source unit
-    dipnet_order.append(dipnetify_suborder(daide_style_order_groups[0]))
-    if daide_style_order_groups[1] == "SUP":
-        # Support order
-        dipnet_order.append("S")
-        dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2]))
-        if len(daide_style_order_groups) == 5 and daide_style_order_groups[3] == "MTO":
-            dipnet_order.append("-")
-            dipnet_order.append(daide_style_order_groups[4])
-        elif len(daide_style_order_groups) > 5:
-            raise f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
-    elif daide_style_order_groups[1] == "HLD":
-        # Hold order
-        dipnet_order.append("H")
-    elif daide_style_order_groups[1] == "CTO":
-        # CTO order
-        dipnet_order.append("-")
-        dipnet_order.append(daide_style_order_groups[2])
-        dipnet_order.append("VIA")
-    elif daide_style_order_groups[1] == "CVY":
-        # Convoy order
-        dipnet_order.append("C")
-        dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2]))
-        dipnet_order.append("-")
-        dipnet_order.append(daide_style_order_groups[4])
-    elif daide_style_order_groups[1] == "MTO":
-        # Move orders
-        dipnet_order.append("-")
-        dipnet_order.append(daide_style_order_groups[2])
-        if len(daide_style_order_groups) > 3:
-            raise f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
-    else:
-        raise f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
-
-    return " ".join(dipnet_order)
-    
 class MessagesData:
     def __init__(self):
         self.messages = []
