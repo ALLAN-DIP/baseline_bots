@@ -1,5 +1,6 @@
 """unit tests for smart order accepter bot"""
 from gameplay_framework import GamePlay
+from diplomacy import Game
 
 from baseline_bots.bots.smart_order_accepter_bot import SmartOrderAccepterBot
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
@@ -25,17 +26,18 @@ class TestSOABot():
         self.test_gen_messages()
 
     def test_play(self):
-        game_play = GamePlay(None, [RandomProposerBot, RandomProposerBot, SmartOrderAccepterBot], 3, True)
+        game = Game()
+        game_play = GamePlay(game, [RandomProposerBot('AUSTRIA', game), RandomProposerBot('ENGLAND', game), SmartOrderAccepterBot('FRANCE', game)], 3, True)
         msgs, done = game_play.step()
-        print(msgs)
-        game_play = GamePlay(None, [RandomProposerBot, RandomProposerBot, SmartOrderAccepterBot], 3, True)
+        game_play = GamePlay(game, [RandomProposerBot('AUSTRIA', game), RandomProposerBot('ENGLAND', game), SmartOrderAccepterBot('FRANCE', game)], 3, True)
         game_play.play()
 
     def test_stance(self):
         # score-based
         SOA_bot = SmartOrderAccepterBot
-        bot_instances = [RandomProposerBot, RandomProposerBot, SOA_bot, RandomProposerBot ]
-        game_play = GamePlay(None, bot_instances, 3, True)
+        game = Game()
+        bot_instances = [RandomProposerBot('AUSTRIA', game), RandomProposerBot('ENGLAND', game), SmartOrderAccepterBot('FRANCE', game), RandomProposerBot('GERMANY', game)]
+        game_play = GamePlay(game, bot_instances, 3, True)
         game_play.game.set_centers('AUSTRIA', ['VIE','TRI','BUD'], reset=True)
         game_play.game.set_centers('ENGLAND', ['LON'])
         game_play.game.set_centers('GERMANY', ['MUN', 'KIE', 'BER','BEL'])
@@ -51,11 +53,12 @@ class TestSOABot():
     def test_get_proposals(self):
         # proposal messages -> proposal dict {power_name: a list of proposal orders}
         # valid moves and power units must belong to SOA
-        SOA_bot = SmartOrderAccepterBot
-        baseline1 = RandomProposerBot
-        baseline2 = RandomProposerBot
+        game = Game()
+        SOA_bot = SmartOrderAccepterBot('FRANCE', game)
+        baseline1 = RandomProposerBot('AUSTRIA', game)
+        baseline2 = RandomProposerBot('ENGLAND', game)
         bot_instances = [baseline1, baseline2, SOA_bot]   
-        game_play = GamePlay(None, bot_instances, 3, True)
+        game_play = GamePlay(game, bot_instances, 3, True)
         bl1_msg = baseline1.gen_messages().messages
         bl2_msg = baseline2.gen_messages().messages
 
@@ -97,13 +100,14 @@ class TestSOABot():
         n=100
         orders = yield self.brain.get_orders(self.game, self.power_name)
         for i in range(n):
-            SOA_bot = SmartOrderAccepterBot
+            game = Game()
+            SOA_bot = SmartOrderAccepterBot('FRANCE', game)
             SOA_bot.rollout_length = 10
-            baseline1 = RandomProposerBot
-            baseline2 = RandomProposerBot
+            baseline1 = RandomProposerBot('AUSTRIA', game)
+            baseline2 = RandomProposerBot('ENGLAND', game)
             bot_instances = [baseline1, baseline2, SOA_bot]   
 
-            game_play = GamePlay(None, bot_instances, 3, True)
+            game_play = GamePlay(game, bot_instances, 3, True)
             bl1_msg = baseline1.gen_messages().messages
             bl2_msg = baseline2.gen_messages().messages
 
@@ -149,10 +153,9 @@ class TestSOABot():
 
     def gen_pos_stance_messages(self):
         # gen for only allies 
-
-        SOA_bot = SmartOrderAccepterBot
-        bot_instances = [RandomProposerBot, RandomProposerBot, SOA_bot]
-        game_play = GamePlay(None, bot_instances, 3, True)
+        game = Game()
+        bot_instances = [RandomProposerBot('AUSTRIA', game), RandomProposerBot('ENGLAND', game), SmartOrderAccepterBot('FRANCE', game), RandomProposerBot('GERMANY', game)]
+        game_play = GamePlay(game, bot_instances, 3, True)
         game_play.game.set_centers('AUSTRIA', ['VIE','TRI','BUD'], reset=True)
         game_play.game.set_centers('ENGLAND', ['LON'])
         game_play.game.set_centers('GERMANY', ['MUN', 'KIE', 'BER','BEL'])
