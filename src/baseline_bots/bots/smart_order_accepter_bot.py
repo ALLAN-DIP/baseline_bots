@@ -3,7 +3,7 @@ __email__ = "sanderschulhoff@gmail.com"
 
 from typing import Dict, List, Tuple
 
-from DAIDE import FCT, ORR, XDO
+from DAIDE import FCT, ORR, XDO, PRP
 from diplomacy import Message
 from stance_vector import ScoreBasedStance
 
@@ -61,6 +61,25 @@ class SmartOrderAccepterBot(DipnetBot):
 
         return msgs_data
 
+    def gen_proposal_reply(self, best_proposer: str, prp_orders: dict, messages: MessagesData) -> MessagesData: 
+        """
+        Reply back to allies regarding their proposals whether we follow or not follow
+        """
+        for proposer, orders in prp_orders.items():
+            if orders and self.power_name != proposer and self.stance.get_stance()[self.power_name][proposer]>0:
+                if proposer == best_proposer:
+                    msg = YES(
+                        PRP(ORR(XDO(dipnet_to_daide_parsing(orders))))
+                    )
+                else:
+                    msg = REJ(
+                        PRP(ORR(XDO(dipnet_to_daide_parsing(orders))))
+                    )
+                messages.add_message(
+                    proposer, str(msg)
+                )
+        return messages
+
     def __call__(self, rcvd_messages: List[Tuple[int, Message]]):
         # compute pos/neg stance on other bots using Tony's stance vector
         self.stance.get_stance()
@@ -83,6 +102,9 @@ class SmartOrderAccepterBot(DipnetBot):
         orders_data = OrdersData()
         orders_data.add_orders(best_orders)
 
-        # generate messages
+        # generate messages for FCT sharing info orders
         messages = self.gen_messages(orders_data)
+
+        # generate proposal response YES/NO to allies
+        messages = self.gen_proposal_reply(best_proposer, prp_orders, messages)
         return {"messages": messages, "orders": orders_data.get_list_of_orders()}
