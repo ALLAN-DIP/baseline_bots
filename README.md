@@ -1,4 +1,4 @@
-# Baselines Bots
+# Baseline Bots
 
 ```
     ___    __    __    ___    _   __

@@ -1,7 +1,6 @@
 __authors__ = ["Sander Schulhoff", "Kartik Shenoy"]
 __email__ = "sanderschulhoff@gmail.com"
 
-from multiprocessing.sharedctypes import RawValue
 import random
 from typing import List
 
