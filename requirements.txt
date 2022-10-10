@@ -1,4 +1,4 @@
-diplomacy
+https://github.com/SHADE-AI/diplomacy.git
 sphinx
 pytest
 git+https://github.com/trigaten/DAIDE.git
