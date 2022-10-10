@@ -84,6 +84,7 @@ async def play(hostname, port, game_id, power_name, bot_type, outdir):
 	while game.is_game_forming:
 		await asyncio.sleep(2)
 		print("", end='.')
+	print()
 
 
 	t1 = time.perf_counter()
