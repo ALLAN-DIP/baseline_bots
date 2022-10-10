@@ -13,6 +13,7 @@ printf "/_/  |_/_____/_____/_/  |_/_/ |_/   \n"
 printf "\n"
 
 export PYTHONPATH=$PYTHONPATH:/model/src/model_server/research/
+export WORKING_DIR=/model/src/model_server/research/WORKING_DIR/
 
 # launch bot script
 # python /model/src/model_server/baseline_bots/run_bot.py $@

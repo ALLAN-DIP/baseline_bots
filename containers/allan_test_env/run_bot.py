@@ -6,7 +6,6 @@ import sys, os
 sys.path.append("..") # Adds higher directory to python modules path.
 
 # inside container
-os.environ['WORKING_DIR'] = "/model/src/model_server/research/WORKING_DIR"
 os.environ['PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION'] = 'cpp'
 
 import argparse

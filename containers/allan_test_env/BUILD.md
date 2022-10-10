@@ -9,12 +9,12 @@ Build:
 $ wget https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-sl_model.zip
 $ mkdir bot_neurips2019-sl_model
 $ unzip neurips2019-sl_model.zip -d bot_neurips2019-sl_model/
-$ docker build -t allan_dip_bot . 
+$ docker build -t allan_test_env . 
 ```
 
 Usage:
 ```shell
-$ docker run -it allan_dip_bot --help
+$ docker run -it allan_test_env --help
 --host 		HOST [default localhost]
 --port 		PORT [default 8432]
 --game_id 	GAME_ID
