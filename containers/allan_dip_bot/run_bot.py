@@ -2,6 +2,7 @@ __author__ = "Kartik Shenoy"
 __email__ = "kartik.shenoyy@gmail.com"
 
 import sys, os
+
 sys.path.append("..") # Adds higher directory to python modules path.
 
 # inside container
@@ -17,6 +18,8 @@ from diplomacy import Game, connect, Message
 
 # import required bots
 from baseline_bots.bots.dipnet.no_press_bot import NoPressDipBot
+from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
+from baseline_bots.bots.smart_order_accepter_bot import SmartOrderAccepterBot
 
 from diplomacy_research.utils.cluster import is_port_opened
 
@@ -48,7 +51,7 @@ async def test(hostname='localhost', port=8432):
 		print(game_info)
 	print(games)
 
-async def launch(hostname, port, game_id, power_name, outdir):
+async def launch(hostname, port, game_id, power_name, bot_type, outdir):
 	print("Waiting for tensorflow server to come online")
 	serving_flag = False
 	while not serving_flag:
@@ -57,9 +60,9 @@ async def launch(hostname, port, game_id, power_name, outdir):
 		await asyncio.sleep(1)
 	print("tensorflow server online")
 
-	await play(hostname, port, game_id, power_name, outdir)
+	await play(hostname, port, game_id, power_name, bot_type, outdir)
 
-async def play(hostname, port, game_id,power_name, outdir):
+async def play(hostname, port, game_id, power_name, bot_type, outdir):
 
 	print("DipNetSL joining game: " + game_id + " as " + power_name)
 	connection = await connect(hostname, port)
@@ -67,8 +70,15 @@ async def play(hostname, port, game_id,power_name, outdir):
 	game = await channel.join_game(game_id=game_id, power_name=power_name)
 
 
-	bot = NoPressDipBot(power_name, game)
+	bot = None
 
+	if bot_type == "NoPressDipBot":
+		bot = NoPressDipBot(power_name, game)
+	elif bot_type == "TransparentBot":
+		bot = TransparentBot(power_name, game)
+	elif bot_type == "SmartOrderAccepterBot":
+		bot = SmartOrderAccepterBot(power_name, game)
+		
 	# Wait while game is still being formed
 	while game.is_game_forming:
 		await asyncio.sleep(0.5)
@@ -82,48 +92,39 @@ async def play(hostname, port, game_id,power_name, outdir):
 
 		current_phase = game.get_current_phase()
 
+		# Retrieve messages
 		rcvd_messages = game.filter_messages(messages=game.messages, game_role=bot.power_name)
 		rcvd_messages = list(rcvd_messages.items())
 		rcvd_messages.sort()
 
-		round_msgs = game.messages
 		to_send_msgs = {}
 	
 		if not game.powers[bot.power_name].is_eliminated():
-			# Retrieve messages
-			rcvd_messages = game.filter_messages(messages=round_msgs, game_role=bot.power_name)
-			rcvd_messages = list(rcvd_messages.items())
-			rcvd_messages.sort()
-
 			# Send messages to bots and fetch messages from bot
-			bot_messages = await bot.gen_messages(rcvd_messages)
+			bot_data = await bot(rcvd_messages)
 
 			# If messages are to be sent, send them
-			if bot_messages and bot_messages.messages:
-				to_send_msgs[bot.power_name] = bot_messages.messages
+			if bot_data['messages'] and bot_data['messages'].messages:
+				to_send_msgs[bot.power_name] = bot_data['messages'].messages
 
-		# Send all messages
-		for sender in to_send_msgs:
-			for msg in to_send_msgs[sender]:
-				msg_obj = Message(
-					sender=sender,
-					recipient=msg['recipient'],
-					message=msg['message'],
-					phase=game.get_current_phase(),
-				)
-				await game.send_game_message(message=msg_obj)
-		if len(to_send_msgs):
-			print(f"Messages sent: {len(to_send_msgs)}")
-			
-		if not game.powers[bot.power_name].is_eliminated():
-			# Orders round
-			orders = await bot.gen_orders()
+			# Send all messages
+			for sender in to_send_msgs:
+				for msg in to_send_msgs[sender]:
+					msg_obj = Message(
+						sender=sender,
+						recipient=msg['recipient'],
+						message=msg['message'],
+						phase=game.get_current_phase(),
+					)
+					await game.send_game_message(message=msg_obj)
+			if len(to_send_msgs):
+				print(f"Messages sent: {len(to_send_msgs)}")
 
-			if orders is not None:
-				await game.set_orders(power_name=power_name, orders=orders, wait=False)
+			if bot_data['orders'] is not None:
+				await game.set_orders(power_name=power_name, orders=bot_data['orders'], wait=False)
 			print("Phase: " + current_phase)
 			print("Orders: ")
-			print(orders)
+			print(bot_data['orders'])
 
 		while current_phase == game.get_current_phase():
 			await asyncio.sleep(2)
@@ -139,11 +140,13 @@ if __name__ == '__main__':
 	parser.add_argument('--port', type=int)
 	parser.add_argument('--game_id', type=str)
 	parser.add_argument("--power", type=str)
+	parser.add_argument("--bot_type", type=str, default="TransparentBot")
 	parser.add_argument('--outdir', type=str)
 	args = parser.parse_args()
 	host = args.host
 	port = args.port
 	game_id = args.game_id
+	bot_type = args.bot_type
 	outdir = args.outdir
 	power = args.power
 
@@ -156,4 +159,4 @@ if __name__ == '__main__':
 		print("Game ID required")
 		sys.exit(1)
 
-	asyncio.run(launch(hostname=host, port=port, game_id=game_id,power_name=power, outdir=outdir))
+	asyncio.run(launch(hostname=host, port=port, game_id=game_id,power_name=power, bot_type=bot_type, outdir=outdir))

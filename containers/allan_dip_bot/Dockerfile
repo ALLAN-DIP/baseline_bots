@@ -51,9 +51,9 @@ WORKDIR /model/src/model_server/baseline_bots
 RUN pip install -r requirements.txt
 RUN pip install -e .
 
-COPY run_dipnet.py /model/src/model_server/baseline_bots/run_dipnet.py
+COPY run_bot.py /model/src/model_server/baseline_bots/run_bot.py
 COPY run.sh /model/src/model_server/baseline_bots/run.sh
-RUN chmod 777 /model/src/model_server/baseline_bots/run_dipnet.py
+RUN chmod 777 /model/src/model_server/baseline_bots/run_bot.py
 RUN chmod 777 /model/src/model_server/baseline_bots/run.sh
 ENTRYPOINT ["/model/src/model_server/baseline_bots/run.sh"]
 
