@@ -74,7 +74,7 @@ class TransparentBot(DipnetBot):
 
         for other_power in get_other_powers([self.power_name], self.game):
             if final_orders:
-                msg = FCT(ORR(XDO(dipnet_to_daide_parsing(final_orders, self.game))))
+                msg = FCT(ORR(XDO(final_orders)))
                 comms_obj.add_message(other_power, msg)
 
         return comms_obj
