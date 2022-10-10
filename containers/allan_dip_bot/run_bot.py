@@ -104,11 +104,12 @@ async def play(hostname, port, game_id, power_name, bot_type, outdir):
 	
 		if not game.powers[bot.power_name].is_eliminated():
 			# Send messages to bots and fetch messages from bot
-			bot_data = await bot(rcvd_messages)
+			messages_data = await bot.gen_messages(rcvd_messages)
+			orders_data = await bot.gen_orders()
 
 			# If messages are to be sent, send them
-			if bot_data['messages'] and bot_data['messages'].messages:
-				to_send_msgs[bot.power_name] = bot_data['messages'].messages
+			if messages_data and messages_data.messages:
+				to_send_msgs[bot.power_name] = messages_data.messages
 
 			# Send all messages
 			for sender in to_send_msgs:
@@ -123,11 +124,11 @@ async def play(hostname, port, game_id, power_name, bot_type, outdir):
 			if len(to_send_msgs):
 				print(f"Messages sent: {len(to_send_msgs)}")
 
-			if bot_data['orders'] is not None:
-				await game.set_orders(power_name=power_name, orders=bot_data['orders'], wait=False)
+			if orders_data is not None:
+				await game.set_orders(power_name=power_name, orders=orders_data, wait=False)
 			print("Phase: " + current_phase)
 			print("Orders: ")
-			print(bot_data['orders'])
+			print(orders_data)
 
 		while current_phase == game.get_current_phase():
 			await asyncio.sleep(2)
