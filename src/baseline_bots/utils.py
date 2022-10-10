@@ -97,6 +97,11 @@ def FCT(string) -> str:
     return f"FCT ({string})"
 
 
+def HUH(string) -> str:
+    """Forms HUH message"""
+    return f"HUH ({string})"
+
+
 def parse_FCT(msg) -> str:
     """Detaches FCT from main arrangement"""
     if "FCT" not in msg:
