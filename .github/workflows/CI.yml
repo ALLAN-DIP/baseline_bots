@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: [ main ]
   push:
-    branches: [ main ]
+    branches: [ main, test_CI ]
 
 jobs:
   testbuild:
@@ -26,3 +26,4 @@ jobs:
       run: |
         pytest tests/utils_test.py
         pytest tests/bot_tests/bots_test.py
+        pytest tests/randomize_order_test.py

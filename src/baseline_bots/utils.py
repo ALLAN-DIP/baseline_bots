@@ -9,7 +9,7 @@ __email__ = "sanderschulhoff@gmail.com"
 # from diplomacy_research.models.state_space import get_order_tokens
 import re
 from collections import defaultdict
-from typing import List
+from typing import Dict, List, Tuple
 
 from DAIDE.utils.exceptions import ParseError
 from diplomacy import Game, Message
@@ -107,9 +107,19 @@ def parse_FCT(msg) -> str:
     if "FCT" not in msg:
         raise ParseError("This is not an FCT message")
     try:
-        return msg[5:-1]
+        return msg[msg.find("(") + 1:-1]
     except Exception:
-        raise ParseError(f"Cant parse ORR XDO msg {msg}")
+        raise Exception(f"Cant parse FCT msg {msg}")
+
+
+def parse_PRP(msg) -> str:
+    """Detaches PRP from main arrangement"""
+    if "PRP" not in msg:
+        raise ParseError("This is not an PRP message")
+    try:
+        return msg[msg.find("(") + 1:-1]
+    except Exception:
+        raise Exception(f"Cant parse PRP msg {msg}")
 
 
 def parse_orr_xdo(msg: str) -> List[str]:
@@ -121,13 +131,42 @@ def parse_orr_xdo(msg: str) -> List[str]:
         raise ParseError("This looks an ally message")
     try:
         if "ORR" in msg:
-            msg = msg[5:-1]
+            msg = msg[msg.find("(") + 1:-1]
         # else:
         #     # remove else since it is a bug to 'XDO (order)'
         #     msg = msg[1:-1]
-        parts = msg.split(") (")
 
-        return [part[5:-1] for part in parts]
+        # split the message at )( points
+        parts = re.split(r"\)\s*\(", msg)
+
+        def extract_suborder_indices(part: str) -> str:
+            """
+            Finds the start and end indices of suborder in an XDO message
+            For instance, 
+            "XDO (F BLK - CON)" returns (4, 16)
+            "XDO(F BLK - CON)" returns (3, 15)
+            "XDO ((RUS AMY WAR) MTO PRU)" returns (4, 26)
+
+            :param part: part of the message representing an arrangement for 1 unit
+            :return: the actual order after excluding XDO
+            """
+            start_in = part.find("(", part.find("XDO"))
+            parenthesis_cnt = 0
+            for i in range(start_in, len(part)):
+                if part[i] == '(':
+                    parenthesis_cnt += 1
+                elif part[i] == ')':
+                    parenthesis_cnt -= 1
+                if parenthesis_cnt == 0:
+                    return start_in, i
+            return start_in, -1
+        
+        ans = []
+        for part in parts:
+            start, end = extract_suborder_indices(part)
+            ans.append(part[start+1:end])
+        return ans
+
     except Exception:
         raise ParseError("Cant parse ORR XDO msg")
 
@@ -230,8 +269,6 @@ def get_province_from_order(order):
         return parts[1]
     else:
         return order_tokens[0]
-
-
 class MessagesData:
     def __init__(self):
         self.messages = []
@@ -302,6 +339,63 @@ def get_state_value(bot, game, power_name):
             )
         game.process()
     return len(game.get_centers(power_name))
+
+
+@gen.coroutine
+def get_best_orders(bot, proposal_order: dict, shared_order: dict):
+    """
+    input:
+        bot: A bot instance e.g. RealPolitik
+        proposal_order: a dictionary of key=power name of proposer, value=list of orders. This can include self base order
+                        i.e. if a bot is RealPolitik, its base order is from DipNet
+        shared_order: a dictionary of key=power name of proposer, value=list of orders. The proposers share info (or orders) about the current turn,
+                    where we can use these shared order to our current turn in a simulated game to roll out with most correct info.
+    output:
+        best_proposer: best power that propose the best orders to a bot, this can be itself
+        proposal_order[best_proposer]: the orders from the best proposer
+    """
+
+    # initialize state value for each proposal
+    state_value = {power: -10000 for power in bot.game.powers}
+
+    # get state value for each proposal
+    for proposer, unit_orders in proposal_order.items():
+
+        # if there is a proposal from this power
+        if unit_orders:
+            proposed = True
+
+            # simulate game by copying the current one
+            simulated_game = bot.game.__deepcopy__(None)
+
+            # censor aggressive orders
+            unit_orders = get_non_aggressive_orders(
+                unit_orders, bot.power_name, bot.game
+            )
+
+            # set orders as a proposal order
+            simulated_game.set_orders(power_name=bot.power_name, orders=unit_orders)
+
+            # consider shared orders in a simulated game
+            for other_power, power_orders in shared_order.items():
+
+                # if they are not sharing any info about their orders then assume that they are DipNet-based
+                if not power_orders:
+                    power_orders = yield bot.brain.get_orders(game, other_power)
+                simulated_game.set_orders(power_name=other_power, orders=power_orders)
+
+            # process current turn
+            simulated_game.process()
+
+            # rollout and get state value
+            state_value[proposer] = yield get_state_value(
+                bot, simulated_game, bot.power_name
+            )
+
+    # get power name that gives the max state value
+    best_proposer = max(state_value, key=state_value.get)
+
+    return best_proposer, proposal_order[best_proposer]
 
 
 if __name__ == "__main__":

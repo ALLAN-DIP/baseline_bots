@@ -15,7 +15,7 @@ This website contains the documentation for the ALLAN Baseline Bots.
    development.rst
    bots.rst
    utils.rst
-
+   random_order_mod.rst
 
 
 Indices and tables

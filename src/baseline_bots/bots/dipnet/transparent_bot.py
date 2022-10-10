@@ -2,17 +2,12 @@ __author__ = "Kartik Shenoy"
 __email__ = "kartik.shenoyy@gmail.com"
 
 import random
-import sys
-
-sys.path.append("..")
-sys.path.append("../..")
-
 from collections import defaultdict
 
 from tornado import gen
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
-from baseline_bots.src.utils import (
+from baseline_bots.utils import (
     FCT,
     ORR,
     XDO,

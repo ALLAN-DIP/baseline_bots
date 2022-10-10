@@ -8,3 +8,6 @@ _build
 *.egg*
 test.ipynb
 build
+.vscode
+./joblogs/*
+./jobs/*
