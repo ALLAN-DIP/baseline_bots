@@ -80,8 +80,11 @@ async def play(hostname, port, game_id, power_name, bot_type, outdir):
 		bot = SmartOrderAccepterBot(power_name, game)
 		
 	# Wait while game is still being formed
+	print("Waiting for game to start", end=' ')
 	while game.is_game_forming:
-		await asyncio.sleep(0.5)
+		await asyncio.sleep(2)
+		print("", end='.')
+
 
 	t1 = time.perf_counter()
 	i = 0
@@ -135,13 +138,13 @@ async def play(hostname, port, game_id, power_name, bot_type, outdir):
 
 
 if __name__ == '__main__':
-	parser = argparse.ArgumentParser()
-	parser.add_argument('--host', type=str)
-	parser.add_argument('--port', type=int)
-	parser.add_argument('--game_id', type=str)
-	parser.add_argument("--power", type=str)
-	parser.add_argument("--bot_type", type=str, default="TransparentBot")
-	parser.add_argument('--outdir', type=str)
+	parser = argparse.ArgumentParser(description='ALLAN-DIP: Team ALLAN\'s Diplomacy Agent')
+	parser.add_argument('--host', type=str, default='localhost', help='host IP address (defaults to localhost)')
+	parser.add_argument('--port', type=int, default=8432, help='port to connect to the game')
+	parser.add_argument('--game_id', type=str, help='game id of game created in DATC diplomacy game')
+	parser.add_argument("--power", type=str, help='power name (AUSTRIA, ENGLAND, FRANCE, GERMANY, ITALY, RUSSIA, TURKEY)')
+	parser.add_argument("--bot_type", type=str, default="TransparentBot", help='type of bot to be launched (NoPressDipBot, TransparentBot, SmartOrderAccepterBot)')
+	parser.add_argument('--outdir', type=str, help='output directory for game json to be stored')
 	args = parser.parse_args()
 	host = args.host
 	port = args.port
