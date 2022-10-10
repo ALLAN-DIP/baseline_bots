@@ -25,10 +25,13 @@ from diplomacy_research.utils.cluster import is_port_opened
 
 POWERS = ['AUSTRIA', 'ENGLAND', 'FRANCE', 'GERMANY', 'ITALY', 'RUSSIA', 'TURKEY']
 
+async def test(hostname:str='localhost', port:int=8432) -> None:
+	"""
+	Tests the game connection
 
-#@gen.coroutine
-
-async def test(hostname='localhost', port=8432):
+	:param hostname: name of host on which games are hosted
+	:param port: port to which the bot should connect on the host
+	"""
 	connection = await connect(hostname, port)
 	channel = await connection.authenticate('random_user', 'password')
 	games = await channel.list_games()
@@ -51,19 +54,42 @@ async def test(hostname='localhost', port=8432):
 		print(game_info)
 	print(games)
 
-async def launch(hostname, port, game_id, power_name, bot_type, outdir):
-	print("Waiting for tensorflow server to come online")
+
+async def launch(hostname:str, port:int, game_id:str, power_name:str, bot_type:str, outdir:str) -> None:
+	"""
+	Waits for dipnet model to load and then starts the bot execution
+
+	:param hostname: name of host on which games are hosted
+	:param port: port to which the bot should connect on the host
+	:param game_id: game id to connect to on host
+	:param power_name: power name of the bot to be launched
+	:param bot_type: the type of bot to be launched - NoPressDipBot/TransparentBot/SmartOrderAccepterBot/..
+	:param outdir: the output directory where game json files should be stored
+	"""
+	print("Waiting for tensorflow server to come online", end=' ')
 	serving_flag = False
 	while not serving_flag:
 		serving_flag = is_port_opened(9501)
-		print("+")
+		print("", end='.')
 		await asyncio.sleep(1)
-	print("tensorflow server online")
+	print()
+	print("Tensorflow server online")
 
 	await play(hostname, port, game_id, power_name, bot_type, outdir)
 
-async def play(hostname, port, game_id, power_name, bot_type, outdir):
 
+async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str, outdir:str) -> None:
+	"""
+	Launches the bot for game play
+
+	:param hostname: name of host on which games are hosted
+	:param port: port to which the bot should connect on the host
+	:param game_id: game id to connect to on host
+	:param power_name: power name of the bot to be launched
+	:param bot_type: the type of bot to be launched - NoPressDipBot/TransparentBot/SmartOrderAccepterBot/..
+	:param outdir: the output directory where game json files should be stored
+	"""
+	# Connect to the game
 	print("DipNetSL joining game: " + game_id + " as " + power_name)
 	connection = await connect(hostname, port)
 	channel = await connection.authenticate('dipnet_' + power_name, 'password')
@@ -106,13 +132,14 @@ async def play(hostname, port, game_id, power_name, bot_type, outdir):
 		if not game.powers[bot.power_name].is_eliminated():
 			# Send messages to bots and fetch messages from bot
 			messages_data = await bot.gen_messages(rcvd_messages)
+
+			# Fetch orders from bot
 			orders_data = await bot.gen_orders()
 
 			# If messages are to be sent, send them
 			if messages_data and messages_data.messages:
 				to_send_msgs[bot.power_name] = messages_data.messages
 
-			# Send all messages
 			for sender in to_send_msgs:
 				for msg in to_send_msgs[sender]:
 					msg_obj = Message(
@@ -122,11 +149,14 @@ async def play(hostname, port, game_id, power_name, bot_type, outdir):
 						phase=game.get_current_phase(),
 					)
 					await game.send_game_message(message=msg_obj)
+
 			if len(to_send_msgs):
 				print(f"Messages sent: {len(to_send_msgs)}")
 
+			# If orders are present, send them
 			if orders_data is not None:
 				await game.set_orders(power_name=power_name, orders=orders_data, wait=False)
+
 			print("Phase: " + current_phase)
 			print("Orders: ")
 			print(orders_data)
@@ -155,11 +185,6 @@ if __name__ == '__main__':
 	outdir = args.outdir
 	power = args.power
 
-	#default
-	if host == None:
-		host = 'localhost'
-	if port == None:
-		port = 8432
 	if game_id == None:
 		print("Game ID required")
 		sys.exit(1)

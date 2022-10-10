@@ -1,8 +1,9 @@
 #!/bin/bash
 
-#launch model server
+# launch model server
 /model/src/model_server/run_model_server.sh &
 
+# ASCII art
 printf "Running ALLAN bot\n"
 printf "    ___    __    __    ___    _   __\n"
 printf "   /   |  / /   / /   /   |  / | / /\n"
@@ -13,5 +14,5 @@ printf "\n"
 
 export PYTHONPATH=$PYTHONPATH:/model/src/model_server/research/
 
-#launch dipnet script
+# launch bot script
 python /model/src/model_server/baseline_bots/run_bot.py $@
