@@ -53,11 +53,10 @@ class TransparentBot(DipnetBot):
 
     @gen.coroutine
     def gen_messages(self, rcvd_messages):
-        if self.curr_msg_round == 1:
-            # Fetch list of orders from DipNet
-            orders = yield from self.brain.get_orders(self.game, self.power_name)
-            self.orders.add_orders(orders, overwrite=True)
-            self.my_orders_informed = False
+        # Fetch list of orders from DipNet
+        orders = yield from self.brain.get_orders(self.game, self.power_name)
+        self.orders.add_orders(orders, overwrite=True)
+        self.my_orders_informed = False
         comms_obj = MessagesData()
 
         parsed_orders = self.parse_messages(rcvd_messages)
@@ -78,7 +77,6 @@ class TransparentBot(DipnetBot):
                 msg = FCT(ORR(XDO(dipnet_to_daide_parsing(final_orders))))
                 comms_obj.add_message(other_power, msg)
 
-        self.curr_msg_round += 1
         return comms_obj
 
     @gen.coroutine
