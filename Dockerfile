@@ -2,6 +2,7 @@ FROM ubuntu:18.04
 
 # install updates and use python3.7
 RUN apt-get update -y && \
+pwd && \
 apt-get upgrade -y && \
 apt-get install -y python3.7 python3-pip && \
 cd /usr/bin && ls -lrth python* && \
@@ -18,12 +19,12 @@ pip3 install -r requirements.txt && \
 cd ..
 # install singularity
 RUN export VERSION=v3.2.0  && \
-sudo apt-get update -y  && \
-sudo apt-get install -y build-essential libssl-dev uuid-dev libgpgme11-dev libseccomp-dev pkg-config squashfs-tools  && \
+apt-get update -y  && \
+apt-get install -y build-essential libssl-dev uuid-dev libgpgme11-dev libseccomp-dev pkg-config squashfs-tools  && \
 # Installing GO 1.12.5
 export GO_VERSION=1.12.5 OS=linux ARCH=amd64  && \
 wget -nv https://dl.google.com/go/go$GO_VERSION.$OS-$ARCH.tar.gz  && \
-sudo tar -C /usr/local -xzf go$GO_VERSION.$OS-$ARCH.tar.gz  && \
+tar -C /usr/local -xzf go$GO_VERSION.$OS-$ARCH.tar.gz  && \
 rm -f go$GO_VERSION.$OS-$ARCH.tar.gz  && \
 export GOPATH=$HOME/.go  && \
 export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin  && \
@@ -38,7 +39,7 @@ git checkout $VERSION  && \
 ./mconfig -p /usr/local  && \
 cd ./builddir  && \
 make  && \
-sudo make install && pwd
+make install && pwd
 # run tests
 RUN cd research && \ 
 pip3 install -r requirements.txt && \
