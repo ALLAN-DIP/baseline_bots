@@ -10,6 +10,7 @@ python3 --version
 RUN pip3 install --upgrade pip && \
 apt-get install -y git && \
 apt-get install -y wget && \
+pip3 install singularity && \
 git clone https://github.com/diplomacy/research.git && \
 git clone https://github.com/ALLAN-DIP/baseline_bots.git && \
 cd baseline_bots && \
@@ -19,7 +20,7 @@ cd ..
 RUN cd research && \ 
 pip3 install -r requirements.txt && \
 pip3 install -r requirements_dev.txt
-RUN cd ../baseline_bots && git checkout test_CI && \
+RUN cd ../baseline_bots && \
 pip3 install -e . && \
 python3 -m pytest tests/utils_test.py && \
 python3 -m pytest tests/bot_tests/bots_test.py && \
