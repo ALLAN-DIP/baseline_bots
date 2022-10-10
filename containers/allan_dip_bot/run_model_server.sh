@@ -7,13 +7,13 @@ printf "batch_timeout_micros { value: %s }\n" $BATCH_TIMEOUT_MICROS >> $batch_fi
 printf "max_enqueued_batches { value: %s }\n" $MAX_ENQUEUED_BATCHES >> $batch_file
 printf "num_batch_threads { value: %s }\n" $NUM_BATCH_THREADS >> $batch_file
 printf "pad_variable_length_inputs: %s\n" $PAD_VARIABLE_LENGTH_INPUTS >> $batch_file
-printf "Running ALLAN bot\n"
-printf "    ___    __    __    ___    _   __\n"
-printf "   /   |  / /   / /   /   |  / | / /\n"
-printf "  / /| | / /   / /   / /| | /  |/ / \n"
-printf " / ___ |/ /___/ /___/ ___ |/ /|  /  \n"
-printf "/_/  |_/_____/_____/_/  |_/_/ |_/   \n"
-printf " "
+printf "Running ALLAN bot\n" >> $batch_file
+printf "    ___    __    __    ___    _   __\n" >> $batch_file
+printf "   /   |  / /   / /   /   |  / | / /\n" >> $batch_file
+printf "  / /| | / /   / /   / /| | /  |/ / \n" >> $batch_file
+printf " / ___ |/ /___/ /___/ ___ |/ /|  /  \n" >> $batch_file
+printf "/_/  |_/_____/_____/_/  |_/_/ |_/   \n" >> $batch_file
+printf "\n" >> $batch_file
 
 tensorflow_model_server --port=9501 --model_name="player" --enable_batching=true --batching_parameters_file=batch.txt --model_base_path=/model/src/model_server/bot_neurips2019-sl_model/ --tensorflow_session_parallelism=8 --file_system_poll_wait_seconds=3
 
