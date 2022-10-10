@@ -79,12 +79,12 @@ async def play(hostname, port, game_id, power_name, bot_type, outdir):
 	elif bot_type == "SmartOrderAccepterBot":
 		bot = SmartOrderAccepterBot(power_name, game)
 		
-	# # Wait while game is still being formed
-	# print("Waiting for game to start", end=' ')
-	# while game.is_game_forming:
-	# 	await asyncio.sleep(2)
-	# 	print("", end='.')
-	# print()
+	# Wait while game is still being formed
+	print("Waiting for game to start", end=' ')
+	while game.is_game_forming:
+		await asyncio.sleep(2)
+		print("", end='.')
+	print()
 
 
 	t1 = time.perf_counter()
