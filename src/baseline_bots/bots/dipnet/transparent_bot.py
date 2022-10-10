@@ -6,6 +6,8 @@ from collections import defaultdict
 
 from tornado import gen
 
+from diplomacy import Game, Message
+
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from baseline_bots.utils import (
     FCT,
@@ -16,6 +18,12 @@ from baseline_bots.utils import (
     parse_FCT,
     parse_orr_xdo,
 )
+
+from baseline_bots.parsing_utils import (
+    dipnet_to_daide_parsing
+)
+
+from typing import List
 
 
 class TransparentBot(DipnetBot):
@@ -53,7 +61,6 @@ class TransparentBot(DipnetBot):
         comms_obj = MessagesData()
 
         parsed_orders = self.parse_messages(rcvd_messages)
-        # print(parsed_orders)
 
         # My orders' messages if not already sent
         if not self.my_orders_informed:
@@ -68,9 +75,8 @@ class TransparentBot(DipnetBot):
 
         for other_power in get_other_powers([self.power_name], self.game):
             if final_orders:
-                msg = FCT(ORR(XDO(final_orders)))
+                msg = FCT(ORR(XDO(dipnet_to_daide_parsing(final_orders))))
                 comms_obj.add_message(other_power, msg)
-                print(msg)
 
         self.curr_msg_round += 1
         return comms_obj
@@ -84,3 +90,7 @@ class TransparentBot(DipnetBot):
             self.orders.add_orders(orders, overwrite=True)
 
         return self.orders.get_list_of_orders()
+
+    @gen.coroutine
+    def __call__(self, rcvd_messages: List[Message]):
+        return {"messages": self.gen_messages(rcvd_messages), "orders": self.gen_orders()}
