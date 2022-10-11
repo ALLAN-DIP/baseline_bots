@@ -3,7 +3,7 @@ __email__ = "sanderschulhoff@gmail.com"
 
 from typing import Dict, List, Tuple
 
-from DAIDE import FCT, ORR, XDO, PRP, HUH
+from DAIDE import FCT, ORR, XDO, PRP, HUH, YES, REJ
 from diplomacy import Message
 from stance_vector import ScoreBasedStance
 
@@ -13,7 +13,8 @@ from baseline_bots.utils import (
     OrdersData,
     get_best_orders,
     get_other_powers,
-    parse_orr_xdo,
+    parse_alliance_proposal,
+    parse_orr,
     parse_PRP
 )
 from baseline_bots.parsing_utils import (
@@ -21,6 +22,8 @@ from baseline_bots.parsing_utils import (
     daide_to_dipnet_parsing,
     parse_proposal_messages
 )
+
+from collections import defaultdict
 
 
 class SmartOrderAccepterBot(DipnetBot):
@@ -40,6 +43,7 @@ class SmartOrderAccepterBot(DipnetBot):
         super().__init__(power_name, game)
         self.alliance_props_sent = False
         self.stance = ScoreBasedStance(power_name, game)
+        self.alliances = defaultdict(list)
 
     def gen_pos_stance_messages(
         self, msgs_data: MessagesData, orders_list: List[str]
@@ -88,6 +92,21 @@ class SmartOrderAccepterBot(DipnetBot):
             messages_data.add_message(
                 sender, str(message)
             )
+        
+    def respond_to_alliance_messages(self, messages_data: MessagesData) -> None:
+        """
+        Send YES confirmation messages to all alliance proposals
+        :param messages_data: Message Data object to add messages
+        """
+        unique_senders = {}
+        for sender, message in self.alliances.values():
+            unique_senders[sender] = message
+        for sender, message in unique_senders.items():
+            messages_data.add_message(sender, str(YES(message)))
+
+        if self.alliances:
+            print("Alliances accepted")
+            print(self.alliances)
 
     def __call__(self, rcvd_messages: List[Tuple[int, Message]]):
         # compute pos/neg stance on other bots using Tony's stance vector
@@ -97,7 +116,12 @@ class SmartOrderAccepterBot(DipnetBot):
         orders = yield self.brain.get_orders(self.game, self.power_name)
 
         # extract only the proposed orders from the messages the bot has just received
-        valid_proposal_orders, invalid_proposal_orders, shared_orders, other_orders = parse_proposal_messages(rcvd_messages, self.game, self.power_name)
+        parsed_messages_dict = parse_proposal_messages(rcvd_messages, self.game, self.power_name)
+        valid_proposal_orders = parsed_messages_dict['valid_proposals']
+        invalid_proposal_orders = parsed_messages_dict['invalid_proposals']
+        shared_orders = parsed_messages_dict['shared_orders']
+        other_orders =  parsed_messages_dict['other_orders']
+        self.alliances =  parsed_messages_dict['alliance_proposals']
 
         # include base order to prp_orders.
         # This is to avoid having double calculation for the best list of orders between (self-generated) base orders vs proposal orders
@@ -114,6 +138,7 @@ class SmartOrderAccepterBot(DipnetBot):
         # generate messages for FCT sharing info orders
         msgs_data = self.gen_messages(orders_data)
         self.respond_to_invalid_orders(invalid_proposal_orders, msgs_data)
+        self.respond_to_alliance_messages(msgs_data)
 
         # generate proposal response YES/NO to allies
         msgs_data = self.gen_proposal_reply(best_proposer, prp_orders, msgs_data)
