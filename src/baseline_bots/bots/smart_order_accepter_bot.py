@@ -141,5 +141,5 @@ class SmartOrderAccepterBot(DipnetBot):
         self.respond_to_alliance_messages(msgs_data)
 
         # generate proposal response YES/NO to allies
-        msgs_data = self.gen_proposal_reply(best_proposer, prp_orders, msgs_data)
+        msgs_data = self.gen_proposal_reply(best_proposer, valid_proposal_orders, msgs_data)
         return {"messages": msgs_data, "orders": orders_data.get_list_of_orders()}
