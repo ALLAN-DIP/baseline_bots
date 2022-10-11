@@ -15,7 +15,7 @@ from baseline_bots.utils import (
     get_order_tokens,
     get_other_powers,
     parse_alliance_proposal,
-    parse_orr_xdo,
+    parse_orr,
 )
 
 
@@ -111,7 +111,7 @@ class RandomLSPBot(BaselineMsgRoundBot):
         if order_msgs:
             for msg in order_msgs:
                 if msg.sender == self.my_leader:
-                    rcvd_orders += parse_orr_xdo(msg.message)
+                    rcvd_orders += parse_orr(msg.message)
 
         return {
             "alliance_proposer": alliance_proposer,

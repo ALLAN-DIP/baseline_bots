@@ -15,6 +15,15 @@ from DAIDE.utils.exceptions import ParseError
 from diplomacy import Game, Message
 from tornado import gen
 
+POWER_NAMES_DICT = {
+	"RUS": "RUSSIA",
+	"AUS": "AUSTRIA",
+	"ITA": "ITALY",
+	"ENG": "ENGLAND",
+	"FRA": "FRANCE",
+	"TUR": "TURKEY",
+	"GER": "GERMANY"
+}
 
 def get_order_tokens(order):
     """Retrieves the order tokens used in an order
@@ -122,13 +131,10 @@ def parse_PRP(msg) -> str:
         raise Exception(f"Cant parse PRP msg {msg}")
 
 
-def parse_orr_xdo(msg: str) -> List[str]:
+def parse_orr(msg: str, xdo_only=True) -> List[str]:
     """
     Attempts to parse a specific message configuration
     """
-    # parse may fail
-    if "VSS" in msg:
-        raise ParseError("This looks an ally message")
     try:
         if "ORR" in msg:
             msg = msg[msg.find("(") + 1:-1]
@@ -150,7 +156,9 @@ def parse_orr_xdo(msg: str) -> List[str]:
             :param part: part of the message representing an arrangement for 1 unit
             :return: the actual order after excluding XDO
             """
-            start_in = part.find("(", part.find("XDO"))
+            match_obj = re.search(r"(XDO|ALY|[A-Z]+)", part)
+            start_in = part.find("(", match_obj.start())
+            suborder_type = match_obj.group()
             parenthesis_cnt = 0
             for i in range(start_in, len(part)):
                 if part[i] == '(':
@@ -158,17 +166,25 @@ def parse_orr_xdo(msg: str) -> List[str]:
                 elif part[i] == ')':
                     parenthesis_cnt -= 1
                 if parenthesis_cnt == 0:
-                    return start_in, i
-            return start_in, -1
+                    return start_in, i, suborder_type
+            return start_in, -1, suborder_type
         
         ans = []
         for part in parts:
-            start, end = extract_suborder_indices(part)
-            ans.append(part[start+1:end])
+            if part[0] == '(':
+                part = part.strip()[1:-1].strip()
+            start, end, suborder_type = extract_suborder_indices(part)
+            if xdo_only:
+                ans.append(part[start+1:end])
+            else:
+                if suborder_type == "XDO":
+                    ans.append((suborder_type, part[start+1:end]))
+                else:
+                    ans.append((suborder_type, part))
         return ans
 
-    except Exception:
-        raise ParseError("Cant parse ORR XDO msg")
+    except Exception as e:
+        raise ParseError("Cant parse ORR msg")
 
 
 def parse_alliance_proposal(msg: str, recipient: str) -> List[str]:
@@ -179,6 +195,7 @@ def parse_alliance_proposal(msg: str, recipient: str) -> List[str]:
     :param recipient: the power which has received the alliance proposal
     :return: list of allies in the proposal
     """
+    recipient = recipient[:3]
     groups = re.findall(r"\(([a-zA-Z\s]*)\)", msg)
 
     if len(groups) != 2:
@@ -196,7 +213,7 @@ def parse_alliance_proposal(msg: str, recipient: str) -> List[str]:
     allies.remove(recipient)
 
     if allies:
-        return allies
+        return [POWER_NAMES_DICT[ally] if ally in POWER_NAMES_DICT else ally for ally in allies]
     else:
         raise ParseError("A minimum of 2 powers are needed for an alliance")
 
@@ -429,7 +446,7 @@ if __name__ == "__main__":
     # # print(AND(["GO HOME"]))
     # print(XDO(["Move back", "Move"]))
     msg = ORR(XDO(["Move back", "Move"]))
-    print(parse_orr_xdo(msg))
+    print(parse_orr(msg))
     # # print(ALY(["p1", "p2"]))
     # # print(ALY(["GERMANY", "RUSSIA"], game))
     # # print(parse_alliance_proposal("ALY (GERMANY RUSSIA) VSS (FRANCE ENGLAND ITALY TURKEY AUSTRIA)", "RUSSIA"))

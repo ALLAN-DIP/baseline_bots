@@ -10,7 +10,7 @@ from baseline_bots.utils import (
     MessagesData,
     OrdersData,
     get_non_aggressive_orders,
-    parse_orr_xdo,
+    parse_orr,
     sort_messages_by_most_recent,
 )
 
@@ -45,7 +45,7 @@ class LoyalBot(BaselineBot):
             if last_message.sender in self.allies:
                 try:
                     orders = get_non_aggressive_orders(
-                        parse_orr_xdo(last_message.message), self.power_name, self.game
+                        parse_orr(last_message.message), self.power_name, self.game
                     )
                     self.orders.add_orders(orders)
 
