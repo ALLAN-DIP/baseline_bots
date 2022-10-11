@@ -2,7 +2,6 @@ FROM ubuntu:18.04
 
 # install updates and use python3.7
 RUN apt-get update -y && \
-pwd && \
 apt-get upgrade -y && \
 apt-get install -y python3.7 python3-pip && \
 cd /usr/bin && ls -lrth python* && \
@@ -39,9 +38,9 @@ git checkout $VERSION  && \
 ./mconfig -p /usr/local  && \
 cd ./builddir  && \
 make  && \
-make install && pwd
+make install
 # run tests
-RUN cd research && \ 
+RUN cd root/research && \ 
 pip3 install -r requirements.txt && \
 pip3 install -r requirements_dev.txt
 RUN cd ../baseline_bots && \
