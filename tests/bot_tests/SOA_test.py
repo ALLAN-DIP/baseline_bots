@@ -17,6 +17,10 @@ from baseline_bots.utils import (
     daide_to_dipnet_parsing
 )
 
+from baseline_bots.parsing_utils import (
+    parse_proposal_messages
+)
+
 class TestSOABot():
     def test(self):
         self.test_play()
@@ -34,19 +38,19 @@ class TestSOABot():
 
     def test_stance(self):
         # score-based
-        SOA_bot = SmartOrderAccepterBot
+        soa_bot = SmartOrderAccepterBot('FRANCE', game)
         game = Game()
-        bot_instances = [RandomProposerBot('AUSTRIA', game), RandomProposerBot('ENGLAND', game), SmartOrderAccepterBot('FRANCE', game), RandomProposerBot('GERMANY', game)]
+        bot_instances = [RandomProposerBot('AUSTRIA', game), RandomProposerBot('ENGLAND', game), soa_bot, RandomProposerBot('GERMANY', game)]
         game_play = GamePlay(game, bot_instances, 3, True)
         game_play.game.set_centers('AUSTRIA', ['VIE','TRI','BUD'], reset=True)
         game_play.game.set_centers('ENGLAND', ['LON'])
         game_play.game.set_centers('GERMANY', ['MUN', 'KIE', 'BER','BEL'])
         game_play.game.set_centers(SOA_bot.power, ['PAR','BRE', 'MAR'])
         msgs, done = game_play.step()
-        SOA_bot_stance = SOA_bot.stance.get_stance()[SOA_bot.power]
-        assert SOA_bot_stance['ENGLAND'] == 1, "Positive stance error"
-        assert SOA_bot_stance['GERMANY'] == -1, "Negative stance error"
-        assert SOA_bot_stance['AUSTRIA'] == 0 , "Neutral stance error"
+        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power]
+        assert soa_bot_stance['ENGLAND'] == 1, "Positive stance error"
+        assert soa_bot_stance['GERMANY'] == -1, "Negative stance error"
+        assert soa_bot_stance['AUSTRIA'] == 0 , "Neutral stance error"
 
         # to do: add action-based stance test
 
@@ -54,10 +58,10 @@ class TestSOABot():
         # proposal messages -> proposal dict {power_name: a list of proposal orders}
         # valid moves and power units must belong to SOA
         game = Game()
-        SOA_bot = SmartOrderAccepterBot('FRANCE', game)
+        soa_bot = SmartOrderAccepterBot('FRANCE', game)
         baseline1 = RandomProposerBot('AUSTRIA', game)
         baseline2 = RandomProposerBot('ENGLAND', game)
-        bot_instances = [baseline1, baseline2, SOA_bot]   
+        bot_instances = [baseline1, baseline2, soa_bot]   
         game_play = GamePlay(game, bot_instances, 3, True)
         bl1_msg = baseline1.gen_messages().messages
         bl2_msg = baseline2.gen_messages().messages
@@ -79,18 +83,19 @@ class TestSOABot():
         game_play.game.add_message(message=msg_obj1)
         game_play.game.add_message(message=msg_obj2)
 
-        rcvd_messages = game_play.game.filter_messages(messages=game_play.game.messages, game_role=SOA_bot.power_name)
-        prp_orders = SOA_bot.get_proposals(rcvd_messages)
+        rcvd_messages = game_play.game.filter_messages(messages=game_play.game.messages, game_role=soa_bot.power_name)
+        parsed_messages_dict = parse_proposal_messages(rcvd_messages, game_play.game, soa_bot.power_name)
+        valid_proposal_orders = parsed_messages_dict['valid_proposals']
         possible_orders = game_play.game.get_all_possible_orders()
 
-        SOA_power_units = game_play.game.powers[SOA_bot.power_name].units[:]
+        soa_power_units = game_play.game.powers[soa_bot.power_name].units[:]
         
-        for power, orders in prp_orders.items():
+        for power, orders in valid_proposal_orders.items():
             for order in orders:
                 order_token = get_order_tokens(order)
                 unit_order = order_token[0]
-                assert unit_order in SOA_power_units, "unit in " + order + " does not belong to SOA's power (" + SOA_bot.power_name + ")"
-                assert order in possible_orders[unit_order], order + " is not possible in this current phase of a game for SOA's power (" + SOA_bot.power_name + ")"
+                assert unit_order in soa_power_units, "unit in " + order + " does not belong to SOA's power (" + soa_bot.power_name + ")"
+                assert order in possible_orders[unit_order], order + " is not possible in this current phase of a game for SOA's power (" + soa_bot.power_name + ")"
 
 
     def test_get_best_orders(self):
@@ -101,11 +106,11 @@ class TestSOABot():
         orders = yield self.brain.get_orders(self.game, self.power_name)
         for i in range(n):
             game = Game()
-            SOA_bot = SmartOrderAccepterBot('FRANCE', game)
-            SOA_bot.rollout_length = 10
+            soa_bot = SmartOrderAccepterBot('FRANCE', game)
+            soa_bot.rollout_length = 10
             baseline1 = RandomProposerBot('AUSTRIA', game)
             baseline2 = RandomProposerBot('ENGLAND', game)
-            bot_instances = [baseline1, baseline2, SOA_bot]   
+            bot_instances = [baseline1, baseline2, soa_bot]   
 
             game_play = GamePlay(game, bot_instances, 3, True)
             bl1_msg = baseline1.gen_messages().messages
@@ -127,23 +132,24 @@ class TestSOABot():
                             )
             game_play.game.add_message(message=msg_obj1)
             game_play.game.add_message(message=msg_obj2)
-            rcvd_messages = game_play.game.filter_messages(messages=game_play.game.messages, game_role=SOA_bot.power_name)
-            prp_orders = SOA_bot.get_proposals(rcvd_messages)
-            prp_orders[SOA_bot.power_name] = orders
+            rcvd_messages = game_play.game.filter_messages(messages=game_play.game.messages, game_role=soa_bot.power_name)
+            parsed_messages_dict = parse_proposal_messages(rcvd_messages, game_play.game, soa_bot.power_name)
+            valid_proposal_orders = parsed_messages_dict['valid_proposals']
+            valid_proposal_orders[soa_bot.power_name] = orders
 
             state_value = {power_name: -10000 for power_name in game_play.game.powers}
 
             for power_name, orders in prp_orders:
                 sim_game = game_play.game.__deepcopy__(None)
-                sim_game.set_orders(power_name=SOA_bot.power_name, orders=orders)
+                sim_game.set_orders(power_name=soa_bot.power_name, orders=orders)
                 
                 for other_power in game_play.game.powers:
-                    power_orders = yield SOA_bot.brain.get_orders(sim_game, other_power)
+                    power_orders = yield soa_bot.brain.get_orders(sim_game, other_power)
                     sim_game.set_orders(power_name=other_power, orders=power_orders)
 
                 sim_game.progress()
                 
-                state_value[power_name] = yield get_state_value(SOA_bot, sim_game, SOA_bot.power_name)
+                state_value[power_name] = yield get_state_value(soa_bot, sim_game, soa_bot.power_name)
 
             best_proposer, best_orders = get_best_orders(prp_orders, shared_order)
             max_sv = max(state_value.values())
@@ -154,14 +160,15 @@ class TestSOABot():
     def gen_pos_stance_messages(self):
         # gen for only allies 
         game = Game()
-        bot_instances = [RandomProposerBot('AUSTRIA', game), RandomProposerBot('ENGLAND', game), SmartOrderAccepterBot('FRANCE', game), RandomProposerBot('GERMANY', game)]
+        soa_bot = SmartOrderAccepterBot('FRANCE', game)
+        bot_instances = [RandomProposerBot('AUSTRIA', game), RandomProposerBot('ENGLAND', game), soa_bot, RandomProposerBot('GERMANY', game)]
         game_play = GamePlay(game, bot_instances, 3, True)
         game_play.game.set_centers('AUSTRIA', ['VIE','TRI','BUD'], reset=True)
         game_play.game.set_centers('ENGLAND', ['LON'])
         game_play.game.set_centers('GERMANY', ['MUN', 'KIE', 'BER','BEL'])
-        game_play.game.set_centers(SOA_bot.power, ['PAR','BRE', 'MAR'])
+        game_play.game.set_centers(soa_bot.power, ['PAR','BRE', 'MAR'])
         msgs, done = game_play.step()
-        msgs_data = SOA_bot.gen_messages()
+        msgs_data = soa_bot.gen_messages()
         ally = 'ENGLAND'
         sending_to_ally = False
         for msg in msgs_data:
