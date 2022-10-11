@@ -58,6 +58,9 @@ class TestUtils:
             assert daide_to_dipnet_parsing(tc_op[0])[0] == tc_ip[0].replace(" R ", " - "), daide_to_dipnet_parsing(tc_op[0])
             print(tc_ip, " --> ", tc_op)
         
+
+
+
         # Tests for convoy orders
         PARSING_CVY_TEST_CASES = [
             (["A TUN - SYR VIA", "F ION C A TUN - SYR", "F EAS C A TUN - SYR"], ["(ITA AMY TUN) CTO SYR VIA (ION EAS)", "(ITA FLT ION) CVY (ITA AMY TUN) CTO SYR", "(ITA FLT EAS) CVY (ITA AMY TUN) CTO SYR"])
@@ -72,6 +75,9 @@ class TestUtils:
             for tc_ip_ord, tc_op_ord in zip(tc_ip, tc_op):
                 assert daide_to_dipnet_parsing(tc_op_ord)[0] == tc_ip_ord.replace(" R ", " - "), daide_to_dipnet_parsing(tc_op_ord)
         
+
+
+
 
         # Tests for parse_proposal_messages
         PARSE_PROPOSALS_TC = [
@@ -182,6 +188,10 @@ class TestUtils:
             
                 for key in parsed_orders_dict[pod_key]:
                     assert set(parsed_orders_dict[pod_key][key]) == set(tc_op[pod_key][key]), (pod_key, key, set(parsed_orders_dict[pod_key][key]), set(tc_op[pod_key][key]))
+
+
+
+
 
         # Tests for orders extraction
         FCT_TCS = [

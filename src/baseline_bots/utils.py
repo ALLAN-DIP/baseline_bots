@@ -133,7 +133,20 @@ def parse_PRP(msg) -> str:
 
 def parse_arrangement(msg: str, xdo_only=True) -> List[str]:
     """
-    Attempts to parse sub arrangements
+    Attempts to parse arrangements (may or may not have ORR keyword)
+
+    Examples when xdo_only = False
+    XDO (F BLA - CON) -> ("XDO", "F BLA - CON")
+    ORR (XDO ((RUS FLT BLA) MTO CON)) (ALY (GER RUS TUR) VSS (FRA ENG ITA AUS)) (ABC (F BLA - CON))
+            -> ("XDO", "(RUS FLT BLA) MTO CON"), ("ALY", "ALY (GER RUS TUR) VSS (FRA ENG ITA AUS)"), ("ABC", "ABC (F BLA - CON)")
+
+    Examples when xdo_only = True
+    ORR (XDO(F BLK - CON))(XDO(A RUM - BUD))(XDO(F BLK - BUD))
+            -> "F BLK - CON", "A RUM - BUD", "F BLK - BUD"
+
+    :param msg: message to be parsed
+    :param xdo_only: flag indicating if subarrangement type should be included in the return structure
+    :return: parsed subarrangements
     """
     try:
         if "ORR" in msg:
@@ -180,7 +193,7 @@ def parse_arrangement(msg: str, xdo_only=True) -> List[str]:
         
         ans = []
         for part in parts:
-            if part[0] == '(':
+            if part[0] == '(': # If there is a parenthesis in the beginning, just remove the extra set of parenthesis from both ends
                 part = part.strip()[1:-1].strip()
             start, end, suborder_type = extract_suborder_indices(part)
             if xdo_only:

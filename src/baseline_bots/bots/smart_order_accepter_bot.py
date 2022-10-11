@@ -84,7 +84,13 @@ class SmartOrderAccepterBot(DipnetBot):
                 )
         return messages
     
-    def respond_to_invalid_orders(self, invalid_proposal_orders: Dict[str, List[str]], messages_data) -> None:
+    def respond_to_invalid_orders(self, invalid_proposal_orders: Dict[str, List[str]], messages_data: MessagesData) -> None:
+        """
+        The bot responds by HUHing the invalid proposal orders received (this could occur if the move proposed is invalid)
+
+        :param invalid_proposal_orders: dictionary of sender -> invalid orders proposed
+        :param messages_data: Message Data object to add messages
+        """
         if not invalid_proposal_orders:
             return
         for sender in invalid_proposal_orders:
@@ -115,7 +121,7 @@ class SmartOrderAccepterBot(DipnetBot):
         # get dipnet order
         orders = yield self.brain.get_orders(self.game, self.power_name)
 
-        # extract only the proposed orders from the messages the bot has just received
+        # parse the proposal messages received by the bot
         parsed_messages_dict = parse_proposal_messages(rcvd_messages, self.game, self.power_name)
         valid_proposal_orders = parsed_messages_dict['valid_proposals']
         invalid_proposal_orders = parsed_messages_dict['invalid_proposals']
