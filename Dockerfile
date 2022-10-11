@@ -10,6 +10,7 @@ unlink python3 && ln -s /usr/bin/python3.7 python3
 RUN pip3 install --upgrade pip && \
 apt-get install -y git && \
 apt-get install -y wget && \
+pwd && \
 git clone https://github.com/diplomacy/research.git && \
 git clone https://github.com/ALLAN-DIP/baseline_bots.git && \
 cd baseline_bots && \
