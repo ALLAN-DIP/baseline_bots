@@ -10,7 +10,6 @@ unlink python3 && ln -s /usr/bin/python3.7 python3
 RUN pip3 install --upgrade pip && \
 apt-get install -y git && \
 apt-get install -y wget && \
-pwd && \
 git clone https://github.com/diplomacy/research.git && \
 git clone https://github.com/ALLAN-DIP/baseline_bots.git && \
 cd baseline_bots && \
@@ -41,7 +40,7 @@ cd ./builddir  && \
 make  && \
 make install
 # run tests
-RUN cd root/research && \ 
+RUN cd / && ls -a && cd research && \ 
 pip3 install -r requirements.txt && \
 pip3 install -r requirements_dev.txt
 RUN cd ../baseline_bots && \
