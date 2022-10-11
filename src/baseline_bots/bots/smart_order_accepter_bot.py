@@ -14,7 +14,7 @@ from baseline_bots.utils import (
     get_best_orders,
     get_other_powers,
     parse_alliance_proposal,
-    parse_orr,
+    parse_arrangement,
     parse_PRP
 )
 from baseline_bots.parsing_utils import (

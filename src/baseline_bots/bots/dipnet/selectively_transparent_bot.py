@@ -15,7 +15,7 @@ from baseline_bots.utils import (
     get_other_powers,
     is_order_aggressive,
     parse_FCT,
-    parse_orr,
+    parse_arrangement,
 )
 
 config.ORDERS_DAIDE = False

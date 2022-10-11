@@ -131,9 +131,9 @@ def parse_PRP(msg) -> str:
         raise Exception(f"Cant parse PRP msg {msg}")
 
 
-def parse_orr(msg: str, xdo_only=True) -> List[str]:
+def parse_arrangement(msg: str, xdo_only=True) -> List[str]:
     """
-    Attempts to parse a specific message configuration
+    Attempts to parse sub arrangements
     """
     try:
         if "ORR" in msg:
@@ -455,7 +455,7 @@ if __name__ == "__main__":
     # # print(AND(["GO HOME"]))
     # print(XDO(["Move back", "Move"]))
     msg = ORR(XDO(["Move back", "Move"]))
-    print(parse_orr(msg))
+    print(parse_arrangement(msg))
     # # print(ALY(["p1", "p2"]))
     # # print(ALY(["GERMANY", "RUSSIA"], game))
     # # print(parse_alliance_proposal("ALY (GERMANY RUSSIA) VSS (FRANCE ENGLAND ITALY TURKEY AUSTRIA)", "RUSSIA"))

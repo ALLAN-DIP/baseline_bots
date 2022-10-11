@@ -228,9 +228,9 @@ def parse_proposal_messages(
     for order_msg in order_msgs:
         try:
             if "AND" in order_msg.message: # works when AND is present in this format: XDO () AND XDO () AND XDO()
-                daide_style_orders = [order_1 for order in (parse_PRP(order_msg.message)).split("AND") for order_1 in parse_orr(order.strip(), xdo_only=False)]
+                daide_style_orders = [order_1 for order in (parse_PRP(order_msg.message)).split("AND") for order_1 in parse_arrangement(order.strip(), xdo_only=False)]
             else: # works for cases where ORR is present in PRP or nothing is present: ORR ( (XDO()) (XDO()))
-                daide_style_orders = [order for order in parse_orr(parse_PRP(order_msg.message), xdo_only=False)]
+                daide_style_orders = [order for order in parse_arrangement(parse_PRP(order_msg.message), xdo_only=False)]
             for order_type, order in daide_style_orders:
                 if order_type == "XDO":
                     proposals[order_msg.sender].append(daide_to_dipnet_parsing(order))

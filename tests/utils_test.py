@@ -1,4 +1,4 @@
-from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, parse_FCT, parse_PRP, parse_orr
+from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, parse_FCT, parse_PRP, parse_arrangement
 from baseline_bots.parsing_utils import dipnet_to_daide_parsing, daide_to_dipnet_parsing, parse_proposal_messages
 from diplomacy import Game, Message
 
@@ -234,7 +234,7 @@ class TestUtils:
         ]
         
         for tc_ip, tc_op in ORR_TCS:
-            assert parse_orr(tc_ip, xdo_only=True) == tc_op, parse_orr(tc_ip, xdo_only=True)
+            assert parse_arrangement(tc_ip, xdo_only=True) == tc_op, parse_arrangement(tc_ip, xdo_only=True)
 
         ORR_XDO_ALY_TCS = [
             [
@@ -272,4 +272,4 @@ class TestUtils:
         ]
         
         for tc_ip, tc_op in ORR_XDO_ALY_TCS:
-            assert parse_orr(tc_ip, xdo_only=False) == tc_op, (parse_orr(tc_ip, xdo_only=False), tc_op)
+            assert parse_arrangement(tc_ip, xdo_only=False) == tc_op, (parse_arrangement(tc_ip, xdo_only=False), tc_op)
