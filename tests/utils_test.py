@@ -224,11 +224,11 @@ class TestUtils:
                 ["F BLK - CON"]
             ],
             [
-                "ORR((XDO(F BLK - CON))(XDO(A RUM - BUD))(XDO(F BLK - BUD)))",
+                "ORR (XDO(F BLK - CON))(XDO(A RUM - BUD))(XDO(F BLK - BUD))",
                 ["F BLK - CON", "A RUM - BUD", "F BLK - BUD"]
             ],
             [
-                "ORR ( (XDO (F BLK - CON)) (XDO (A RUM - BUD)))",
+                "ORR (XDO (F BLK - CON)) (XDO (A RUM - BUD))",
                 ["F BLK - CON", "A RUM - BUD"]
             ]
         ]
@@ -254,22 +254,22 @@ class TestUtils:
                 [("ALY", "ALY (GER RUS) VSS (FRA ENG ITA TUR AUS)")]
             ],
             [
-                "ORR((XDO(F BLA - CON))(XDO(A RUM - BUD))(XDO(F BLA - BUD)))",
+                "ORR (XDO(F BLA - CON))(XDO(A RUM - BUD))(XDO(F BLA - BUD))",
                 [("XDO", "F BLA - CON"), ("XDO", "A RUM - BUD"), ("XDO", "F BLA - BUD")]
             ],
             [
-                "ORR ( (XDO (F BLA - CON)) (XDO (A RUM - BUD)))",
+                "ORR  (XDO (F BLA - CON)) (XDO (A RUM - BUD))",
                 [("XDO", "F BLA - CON"), ("XDO", "A RUM - BUD")]
             ],
             [
-                "ORR ( (XDO (F BLA - CON)) (ALY (GER RUS TUR) VSS (FRA ENG ITA AUS))",
-                [("XDO", "F BLA - CON"), ("ALY", "ALY (GER RUS) VSS (FRA ENG ITA TUR AUS)")]
+                "ORR (XDO (F BLA - CON)) (ALY (GER RUS TUR) VSS (FRA ENG ITA AUS))",
+                [("XDO", "F BLA - CON"), ("ALY", "ALY (GER RUS TUR) VSS (FRA ENG ITA AUS)")]
             ],
             [
-                "ORR ( (XDO ((RUS FLT BLA) MTO CON)) (ALY (GER RUS TUR) VSS (FRA ENG ITA AUS)) (ABC (F BLA - CON))",
-                [("XDO", "(RUS FLT BLA) MTO CON"), ("ALY", "ALY (GER RUS) VSS (FRA ENG ITA TUR AUS)"), ("ABC", "ABC (F BLA - CON)")]
+                "ORR (XDO ((RUS FLT BLA) MTO CON)) (ALY (GER RUS TUR) VSS (FRA ENG ITA AUS)) (ABC (F BLA - CON))",
+                [("XDO", "(RUS FLT BLA) MTO CON"), ("ALY", "ALY (GER RUS TUR) VSS (FRA ENG ITA AUS)"), ("ABC", "ABC (F BLA - CON)")]
             ]
         ]
         
         for tc_ip, tc_op in ORR_XDO_ALY_TCS:
-            assert parse_orr(tc_ip, xdo_only=False) == tc_op, parse_orr(tc_ip, xdo_only=False)
+            assert parse_orr(tc_ip, xdo_only=False) == tc_op, (parse_orr(tc_ip, xdo_only=False), tc_op)

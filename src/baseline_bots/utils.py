@@ -137,13 +137,22 @@ def parse_orr(msg: str, xdo_only=True) -> List[str]:
     """
     try:
         if "ORR" in msg:
-            msg = msg[msg.find("(") + 1:-1]
+            msg = msg[msg.find("("):]
         # else:
         #     # remove else since it is a bug to 'XDO (order)'
         #     msg = msg[1:-1]
 
         # split the message at )( points
-        parts = re.split(r"\)\s*\(", msg)
+        parts = []
+        ind = 0
+        while ind < len(msg):
+            next_ind = re.search(r"\)\s*\(", msg[ind:])
+            if next_ind is None:
+                parts.append(msg[ind:].strip())
+                break
+            else:
+                parts.append((msg[ind:ind+next_ind.start() + 1]).strip())
+                ind = ind+next_ind.end() - 1
 
         def extract_suborder_indices(part: str) -> str:
             """
