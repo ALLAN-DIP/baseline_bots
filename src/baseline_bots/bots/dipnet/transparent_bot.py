@@ -38,9 +38,7 @@ class TransparentBot(DipnetBot):
         press_msgs = [msg[1] for msg in rcvd_messages if "FCT" in msg[1].message]
         parsed_orders = []
         for msg in press_msgs:
-            print(msg.message)
             parsed_orders += parse_arrangement(parse_FCT(msg.message))
-            print(parse_arrangement(parse_FCT(msg.message)))
         return parsed_orders
 
     @gen.coroutine
@@ -53,7 +51,6 @@ class TransparentBot(DipnetBot):
         comms_obj = MessagesData()
 
         parsed_orders = self.parse_messages(rcvd_messages)
-        # print(parsed_orders)
 
         # My orders' messages if not already sent
         if not self.my_orders_informed:
@@ -70,7 +67,6 @@ class TransparentBot(DipnetBot):
             if final_orders:
                 msg = FCT(ORR(XDO(final_orders)))
                 comms_obj.add_message(other_power, msg)
-                print(msg)
 
         self.curr_msg_round += 1
         return comms_obj
