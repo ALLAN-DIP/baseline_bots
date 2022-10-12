@@ -3,12 +3,20 @@ __email__ = "sanderschulhoff@gmail.com"
 
 import random
 
-from DAIDE import ORR, XDO
+from DAIDE import FCT, ORR, XDO, PRP, HUH, YES
 from diplomacy import Message
 from tornado import gen
 
 from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.utils import MessagesData, get_other_powers
+
+from baseline_bots.parsing_utils import (
+    dipnet_to_daide_parsing,
+    daide_to_dipnet_parsing,
+    parse_proposal_messages
+)
+
+
 
 
 class RandomProposerBot(BaselineBot):
@@ -33,8 +41,9 @@ class RandomProposerBot(BaselineBot):
                 for loc in self.game.get_orderable_locations(other_power)
                 if possible_orders[loc]
             ]
-            suggested_random_orders = ORR(
-                [XDO(order) for order in suggested_random_orders]
+            suggested_random_orders = PRP(ORR(
+                [XDO(order) for order in dipnet_to_daide_parsing(suggested_random_orders, self.game)]
+            )
             )
             # send the other power a message containing the orders
             ret_obj.add_message(other_power, str(suggested_random_orders))
@@ -59,6 +68,9 @@ class RandomProposerBot_AsyncBot(RandomProposerBot):
     def gen_orders(self):
         return super().gen_orders()
 
+    @gen.coroutine
+    def __call__(self, rcvd_messages):
+        return super().__call__(rcvd_messages)
 
 if __name__ == "__main__":
     from diplomacy import Game

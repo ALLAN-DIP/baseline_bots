@@ -2,7 +2,7 @@ __authors__ = ["Sander Schulhoff", "Kartik Shenoy"]
 __email__ = "sanderschulhoff@gmail.com"
 
 from typing import List
-
+from tornado import gen
 from diplomacy import Game, Message
 from diplomacy.utils.export import to_saved_game_format
 
@@ -34,12 +34,13 @@ class GamePlay():
         self.save_json = save_json
         self.cur_local_message_round = 0
         self.phase_init_bots()
-        
+
+    @gen.coroutine  
     def play(self):
         """play a game with the bots"""
 
         while not self.game.is_game_done:
-            self.step()
+            yield self.step()
 
         if self.save_json:
             to_saved_game_format(self.game, output_path='GamePlayFramework.json')
@@ -51,6 +52,7 @@ class GamePlay():
             if type(bot) == BaselineMsgRoundBot:
                 bot.phase_init()
 
+    @gen.coroutine     
     def step(self):
         """one step of messaging"""
 
@@ -74,7 +76,7 @@ class GamePlay():
             rcvd_messages = list(rcvd_messages.values())
             
             # get messages to be sent from bot
-            ret_dict = bot(rcvd_messages)
+            ret_dict = yield bot(rcvd_messages)
 
             if "messages" in ret_dict:
                 bot_messages = ret_dict["messages"]#bot.gen_messages(rcvd_messages)
@@ -96,9 +98,9 @@ class GamePlay():
         # get/set orders
         for bot in self.bots:
             if hasattr(bot, "orders"):
-                orders = bot.orders
+                orders = ret_dict["orders"]
                 if orders is not None:
-                    self.game.set_orders(power_name=bot.power_name, orders=orders.get_list_of_orders())
+                    self.game.set_orders(power_name=bot.power_name, orders=orders)
 
         self.cur_local_message_round+=1
 
