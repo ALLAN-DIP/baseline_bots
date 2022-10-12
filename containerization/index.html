@@ -3,10 +3,11 @@
 <!DOCTYPE html>
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Search &mdash; ALLAN Baseline Bots  documentation</title>
+  <title>Containerization &mdash; ALLAN Baseline Bots  documentation</title>
   
 
   
@@ -28,7 +29,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.min.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex/" />
-    <link rel="search" title="Search" href="#" /> 
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="prev" title="Random Order Modification" href="../random_order_mod/" /> 
 
 </head>
 
@@ -67,12 +69,14 @@
     
       <li><a href="../">Docs</a></li>
         
-      <li>Search</li>
+      <li>Containerization</li>
     
     
       <li class="breadcrumbs-aside">
         
             
+            <a href="../_sources/containerization.rst.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
     
@@ -86,7 +90,7 @@
                 <div class="col-12 col-lg-3 site-nav">
                     
 <div role="search">
-    <form class="search" action="#" method="get">
+    <form class="search" action="../search/" method="get">
         <div class="icon-input">
             <input type="text" name="q" placeholder="Search" />
             <span class="icon-search"></span>
@@ -101,7 +105,7 @@
                             
                             
                                 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../development/">Development</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../development/#setting-up-your-development-environment">Setting up your development environment:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../development/#modifying-documentation">Modifying documentation:</a></li>
@@ -113,9 +117,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../bots/">Bots</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utils/">Utilities</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../random_order_mod/">Random Order Modification</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../containerization/">Containerization</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../containerization/#building-the-container">Building the container</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../containerization/#usage">Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Containerization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#building-the-container">Building the container</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
 </ul>
 </li>
 </ul>
@@ -128,19 +132,53 @@
                     <div class="document">
                         
                             
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search
-      functionality.
-    </p>
-  </div>
-  </noscript>
+  <section id="containerization">
+<h1>Containerization<a class="headerlink" href="#containerization" title="Permalink to this heading">¶</a></h1>
+<p>Containerization code referenced from SHADE-AI/diplomacy-playground</p>
+<p>This is a docker implementation of ALLAN team’s bots.
+The model parameters are embedded and the TF model server is run within the container along with a python script to instantiate the bot and facilitate game play.</p>
+<section id="building-the-container">
+<h2>Building the container<a class="headerlink" href="#building-the-container" title="Permalink to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Go to subdirectory:</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">containers</span><span class="o">/</span><span class="n">allan_dip_bot</span><span class="o">/</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Download and unzip the model file:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ wget https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-sl_model.zip
+    $ mkdir bot_neurips2019-sl_model
+    $ unzip neurips2019-sl_model.zip -d bot_neurips2019-sl_model/
+</pre></div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Build the docker container with the tag to be used while pushing it to DockerHub:</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ docker build -t uname/allan_dip_bot .
+    $ docker push uname/allan_dip_bot
+</pre></div>
+</div>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ docker run -it allan_dip_bot --help
+    --host          HOST <span class="o">[</span>default localhost<span class="o">]</span>
+    --port          PORT <span class="o">[</span>default <span class="m">8432</span><span class="o">]</span>
+    --game_id       GAME_ID
+    --power         POWER
+    --bot_type  BOT_TYPE <span class="o">[</span>default TransparentBot<span class="o">]</span>
+    --outdir    OUT_DIR
 
-  
-  <div id="search-results">
-  
-  </div>
+    <span class="c1">#connect to remote game engine</span>
+    $ docker run uname/allan_dip_bot --game_id test_game --host shade.tacc.utexas.edu --power TURKEY
+    $ singularity run uname/allan_dip_bot --game_id test_game --host shade.tacc.utexas.edu --power TURKEY
+</pre></div>
+</div>
+</section>
+</section>
+
 
                         
                     </div>
@@ -169,22 +207,14 @@
     <script type="text/javascript" src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="../_static/sphinx_highlight.js"></script>
-    <script type="text/javascript" src="../_static/searchtools.js"></script>
     <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
-  <script type="text/javascript">
-    jQuery(function() { Search.loadIndex("../searchindex.js"); });
-  </script>
-  
-  <script type="text/javascript" id="searchindexloader"></script>
   
     <div class="footer" role="contentinfo">
         <div class="container">
             &#169; Copyright 2022, ALLAN.
         Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.2.3.
         </div>
-    </div>
-  
+    </div>  
 
 </body>
 </html>
