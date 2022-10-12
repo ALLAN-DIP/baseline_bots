@@ -1,4 +1,4 @@
-from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, parse_FCT, parse_PRP, parse_orr_xdo
+from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, parse_FCT, parse_PRP, parse_arrangement
 from baseline_bots.parsing_utils import dipnet_to_daide_parsing, daide_to_dipnet_parsing, parse_proposal_messages
 from diplomacy import Game, Message
 
@@ -58,6 +58,9 @@ class TestUtils:
             assert daide_to_dipnet_parsing(tc_op[0])[0] == tc_ip[0].replace(" R ", " - "), daide_to_dipnet_parsing(tc_op[0])
             print(tc_ip, " --> ", tc_op)
         
+
+
+
         # Tests for convoy orders
         PARSING_CVY_TEST_CASES = [
             (["A TUN - SYR VIA", "F ION C A TUN - SYR", "F EAS C A TUN - SYR"], ["(ITA AMY TUN) CTO SYR VIA (ION EAS)", "(ITA FLT ION) CVY (ITA AMY TUN) CTO SYR", "(ITA FLT EAS) CVY (ITA AMY TUN) CTO SYR"])
@@ -73,6 +76,9 @@ class TestUtils:
                 assert daide_to_dipnet_parsing(tc_op_ord)[0] == tc_ip_ord.replace(" R ", " - "), daide_to_dipnet_parsing(tc_op_ord)
         
 
+
+
+
         # Tests for parse_proposal_messages
         PARSE_PROPOSALS_TC = [
             [
@@ -82,40 +88,88 @@ class TestUtils:
                     "AUSTRIA": "PRP (XDO ((RUS AMY MOS) SUP (RUS FLT STP/SC) MTO LVN)))",
                     "ENGLAND": "PRP (XDO ((RUS AMY PRU) MTO LVN)))"
                 }, 
-                [
-                    {
+                {
+                    'valid_proposals': {
                         "GERMANY": ["A WAR - PRU", "F SEV - RUM"],
                         "AUSTRIA": ["A MOS S F STP/SC - LVN"]
                     },
-                    {
+                    'invalid_proposals': {
                         "GERMANY": ["A PRU - LVN"],
                         "ENGLAND": ["A PRU - LVN"]
                     },
-                    {},
-                    {}
-                ]
+                    'shared_orders': {},
+                    'other_orders': {},
+                    'alliance_proposals': {}
+                }
+            ],
+            [
+                "RUSSIA",
+                {
+                    "GERMANY": "PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (ALY (GER RUS ENG ITA) VSS (FRA TUR AUS)) (ABC ((RUS AMY WAR) MTO PRU)))",
+                    "AUSTRIA": "PRP (ALY (AUS RUS) VSS (FRA ENG ITA TUR GER))"
+                }, 
+                {
+                    'valid_proposals': {
+                        "GERMANY": ["A WAR - PRU"]
+                    },
+                    'invalid_proposals': {},
+                    'shared_orders': {},
+                    'other_orders': {
+                        "GERMANY": ["ABC ((RUS AMY WAR) MTO PRU)"]
+                    },
+                    'alliance_proposals': {
+                        "GERMANY": [("GERMANY", "ALY (GER RUS ENG ITA) VSS (FRA TUR AUS)")],
+                        "ENGLAND": [("GERMANY", "ALY (GER RUS ENG ITA) VSS (FRA TUR AUS)")],
+                        "ITALY": [("GERMANY", "ALY (GER RUS ENG ITA) VSS (FRA TUR AUS)")],
+                        "AUSTRIA": [("AUSTRIA", "ALY (AUS RUS) VSS (FRA ENG ITA TUR GER)")],
+                    }
+                }
             ],
             [
                 "TURKEY",
                 {
                     "RUSSIA": "PRP(XDO((TUR FLT ANK) MTO BLA) AND XDO((RUS AMY SEV) MTO RUM) AND (XDO((ENG AMY LVP) HLD)))"
                 }, 
-                [
-                    {
+                {
+                    'valid_proposals': {
                         "RUSSIA": ["F ANK - BLA"]
                     },
-                    {},
-                    {
+                    'invalid_proposals': {},
+                    'shared_orders': {
                         "RUSSIA": ["A SEV - RUM"]
                     },
-                    {
+                    'other_orders': {
                         "RUSSIA": ["A LVP H"]
+                    },
+                    'alliance_proposals': {}
+                }
+            ],
+            [
+                "TURKEY",
+                {
+                    "RUSSIA": "PRP(XDO((TUR FLT ANK) MTO BLA) AND XDO((RUS AMY SEV) MTO RUM) AND (XDO((ENG AMY LVP) HLD)) AND (ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)) AND (ABC ((RUS AMY WAR) MTO PRU) ) )"
+                }, 
+                {
+                    'valid_proposals': {
+                        "RUSSIA": ["F ANK - BLA"]
+                    },
+                    'invalid_proposals': {},
+                    'shared_orders': {
+                        "RUSSIA": ["A SEV - RUM"]
+                    },
+                    'other_orders': {
+                        "RUSSIA": ["A LVP H", "ABC ((RUS AMY WAR) MTO PRU)"]
+                    },
+                    'alliance_proposals': {
+                        "RUSSIA": [("RUSSIA", "ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)")],
+                        "ENGLAND": [("RUSSIA", "ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)")],
+                        "ITALY": [("RUSSIA", "ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)")],
                     }
-                ]
+                }
             ]
         ]
-        game_GTP = Game()
         for power_name, tc_ip, tc_op in PARSE_PROPOSALS_TC:
+            game_GTP = Game()
             for sender in tc_ip:
                 msg_obj = Message(
                     sender=sender,
@@ -124,28 +178,20 @@ class TestUtils:
                     phase=game_GTP.get_current_phase(),
                 )
                 game_GTP.add_message(message=msg_obj)
-            valid_proposals, invalid_proposals, shared_orders, other_orders = parse_proposal_messages(game_GTP.filter_messages(messages=game_GTP.messages, game_role=power_name), game_GTP, power_name)
-            # print(valid_proposals)
-            # print(invalid_proposals)
-            # print(shared_orders)
-            # print(other_orders)
+            parsed_orders_dict = parse_proposal_messages(game_GTP.filter_messages(messages=game_GTP.messages, game_role=power_name), game_GTP, power_name)
+            # print(tc_ip)
+            # print(parsed_orders_dict)
 
-            assert set(valid_proposals.keys()) == set(tc_op[0].keys()), (set(valid_proposals.keys()), set(tc_op[0].keys()))
-            assert set(invalid_proposals.keys()) == set(tc_op[1].keys()), (set(invalid_proposals.keys()), set(tc_op[1].keys()))
-            assert set(shared_orders.keys()) == set(tc_op[2].keys()), (set(shared_orders.keys()), set(tc_op[2].keys()))
-            assert set(other_orders.keys()) == set(tc_op[3].keys()), (set(other_orders.keys()), set(tc_op[3].keys()))
+            assert set(parsed_orders_dict.keys()) == set(tc_op.keys())
+            for pod_key in parsed_orders_dict:
+                assert set(parsed_orders_dict[pod_key].keys()) == set(tc_op[pod_key].keys()), (pod_key, set(parsed_orders_dict[pod_key].keys()), set(tc_op[pod_key].keys()))
             
-            for key in valid_proposals:
-                assert set(valid_proposals[key]) == set(tc_op[0][key])
-            
-            for key in invalid_proposals:
-                assert set(invalid_proposals[key]) == set(tc_op[1][key])
+                for key in parsed_orders_dict[pod_key]:
+                    assert set(parsed_orders_dict[pod_key][key]) == set(tc_op[pod_key][key]), (pod_key, key, set(parsed_orders_dict[pod_key][key]), set(tc_op[pod_key][key]))
 
-            for key in shared_orders:
-                assert set(shared_orders[key]) == set(tc_op[2][key])
-            
-            for key in other_orders:
-                assert set(other_orders[key]) == set(tc_op[3][key])
+
+
+
 
         # Tests for orders extraction
         FCT_TCS = [
@@ -174,7 +220,7 @@ class TestUtils:
         for tc_ip, tc_op in PRP_TCS:
             assert parse_PRP(tc_ip) == tc_op, parse_PRP(tc_ip)
 
-        XDO_ORR_TCS = [
+        ORR_TCS = [
             [
                 "XDO (F BLK - CON)",
                 ["F BLK - CON"]
@@ -188,14 +234,52 @@ class TestUtils:
                 ["F BLK - CON"]
             ],
             [
-                "ORR((XDO(F BLK - CON))(XDO(A RUM - BUD))(XDO(F BLK - BUD)))",
+                "ORR (XDO(F BLK - CON))(XDO(A RUM - BUD))(XDO(F BLK - BUD))",
                 ["F BLK - CON", "A RUM - BUD", "F BLK - BUD"]
             ],
             [
-                "ORR ( (XDO (F BLK - CON)) (XDO (A RUM - BUD)))",
+                "ORR (XDO (F BLK - CON)) (XDO (A RUM - BUD))",
                 ["F BLK - CON", "A RUM - BUD"]
             ]
         ]
         
-        for tc_ip, tc_op in XDO_ORR_TCS:
-            assert parse_orr_xdo(tc_ip) == tc_op, parse_orr_xdo(tc_ip)
+        for tc_ip, tc_op in ORR_TCS:
+            assert parse_arrangement(tc_ip, xdo_only=True) == tc_op, parse_arrangement(tc_ip, xdo_only=True)
+
+        ORR_XDO_ALY_TCS = [
+            [
+                "XDO (F BLA - CON)",
+                [("XDO", "F BLA - CON")]
+            ], 
+            [
+                "XDO (F BLA - CON)",
+                [("XDO", "F BLA - CON")]
+            ],
+            [
+                "XDO(F BLA - CON)",
+                [("XDO", "F BLA - CON")]
+            ],
+            [
+                "ALY (GER RUS) VSS (FRA ENG ITA TUR AUS)",
+                [("ALY", "ALY (GER RUS) VSS (FRA ENG ITA TUR AUS)")]
+            ],
+            [
+                "ORR (XDO(F BLA - CON))(XDO(A RUM - BUD))(XDO(F BLA - BUD))",
+                [("XDO", "F BLA - CON"), ("XDO", "A RUM - BUD"), ("XDO", "F BLA - BUD")]
+            ],
+            [
+                "ORR  (XDO (F BLA - CON)) (XDO (A RUM - BUD))",
+                [("XDO", "F BLA - CON"), ("XDO", "A RUM - BUD")]
+            ],
+            [
+                "ORR (XDO (F BLA - CON)) (ALY (GER RUS TUR) VSS (FRA ENG ITA AUS))",
+                [("XDO", "F BLA - CON"), ("ALY", "ALY (GER RUS TUR) VSS (FRA ENG ITA AUS)")]
+            ],
+            [
+                "ORR (XDO ((RUS FLT BLA) MTO CON)) (ALY (GER RUS TUR) VSS (FRA ENG ITA AUS)) (ABC (F BLA - CON))",
+                [("XDO", "(RUS FLT BLA) MTO CON"), ("ALY", "ALY (GER RUS TUR) VSS (FRA ENG ITA AUS)"), ("ABC", "ABC (F BLA - CON)")]
+            ]
+        ]
+        
+        for tc_ip, tc_op in ORR_XDO_ALY_TCS:
+            assert parse_arrangement(tc_ip, xdo_only=False) == tc_op, (parse_arrangement(tc_ip, xdo_only=False), tc_op)

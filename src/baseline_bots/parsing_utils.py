@@ -199,56 +199,77 @@ def parse_proposal_messages(
         rcvd_messages: List[Tuple[int, Message]],
         game: Game, 
         power_name: str
-    ) -> Tuple[Dict[str, List[str]], Dict[str, List[str]], Dict[str, List[str]], Dict[str, List[str]]]:
-        """
-        From received messages, extract the proposals (categorize as valid and invalid), shared orders and other orders. Use specified game state and power_name to check for validity of moves
+    ) -> Dict[str, Dict[str, List[str]]]:
+    """
+    From received messages, extract the proposals (categorize as valid and invalid), shared orders and other orders. Use specified game state and power_name to check for validity of moves
 
-        :param rcvd_messages: list of messages received from other players
-        :param game: Game state
-        :param power_name: power name against which the validity of moves need to be checked
-        :return: dictionary of valid proposals, invalid proposals, shared orders (orders that the other power said it would execute), other orders (orders that the other power shared as gossip)
-        """
-        # Extract messages containing PRP string
-        order_msgs = [msg for msg in rcvd_messages.values() if "PRP" in msg.message]
+    :param rcvd_messages: list of messages received from other players
+    :param game: Game state
+    :param power_name: power name against which the validity of moves need to be checked
+    :return: dictionary of 
+        valid proposals, 
+        invalid proposals, 
+        shared orders (orders that the other power said it would execute), 
+        other orders (orders that the other power shared as gossip),
+        alliance proposals
+    """
+    # Extract messages containing PRP string
+    order_msgs = [msg for msg in rcvd_messages.values() if "PRP" in msg.message]
 
-        # Generate a dictionary of sender to list of orders (dipnet-style) for this sender
-        proposals = {}
-        for order_msg in order_msgs:
-            try:
-                if "AND" in order_msg.message: # works when AND is present in this format: XDO () AND XDO () AND XDO()
-                    daide_style_orders = [order_1 for order in (parse_PRP(order_msg.message)).split("AND") for order_1 in parse_orr_xdo(order.strip())]
-                    proposals[order_msg.sender] = [daide_to_dipnet_parsing(order) for order in daide_style_orders]
-                else: # works for cases where ORR is present in PRP or nothing is present: ORR ( (XDO()) (XDO()))
-                    proposals[order_msg.sender] = [daide_to_dipnet_parsing(order) for order in parse_orr_xdo(parse_PRP(order_msg.message))]
-            except Exception:
-                raise Exception(f"Exception raised for {order_msg.message}")
-        
-        invalid_proposals = defaultdict(list)
-        valid_proposals = defaultdict(list)
-        shared_orders = defaultdict(list)
-        other_orders = defaultdict(list)
-        # Generate set of possible orders for the given power
-        orderable_locs = game.get_orderable_locations(power_name)
-        all_possible_orders = game.get_all_possible_orders()
-        possible_orders = set([ord for ord_key in all_possible_orders for ord in all_possible_orders[ord_key] if ord_key in orderable_locs])
+    # Generate a dictionary of sender to list of orders (dipnet-style) for this sender
+    proposals = defaultdict(list)
 
-        # For the set of proposed moves from each sender, check if the specified orders would be allowed. If not, mark them as invalid.
-        for sender in proposals:
-            for order, unit_power_name in proposals[sender]:
-                if unit_power_name == power_name[:3]: # These are supposed to be proposal messages to me
-                    if order in possible_orders: # These would be valid proposals to me
-                        valid_proposals[sender].append(order)
-                    else: # These would be invalid proposals
-                        invalid_proposals[sender].append(order)
-                elif unit_power_name == sender[:3]: # These are supposed to be conditional orders that the sender is going to execute
-                    shared_orders[sender].append(order)
+    invalid_proposals = defaultdict(list)
+    valid_proposals = defaultdict(list)
+    shared_orders = defaultdict(list)
+    other_orders = defaultdict(list)
+    alliance_proposals = defaultdict(list)
+
+    for order_msg in order_msgs:
+        try:
+            if "AND" in order_msg.message: # works when AND is present in this format: XDO () AND XDO () AND XDO()
+                daide_style_orders = [order_1 for order in (parse_PRP(order_msg.message)).split("AND") for order_1 in parse_arrangement(order.strip(), xdo_only=False)]
+            else: # works for cases where ORR is present in PRP or nothing is present: ORR ( (XDO()) (XDO()))
+                daide_style_orders = [order for order in parse_arrangement(parse_PRP(order_msg.message), xdo_only=False)]
+            for order_type, order in daide_style_orders:
+                if order_type == "XDO":
+                    proposals[order_msg.sender].append(daide_to_dipnet_parsing(order))
+                elif order_type == "ALY":
+                    for ally in parse_alliance_proposal(order, power_name):
+                        alliance_proposals[ally].append((order_msg.sender, order))
                 else:
-                    other_orders[sender].append(order)
+                    other_orders[order_msg.sender].append(order)
+        except Exception as e:
+            raise Exception(f"Exception raised for {order_msg.message}")
+    
+    # Generate set of possible orders for the given power
+    orderable_locs = game.get_orderable_locations(power_name)
+    all_possible_orders = game.get_all_possible_orders()
+    possible_orders = set([ord for ord_key in all_possible_orders for ord in all_possible_orders[ord_key] if ord_key in orderable_locs])
 
-        if other_orders:
-            print("Found other orders while extracting proposal messages:")
-            print([msg.message for msg in order_msgs])
-            print("Other orders found:")
-            print(other_orders)
-        
-        return valid_proposals, invalid_proposals, shared_orders, other_orders
+    # For the set of proposed moves from each sender, check if the specified orders would be allowed. If not, mark them as invalid.
+    for sender in proposals:
+        for order, unit_power_name in proposals[sender]:
+            if unit_power_name == power_name[:3]: # These are supposed to be proposal messages to me
+                if order in possible_orders: # These would be valid proposals to me
+                    valid_proposals[sender].append(order)
+                else: # These would be invalid proposals
+                    invalid_proposals[sender].append(order)
+            elif unit_power_name == sender[:3]: # These are supposed to be conditional orders that the sender is going to execute
+                shared_orders[sender].append(order)
+            else:
+                other_orders[sender].append(order)
+
+    if other_orders:
+        print("Found other orders while extracting proposal messages:")
+        print([msg.message for msg in order_msgs])
+        print("Other orders found:")
+        print(other_orders)
+    
+    return {
+        'valid_proposals': valid_proposals, 
+        'invalid_proposals': invalid_proposals, 
+        'shared_orders': shared_orders, 
+        'other_orders': other_orders, 
+        'alliance_proposals': alliance_proposals
+    }

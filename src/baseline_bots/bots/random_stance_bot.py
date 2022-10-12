@@ -10,7 +10,7 @@ from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.utils import (
     get_non_aggressive_orders,
     get_other_powers,
-    parse_orr_xdo,
+    parse_arrangement,
     OrdersData,
     MessagesData
 )
@@ -52,9 +52,9 @@ class RandomStanceBot(BaselineBot):
         proposed_orders_by_country = {}
         for key in messages:
             message = messages[key]
-            # parse_orr_xdo could fail if the message type isnt right
+            # parse_arrangement could fail if the message type isnt right
             try:
-                parsed = parse_orr_xdo(message.message)
+                parsed = parse_arrangement(message.message)
                 if self.stance[message.sender] > 0:
                     self.orders_obj.add_orders(parsed)
                     proposed_orders_by_country[message.sender] = parsed

@@ -11,7 +11,7 @@ from baseline_bots.utils import (
     MessagesData,
     OrdersData,
     get_non_aggressive_orders,
-    parse_orr_xdo,
+    parse_arrangement,
 )
 
 
@@ -50,9 +50,9 @@ class RandomHonestOrderAccepterBot(BaselineMsgRoundBot):
         proposed_orders = []
         proposed_orders_by_country = {}
         for message in rcvd_messages:
-            # parse_orr_xdo could fail if the message type isnt right
+            # parse_arrangement could fail if the message type isnt right
             try:
-                parsed = parse_orr_xdo(message.message)
+                parsed = parse_arrangement(message.message)
                 proposed_orders += parsed
                 proposed_orders_by_country[message.sender] = parsed
             except:

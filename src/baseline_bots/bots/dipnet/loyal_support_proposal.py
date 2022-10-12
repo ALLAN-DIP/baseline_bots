@@ -21,7 +21,7 @@ from baseline_bots.utils import (
     is_move_order,
     is_support_order,
     parse_alliance_proposal,
-    parse_orr_xdo,
+    parse_arrangement,
 )
 
 
@@ -126,7 +126,7 @@ class LSP_DipBot(DipnetBot):
             # Follower
             for msg in order_msgs:
                 if msg.sender == self.my_leader:
-                    rcvd_orders += parse_orr_xdo(msg.message)
+                    rcvd_orders += parse_arrangement(msg.message)
 
         return {
             "alliance_proposer": alliance_proposer,
