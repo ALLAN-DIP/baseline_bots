@@ -24,6 +24,7 @@ from baseline_bots.parsing_utils import (
 )
 
 from collections import defaultdict
+from tornado import gen
 
 
 class SmartOrderAccepterBot(DipnetBot):
@@ -45,6 +46,7 @@ class SmartOrderAccepterBot(DipnetBot):
         self.stance = ScoreBasedStance(power_name, game)
         self.alliances = defaultdict(list)
 
+    @gen.coroutine
     def gen_pos_stance_messages(
         self, msgs_data: MessagesData, orders_list: List[str]
     ) -> None:
@@ -56,7 +58,8 @@ class SmartOrderAccepterBot(DipnetBot):
         for pow in self.stance.stance[self.power_name]:
             if self.stance.stance[self.power_name][pow] > 0:
                 msgs_data.add_message(pow, str(orders_decided))
-
+    
+    @gen.coroutine
     def gen_messages(self, orders_list: List[str]):
         msgs_data = MessagesData()
 
@@ -65,6 +68,7 @@ class SmartOrderAccepterBot(DipnetBot):
 
         return msgs_data
 
+    @gen.coroutine
     def gen_proposal_reply(self, best_proposer: str, prp_orders: dict, messages: MessagesData) -> MessagesData: 
         """
         Reply back to allies regarding their proposals whether we follow or not follow
@@ -114,6 +118,7 @@ class SmartOrderAccepterBot(DipnetBot):
             print("Alliances accepted")
             print(self.alliances)
 
+    @gen.coroutine
     def __call__(self, rcvd_messages: List[Tuple[int, Message]]):
         # compute pos/neg stance on other bots using Tony's stance vector
         self.stance.get_stance()
