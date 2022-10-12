@@ -2,10 +2,10 @@ __authors__ = ["Sander Schulhoff", "Kartik Shenoy"]
 __email__ = "sanderschulhoff@gmail.com"
 
 from typing import List
-
+from tornado import gen
 from diplomacy import Game, Message
 from diplomacy.utils.export import to_saved_game_format
-
+from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from baseline_bots.bots.baseline_bot import BaselineBot, BaselineMsgRoundBot
 
 class GamePlay():
@@ -34,12 +34,14 @@ class GamePlay():
         self.save_json = save_json
         self.cur_local_message_round = 0
         self.phase_init_bots()
-        
+        print('initilaize gameplay')
+
+    @gen.coroutine  
     def play(self):
         """play a game with the bots"""
 
         while not self.game.is_game_done:
-            self.step()
+            yield self.step()
 
         if self.save_json:
             to_saved_game_format(self.game, output_path='GamePlayFramework.json')
@@ -51,6 +53,7 @@ class GamePlay():
             if type(bot) == BaselineMsgRoundBot:
                 bot.phase_init()
 
+    @gen.coroutine
     def step(self):
         """one step of messaging"""
 
@@ -66,7 +69,9 @@ class GamePlay():
 
         round_msgs = self.game.messages
         msgs_to_send = {}
+        print('bot loop')
         for bot in self.bots:
+            print(type(bot).__name__)
             # retrieve messages sent to bot
             rcvd_messages = self.game.filter_messages(messages=round_msgs, game_role=bot.power_name)
             
@@ -74,9 +79,12 @@ class GamePlay():
             rcvd_messages = list(rcvd_messages.values())
             
             # get messages to be sent from bot
-            ret_dict = bot(rcvd_messages)
+            ret_dict = yield bot(rcvd_messages)
+            print('yield message in gameplay')
+            # msg = yield from bot(rcvd_messages)
 
             if "messages" in ret_dict:
+            # if msg:
                 bot_messages = ret_dict["messages"]#bot.gen_messages(rcvd_messages)
                 
                 msgs_to_send[bot.power_name] = bot_messages
@@ -96,20 +104,16 @@ class GamePlay():
         # get/set orders
         for bot in self.bots:
             if hasattr(bot, "orders"):
-                orders = bot.orders
+                orders = ret_dict["orders"]
                 if orders is not None:
-                    self.game.set_orders(power_name=bot.power_name, orders=orders.get_list_of_orders())
+                    self.game.set_orders(power_name=bot.power_name, orders=orders)
 
         self.cur_local_message_round+=1
 
         self.game.process()
+        print('process game step')
         return {"messages": msgs_to_send}, self.game.is_game_done
             
-            
-
-            
-        
-
                 
 if __name__ == "__main__":
     import sys

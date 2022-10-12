@@ -209,7 +209,7 @@ def parse_proposal_messages(
         :return: dictionary of valid proposals, invalid proposals, shared orders (orders that the other power said it would execute), other orders (orders that the other power shared as gossip)
         """
         # Extract messages containing PRP string
-        order_msgs = [msg for msg in rcvd_messages.values() if "PRP" in msg.message]
+        order_msgs = [msg[1] for msg in rcvd_messages if "PRP" in msg[1].message]
 
         # Generate a dictionary of sender to list of orders (dipnet-style) for this sender
         proposals = {}
