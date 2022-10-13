@@ -41,7 +41,7 @@ class RandomProposerBot(BaselineBot):
                 for loc in self.game.get_orderable_locations(other_power)
                 if possible_orders[loc]
             ]
-            print(suggested_random_orders)
+            suggested_random_orders = list(filter(lambda x: x != 'WAIVE', suggested_random_orders))
             suggested_random_orders = PRP(ORR(
                 [XDO(order) for order in dipnet_to_daide_parsing(suggested_random_orders, self.game)]
             )
