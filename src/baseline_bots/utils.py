@@ -404,9 +404,9 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
         # if there is a proposal from this power
         if unit_orders:
             proposed = True
-
+            game = yield from bot.game
             # simulate game by copying the current one
-            simulated_game = bot.game.__deepcopy__(None)
+            simulated_game = game.__deepcopy__(None)
 
             # censor aggressive orders
             unit_orders = get_non_aggressive_orders(
