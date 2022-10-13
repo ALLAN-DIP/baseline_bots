@@ -73,7 +73,7 @@ class TransparentBot(DipnetBot):
 
         for other_power in get_other_powers([self.power_name], self.game):
             if final_orders:
-                msg = FCT(ORR([XDO(order) for order in dipnet_to_daide_parsing(final_orders, self.game)]))
+                msg = FCT(ORR([XDO(order) for order in dipnet_to_daide_parsing(final_orders, self.game, unit_power_tuples_included=True)]))
                 comms_obj.add_message(other_power, str(msg))
 
         return comms_obj

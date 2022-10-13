@@ -77,7 +77,6 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, 
         # If unit powers are also included in the input, then add the unit - unit power mapping for DAIDE construction 
         if unit_power_tuples_included:
             unit_game_mapping[dipnet_order_tokens[0]] = unit_power
-            unit_game_mapping[dipnet_order_tokens[2]] = unit_power
 
         daide_order = []
 
