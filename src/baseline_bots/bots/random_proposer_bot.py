@@ -41,6 +41,7 @@ class RandomProposerBot(BaselineBot):
                 for loc in self.game.get_orderable_locations(other_power)
                 if possible_orders[loc]
             ]
+            print(suggested_random_orders)
             suggested_random_orders = PRP(ORR(
                 [XDO(order) for order in dipnet_to_daide_parsing(suggested_random_orders, self.game)]
             )
@@ -51,7 +52,18 @@ class RandomProposerBot(BaselineBot):
         return ret_obj
 
     def gen_orders(self):
-        return None
+        self.orders = OrdersData()
+        possible_orders = self.game.get_all_possible_orders()
+
+        orders = [
+            random.choice([ord for ord in possible_orders[loc]])
+            for loc in self.game.get_orderable_locations(self.power_name)
+            if possible_orders[loc]
+        ]
+
+        self.orders.add_orders(orders)
+
+        return self.orders.get_list_of_orders()
 
     def __call__(self, rcvd_messages):
         return super().__call__(rcvd_messages)
