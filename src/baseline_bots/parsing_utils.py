@@ -37,7 +37,7 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, 
         """
         if dipnet_suborder not in unit_game_mapping:
             raise Exception(f"error from utils.dipnet_to_daide_parsing: unit {dipnet_suborder} not present in unit_game_mapping")
-            return "(" + (" ".join(
+        return "(" + (" ".join(
                 [
                     unit_game_mapping[dipnet_suborder],
                     "AMY" if dipnet_suborder[0] == "A" else "FLT",
