@@ -79,9 +79,10 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, 
             unit_game_mapping[dipnet_order_tokens[0]] = unit_power
         
         daide_order = []
-        print('dipnet_order_tokens ', dipnet_order_tokens)
-        if dipnet_order_tokens[0] not in unit_game_mapping or dipnet_order_tokens[2] not in unit_game_mapping:
-            print('this dipnet order is not in unit_game_mapping',dipnet_order_tokens)
+        # print('dipnet_order_tokens ', dipnet_order_tokens)
+        if dipnet_order_tokens[0] not in unit_game_mapping
+            continue
+        if len(dipnet_order_tokens)>=3 and dipnet_order_tokens[2] not in unit_game_mapping:    
             continue
 
         # Daidefy and add source unit as it is
@@ -120,9 +121,9 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, 
             daide_order.append(dipnet_order_tokens[1].split()[-1])
             if len(dipnet_order_tokens) > 2:
                 raise Exception(f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!")
-        print('daide_order ',daide_order)
-        if None not in daide_order:    
-            daide_orders.append(" ".join(daide_order))
+        # print('daide_order ',daide_order)
+        # if None not in daide_order:    
+        daide_orders.append(" ".join(daide_order))
 
     return daide_orders
 
