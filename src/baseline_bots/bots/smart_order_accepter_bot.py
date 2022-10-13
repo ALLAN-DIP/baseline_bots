@@ -119,13 +119,13 @@ class SmartOrderAccepterBot(DipnetBot):
             print("Alliances accepted")
             print(self.alliances)
 
-    
-    async def __call__(self, rcvd_messages: List[Tuple[int, Message]]):
+    @gen.coroutine
+    def __call__(self, rcvd_messages: List[Tuple[int, Message]]):
         # compute pos/neg stance on other bots using Tony's stance vector
         self.stance.get_stance()
 
         # get dipnet order
-        orders = await self.brain.get_orders(self.game, self.power_name)
+        orders = yield from self.brain.get_orders(self.game, self.power_name)
 
         # parse the proposal messages received by the bot
         parsed_messages_dict = parse_proposal_messages(rcvd_messages, self.game, self.power_name)
@@ -141,7 +141,7 @@ class SmartOrderAccepterBot(DipnetBot):
         # if there is any better proposal orders that has a state value more than ours, then do it. If not, just follow the base orders.
         valid_proposal_orders[self.power_name] = orders
 
-        best_proposer, best_orders = await get_best_orders(self, valid_proposal_orders, shared_orders)
+        best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
 
         # add orders
         orders_data = OrdersData()

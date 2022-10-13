@@ -134,12 +134,10 @@ async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str
 	
 		if not game.powers[bot.power_name].is_eliminated():
 			# Send messages to bots and fetch messages from bot
-			ret_data = await bot(rcvd_messages)
+			messages_data = await bot.gen_messages(rcvd_messages)
 
 			# Fetch orders from bot
-			messages_data = ret_data['messages']
-			orders_data = ret_data['orders']
-
+			orders_data = await bot.gen_orders()
 
 			# If messages are to be sent, send them
 			if messages_data and messages_data.messages:
