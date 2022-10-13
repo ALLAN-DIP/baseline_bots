@@ -46,16 +46,18 @@ class TestUtils:
 
         # Tests for utils.dipnet_to_daide_parsing
         PARSING_TEST_CASES = [
-            (["A PAR H"], ["(FRA AMY PAR) HLD"]),
-            (["A PAR - MAR"], ["(FRA AMY PAR) MTO MAR"]),
-            (["A PAR R MAR"], ["(FRA AMY PAR) MTO MAR"]),
-            (["A BUD S F TRI"], ["(AUS AMY BUD) SUP (AUS FLT TRI)"]),
-            (["A PAR S A MAR - BUR"], ["(FRA AMY PAR) SUP (FRA AMY MAR) MTO BUR"]),
+            (["A PAR H"], ["(FRA AMY PAR) HLD"], False),
+            ([("A PAR H", "ENG")], ["(ENG AMY PAR) HLD"], True),
+            (["A PAR - MAR"], ["(FRA AMY PAR) MTO MAR"], False),
+            (["A PAR R MAR"], ["(FRA AMY PAR) MTO MAR"], False),
+            (["A BUD S F TRI"], ["(AUS AMY BUD) SUP (AUS FLT TRI)"], False),
+            (["A PAR S A MAR - BUR"], ["(FRA AMY PAR) SUP (FRA AMY MAR) MTO BUR"], False),
         ]
 
-        for tc_ip, tc_op in PARSING_TEST_CASES:
-            assert dipnet_to_daide_parsing(tc_ip, Game()) == tc_op, dipnet_to_daide_parsing(tc_ip, Game())
-            assert daide_to_dipnet_parsing(tc_op[0])[0] == tc_ip[0].replace(" R ", " - "), daide_to_dipnet_parsing(tc_op[0])
+        for tc_ip, tc_op, unit_power_tuples_included in PARSING_TEST_CASES:
+            assert dipnet_to_daide_parsing(tc_ip, Game(), unit_power_tuples_included=unit_power_tuples_included) == tc_op, dipnet_to_daide_parsing(tc_ip, Game(), unit_power_tuples_included=unit_power_tuples_included)
+            comparison_tc_op = tc_ip[0].replace(" R ", " - ") if type(tc_ip[0]) == str else tc_ip[0][0].replace(" R ", " - ")
+            assert daide_to_dipnet_parsing(tc_op[0])[0] == comparison_tc_op, daide_to_dipnet_parsing(tc_op[0])
             print(tc_ip, " --> ", tc_op)
         
 
@@ -94,8 +96,8 @@ class TestUtils:
                         "AUSTRIA": ["A MOS S F STP/SC - LVN"]
                     },
                     'invalid_proposals': {
-                        "GERMANY": ["A PRU - LVN"],
-                        "ENGLAND": ["A PRU - LVN"]
+                        "GERMANY": [("A PRU - LVN", "RUS")],
+                        "ENGLAND": [("A PRU - LVN", "RUS")]
                     },
                     'shared_orders': {},
                     'other_orders': {},

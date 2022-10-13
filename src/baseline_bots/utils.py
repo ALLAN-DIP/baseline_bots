@@ -9,7 +9,7 @@ __email__ = "sanderschulhoff@gmail.com"
 # from diplomacy_research.models.state_space import get_order_tokens
 import re
 from collections import defaultdict
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 
 from DAIDE.utils.exceptions import ParseError
 from diplomacy import Game, Message
@@ -435,3 +435,522 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
     best_proposer = max(state_value, key=state_value.get)
 
     return best_proposer, proposal_order[best_proposer]
+
+def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, str]]], game: Game, unit_power_tuples_included=False) -> List[str]:
+    """
+    Convert dipnet style single order to DAIDE style order. Needs game instance to determine the powers owning the units
+
+    More details here: https://docs.google.com/document/d/16RODa6KDX7vNNooBdciI4NqSVN31lToto3MLTNcEHk0/edit?usp=sharing
+
+    :param dipnet_style_order_strs: dipnet style list of orders to be converted to DAIDE. Either in format: {"RUSSIA": ["A SEV - RUM"]} or {"RUSSIA": [("A SEV - RUM", "RUS")]}
+    :param game: game instance
+    :param unit_power_tuples_included: this means the unit power will also be included in the input dipnet_style_order_strs along with the orders like this: ("A SEV - RUM", "RUS")
+    :return: DAIDE style order string
+    """
+    def daidefy_suborder(dipnet_suborder: str) -> str:
+        """
+        Translates dipnet style units to DAIDE style units
+        E.g. for initial game state
+        A BUD       --> AUS AMY BUD
+        F TRI       --> AUS FLT TRI
+        A PAR       --> FRA AMY PAR
+        A MAR       --> FRA AMY MAR
+
+        :param dipnet_suborder: dipnet suborder to be encoded
+        :return: DAIDE-style suborder
+        """
+        if dipnet_suborder not in unit_game_mapping:
+            raise Exception(f"error from utils.dipnet_to_daide_parsing: unit {dipnet_suborder} not present in unit_game_mapping")
+        return "(" + (" ".join(
+            [
+                unit_game_mapping[dipnet_suborder],
+                "AMY" if dipnet_suborder[0] == "A" else "FLT",
+                dipnet_suborder.split()[-1]
+            ]
+        ) ) + ")"
+    
+    convoy_map = defaultdict(list)
+    dipnet_style_order_strs_tokens = [None for _ in range(len(dipnet_style_order_strs))]
+
+    # Convert strings to order tokens and store a dictionary mapping of armies to be convoyed and fleets helping to convoy
+    for i in range(len(dipnet_style_order_strs)):
+        if not(unit_power_tuples_included):
+            dipnet_style_order_strs_tokens[i] = get_order_tokens(dipnet_style_order_strs[i])
+            if dipnet_style_order_strs_tokens[i][1] == 'C':
+                convoy_map[dipnet_style_order_strs_tokens[i][2] + dipnet_style_order_strs_tokens[i][3]].append(dipnet_style_order_strs_tokens[i][0].split()[-1])
+        else: # If unit powers are also included in the input, then use the right values
+            dipnet_style_order_strs_tokens[i] = get_order_tokens(dipnet_style_order_strs[i][0]), dipnet_style_order_strs[i][1]
+            if dipnet_style_order_strs_tokens[i][0][1] == 'C':
+                convoy_map[dipnet_style_order_strs_tokens[i][0][2] + dipnet_style_order_strs_tokens[i][0][3]].append(dipnet_style_order_strs_tokens[i][0][0].split()[-1])
+    
+    daide_orders = []
+
+    # For each order
+    for dipnet_order_tokens in dipnet_style_order_strs_tokens:
+
+        # If unit powers are also included in the input, then update representation
+        if unit_power_tuples_included:
+            dipnet_order_tokens, unit_power = dipnet_order_tokens
+
+        # Create unit to power mapping for constructing DAIDE tokens
+        unit_game_mapping = {}
+        for power in list(game.powers.keys()):
+            for unit in game.get_units(power):
+                unit_game_mapping[unit] = power[:3]
+
+        # If unit powers are also included in the input, then add the unit - unit power mapping for DAIDE construction 
+        if unit_power_tuples_included:
+            unit_game_mapping[dipnet_order_tokens[0]] = unit_power
+
+        daide_order = []
+
+        # Daidefy and add source unit as it is
+        daide_order.append(daidefy_suborder(dipnet_order_tokens[0]))
+        if dipnet_order_tokens[1] == "S":
+            # Support orders
+            daide_order.append("SUP")
+            daide_order.append(daidefy_suborder(dipnet_order_tokens[2]))
+            if len(dipnet_order_tokens) == 4 and dipnet_order_tokens[3] != "H":
+                daide_order.append("MTO")
+                daide_order.append(dipnet_order_tokens[3].split()[-1])
+            elif len(dipnet_order_tokens) > 4:
+                raise Exception(f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!")
+        elif dipnet_order_tokens[1] == "H":
+            # Hold orders
+            daide_order.append("HLD")
+        elif dipnet_order_tokens[1] == "C":
+            # Convoy orders
+            daide_order.append("CVY")
+            daide_order.append(daidefy_suborder(dipnet_order_tokens[2]))
+            daide_order.append("CTO")
+            daide_order.append(dipnet_order_tokens[3].split()[-1])
+        elif len(dipnet_order_tokens) >= 3 and dipnet_order_tokens[2] == "VIA":
+            # VIA/CTO orders
+            daide_order.append("CTO")
+            daide_order.append(dipnet_order_tokens[1].split()[-1])
+            daide_order.append("VIA")
+            if dipnet_order_tokens[0] + dipnet_order_tokens[1] in convoy_map:
+                daide_order.append(f"({' '.join(convoy_map[dipnet_order_tokens[0] + dipnet_order_tokens[1]])})")
+            else:
+                print(f"unexpected situation at utils.dipnet_to_daide_parsing. Found order {dipnet_order_tokens} which doesn't have convoying fleet in its own set of orders")
+        else:
+            # Move orders
+            daide_order.append("MTO")
+            daide_order.append(dipnet_order_tokens[1].split()[-1])
+            if len(dipnet_order_tokens) > 2:
+                raise Exception(f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!")
+        daide_orders.append(" ".join(daide_order))
+
+    return daide_orders
+
+
+def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
+    """
+    Convert DAIDE style single order to dipnet style order
+
+    More details here: https://docs.google.com/document/d/16RODa6KDX7vNNooBdciI4NqSVN31lToto3MLTNcEHk0/edit?usp=sharing
+
+    :param daide_style_order_str: DAIDE style string to be converted to dipnet style
+    :return: dipnet style order string and unit's power name
+    """
+    def split_into_groups(daide_style_order_str: str) -> List[str]:
+        """
+        Split the string based on parenthesis or spaces
+        E.g.
+        "(FRA AMY PAR) SUP (FRA AMY MAR) MTO BUR" --> "(FRA AMY PAR)", "SUP", "(FRA AMY MAR)", "MTO", "BUR"
+
+        :param daide_style_order_str: DAIDE style string
+        :return: list of strings containing components of the order which makes it easy to convert to dipnet-style order
+        """
+        open_brack = False
+        stack = ""
+        grouped_order = []
+        for char in daide_style_order_str:
+            if (not(open_brack) and char == ' ') or char == ')':
+                if stack:
+                    grouped_order.append(stack)
+                    stack = ""
+                    open_brack = False
+            elif char == '(':
+                open_brack = True
+            else:
+                stack += char
+        if stack:
+            grouped_order.append(stack)
+        return grouped_order
+    daide_style_order_groups = split_into_groups(daide_style_order_str)
+
+    def dipnetify_suborder(suborder: str) -> str:
+        """
+        Translates DAIDE style units to dipnet style units
+
+        :param suborder: DAIDE-style suborder to be encoded
+        :return: dipnet suborder
+        """
+        suborder_tokens = suborder.split()
+        try:
+            ans = suborder_tokens[1][0] + " " + suborder_tokens[2]
+        except Exception:
+            raise Exception(f"Failed for suborder: {suborder_tokens}")
+        return ans, suborder_tokens[0]
+
+    dipnet_order = []
+
+    # Dipnetify source unit
+    suborder, unit_power = dipnetify_suborder(daide_style_order_groups[0])
+    dipnet_order.append(suborder)
+    if daide_style_order_groups[1] == "SUP":
+        # Support order
+        dipnet_order.append("S")
+        dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2])[0])
+        if len(daide_style_order_groups) == 5 and daide_style_order_groups[3] == "MTO":
+            dipnet_order.append("-")
+            dipnet_order.append(daide_style_order_groups[4])
+        elif len(daide_style_order_groups) > 5:
+            raise Exception(f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!")
+    elif daide_style_order_groups[1] == "HLD":
+        # Hold order
+        dipnet_order.append("H")
+    elif daide_style_order_groups[1] == "CTO":
+        # CTO order
+        dipnet_order.append("-")
+        dipnet_order.append(daide_style_order_groups[2])
+        dipnet_order.append("VIA")
+    elif daide_style_order_groups[1] == "CVY":
+        # Convoy order
+        dipnet_order.append("C")
+        dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2])[0])
+        dipnet_order.append("-")
+        dipnet_order.append(daide_style_order_groups[4])
+    elif daide_style_order_groups[1] == "MTO":
+        # Move orders
+        dipnet_order.append("-")
+        dipnet_order.append(daide_style_order_groups[2])
+        if len(daide_style_order_groups) > 3:
+            raise Exception(f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!")
+    else:
+        raise Exception(f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!")
+
+    return " ".join(dipnet_order), unit_power
+
+def parse_proposal_messages(
+        rcvd_messages: List[Tuple[int, Message]],
+        game: Game, 
+        power_name: str
+    ) -> Dict[str, Dict[str, List[str]]]:
+    """
+    From received messages, extract the proposals (categorize as valid and invalid), shared orders and other orders. Use specified game state and power_name to check for validity of moves
+
+    :param rcvd_messages: list of messages received from other players
+    :param game: Game state
+    :param power_name: power name against which the validity of moves need to be checked
+    :return: dictionary of 
+        valid proposals, 
+        invalid proposals, 
+        shared orders (orders that the other power said it would execute), 
+        other orders (orders that the other power shared as gossip),
+        alliance proposals
+    """
+    # Extract messages containing PRP string
+    order_msgs = [msg for msg in rcvd_messages.values() if "PRP" in msg.message]
+
+    # Generate a dictionary of sender to list of orders (dipnet-style) for this sender
+    proposals = defaultdict(list)
+
+    invalid_proposals = defaultdict(list)
+    valid_proposals = defaultdict(list)
+    shared_orders = defaultdict(list)
+    other_orders = defaultdict(list)
+    alliance_proposals = defaultdict(list)
+
+    for order_msg in order_msgs:
+        try:
+            if "AND" in order_msg.message: # works when AND is present in this format: XDO () AND XDO () AND XDO()
+                daide_style_orders = [order_1 for order in (parse_PRP(order_msg.message)).split("AND") for order_1 in parse_arrangement(order.strip(), xdo_only=False)]
+            else: # works for cases where ORR is present in PRP or nothing is present: ORR ( (XDO()) (XDO()))
+                daide_style_orders = [order for order in parse_arrangement(parse_PRP(order_msg.message), xdo_only=False)]
+            for order_type, order in daide_style_orders:
+                if order_type == "XDO":
+                    proposals[order_msg.sender].append(daide_to_dipnet_parsing(order))
+                elif order_type == "ALY":
+                    for ally in parse_alliance_proposal(order, power_name):
+                        alliance_proposals[ally].append((order_msg.sender, order))
+                else:
+                    other_orders[order_msg.sender].append(order)
+        except Exception as e:
+            raise Exception(f"Exception raised for {order_msg.message}")
+    
+    # Generate set of possible orders for the given power
+    orderable_locs = game.get_orderable_locations(power_name)
+    all_possible_orders = game.get_all_possible_orders()
+    possible_orders = set([ord for ord_key in all_possible_orders for ord in all_possible_orders[ord_key] if ord_key in orderable_locs])
+
+    # For the set of proposed moves from each sender, check if the specified orders would be allowed. If not, mark them as invalid.
+    for sender in proposals:
+        for order, unit_power_name in proposals[sender]:
+            if unit_power_name == power_name[:3]: # These are supposed to be proposal messages to me
+                if order in possible_orders: # These would be valid proposals to me
+                    valid_proposals[sender].append(order)
+                else: # These would be invalid proposals
+                    invalid_proposals[sender].append((order, unit_power_name))
+            elif unit_power_name == sender[:3]: # These are supposed to be conditional orders that the sender is going to execute
+                shared_orders[sender].append(order)
+            else:
+                other_orders[sender].append(order)
+
+    if other_orders:
+        print("Found other orders while extracting proposal messages:")
+        print([msg.message for msg in order_msgs])
+        print("Other orders found:")
+        print(other_orders)
+    
+    return {
+        'valid_proposals': valid_proposals, 
+        'invalid_proposals': invalid_proposals, 
+        'shared_orders': shared_orders, 
+        'other_orders': other_orders, 
+        'alliance_proposals': alliance_proposals
+    }
+
+if __name__ == "__main__":
+    # Tests for utils.dipnet_to_daide_parsing
+    PARSING_TEST_CASES = [
+        (["A PAR H"], ["(FRA AMY PAR) HLD"], False),
+        ([("A PAR H", "ENG")], ["(ENG AMY PAR) HLD"], True),
+        (["A PAR - MAR"], ["(FRA AMY PAR) MTO MAR"], False),
+        (["A PAR R MAR"], ["(FRA AMY PAR) MTO MAR"], False),
+        (["A BUD S F TRI"], ["(AUS AMY BUD) SUP (AUS FLT TRI)"], False),
+        (["A PAR S A MAR - BUR"], ["(FRA AMY PAR) SUP (FRA AMY MAR) MTO BUR"], False),
+    ]
+
+    for tc_ip, tc_op, unit_power_tuples_included in PARSING_TEST_CASES:
+        assert dipnet_to_daide_parsing(tc_ip, Game(), unit_power_tuples_included=unit_power_tuples_included) == tc_op, dipnet_to_daide_parsing(tc_ip, Game(), unit_power_tuples_included=unit_power_tuples_included)
+        comparison_tc_op = tc_ip[0].replace(" R ", " - ") if type(tc_ip[0]) == str else tc_ip[0][0].replace(" R ", " - ")
+        assert daide_to_dipnet_parsing(tc_op[0])[0] == comparison_tc_op, daide_to_dipnet_parsing(tc_op[0])
+        print(tc_ip, " --> ", tc_op)
+    
+
+
+
+    # Tests for convoy orders
+    PARSING_CVY_TEST_CASES = [
+        (["A TUN - SYR VIA", "F ION C A TUN - SYR", "F EAS C A TUN - SYR"], ["(ITA AMY TUN) CTO SYR VIA (ION EAS)", "(ITA FLT ION) CVY (ITA AMY TUN) CTO SYR", "(ITA FLT EAS) CVY (ITA AMY TUN) CTO SYR"])
+    ]
+
+    game_tc = Game()
+    game_tc.set_units("ITALY", ["A TUN", "F ION", "F EAS"])
+
+    for tc_ip, tc_op in PARSING_CVY_TEST_CASES:
+        assert dipnet_to_daide_parsing(tc_ip, game_tc) == tc_op, dipnet_to_daide_parsing(tc_ip, game_tc)
+        print(tc_ip, " --> ", tc_op)
+        for tc_ip_ord, tc_op_ord in zip(tc_ip, tc_op):
+            assert daide_to_dipnet_parsing(tc_op_ord)[0] == tc_ip_ord.replace(" R ", " - "), daide_to_dipnet_parsing(tc_op_ord)
+    
+
+
+
+
+    # Tests for parse_proposal_messages
+    PARSE_PROPOSALS_TC = [
+        [
+            "RUSSIA",
+            {
+                "GERMANY": "PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (XDO ((RUS FLT SEV) MTO RUM)) (XDO ((RUS AMY PRU) MTO LVN)))",
+                "AUSTRIA": "PRP (XDO ((RUS AMY MOS) SUP (RUS FLT STP/SC) MTO LVN)))",
+                "ENGLAND": "PRP (XDO ((RUS AMY PRU) MTO LVN)))"
+            }, 
+            {
+                'valid_proposals': {
+                    "GERMANY": ["A WAR - PRU", "F SEV - RUM"],
+                    "AUSTRIA": ["A MOS S F STP/SC - LVN"]
+                },
+                'invalid_proposals': {
+                    "GERMANY": [("A PRU - LVN", "RUS")],
+                    "ENGLAND": [("A PRU - LVN", "RUS")]
+                },
+                'shared_orders': {},
+                'other_orders': {},
+                'alliance_proposals': {}
+            }
+        ],
+        [
+            "RUSSIA",
+            {
+                "GERMANY": "PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (ALY (GER RUS ENG ITA) VSS (FRA TUR AUS)) (ABC ((RUS AMY WAR) MTO PRU)))",
+                "AUSTRIA": "PRP (ALY (AUS RUS) VSS (FRA ENG ITA TUR GER))"
+            }, 
+            {
+                'valid_proposals': {
+                    "GERMANY": ["A WAR - PRU"]
+                },
+                'invalid_proposals': {},
+                'shared_orders': {},
+                'other_orders': {
+                    "GERMANY": ["ABC ((RUS AMY WAR) MTO PRU)"]
+                },
+                'alliance_proposals': {
+                    "GERMANY": [("GERMANY", "ALY (GER RUS ENG ITA) VSS (FRA TUR AUS)")],
+                    "ENGLAND": [("GERMANY", "ALY (GER RUS ENG ITA) VSS (FRA TUR AUS)")],
+                    "ITALY": [("GERMANY", "ALY (GER RUS ENG ITA) VSS (FRA TUR AUS)")],
+                    "AUSTRIA": [("AUSTRIA", "ALY (AUS RUS) VSS (FRA ENG ITA TUR GER)")],
+                }
+            }
+        ],
+        [
+            "TURKEY",
+            {
+                "RUSSIA": "PRP(XDO((TUR FLT ANK) MTO BLA) AND XDO((RUS AMY SEV) MTO RUM) AND (XDO((ENG AMY LVP) HLD)))"
+            }, 
+            {
+                'valid_proposals': {
+                    "RUSSIA": ["F ANK - BLA"]
+                },
+                'invalid_proposals': {},
+                'shared_orders': {
+                    "RUSSIA": ["A SEV - RUM"]
+                },
+                'other_orders': {
+                    "RUSSIA": ["A LVP H"]
+                },
+                'alliance_proposals': {}
+            }
+        ],
+        [
+            "TURKEY",
+            {
+                "RUSSIA": "PRP(XDO((TUR FLT ANK) MTO BLA) AND XDO((RUS AMY SEV) MTO RUM) AND (XDO((ENG AMY LVP) HLD)) AND (ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)) AND (ABC ((RUS AMY WAR) MTO PRU) ) )"
+            }, 
+            {
+                'valid_proposals': {
+                    "RUSSIA": ["F ANK - BLA"]
+                },
+                'invalid_proposals': {},
+                'shared_orders': {
+                    "RUSSIA": ["A SEV - RUM"]
+                },
+                'other_orders': {
+                    "RUSSIA": ["A LVP H", "ABC ((RUS AMY WAR) MTO PRU)"]
+                },
+                'alliance_proposals': {
+                    "RUSSIA": [("RUSSIA", "ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)")],
+                    "ENGLAND": [("RUSSIA", "ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)")],
+                    "ITALY": [("RUSSIA", "ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)")],
+                }
+            }
+        ]
+    ]
+    for power_name, tc_ip, tc_op in PARSE_PROPOSALS_TC:
+        game_GTP = Game()
+        for sender in tc_ip:
+            msg_obj = Message(
+                sender=sender,
+                recipient=power_name,
+                message=tc_ip[sender],
+                phase=game_GTP.get_current_phase(),
+            )
+            game_GTP.add_message(message=msg_obj)
+        parsed_orders_dict = parse_proposal_messages(game_GTP.filter_messages(messages=game_GTP.messages, game_role=power_name), game_GTP, power_name)
+        # print(tc_ip)
+        # print(parsed_orders_dict)
+
+        assert set(parsed_orders_dict.keys()) == set(tc_op.keys())
+        for pod_key in parsed_orders_dict:
+            assert set(parsed_orders_dict[pod_key].keys()) == set(tc_op[pod_key].keys()), (pod_key, set(parsed_orders_dict[pod_key].keys()), set(tc_op[pod_key].keys()))
+        
+            for key in parsed_orders_dict[pod_key]:
+                assert set(parsed_orders_dict[pod_key][key]) == set(tc_op[pod_key][key]), (pod_key, key, set(parsed_orders_dict[pod_key][key]), set(tc_op[pod_key][key]))
+
+
+
+
+
+    # Tests for orders extraction
+    FCT_TCS = [
+        [
+            "FCT (XDO (F BLK - CON))", 
+            "XDO (F BLK - CON)"
+        ],
+        [
+            "FCT(XDO (F BLK - CON))", 
+            "XDO (F BLK - CON)"
+        ]
+    ]
+    for tc_ip, tc_op in FCT_TCS:
+        assert parse_FCT(tc_ip) == tc_op, parse_FCT(tc_ip)
+        
+    PRP_TCS = [
+        [
+            "PRP (XDO (F BLK - CON))", 
+            "XDO (F BLK - CON)"
+        ],
+        [
+            "PRP(XDO (F BLK - CON))", 
+            "XDO (F BLK - CON)"
+        ]
+    ]
+    for tc_ip, tc_op in PRP_TCS:
+        assert parse_PRP(tc_ip) == tc_op, parse_PRP(tc_ip)
+
+    ORR_TCS = [
+        [
+            "XDO (F BLK - CON)",
+            ["F BLK - CON"]
+        ], 
+        [
+            "XDO (F BLK - CON)",
+            ["F BLK - CON"]
+        ],
+        [
+            "XDO(F BLK - CON)",
+            ["F BLK - CON"]
+        ],
+        [
+            "ORR (XDO(F BLK - CON))(XDO(A RUM - BUD))(XDO(F BLK - BUD))",
+            ["F BLK - CON", "A RUM - BUD", "F BLK - BUD"]
+        ],
+        [
+            "ORR (XDO (F BLK - CON)) (XDO (A RUM - BUD))",
+            ["F BLK - CON", "A RUM - BUD"]
+        ]
+    ]
+    
+    for tc_ip, tc_op in ORR_TCS:
+        assert parse_arrangement(tc_ip, xdo_only=True) == tc_op, parse_arrangement(tc_ip, xdo_only=True)
+
+    ORR_XDO_ALY_TCS = [
+        [
+            "XDO (F BLA - CON)",
+            [("XDO", "F BLA - CON")]
+        ], 
+        [
+            "XDO (F BLA - CON)",
+            [("XDO", "F BLA - CON")]
+        ],
+        [
+            "XDO(F BLA - CON)",
+            [("XDO", "F BLA - CON")]
+        ],
+        [
+            "ALY (GER RUS) VSS (FRA ENG ITA TUR AUS)",
+            [("ALY", "ALY (GER RUS) VSS (FRA ENG ITA TUR AUS)")]
+        ],
+        [
+            "ORR (XDO(F BLA - CON))(XDO(A RUM - BUD))(XDO(F BLA - BUD))",
+            [("XDO", "F BLA - CON"), ("XDO", "A RUM - BUD"), ("XDO", "F BLA - BUD")]
+        ],
+        [
+            "ORR  (XDO (F BLA - CON)) (XDO (A RUM - BUD))",
+            [("XDO", "F BLA - CON"), ("XDO", "A RUM - BUD")]
+        ],
+        [
+            "ORR (XDO (F BLA - CON)) (ALY (GER RUS TUR) VSS (FRA ENG ITA AUS))",
+            [("XDO", "F BLA - CON"), ("ALY", "ALY (GER RUS TUR) VSS (FRA ENG ITA AUS)")]
+        ],
+        [
+            "ORR (XDO ((RUS FLT BLA) MTO CON)) (ALY (GER RUS TUR) VSS (FRA ENG ITA AUS)) (ABC (F BLA - CON))",
+            [("XDO", "(RUS FLT BLA) MTO CON"), ("ALY", "ALY (GER RUS TUR) VSS (FRA ENG ITA AUS)"), ("ABC", "ABC (F BLA - CON)")]
+        ]
+    ]
+    
+    for tc_ip, tc_op in ORR_XDO_ALY_TCS:
+        assert parse_arrangement(tc_ip, xdo_only=False) == tc_op, (parse_arrangement(tc_ip, xdo_only=False), tc_op)
