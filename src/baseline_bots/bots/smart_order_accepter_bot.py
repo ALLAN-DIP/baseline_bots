@@ -8,10 +8,11 @@ from diplomacy import Message
 from stance_vector import ScoreBasedStance
 
 import sys
+sys.path.append("../")
 sys.path.append("../../../")
 
-from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
-from baseline_bots.utils import (
+from dipnet.dipnet_bot import DipnetBot
+from utils import (
     MessagesData,
     OrdersData,
     get_best_orders,
@@ -20,7 +21,7 @@ from baseline_bots.utils import (
     parse_arrangement,
     parse_PRP
 )
-from baseline_bots.parsing_utils import (
+from parsing_utils import (
     dipnet_to_daide_parsing,
     daide_to_dipnet_parsing,
     parse_proposal_messages
