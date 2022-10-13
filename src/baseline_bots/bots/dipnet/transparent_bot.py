@@ -19,7 +19,8 @@ from baseline_bots.utils import (
 from DAIDE import FCT, ORR, XDO
 
 from baseline_bots.parsing_utils import (
-    dipnet_to_daide_parsing
+    dipnet_to_daide_parsing,
+    daide_to_dipnet_parsing
 )
 
 from typing import List
@@ -57,6 +58,7 @@ class TransparentBot(DipnetBot):
         comms_obj = MessagesData()
 
         parsed_orders = self.parse_messages(rcvd_messages)
+        parsed_orders = [daide_to_dipnet_parsing(order) in parsed_orders]
 
         # My orders' messages if not already sent
         if not self.my_orders_informed:
