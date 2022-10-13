@@ -80,7 +80,7 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, 
         
         daide_order = []
         # print('dipnet_order_tokens ', dipnet_order_tokens)
-        if dipnet_order_tokens[0] not in unit_game_mapping
+        if dipnet_order_tokens[0] not in unit_game_mapping:
             continue
         if len(dipnet_order_tokens)>=3 and dipnet_order_tokens[2] not in unit_game_mapping:    
             continue
