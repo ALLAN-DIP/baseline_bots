@@ -121,7 +121,8 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, 
             if len(dipnet_order_tokens) > 2:
                 raise Exception(f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!")
         print('daide_order ',daide_order)
-        daide_orders.append(" ".join(daide_order))
+        if None not in daide_order:    
+            daide_orders.append(" ".join(daide_order))
 
     return daide_orders
 
