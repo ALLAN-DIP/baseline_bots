@@ -35,8 +35,8 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, 
         :param dipnet_suborder: dipnet suborder to be encoded
         :return: DAIDE-style suborder
         """
-        if dipnet_suborder not in unit_game_mapping:
-            raise Exception(f"error from utils.dipnet_to_daide_parsing: unit {dipnet_suborder} not present in unit_game_mapping")
+        # if dipnet_suborder not in unit_game_mapping:
+        #     raise Exception(f"error from utils.dipnet_to_daide_parsing: unit {dipnet_suborder} not present in unit_game_mapping")
         return "(" + (" ".join(
             [
                 unit_game_mapping[dipnet_suborder],
