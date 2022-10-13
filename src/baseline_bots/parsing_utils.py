@@ -79,8 +79,9 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, 
             unit_game_mapping[dipnet_order_tokens[0]] = unit_power
         
         daide_order = []
-        
+
         if dipnet_order_tokens[0] not in unit_game_mapping or dipnet_order_tokens[2] not in unit_game_mapping:
+            print('this dipnet order is not in unit_game_mapping',dipnet_order_tokens)
             continue
 
         # Daidefy and add source unit as it is
