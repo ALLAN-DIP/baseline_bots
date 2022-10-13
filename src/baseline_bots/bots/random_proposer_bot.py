@@ -30,7 +30,9 @@ class RandomProposerBot(BaselineBot):
     def gen_messages(self, _) -> MessagesData:
         # Return data initialization
         ret_obj = MessagesData()
-
+        
+        if self.game.get_current_phase()[-1] != "M":
+            return comms_obj
         # Getting the list of possible orders for all locations
         possible_orders = self.game.get_all_possible_orders()
 
