@@ -6,20 +6,21 @@ __author__ = "Kartik Shenoy"
 __email__ = "kartik.shenoyy@gmail.com"
 import re
 from collections import defaultdict
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 
 from DAIDE.utils.exceptions import ParseError
 from diplomacy import Game, Message
 from baseline_bots.utils import *
 
-def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> List[str]:
+def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, str]]], game: Game, unit_power_tuples_included=False) -> List[str]:
     """
     Convert dipnet style single order to DAIDE style order. Needs game instance to determine the powers owning the units
 
     More details here: https://docs.google.com/document/d/16RODa6KDX7vNNooBdciI4NqSVN31lToto3MLTNcEHk0/edit?usp=sharing
 
-    :param dipnet_style_order_strs: dipnet style list of orders to be converted to DAIDE
+    :param dipnet_style_order_strs: dipnet style list of orders to be converted to DAIDE. Either in format: {"RUSSIA": ["A SEV - RUM"]} or {"RUSSIA": [("A SEV - RUM", "RUS")]}
     :param game: game instance
+    :param unit_power_tuples_included: this means the unit power will also be included in the input dipnet_style_order_strs along with the orders like this: ("A SEV - RUM", "RUS")
     :return: DAIDE style order string
     """
     def daidefy_suborder(dipnet_suborder: str) -> str:
@@ -49,20 +50,33 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[str], game: Game) -> L
 
     # Convert strings to order tokens and store a dictionary mapping of armies to be convoyed and fleets helping to convoy
     for i in range(len(dipnet_style_order_strs)):
-        dipnet_style_order_strs_tokens[i] = get_order_tokens(dipnet_style_order_strs[i])
-        if dipnet_style_order_strs_tokens[i][1] == 'C':
-            convoy_map[dipnet_style_order_strs_tokens[i][2] + dipnet_style_order_strs_tokens[i][3]].append(dipnet_style_order_strs_tokens[i][0].split()[-1])
+        if not(unit_power_tuples_included):
+            dipnet_style_order_strs_tokens[i] = get_order_tokens(dipnet_style_order_strs[i])
+            if dipnet_style_order_strs_tokens[i][1] == 'C':
+                convoy_map[dipnet_style_order_strs_tokens[i][2] + dipnet_style_order_strs_tokens[i][3]].append(dipnet_style_order_strs_tokens[i][0].split()[-1])
+        else: # If unit powers are also included in the input, then use the right values
+            dipnet_style_order_strs_tokens[i] = get_order_tokens(dipnet_style_order_strs[i][0]), dipnet_style_order_strs[i][1]
+            if dipnet_style_order_strs_tokens[i][0][1] == 'C':
+                convoy_map[dipnet_style_order_strs_tokens[i][0][2] + dipnet_style_order_strs_tokens[i][0][3]].append(dipnet_style_order_strs_tokens[i][0][0].split()[-1])
     
     daide_orders = []
 
     # For each order
     for dipnet_order_tokens in dipnet_style_order_strs_tokens:
 
+        # If unit powers are also included in the input, then update representation
+        if unit_power_tuples_included:
+            dipnet_order_tokens, unit_power = dipnet_order_tokens
+
         # Create unit to power mapping for constructing DAIDE tokens
         unit_game_mapping = {}
         for power in list(game.powers.keys()):
             for unit in game.get_units(power):
                 unit_game_mapping[unit] = power[:3]
+
+        # If unit powers are also included in the input, then add the unit - unit power mapping for DAIDE construction 
+        if unit_power_tuples_included:
+            unit_game_mapping[dipnet_order_tokens[0]] = unit_power
 
         daide_order = []
 
@@ -254,7 +268,7 @@ def parse_proposal_messages(
                 if order in possible_orders: # These would be valid proposals to me
                     valid_proposals[sender].append(order)
                 else: # These would be invalid proposals
-                    invalid_proposals[sender].append(order)
+                    invalid_proposals[sender].append((order, unit_power_name))
             elif unit_power_name == sender[:3]: # These are supposed to be conditional orders that the sender is going to execute
                 shared_orders[sender].append(order)
             else:

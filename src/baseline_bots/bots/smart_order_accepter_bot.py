@@ -90,17 +90,17 @@ class SmartOrderAccepterBot(DipnetBot):
                 )
         return messages
     
-    def respond_to_invalid_orders(self, invalid_proposal_orders: Dict[str, List[str]], messages_data: MessagesData) -> None:
+    def respond_to_invalid_orders(self, invalid_proposal_orders: Dict[str, List[Tuple[str, str]]], messages_data: MessagesData) -> None:
         """
         The bot responds by HUHing the invalid proposal orders received (this could occur if the move proposed is invalid)
 
-        :param invalid_proposal_orders: dictionary of sender -> invalid orders proposed
+        :param invalid_proposal_orders: dictionary of sender -> (invalid order, unit power)
         :param messages_data: Message Data object to add messages
         """
         if not invalid_proposal_orders:
             return
         for sender in invalid_proposal_orders:
-            message = HUH(PRP(ORR(XDO(dipnet_to_daide_parsing(invalid_proposal_orders[sender])))))
+            message = HUH(PRP(ORR([XDO(order) for order in dipnet_to_daide_parsing(invalid_proposal_orders[sender], self.game, unit_power_tuples_included=True)])))
             messages_data.add_message(
                 sender, str(message)
             )
@@ -111,8 +111,9 @@ class SmartOrderAccepterBot(DipnetBot):
         :param messages_data: Message Data object to add messages
         """
         unique_senders = {}
-        for sender, message in self.alliances.values():
-            unique_senders[sender] = message
+        for sender_message_tuple in self.alliances.values():
+            for sender, message in sender_message_tuple:
+                unique_senders[sender] = message
         for sender, message in unique_senders.items():
             messages_data.add_message(sender, str(YES(message)))
 
