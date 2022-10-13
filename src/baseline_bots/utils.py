@@ -9,8 +9,9 @@ __email__ = "sanderschulhoff@gmail.com"
 # from diplomacy_research.models.state_space import get_order_tokens
 import re
 from collections import defaultdict
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 
+from DAIDE import ALY, PRP, ORR, XDO, HUH, FCT
 from DAIDE.utils.exceptions import ParseError
 from diplomacy import Game, Message
 from tornado import gen
@@ -54,23 +55,23 @@ def AND(arrangements: List[str]) -> str:
     return "AND" + "".join([f" ({a})" for a in arrangements])
 
 
-def ORR(arrangements: List[str]) -> str:
-    """
-    ORRs together an array of arrangements
-    """
+# def ORR(arrangements: List[str]) -> str:
+#     """
+#     ORRs together an array of arrangements
+#     """
 
-    if len(arrangements) < 2:
-        return "".join([f"({a})" for a in arrangements])
-        # raise Exception("Need at least 2 items to ORR")
+#     if len(arrangements) < 2:
+#         return "".join([f"({a})" for a in arrangements])
+#         # raise Exception("Need at least 2 items to ORR")
 
-    return "ORR" + "".join([f" ({a})" for a in arrangements])
+#     return "ORR" + "".join([f" ({a})" for a in arrangements])
 
 
-def XDO(orders: List[str]) -> List[str]:
-    """
-    Adds XDO to each order in array
-    """
-    return [f"XDO ({order})" for order in orders]
+# def XDO(orders: List[str]) -> List[str]:
+#     """
+#     Adds XDO to each order in array
+#     """
+#     return [f"XDO ({order})" for order in orders]
 
 
 def get_other_powers(powers: List[str], game: Game):
@@ -101,14 +102,14 @@ def REJ(string) -> str:
     return f"REJ ({string})"
 
 
-def FCT(string) -> str:
-    """Forms FCT message"""
-    return f"FCT ({string})"
+# def FCT(string) -> str:
+#     """Forms FCT message"""
+#     return f"FCT ({string})"
 
 
-def HUH(string) -> str:
-    """Forms HUH message"""
-    return f"HUH ({string})"
+# def HUH(string) -> str:
+#     """Forms HUH message"""
+#     return f"HUH ({string})"
 
 
 def parse_FCT(msg) -> str:

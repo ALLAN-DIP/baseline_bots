@@ -10,14 +10,13 @@ from diplomacy import Game, Message
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from baseline_bots.utils import (
-    FCT,
-    ORR,
-    XDO,
     MessagesData,
     get_other_powers,
     parse_FCT,
     parse_arrangement,
 )
+
+from DAIDE import FCT, ORR, XDO
 
 from baseline_bots.parsing_utils import (
     dipnet_to_daide_parsing
