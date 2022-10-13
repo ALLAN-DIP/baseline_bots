@@ -417,11 +417,13 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
             simulated_game.set_orders(power_name=bot.power_name, orders=unit_orders)
 
             # consider shared orders in a simulated game
-            for other_power, power_orders in shared_order.items():
+            for other_power in bot.game.powers:
 
                 # if they are not sharing any info about their orders then assume that they are DipNet-based
-                if not power_orders:
-                    power_orders = yield bot.brain.get_orders(game, other_power)
+                if other_power in shared_order:
+                    power_orders = shared_order[other_power]
+                else:
+                    power_orders = yield bot.brain.get_orders(simulated_game, other_power)
                 simulated_game.set_orders(power_name=other_power, orders=power_orders)
 
             # process current turn
@@ -434,5 +436,4 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
 
     # get power name that gives the max state value
     best_proposer = max(state_value, key=state_value.get)
-
     return best_proposer, proposal_order[best_proposer]

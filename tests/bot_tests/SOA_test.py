@@ -14,7 +14,8 @@ from baseline_bots.utils import (
     parse_alliance_proposal,
     parse_arrangement,
     parse_PRP,
-    get_order_tokens
+    get_order_tokens,
+    get_state_value
 )
 
 from baseline_bots.parsing_utils import (
@@ -27,9 +28,9 @@ class TestSOABot():
     def test(self):
         # start_io_loop(self.test_play)
         # start_io_loop(self.test_stance)
-        start_io_loop(self.test_auxilary_functions)
+        # start_io_loop(self.test_auxilary_functions)
         # start_io_loop(self.test_parse_proposals)
-        # self.test_get_best_orders()
+        start_io_loop(self.test_get_best_orders)
         # start_io_loop(self.test_gen_pos_stance_messages)
     
     @gen.coroutine
@@ -170,63 +171,73 @@ class TestSOABot():
         # proposal -> gen state value check if SOA select the best proposal 
         
         #run test for n times
-        n=100
-        orders = yield self.brain.get_orders(self.game, self.power_name)
+        n=10
+
         for i in range(n):
             game = Game()
             soa_bot = SmartOrderAccepterBot('FRANCE', game)
-            soa_bot.rollout_length = 10
+            soa_bot.rollout_length = 7
             baseline1 = RandomProposerBot_AsyncBot('AUSTRIA', game)
             baseline2 = RandomProposerBot_AsyncBot('ENGLAND', game)
             bot_instances = [baseline1, baseline2, soa_bot]   
 
-            game_play = GamePlay(game, bot_instances, 3, True)
-            bl1_msg = baseline1.gen_messages()
-            bl2_msg = baseline2.gen_messages()
+            rcvd_messages = game.filter_messages(messages=game.messages, game_role='AUSTRIA')
+            bl1_msg = yield baseline1.gen_messages(rcvd_messages)
+            rcvd_messages = game.filter_messages(messages=game.messages, game_role='ENGLAND')
+            bl2_msg = yield baseline2.gen_messages(rcvd_messages)
 
             for msg in bl1_msg:
                 msg_obj1 = Message(
                                     sender=baseline1.power_name,
                                     recipient=msg['recipient'],
                                     message=msg['message'],
-                                    phase=game_play.game.get_current_phase(),
+                                    phase=game.get_current_phase(),
                                 )
-                game_play.game.add_message(message=msg_obj1)
+                game.add_message(message=msg_obj1)
 
             for msg in bl2_msg:
                 msg_obj2 = Message(
                                     sender=baseline2.power_name,
                                     recipient=msg['recipient'],
                                     message=msg['message'],
-                                    phase=game_play.game.get_current_phase(),
+                                    phase=game.get_current_phase(),
                                 )
-                game_play.game.add_message(message=msg_obj2)
+                game.add_message(message=msg_obj2)
 
-            rcvd_messages = game_play.game.filter_messages(messages=game_play.game.messages, game_role=soa_bot.power_name)
-            rcvd_messages = list(rcvd_messages.values())
-            parsed_messages_dict = parse_proposal_messages(rcvd_messages, game_play.game, soa_bot.power_name)
+            rcvd_messages = game.filter_messages(messages=game.messages, game_role=soa_bot.power_name)
+            rcvd_messages = list(rcvd_messages.items())
+            rcvd_messages.sort()
+            parsed_messages_dict = parse_proposal_messages(rcvd_messages, game, soa_bot.power_name)
             valid_proposal_orders = parsed_messages_dict['valid_proposals']
+            shared_orders = parsed_messages_dict['shared_orders']
+            orders = yield soa_bot.brain.get_orders(game, soa_bot.power_name)
             valid_proposal_orders[soa_bot.power_name] = orders
 
-            state_value = {power_name: -10000 for power_name in game_play.game.powers}
+            state_value = {power_name: -10000 for power_name in game.powers}
 
-            for power_name, orders in prp_orders:
-                sim_game = game_play.game.__deepcopy__(None)
+            for power_name, orders in valid_proposal_orders.items():
+                sim_game = game.__deepcopy__(None)
                 sim_game.set_orders(power_name=soa_bot.power_name, orders=orders)
                 
-                for other_power in game_play.game.powers:
+                for other_power in game.powers:
                     power_orders = yield soa_bot.brain.get_orders(sim_game, other_power)
                     sim_game.set_orders(power_name=other_power, orders=power_orders)
 
-                sim_game.progress()
+                sim_game.process()
                 
                 state_value[power_name] = yield get_state_value(soa_bot, sim_game, soa_bot.power_name)
+            
+            print(state_value)
 
-            best_proposer, best_orders = get_best_orders(prp_orders, shared_order)
+            best_proposer, best_orders = yield get_best_orders(soa_bot, valid_proposal_orders, shared_orders)
             max_sv = max(state_value.values())
             max_sv_power = [power_name for power_name in state_value if state_value[power_name] == max_sv]
-            assert best_proposer in max_sv_power
+            print('expect to have '+ best_proposer +' in max_state_value_powers: ', max_sv_power)
+            
+            assert best_proposer in max_sv_power, "best proposer did not return the maximum state value"
+
         print('finish test_best_prop_order')
+        stop_io_loop()
 
     @gen.coroutine    
     def test_gen_pos_stance_messages(self):
