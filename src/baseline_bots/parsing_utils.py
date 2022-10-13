@@ -79,7 +79,7 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, 
             unit_game_mapping[dipnet_order_tokens[0]] = unit_power
 
         if dipnet_order_tokens[0] not in unit_game_mapping:
-            return 
+            continue
         
         daide_order = []
 
@@ -89,7 +89,7 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, 
             # Support orders
             daide_order.append("SUP")
             if dipnet_order_tokens[2] not in unit_game_mapping:
-                return 
+                continue 
             daide_order.append(daidefy_suborder(dipnet_order_tokens[2]))
 
             if len(dipnet_order_tokens) == 4 and dipnet_order_tokens[3] != "H":
@@ -104,7 +104,7 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, 
             # Convoy orders
             daide_order.append("CVY")
             if dipnet_order_tokens[2] not in unit_game_mapping:
-                return 
+                continue 
             daide_order.append(daidefy_suborder(dipnet_order_tokens[2]))
             daide_order.append("CTO")
             daide_order.append(dipnet_order_tokens[3].split()[-1])
