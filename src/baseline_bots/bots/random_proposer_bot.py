@@ -30,7 +30,7 @@ class RandomProposerBot(BaselineBot):
     def gen_messages(self, _) -> MessagesData:
         # Return data initialization
         ret_obj = MessagesData()
-        
+
         if self.game.get_current_phase()[-1] != "M":
             return comms_obj
         # Getting the list of possible orders for all locations
@@ -44,12 +44,13 @@ class RandomProposerBot(BaselineBot):
                 if possible_orders[loc]
             ]
             suggested_random_orders = list(filter(lambda x: x != 'WAIVE', suggested_random_orders))
-            suggested_random_orders = PRP(ORR(
-                [XDO(order) for order in dipnet_to_daide_parsing(suggested_random_orders, self.game)]
-            )
-            )
-            # send the other power a message containing the orders
-            ret_obj.add_message(other_power, str(suggested_random_orders))
+            if len(suggested_random_orders) > 0:
+                suggested_random_orders = PRP(ORR(
+                    [XDO(order) for order in dipnet_to_daide_parsing(suggested_random_orders, self.game)]
+                )
+                )
+                # send the other power a message containing the orders
+                ret_obj.add_message(other_power, str(suggested_random_orders))
 
         return ret_obj
 
