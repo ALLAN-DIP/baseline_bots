@@ -3,7 +3,7 @@ __email__ = "sanderschulhoff@gmail.com"
 
 from typing import Dict, List, Tuple
 from tornado import gen
-from DAIDE import FCT, ORR, XDO, PRP, HUH, YES #, REJ
+from DAIDE import FCT, ORR, XDO, PRP, HUH, YES 
 from diplomacy import Message
 from stance_vector import ScoreBasedStance
 
@@ -15,7 +15,8 @@ from baseline_bots.utils import (
     get_other_powers,
     parse_alliance_proposal,
     parse_arrangement,
-    parse_PRP
+    parse_PRP,
+    REJ
 )
 from baseline_bots.parsing_utils import (
     dipnet_to_daide_parsing,
@@ -48,7 +49,6 @@ class SmartOrderAccepterBot(DipnetBot):
         self.rollout_length = 10
         self.rollout_n_order = 5
 
-    @gen.coroutine
     def gen_pos_stance_messages(
         self, msgs_data: MessagesData, orders_list: List[str]
     ) -> None:
@@ -61,7 +61,6 @@ class SmartOrderAccepterBot(DipnetBot):
             if self.stance.stance[self.power_name][pow] > 0:
                 msgs_data.add_message(pow, str(orders_decided))
     
-    @gen.coroutine
     def gen_messages(self, orders_list: List[str]):
         msgs_data = MessagesData()
 
@@ -70,7 +69,6 @@ class SmartOrderAccepterBot(DipnetBot):
 
         return msgs_data
 
-    @gen.coroutine
     def gen_proposal_reply(self, best_proposer: str, prp_orders: dict, messages: MessagesData) -> MessagesData: 
         """
         Reply back to allies regarding their proposals whether we follow or not follow
@@ -82,7 +80,7 @@ class SmartOrderAccepterBot(DipnetBot):
                         PRP(ORR(XDO(dipnet_to_daide_parsing(orders, self.game))))
                     )
                 else:
-                    msg = YES( #REJ(
+                    msg = REJ(
                         PRP(ORR(XDO(dipnet_to_daide_parsing(orders, self.game))))
                     )
                 messages.add_message(

@@ -228,7 +228,7 @@ def parse_proposal_messages(
         alliance proposals
     """
     # Extract messages containing PRP string
-    order_msgs = [msg for msg in rcvd_messages.values() if "PRP" in msg.message]
+    order_msgs = [msg[1] for msg in rcvd_messages if "PRP" in msg[1].message]
 
     # Generate a dictionary of sender to list of orders (dipnet-style) for this sender
     proposals = defaultdict(list)

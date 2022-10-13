@@ -27,13 +27,15 @@ class TestSOABot():
     def test(self):
         # start_io_loop(self.test_play)
         # start_io_loop(self.test_stance)
-        self.test_auxilary_functions()
-        start_io_loop(self.test_parse_proposals)
-        self.test_get_best_orders()
-        self.test_gen_messages()
+        start_io_loop(self.test_auxilary_functions)
+        # start_io_loop(self.test_parse_proposals)
+        # self.test_get_best_orders()
+        # start_io_loop(self.test_gen_pos_stance_messages)
     
-    def test_auxilary_functions():
-        soa_bot = SmartOrderAccepterBot()
+    @gen.coroutine
+    def test_auxilary_functions(self):
+        game = Game()
+        soa_bot = SmartOrderAccepterBot('FRANCE', game)
         RESPOND_TO_INV_ORDERS_TC = [
             [
                 {
@@ -70,6 +72,8 @@ class TestSOABot():
             soa_bot.alliances = tc_ip
             soa_bot.respond_to_alliance_messages(msg_data)
             assert msg_data.messages == tc_op
+        
+        stop_io_loop()
 
     @gen.coroutine
     def test_play(self):
@@ -140,7 +144,9 @@ class TestSOABot():
                             )
             game_play.game.add_message(message=msg_obj2)
 
-        rcvd_messages = game_play.game.filter_messages(messages=game_play.game.messages, game_role=soa_bot.power_name)
+        rcvd_messages = game.filter_messages(messages=game_play.game.messages, game_role=soa_bot.power_name)
+        rcvd_messages = list(rcvd_messages.items())
+        rcvd_messages.sort()
         parsed_messages_dict = parse_proposal_messages(rcvd_messages, game_play.game, soa_bot.power_name)
         valid_proposal_orders = parsed_messages_dict['valid_proposals']
 
@@ -197,6 +203,7 @@ class TestSOABot():
                 game_play.game.add_message(message=msg_obj2)
 
             rcvd_messages = game_play.game.filter_messages(messages=game_play.game.messages, game_role=soa_bot.power_name)
+            rcvd_messages = list(rcvd_messages.values())
             parsed_messages_dict = parse_proposal_messages(rcvd_messages, game_play.game, soa_bot.power_name)
             valid_proposal_orders = parsed_messages_dict['valid_proposals']
             valid_proposal_orders[soa_bot.power_name] = orders
@@ -222,27 +229,36 @@ class TestSOABot():
         print('finish test_best_prop_order')
 
     @gen.coroutine    
-    def gen_pos_stance_messages(self):
+    def test_gen_pos_stance_messages(self):
         # gen for only allies 
         game = Game()
         soa_bot = SmartOrderAccepterBot('FRANCE', game)
         bot_instances = [RandomProposerBot_AsyncBot('AUSTRIA', game), RandomProposerBot_AsyncBot('ENGLAND', game), RandomProposerBot_AsyncBot('GERMANY', game), soa_bot]
         game_play = GamePlay(game, bot_instances, 3, True)
         game_play.game.set_centers('AUSTRIA', ['VIE','TRI','BUD'], reset=True)
-        game_play.game.set_centers('ENGLAND', ['LON'])
+        game_play.game.set_centers('ENGLAND', ['LON'], reset=True)
         game_play.game.set_centers('GERMANY', ['MUN', 'KIE', 'BER','BEL'])
         game_play.game.set_centers(soa_bot.power_name, ['PAR','BRE', 'MAR'])
-        msgs, done = game_play.step()
-        msgs_data = soa_bot.gen_messages()
+        rcvd_messages = game.filter_messages(messages=game_play.game.messages, game_role=soa_bot.power_name)
+        rcvd_messages = list(rcvd_messages.items())
+        rcvd_messages.sort()
+        ret_data = yield soa_bot(rcvd_messages)
+        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
+        print(game_play.game.get_centers())
+        print('expected stance ENGLAND: 1, GERMANY: -1, AUTRIA:0')
+        print('soa stance', soa_bot_stance)
+        print(ret_data['messages'])
         ally = 'ENGLAND'
         sending_to_ally = False
-        for msg in msgs_data:
+        for msg in ret_data['messages']:
             assert msg['recipient'] != 'AUSTRIA' and msg['recipient'] != 'GERMANY', 'SOA bot is sending FCT orders to non-ally powers (AUSTRIA, GERMANY)'
 
             if msg['recipient'] =='ENGLAND':
                 sending_to_ally=True
         assert sending_to_ally, 'SOA bot is not sending FCT orders to ally power (ENGLAND)'
         print('test pos_stance_msg')
+        stop_io_loop()
+
 
 if __name__ == "__main__":
     soa_test=TestSOABot()
