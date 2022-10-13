@@ -70,7 +70,14 @@ class RandomProposerBot_AsyncBot(RandomProposerBot):
 
     @gen.coroutine
     def __call__(self, rcvd_messages):
-        return super().__call__(rcvd_messages)
+        """
+        :return: dict containing messages and orders
+        """
+        messages = yield self.gen_messages(rcvd_messages)
+        orders = yield self.gen_orders()
+        # maintain current orders
+        self.orders = orders
+        return {"messages": messages, "orders": orders}
 
 if __name__ == "__main__":
     from diplomacy import Game
