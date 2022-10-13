@@ -14,8 +14,8 @@ class TestUtils:
 					"AUSTRIA": [("A PRU - LVN", "ENG")]
 				},
 				[
-					["RUSSIA", "HUH (ORR (XDO ((TUR AMY PRU) MTO LVN)) (XDO ((RUS AMY PRU) MTO MOS)))"],
-					["RUSSIA", "HUH (XDO ((TUR AMY PRU) MTO LVN))"]
+					{"recipient": "RUSSIA", "message": "HUH (PRP (ORR (XDO ((TUR AMY PRU) MTO LVN)) (XDO ((RUS AMY PRU) MTO MOS))))"},
+					{"recipient": "AUSTRIA", "message": "HUH (PRP (XDO ((ENG AMY PRU) MTO LVN)))"}
 				]
 			]
 		]
@@ -33,12 +33,13 @@ class TestUtils:
 					"ITALY": [("RUSSIA", "ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)")],
 				},
 				[
-					["RUSSIA", "YES (ALY (TUR RUS ENG ITA) VSS (FRA GER AUS))"]
+					{"recipient": "RUSSIA", "message": "YES (ALY (TUR RUS ENG ITA) VSS (FRA GER AUS))"}
 				]
 			]
 		]
 
 		for tc_ip, tc_op in RESPOND_TO_ALLIANCES_TC:
 			msg_data = MessagesData()
-			soa_bot.respond_to_alliance_messages(tc_ip, msg_data)
+			soa_bot.alliances = tc_ip
+			soa_bot.respond_to_alliance_messages(msg_data)
 			assert msg_data.messages == tc_op
