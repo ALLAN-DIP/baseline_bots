@@ -35,16 +35,16 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, 
         :param dipnet_suborder: dipnet suborder to be encoded
         :return: DAIDE-style suborder
         """
-        # if dipnet_suborder not in unit_game_mapping:
-        #     raise Exception(f"error from utils.dipnet_to_daide_parsing: unit {dipnet_suborder} not present in unit_game_mapping")
-        return "(" + (" ".join(
-            [
-                unit_game_mapping[dipnet_suborder],
-                "AMY" if dipnet_suborder[0] == "A" else "FLT",
-                dipnet_suborder.split()[-1]
-            ]
-        ) ) + ")"
-    
+        if dipnet_suborder not in unit_game_mapping:
+            raise Exception(f"error from utils.dipnet_to_daide_parsing: unit {dipnet_suborder} not present in unit_game_mapping")
+            return "(" + (" ".join(
+                [
+                    unit_game_mapping[dipnet_suborder],
+                    "AMY" if dipnet_suborder[0] == "A" else "FLT",
+                    dipnet_suborder.split()[-1]
+                ]
+            ) ) + ")"
+        
     convoy_map = defaultdict(list)
     dipnet_style_order_strs_tokens = [None for _ in range(len(dipnet_style_order_strs))]
 
@@ -77,6 +77,7 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, 
         # If unit powers are also included in the input, then add the unit - unit power mapping for DAIDE construction 
         if unit_power_tuples_included:
             unit_game_mapping[dipnet_order_tokens[0]] = unit_power
+            unit_game_mapping[dipnet_order_tokens[2]] = unit_power
 
         daide_order = []
 
