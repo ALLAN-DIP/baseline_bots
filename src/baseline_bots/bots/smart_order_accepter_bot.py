@@ -77,11 +77,11 @@ class SmartOrderAccepterBot(DipnetBot):
             if orders and self.power_name != proposer and self.stance.get_stance()[self.power_name][proposer]>0:
                 if proposer == best_proposer:
                     msg = YES(
-                        PRP(ORR(XDO(dipnet_to_daide_parsing(orders, self.game))))
+                        PRP(ORR([XDO(order) for order in dipnet_to_daide_parsing(orders, self.game)]))
                     )
                 else:
                     msg = REJ(
-                        PRP(ORR(XDO(dipnet_to_daide_parsing(orders, self.game))))
+                        PRP(ORR([XDO(order) for order in dipnet_to_daide_parsing(orders, self.game)]))
                     )
                 messages.add_message(
                     proposer, str(msg)
