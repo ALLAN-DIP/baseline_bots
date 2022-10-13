@@ -8,7 +8,7 @@ from diplomacy import Message
 from tornado import gen
 
 from baseline_bots.bots.baseline_bot import BaselineBot
-from baseline_bots.utils import MessagesData, get_other_powers
+from baseline_bots.utils import MessagesData, OrdersData, get_other_powers
 
 from baseline_bots.parsing_utils import (
     dipnet_to_daide_parsing,
