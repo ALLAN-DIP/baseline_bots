@@ -93,7 +93,7 @@ async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str
 	# Connect to the game
 	print("DipNetSL joining game: " + game_id + " as " + power_name)
 	connection = await connect(hostname, port)
-	channel = await connection.authenticate(lower(bot_type) + '_' + power_name, 'password')
+	channel = await connection.authenticate(bot_type.lower() + '_' + power_name, 'password')
 	game = await channel.join_game(game_id=game_id, power_name=power_name)
 
 
