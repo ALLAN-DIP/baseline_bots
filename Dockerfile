@@ -61,8 +61,9 @@ COPY run.sh /model/src/model_server/baseline_bots/run.sh
 RUN chmod 777 /model/src/model_server/baseline_bots/run_bot.py
 RUN chmod 777 /model/src/model_server/baseline_bots/run.sh
 
+WORKDIR /
 RUN git clone -b dev --single-branch https://github.com/SHADE-AI/diplomacy-playground.git
-RUN cd diplomacy-playground && cat requirements.txt
+WORKDIR /diplomacy-playground
 RUN pip install hashids==1.3.1
 RUN pip install -r requirements.txt && cd ..
 

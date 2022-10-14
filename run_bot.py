@@ -74,8 +74,8 @@ async def launch(hostname:str, port:int, game_id:str, power_name:str, bot_type:s
 		await asyncio.sleep(1)
 	print()
 	print("Tensorflow server online")
-	await test(hostname, port)
-	# await play(hostname, port, game_id, power_name, bot_type, outdir)
+	# await test(hostname, port)
+	await play(hostname, port, game_id, power_name, bot_type, outdir)
 
 
 async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str, outdir:str) -> None:
