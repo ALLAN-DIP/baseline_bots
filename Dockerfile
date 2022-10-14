@@ -61,6 +61,10 @@ COPY run.sh /model/src/model_server/baseline_bots/run.sh
 RUN chmod 777 /model/src/model_server/baseline_bots/run_bot.py
 RUN chmod 777 /model/src/model_server/baseline_bots/run.sh
 
+RUN git clone https://github.com/SHADE-AI/diplomacy-playground.git
+RUN cd diplomacy-playground && pip install -r requirements.txt
+RUN git checkout dev && cd ..
+
 ENTRYPOINT [ "/model/src/model_server/baseline_bots/run.sh" ]
 
 # install dip research and baseline bots
