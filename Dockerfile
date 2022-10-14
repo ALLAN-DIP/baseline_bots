@@ -62,18 +62,18 @@ RUN chmod 777 /model/src/model_server/baseline_bots/run_bot.py
 RUN chmod 777 /model/src/model_server/baseline_bots/run.sh
 
 # install dip research and baseline bots
-RUN git clone https://github.com/diplomacy/research.git && \
-git clone https://github.com/ALLAN-DIP/baseline_bots.git && \
-cd baseline_bots && \
-git checkout -b test_CI remotes/origin/test_CI && \
-pip3 install -r requirements.txt && \
-cd ..
+# RUN git clone https://github.com/diplomacy/research.git && \
+# git clone https://github.com/ALLAN-DIP/baseline_bots.git && \
+# cd baseline_bots && \
+# git checkout -b test_CI remotes/origin/test_CI && \
+# pip3 install -r requirements.txt && \
+# cd ..
 
-RUN cd / && ls -a && cd research && \ 
-pip3 install -r requirements.txt && \
-pip3 install -r requirements_dev.txt
-RUN cd ../baseline_bots && \
-pip3 install -e . && \
+# RUN cd / && ls -a && cd research && \ 
+# pip3 install -r requirements.txt && \
+# pip3 install -r requirements_dev.txt
+# RUN cd ../baseline_bots && \
+# pip3 install -e . && \
 # python3 -m pytest tests/utils_test.py && \
 # python3 -m pytest tests/bot_tests/bots_test.py && \
 # python3 -m pytest tests/randomize_order_test.py
