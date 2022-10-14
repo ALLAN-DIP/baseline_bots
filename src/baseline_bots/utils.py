@@ -404,7 +404,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
 
         # Deep copying
         for key in game._slots:
-            if key in ['map', 'renderer', 'powers','channel','notification_callbacks','data']:
+            if key in ['map', 'renderer', 'powers','channel','notification_callbacks','data','__weakref__']:
                 continue
             print('copying', key)
             setattr(result, key, deepcopy(getattr(game, key)))
