@@ -394,6 +394,24 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
         best_proposer: best power that propose the best orders to a bot, this can be itself
         proposal_order[best_proposer]: the orders from the best proposer
     """
+    
+    def __deepcopy__(game):
+        """ Fast deep copy implementation, from Paquette's game engine https://github.com/diplomacy/diplomacy """
+        cls = game.__class__
+        result = cls.__new__(cls)
+
+        # Deep copying
+        for key in game._slots:
+            if key in ['map', 'renderer', 'powers']:
+                continue
+            print('copying', key)
+            setattr(result, key, deepcopy(getattr(game, key)))
+        setattr(result, 'map', game.map)
+        setattr(result, 'powers', {})
+        for power in game.powers.values():
+            result.powers[power.name] = deepcopy(power)
+            setattr(result.powers[power.name], 'game', result)
+        return result
 
     # initialize state value for each proposal
     state_value = {power: -10000 for power in bot.game.powers}
@@ -404,9 +422,9 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
         # if there is a proposal from this power
         if unit_orders:
             proposed = True
-            game = yield from bot.game
+
             # simulate game by copying the current one
-            simulated_game = game.__deepcopy__(None)
+            simulated_game = __deepcopy__(bot.game)
 
             # censor aggressive orders
             unit_orders = get_non_aggressive_orders(
