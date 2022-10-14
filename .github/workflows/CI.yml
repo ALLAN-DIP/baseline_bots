@@ -15,4 +15,4 @@ jobs:
       - run: mkdir bot_neurips2019-sl_model
       - run: unzip neurips2019-sl_model.zip -d bot_neurips2019-sl_model/
       - run: docker build -t allan_test_env .
-      - run: docker run allan_test_env --game_id test_game --power TURKEY
+      - run: docker run allan_test_env

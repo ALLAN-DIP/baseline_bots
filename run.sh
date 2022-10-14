@@ -15,4 +15,4 @@ printf "\n"
 export PYTHONPATH=$PYTHONPATH:/model/src/model_server/research/
 
 # launch bot script
-python /model/src/model_server/baseline_bots/run_bot.py $@
+python /model/src/model_server/baseline_bots/run_bot.py  --game_id test_game --power TURKEY --outdir .
