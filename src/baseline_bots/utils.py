@@ -8,6 +8,7 @@ __email__ = "sanderschulhoff@gmail.com"
 
 # from diplomacy_research.models.state_space import get_order_tokens
 import re
+from copy import deepcopy
 from collections import defaultdict
 from typing import Dict, List, Tuple, Union
 
