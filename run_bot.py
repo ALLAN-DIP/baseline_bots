@@ -74,7 +74,6 @@ async def launch(hostname:str, port:int, game_id:str, power_name:str, bot_type:s
 		await asyncio.sleep(1)
 	print()
 	print("Tensorflow server online")
-	await create_game(game_id)
 	await test(hostname, port)
 	# await play(hostname, port, game_id, power_name, bot_type, outdir)
 
@@ -168,12 +167,6 @@ async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str
 	t2 = time.perf_counter()
 	print(f"TIMING: {t2-t1}:0.4")
 	print('-'*30 + 'GAME COMPLETE' + '-'*30)
-
-async def create_game(game_id, hostname='localhost', port=8432):
-    """ Creates a game on the server """
-    connection = await connect(hostname, port)
-    channel = await connection.authenticate('random_user', 'password')
-    await channel.create_game(game_id=game_id, rules={'REAL_TIME', 'POWER_CHOICE'})
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='ALLAN-DIP: Team ALLAN\'s Diplomacy Agent')
