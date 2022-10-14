@@ -15,6 +15,6 @@ printf "\n"
 export PYTHONPATH=$PYTHONPATH:/model/src/model_server/research/
 
 # create a game
-python diplomacy-playground/scripts/create_game.py --host shade.tacc.utexas.edu --game_id test_game_114514 --deadline 30
+python diplomacy-playground/scripts/create_game.py --game_id test_game_114514 --deadline 30
 # launch bot script
-python /model/src/model_server/baseline_bots/run_bot.py -host shade.tacc.utexas.edu  --game_id test_game_114514 --power TURKEY --outdir .
+python /model/src/model_server/baseline_bots/run_bot.py  --game_id test_game_114514 --power TURKEY --outdir .
