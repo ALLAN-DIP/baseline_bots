@@ -5,12 +5,14 @@ on:
   push:
     branches: [ main, test_CI ]
 
+# TODO: create a game
 jobs:
   testbuild:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: | 
-           docker build -f Dockerfile \
-             --build-arg PYTHON_VERSION=3.6 \
-             --tag baseline-bots-docker .
+      - run: wget https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-sl_model.zip
+      - run: mkdir bot_neurips2019-sl_model
+      - run: unzip neurips2019-sl_model.zip -d bot_neurips2019-sl_model/
+      - run: docker build -t allan_test_env .
+      - run: docker run -it allan_test_env --game_id test_game --power TURKEY
