@@ -62,7 +62,7 @@ RUN chmod 777 /model/src/model_server/baseline_bots/run_bot.py
 RUN chmod 777 /model/src/model_server/baseline_bots/run.sh
 
 RUN git clone -b dev --single-branch https://github.com/SHADE-AI/diplomacy-playground.git
-RUN cd diplomacy-playground && ls && git status
+RUN cd diplomacy-playground && cat requirements.txt
 RUN pip install -r requirements.txt && cd ..
 
 ENTRYPOINT [ "/model/src/model_server/baseline_bots/run.sh" ]
