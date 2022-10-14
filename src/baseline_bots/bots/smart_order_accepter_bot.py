@@ -74,7 +74,7 @@ class SmartOrderAccepterBot(DipnetBot):
         Reply back to allies regarding their proposals whether we follow or not follow
         """
         for proposer, orders in prp_orders.items():
-            if orders and self.power_name != proposer and self.stance.get_stance()[self.power_name][proposer]>0:
+            if orders and self.power_name != proposer and self.stance.get_stance()[self.power_name][proposer]>=0:
                 if proposer == best_proposer:
                     msg = YES(
                         PRP(ORR([XDO(order) for order in dipnet_to_daide_parsing(orders, self.game)]))
