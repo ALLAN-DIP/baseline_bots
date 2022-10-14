@@ -61,7 +61,7 @@ COPY run.sh /model/src/model_server/baseline_bots/run.sh
 RUN chmod 777 /model/src/model_server/baseline_bots/run_bot.py
 RUN chmod 777 /model/src/model_server/baseline_bots/run.sh
 
-ENTRYPOINT [ "run.sh" ]
+ENTRYPOINT [ "/model/src/model_server/baseline_bots/run.sh" ]
 
 # install dip research and baseline bots
 # RUN git clone https://github.com/diplomacy/research.git && \
