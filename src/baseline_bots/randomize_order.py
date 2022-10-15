@@ -87,8 +87,7 @@ def random_list_orders(orders: List) -> List:
                     replacements.append(
                         random_hold((move[0], "HLD"))
                     )  # the corresponding order is replaced with a HLD or MTO order
-                elif move[1] == "SUP": 
-                    print(move)
+                elif move[1] == "SUP":
                     cor_orders.remove(move)  # the corresponding are removed
                     cor_orders.remove((move[2], move[3], move[4]))
                     if len(move) <= 3:  # if it is supporting a hold
