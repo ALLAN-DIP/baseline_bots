@@ -58,10 +58,6 @@ class TestRandomizeDipnet:
 
         assert valid_SUP((("FRA", "AMY", "BUR"), "SUP", ('FRA', 'AMY', "PIC"),"MTO", "PAR"))
 
-
-countries = {'FRA', 'ENG', 'GER', 'ITA', 'TUR', 'RUS', 'AUS'}
-utypes = {'AMY', 'FLT'} # unit types
-
 def valid_order_structure(order: Tuple) -> bool:
     valid_order_tags = {"MTO", "RTO", "CTO", "HLD", "CVY", "BLD", "DSB", "SUP", "WVE", "REM"}
     assert order[1] in valid_order_tags
