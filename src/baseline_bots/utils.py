@@ -453,7 +453,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
             state_value[proposer] = yield get_state_value(
                 bot, simulated_game, bot.power_name
             )
-    print("rollout for {} steps with {} dipnet orders to get state values: {}".format{bot.rollout_length, bot.rollout_n_order, state_value[proposer]})
+    print("rollout for {} steps with {} dipnet orders to get state values: {}".format(bot.rollout_length, bot.rollout_n_order, state_value[proposer]))
     # get power name that gives the max state value
     best_proposer = max(state_value, key=state_value.get)
     return best_proposer, proposal_order[best_proposer]
