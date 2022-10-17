@@ -59,7 +59,7 @@ class SmartOrderAccepterBot(DipnetBot):
         if orders_list:
             orders_decided = FCT(ORR([XDO(order) for order in dipnet_to_daide_parsing(orders_list, self.game)]))
             for pow in self.stance.stance[self.power_name]:
-                if self.stance.stance[self.power_name][pow] > 0:
+                if pow != self.power_name and self.stance.stance[self.power_name][pow] > 0:
                     msgs_data.add_message(pow, str(orders_decided))
     
     def gen_messages(self, orders_list: List[str]):
