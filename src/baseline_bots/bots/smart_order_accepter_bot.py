@@ -100,6 +100,8 @@ class SmartOrderAccepterBot(DipnetBot):
         if not invalid_proposal_orders:
             return
         for sender in invalid_proposal_orders:
+            if sender == self.power_name:
+                continue
             message = HUH(PRP(ORR([XDO(order) for order in dipnet_to_daide_parsing(invalid_proposal_orders[sender], self.game, unit_power_tuples_included=True)])))
             messages_data.add_message(
                 sender, str(message)
@@ -115,6 +117,8 @@ class SmartOrderAccepterBot(DipnetBot):
             for sender, message in sender_message_tuple:
                 unique_senders[sender] = message
         for sender, message in unique_senders.items():
+            if sender == self.power_name:
+                continue
             messages_data.add_message(sender, str(YES(message)))
 
         if self.alliances:
@@ -157,8 +161,11 @@ class SmartOrderAccepterBot(DipnetBot):
         msgs_data = self.gen_messages(orders_data.get_list_of_orders())
         self.respond_to_invalid_orders(invalid_proposal_orders, msgs_data)
         self.respond_to_alliance_messages(msgs_data)
-        msgs_data.add_message("GLOBAL", str(f"From my stance vector perspective, I see {','.join([pow for pow in self.stance.stance[self.power_name] if (pow != self.power_name and self.stance.stance[self.power_name][pow] > 0)])} as my allies, \
-                        {','.join([pow for pow in self.stance.stance[self.power_name] if (pow != self.power_name and self.stance.stance[self.power_name][pow] < 0)])} as my foes and I am indifferent towards {','.join([pow for pow in self.stance.stance[self.power_name] if (pow != self.power_name and self.stance.stance[self.power_name][pow] == 0)])}"))
+        msg_allies = ','.join([pow for pow in self.stance.stance[self.power_name] if (pow != self.power_name and self.stance.stance[self.power_name][pow] > 0)])
+        msg_foes = ','.join([pow for pow in self.stance.stance[self.power_name] if (pow != self.power_name and self.stance.stance[self.power_name][pow] < 0)])
+        msg_neutral = ','.join([pow for pow in self.stance.stance[self.power_name] if (pow != self.power_name and self.stance.stance[self.power_name][pow] == 0)])
+        msgs_data.add_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
+                        {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
 
         # generate proposal response YES/NO to allies
         msgs_data = self.gen_proposal_reply(best_proposer, valid_proposal_orders, msgs_data)
