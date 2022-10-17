@@ -375,6 +375,7 @@ def get_state_value(bot, game, power_name):
             orders = yield bot.brain.get_orders(game, power)
             # print(power + ': ')
             # print(orders)
+            game.role = power
             game.set_orders(
                 power_name=power,
                 orders=orders[: min(bot.rollout_n_order, len(orders))],
@@ -433,7 +434,6 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
                 unit_orders, bot.power_name, bot.game
             )
             simulated_game.role = bot.power_name
-            print(bot.power_name)
             # set orders as a proposal order
             simulated_game.set_orders(power_name=bot.power_name, orders=unit_orders)
 
