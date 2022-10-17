@@ -374,11 +374,8 @@ def get_state_value(bot, game, power_name):
         # print('rollout: ', i)
         for power in game.map.powers:
             list_order, prob_order = yield bot.brain.get_beam_orders(game, power)
-            print(list_order, len(list_order))
-            print(prob_order, len(prob_order))
             
-            if len(list_order[0])>0:
-                list_order = list_order[0]
+            if len(list_order)>0:
                 prob_order = np.array(prob_order)
                 prob_order /= prob_order.sum()
                 orders_index = [i for i in range(len(list_order))]
