@@ -371,12 +371,10 @@ def get_state_value(bot, game, power_name):
     # state value
     for i in range(bot.rollout_length):
         # print('rollout: ', i)
-        print(game.powers)
-        for power in game.powers:
+        for power in game.map.powers:
             orders = yield bot.brain.get_orders(game, power)
             # print(power + ': ')
             # print(orders)
-            game.role = power
             game.set_orders(
                 power_name=power,
                 orders=orders[: min(bot.rollout_n_order, len(orders))],
@@ -414,7 +412,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
         for power in game.powers.values():
             result.powers[power.name] = deepcopy(power)
             setattr(result.powers[power.name], 'game', result)
-        # result.role = strings.SERVER_TYPE
+        result.role = strings.SERVER_TYPE
         return result
 
     # initialize state value for each proposal
@@ -434,7 +432,6 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
             unit_orders = get_non_aggressive_orders(
                 unit_orders, bot.power_name, bot.game
             )
-            simulated_game.role = bot.power_name
             # set orders as a proposal order
             simulated_game.set_orders(power_name=bot.power_name, orders=unit_orders)
 
@@ -446,7 +443,6 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
                     power_orders = shared_order[other_power]
                 else:
                     power_orders = yield bot.brain.get_orders(simulated_game, other_power)
-                simulated_game.role = other_power
                 simulated_game.set_orders(power_name=other_power, orders=power_orders)
 
             # process current turn
