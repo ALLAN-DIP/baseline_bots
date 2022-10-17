@@ -372,7 +372,8 @@ def get_state_value(bot, game, power_name):
     for i in range(bot.rollout_length):
         # print('rollout: ', i)
         for power in game.map.powers:
-            orders = yield bot.brain.get_orders(game, power)
+            list_order, prob_order = yield bot.brain.get_beam_orders(game, power)
+            orders = np.random.choice(list_order, p=prob_order)
             # print(power + ': ')
             # print(orders)
             game.set_orders(
@@ -452,7 +453,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
             state_value[proposer] = yield get_state_value(
                 bot, simulated_game, bot.power_name
             )
-    print("rollout for {} steps with {} dipnet orders to get state values: {}".format(bot.rollout_length, bot.rollout_n_order, state_value[proposer]))
+    print("rollout for {} steps with {} dipnet orders to get state values: {}".format(bot.rollout_length, bot.rollout_n_order, state_value))
     # get power name that gives the max state value
     best_proposer = max(state_value, key=state_value.get)
     return best_proposer, proposal_order[best_proposer]
