@@ -376,8 +376,9 @@ def get_state_value(bot, game, power_name):
             list_order, prob_order = yield bot.brain.get_beam_orders(game, power)
             prob_order = np.array(prob_order)
             prob_order /= prob_order.sum()
-            orders_index = np.random.choice([i for i in range(len(list_order))], p=prob_order)
-            orders = list_order[orders_index]
+            orders_index = [i for i in range(len(list_order))]
+            select_index = np.random.choice(orders_index, p=prob_order)
+            orders = list_order[select_index]
             # print(power + ': ')
             # print(orders)
             game.set_orders(
