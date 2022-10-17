@@ -370,10 +370,13 @@ def sort_messages_by_most_recent(messages: List[Message]):
 def get_state_value(bot, game, power_name, option="default"):
     # rollout the game --- orders in rollout are from dipnet
     # state value
+    firststep_sc = len(game.get_centers(power_name))
+    dipnet_comparison = {power: 0 for power in game.map.powers}
+    support_count = {power: 0 for power in game.map.powers}
     for i in range(bot.rollout_length):
-        # print('rollout: ', i)
+
         for power in game.map.powers:
-            if option = "samplingbeam":
+            if option == "samplingbeam":
                 list_order, prob_order = yield bot.brain.get_beam_orders(game, power)
             
                 if len(list_order)>0:
@@ -383,12 +386,10 @@ def get_state_value(bot, game, power_name, option="default"):
                     select_index = np.random.choice(orders_index, p=prob_order)
                     orders = list_order[select_index]
                 else:
-                    orders = yield bot.brain.get_orders(game, power)
-            elif option = "default":
+                    orders = yield bot.brain.get_orders(game, power)                
+            elif option == "default":
                 orders = yield bot.brain.get_orders(game, power)
 
-            # print(power + ': ')
-            # print(orders)
             game.set_orders(
                 power_name=power,
                 orders=orders[: min(bot.rollout_n_order, len(orders))],
