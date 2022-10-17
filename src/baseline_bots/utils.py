@@ -375,6 +375,7 @@ def get_state_value(bot, game, power_name):
         for power in game.map.powers:
             list_order, prob_order = yield bot.brain.get_beam_orders(game, power)
             print(list_order)
+            print(prob_order)
             if len(list_order[0])>0:
                 list_order = list_order[0]
                 prob_order = np.array(prob_order)
