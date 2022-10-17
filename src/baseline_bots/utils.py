@@ -371,6 +371,7 @@ def get_state_value(bot, game, power_name):
     # state value
     for i in range(bot.rollout_length):
         # print('rollout: ', i)
+        print(game.powers)
         for power in game.powers:
             orders = yield bot.brain.get_orders(game, power)
             # print(power + ': ')
@@ -438,7 +439,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
             simulated_game.set_orders(power_name=bot.power_name, orders=unit_orders)
 
             # consider shared orders in a simulated game
-            for other_power in bot.game.powers:
+            for other_power in simulated_game.powers:
 
                 # if they are not sharing any info about their orders then assume that they are DipNet-based
                 if other_power in shared_order:
