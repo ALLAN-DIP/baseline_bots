@@ -56,10 +56,11 @@ class SmartOrderAccepterBot(DipnetBot):
         Add messages to be sent to powers with positive stance.
         These messages would contain factual information about the orders that current power would execute in current round
         """
-        orders_decided = FCT(ORR([XDO(order) for order in dipnet_to_daide_parsing(orders_list, self.game)]))
-        for pow in self.stance.stance[self.power_name]:
-            if self.stance.stance[self.power_name][pow] > 0:
-                msgs_data.add_message(pow, str(orders_decided))
+        if orders_list:
+            orders_decided = FCT(ORR([XDO(order) for order in dipnet_to_daide_parsing(orders_list, self.game)]))
+            for pow in self.stance.stance[self.power_name]:
+                if self.stance.stance[self.power_name][pow] > 0:
+                    msgs_data.add_message(pow, str(orders_decided))
     
     def gen_messages(self, orders_list: List[str]):
         msgs_data = MessagesData()
