@@ -58,9 +58,10 @@ class SmartOrderAccepterBot(DipnetBot):
         """
         if orders_list:
             orders_decided = FCT(ORR([XDO(order) for order in dipnet_to_daide_parsing(orders_list, self.game)]))
-            for pow in self.stance.stance[self.power_name]:
-                if pow != self.power_name and self.stance.stance[self.power_name][pow] > 0:
-                    msgs_data.add_message(pow, str(orders_decided))
+            if str(orders_decided) != "FCT ()":
+                for pow in self.stance.stance[self.power_name]:
+                    if pow != self.power_name and self.stance.stance[self.power_name][pow] > 0:
+                        msgs_data.add_message(pow, str(orders_decided))
     
     def gen_messages(self, orders_list: List[str]):
         msgs_data = MessagesData()
@@ -156,6 +157,8 @@ class SmartOrderAccepterBot(DipnetBot):
         msgs_data = self.gen_messages(orders_data.get_list_of_orders())
         self.respond_to_invalid_orders(invalid_proposal_orders, msgs_data)
         self.respond_to_alliance_messages(msgs_data)
+        msgs_data.add_message("GLOBAL", str(f"From my stance vector perspective, I see {','.join([pow for pow in self.stance.stance[self.power_name] if (pow != self.power_name and self.stance.stance[self.power_name][pow] > 0)])} as my allies, \
+                        {','.join([pow for pow in self.stance.stance[self.power_name] if (pow != self.power_name and self.stance.stance[self.power_name][pow] < 0)])} as my foes and I am indifferent towards {','.join([pow for pow in self.stance.stance[self.power_name] if (pow != self.power_name and self.stance.stance[self.power_name][pow] == 0)])}"))
 
         # generate proposal response YES/NO to allies
         msgs_data = self.gen_proposal_reply(best_proposer, valid_proposal_orders, msgs_data)
