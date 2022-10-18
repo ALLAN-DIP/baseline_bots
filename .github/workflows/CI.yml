@@ -27,4 +27,4 @@ jobs:
         pytest tests/utils_test.py
         pytest tests/bot_tests/bots_test.py
         pytest tests/randomize_order_test.py
-        pytest tests/bot_tests/soa_bot_functions_test.py
+        # pytest tests/bot_tests/soa_bot_functions_test.py
