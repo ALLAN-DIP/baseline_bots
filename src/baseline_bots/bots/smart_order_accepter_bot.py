@@ -3,7 +3,7 @@ __email__ = "sanderschulhoff@gmail.com"
 
 from typing import Dict, List, Tuple
 
-from DAIDE import FCT, ORR, XDO, PRP, HUH, YES, REJ
+from DAIDE import FCT, ORR, XDO, PRP, HUH, YES
 from diplomacy import Message
 from stance_vector import ScoreBasedStance
 
