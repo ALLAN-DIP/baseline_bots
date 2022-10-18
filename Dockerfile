@@ -23,7 +23,6 @@ RUN git clone https://github.com/SHADE-AI/diplomacy.git
 RUN git clone https://github.com/SHADE-AI/research.git
 RUN mkdir /model/src/model_server/baseline_bots
 COPY . /model/src/model_server/baseline_bots
-# RUN git clone --single-branch --branch containerizing https://github.com/ALLAN-DIP/baseline_bots.git
 
 # Environment variables
 ENV PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp
@@ -54,20 +53,21 @@ RUN pip install -r requirements.txt
 
 # Install baseline_bots requirements
 WORKDIR /model/src/model_server/baseline_bots
+RUN pwd && ls -al
 RUN pip install -r requirements.txt
 RUN pip install -e .
 
 # Script executors
-# COPY run_bot.py /model/src/model_server/baseline_bots/run_bot.py
-# COPY run.sh /model/src/model_server/baseline_bots/run.sh
 RUN chmod 777 /model/src/model_server/baseline_bots/run_bot.py
 RUN chmod 777 /model/src/model_server/baseline_bots/run.sh
 
+# install diplomacy playground
 WORKDIR /
 RUN git clone -b dev --single-branch https://github.com/SHADE-AI/diplomacy-playground.git
+RUN git config --global --add safe.directory /model/src/model_server/diplomacy-playground
 WORKDIR /diplomacy-playground
 RUN pip install hashids==1.3.1
-RUN pip install -r requirements.txt && cd ..
+RUN pip install -r requirements.txt
 
 WORKDIR /
 ENTRYPOINT [ "/model/src/model_server/baseline_bots/run.sh" ]
