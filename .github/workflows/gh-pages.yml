@@ -2,8 +2,6 @@ name: Deploy
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [ main ]
     
 jobs:
   docs:
@@ -17,10 +15,7 @@ jobs:
 
       - name: Install dependencies
         run: | 
-        pip install -r requirements.txt
-        git clone https://github.com/ALLAN-DIP/baseline_bots.git
-        cd baseline_bots
-        pip install -e .
+        pip install -r requirements.txt  && pip install -e .
       
       - name: Build
         run: sphinx-build -b dirhtml -v docs/source build
