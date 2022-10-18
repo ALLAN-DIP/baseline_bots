@@ -58,8 +58,8 @@ RUN pip install -r requirements.txt
 RUN pip install -e .
 
 # Script executors
-RUN chmod 777 /model/src/model_server/baseline_bots/run_bot.py
-RUN chmod 777 /model/src/model_server/baseline_bots/run.sh
+RUN chmod 777 /model/src/model_server/baseline_bots/containers/run_bot.py
+RUN chmod 777 /model/src/model_server/baseline_bots/containers/run.sh
 
 # install diplomacy playground
 WORKDIR /
@@ -70,4 +70,4 @@ RUN pip install hashids==1.3.1
 RUN pip install -r requirements.txt
 
 WORKDIR /
-ENTRYPOINT [ "/model/src/model_server/baseline_bots/run.sh" ]
+ENTRYPOINT [ "/model/src/model_server/baseline_bots/containers/run.sh" ]
