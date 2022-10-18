@@ -16,9 +16,7 @@ jobs:
       - name: Install dependencies
         run: | 
         pip install -r requirements.txt
-        git clone https://github.com/ALLAN-DIP/baseline_bots.git
-        cd baseline_bots
-        pip install -e .
+        pip install -e https://github.com/ALLAN-DIP/baseline_bots.git
       
       - name: Build
         run: sphinx-build -b dirhtml -v docs/source build
