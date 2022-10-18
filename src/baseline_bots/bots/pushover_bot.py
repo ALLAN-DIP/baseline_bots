@@ -15,7 +15,7 @@ from baseline_bots.utils import (
     MessagesData,
     OrdersData,
     get_non_aggressive_orders,
-    parse_orr_xdo,
+    parse_arrangement,
     sort_messages_by_most_recent,
 )
 
@@ -61,9 +61,9 @@ class PushoverBot(BaselineBot):
         # parse may fail
         try:
             # print(last_message.message)
-            # print(parse_orr_xdo(last_message.message))
+            # print(parse_arrangement(last_message.message))
             orders = get_non_aggressive_orders(
-                parse_orr_xdo(last_message.message), self.power_name, self.game
+                parse_arrangement(last_message.message), self.power_name, self.game
             )
             # set the orders
             ret_obj.add_orders(orders)

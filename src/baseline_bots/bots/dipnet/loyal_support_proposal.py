@@ -2,15 +2,13 @@ __author__ = "Kartik Shenoy"
 __email__ = "kartik.shenoyy@gmail.com"
 
 import random
-import sys
 from collections import defaultdict
 
-sys.path.append("..")
-
-from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from diplomacy import Message
 from tornado import gen
-from utils import (
+
+from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
+from baseline_bots.utils import (
     ALY,
     ORR,
     XDO,
@@ -23,7 +21,7 @@ from utils import (
     is_move_order,
     is_support_order,
     parse_alliance_proposal,
-    parse_orr_xdo,
+    parse_arrangement,
 )
 
 
@@ -128,7 +126,7 @@ class LSP_DipBot(DipnetBot):
             # Follower
             for msg in order_msgs:
                 if msg.sender == self.my_leader:
-                    rcvd_orders += parse_orr_xdo(msg.message)
+                    rcvd_orders += parse_arrangement(msg.message)
 
         return {
             "alliance_proposer": alliance_proposer,

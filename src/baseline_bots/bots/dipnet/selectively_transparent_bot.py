@@ -2,17 +2,12 @@ __authors__ = ["Sander Schulhoff"]
 __email__ = "sanderschulhoff@gmail.com"
 
 import random
-import sys
-
-sys.path.append("..")
-sys.path.append("../..")
-
 from collections import defaultdict
 
 from DAIDE import config
 
 from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
-from baseline_bots.src.utils import (
+from baseline_bots.utils import (
     FCT,
     ORR,
     XDO,
@@ -20,7 +15,7 @@ from baseline_bots.src.utils import (
     get_other_powers,
     is_order_aggressive,
     parse_FCT,
-    parse_orr_xdo,
+    parse_arrangement,
 )
 
 config.ORDERS_DAIDE = False
