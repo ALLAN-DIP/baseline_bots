@@ -115,7 +115,7 @@ if __name__ == "__main__":
     import sys
     sys.path.append("..")
     from utils import OrdersData, MessagesData, get_order_tokens
-    from bots.random_proposer_bot import RandomProposerBot
+    from baseline_bots.bots.random_proposer_bot import RandomProposerBot
 
     game_play_obj = GamePlay(None, [RandomProposerBot, RandomProposerBot], 3, True)
 

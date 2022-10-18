@@ -12,7 +12,7 @@ sys.path.append("../../../dipnet_press")
 
 from typing import List
 
-from bots.dipnet.dipnet_bot import DipnetBot
+from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from DAIDE import FCT, ORR, XDO, ParseError
 from diplomacy import Game, Message
 from diplomacy_research.players.benchmark_player import DipNetRLPlayer

@@ -12,7 +12,7 @@ import random
 from abc import ABC, abstractmethod
 from typing import List
 
-from bots.baseline_bot import BaselineMsgRoundBot
+from baseline_bots.bots.baseline_bot import BaselineMsgRoundBot
 from diplomacy import Game, Message
 from diplomacy_research.players.benchmark_player import DipNetRLPlayer
 from DiplomacyEnv import DiplomacyEnv

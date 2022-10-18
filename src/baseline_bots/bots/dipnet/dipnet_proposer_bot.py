@@ -14,8 +14,8 @@ sys.path.append("../../../dipnet_press")
 
 from typing import List
 
-from bots.baseline_bot import BaselineMsgRoundBot
-from bots.dipnet.dipnet_bot import DipnetBot
+from baseline_bots.bots.baseline_bot import BaselineMsgRoundBot
+from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from DAIDE import ORR, XDO
 from diplomacy import Game, Message
 from diplomacy_research.players.benchmark_player import DipNetRLPlayer

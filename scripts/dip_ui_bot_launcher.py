@@ -6,18 +6,18 @@
 
 import asyncio
 import random
-# from bots.dipnet import RealPolitik
-# from bots.dipnet.dipnet_proposer_bot import ProposerDipBot
-from bots.dipnet.loyal_support_proposal import LSP_DipBot
-from bots.dipnet.no_press_bot import NoPressDipBot
+# from baseline_bots.bots.dipnet import RealPolitik
+# from baseline_bots.bots.dipnet.dipnet_proposer_bot import ProposerDipBot
+from baseline_bots.bots.dipnet.loyal_support_proposal import LSP_DipBot
+from baseline_bots.bots.dipnet.no_press_bot import NoPressDipBot
 from diplomacy.client.connection import connect
 from diplomacy.utils import exceptions
 from diplomacy import Message
 import argparse
-# from bots.dipnet.selectively_transparent_bot import SelectivelyTransparentBot
+# from baseline_bots.bots.dipnet.selectively_transparent_bot import SelectivelyTransparentBot
 
-# from bots.dipnet.transparent_bot import TransparentBot
-# from bots.dipnet.transparent_proposer_bot import TransparentProposerDipBot
+# from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
+# from baseline_bots.bots.dipnet.transparent_proposer_bot import TransparentProposerDipBot
 
 def is_in_instance_list(obj, instance_list):
     boo_v = False

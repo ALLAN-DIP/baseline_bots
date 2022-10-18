@@ -10,20 +10,20 @@ sys.path.append("../dipnet_press")
 sys.path.append("./bots/RL/")
 sys.path.append("./bots/RL/models")
 
-from bots.baseline_bot import BaselineMsgRoundBot
-from bots.dipnet.no_press_bot import NoPressDipBot
-from bots.dipnet.loyal_support_proposal import LSP_DipBot
-from bots.dipnet.transparent_bot import TransparentBot
-from bots.dipnet.selectively_transparent_bot import SelectivelyTransparentBot
-from bots.dipnet.transparent_proposer_bot import TransparentProposerDipBot
-from bots.dipnet.dipnet_proposer_bot import ProposerDipBot
-from bots.dipnet.RealPolitik import RealPolitik
-from bots.random_loyal_support_proposal import RandomLSPBot
-from bots.random_no_press import RandomNoPress_AsyncBot
-from bots.random_proposer_bot import RandomProposerBot_AsyncBot
-from bots.pushover_bot import PushoverBot_AsyncBot
-# from bots.RL.RLProposerBot import RLProposerBot
-# from bots.RL.DiplomacyEnv import DiplomacyEnv
+from baseline_bots.bots.baseline_bot import BaselineMsgRoundBot
+from baseline_bots.bots.dipnet.no_press_bot import NoPressDipBot
+from baseline_bots.bots.dipnet.loyal_support_proposal import LSP_DipBot
+from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
+from baseline_bots.bots.dipnet.selectively_transparent_bot import SelectivelyTransparentBot
+from baseline_bots.bots.dipnet.transparent_proposer_bot import TransparentProposerDipBot
+from baseline_bots.bots.dipnet.dipnet_proposer_bot import ProposerDipBot
+from baseline_bots.bots.dipnet.RealPolitik import RealPolitik
+from baseline_bots.bots.random_loyal_support_proposal import RandomLSPBot
+from baseline_bots.bots.random_no_press import RandomNoPress_AsyncBot
+from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
+from baseline_bots.bots.pushover_bot import PushoverBot_AsyncBot
+# from baseline_bots.bots.RL.RLProposerBot import RLProposerBot
+# from baseline_bots.bots.RL.DiplomacyEnv import DiplomacyEnv
 from stance.stance_extraction import StanceExtraction, ScoreBasedStance
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from utils import is_cross_support

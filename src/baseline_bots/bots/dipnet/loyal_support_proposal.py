@@ -7,7 +7,7 @@ from collections import defaultdict
 
 sys.path.append("..")
 
-from bots.dipnet.dipnet_bot import DipnetBot
+from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from diplomacy import Message
 from tornado import gen
 from utils import (
