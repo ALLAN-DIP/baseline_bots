@@ -69,6 +69,5 @@ WORKDIR /diplomacy-playground
 RUN pip install hashids==1.3.1
 RUN pip install -r requirements.txt && cd ..
 
-RUN pwd && ls -la
-
+WORKDIR /
 ENTRYPOINT [ "/model/src/model_server/baseline_bots/run.sh" ]
