@@ -3,21 +3,15 @@ __email__ = "w.wongkamjan@gmail.com"
 
 
 import random
-import sys
-
-sys.path.append("..")
-sys.path.append("../..")
-sys.path.append("../../..")
-sys.path.append("../../../dipnet_press")
-
 from typing import List
 
-from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from DAIDE import FCT, ORR, XDO, ParseError
 from diplomacy import Game, Message
 from diplomacy_research.players.benchmark_player import DipNetRLPlayer
 from tornado import gen
-from utils import (
+
+from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
+from baseline_bots.utils import (
     REJ,
     YES,
     MessagesData,
@@ -26,7 +20,7 @@ from utils import (
     get_order_tokens,
     get_other_powers,
     parse_FCT,
-    parse_orr_xdo,
+    parse_arrangement,
     sort_messages_by_most_recent,
 )
 
@@ -65,9 +59,9 @@ class PushoverDipnet(DipnetBot):
         # parse may fail
         try:
             # print(last_message.message)
-            # print(parse_orr_xdo(last_message.message))
+            # print(parse_arrangement(last_message.message))
             orders = get_non_aggressive_orders(
-                parse_orr_xdo(last_message.message), self.power_name, self.game
+                parse_arrangement(last_message.message), self.power_name, self.game
             )
             # set the orders
             self.orders.add_orders(orders, overwrite=True)

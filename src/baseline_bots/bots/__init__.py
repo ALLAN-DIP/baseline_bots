@@ -7,4 +7,5 @@ from baseline_bots.bots.random_honest_order_accepter_bot import (
     RandomHonestOrderAccepterBot,
 )
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
-from baseline_bots.bots.smart_order_accepter_bot import SmartOrderAccepterBot
+
+# from baseline_bots.bots.smart_order_accepter_bot import SmartOrderAccepterBot

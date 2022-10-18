@@ -2,25 +2,28 @@ __author__ = "Kartik Shenoy"
 __email__ = "kartik.shenoyy@gmail.com"
 
 import random
-import sys
-
-sys.path.append("..")
-sys.path.append("../..")
-
 from collections import defaultdict
 
 from tornado import gen
 
+from diplomacy import Game, Message
+
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
-from baseline_bots.src.utils import (
+from baseline_bots.utils import (
     FCT,
     ORR,
     XDO,
     MessagesData,
     get_other_powers,
     parse_FCT,
-    parse_orr_xdo,
+    parse_arrangement,
 )
+
+from baseline_bots.parsing_utils import (
+    dipnet_to_daide_parsing
+)
+
+from typing import List
 
 
 class TransparentBot(DipnetBot):
@@ -43,22 +46,18 @@ class TransparentBot(DipnetBot):
         press_msgs = [msg[1] for msg in rcvd_messages if "FCT" in msg[1].message]
         parsed_orders = []
         for msg in press_msgs:
-            print(msg.message)
-            parsed_orders += parse_orr_xdo(parse_FCT(msg.message))
-            print(parse_orr_xdo(parse_FCT(msg.message)))
+            parsed_orders += parse_arrangement(parse_FCT(msg.message))
         return parsed_orders
 
     @gen.coroutine
     def gen_messages(self, rcvd_messages):
-        if self.curr_msg_round == 1:
-            # Fetch list of orders from DipNet
-            orders = yield from self.brain.get_orders(self.game, self.power_name)
-            self.orders.add_orders(orders, overwrite=True)
-            self.my_orders_informed = False
+        # Fetch list of orders from DipNet
+        orders = yield from self.brain.get_orders(self.game, self.power_name)
+        self.orders.add_orders(orders, overwrite=True)
+        self.my_orders_informed = False
         comms_obj = MessagesData()
 
         parsed_orders = self.parse_messages(rcvd_messages)
-        # print(parsed_orders)
 
         # My orders' messages if not already sent
         if not self.my_orders_informed:
@@ -75,9 +74,7 @@ class TransparentBot(DipnetBot):
             if final_orders:
                 msg = FCT(ORR(XDO(final_orders)))
                 comms_obj.add_message(other_power, msg)
-                print(msg)
 
-        self.curr_msg_round += 1
         return comms_obj
 
     @gen.coroutine
@@ -89,3 +86,7 @@ class TransparentBot(DipnetBot):
             self.orders.add_orders(orders, overwrite=True)
 
         return self.orders.get_list_of_orders()
+
+    @gen.coroutine
+    def __call__(self, rcvd_messages: List[Message]):
+        return {"messages": self.gen_messages(rcvd_messages), "orders": self.gen_orders()}
