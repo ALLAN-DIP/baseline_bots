@@ -12,7 +12,7 @@ RUN apt-get -y install lsof
 # Copy SL model
 RUN mkdir /model/src/model_server/bot_neurips2019-sl_model
 COPY bot_neurips2019-sl_model /model/src/model_server/bot_neurips2019-sl_model 
-COPY run_model_server.sh /model/src/model_server/run_model_server.sh
+COPY containers/run_model_server.sh /model/src/model_server/run_model_server.sh
 RUN chmod 777 /model/src/model_server/run_model_server.sh
 RUN chmod -R 777 /model/src/model_server/bot_neurips2019-sl_model
 
