@@ -82,7 +82,9 @@ class RealPolitik(DipnetBot):
                 # this is for proposal orders
                 else:
                     # print(game_msg.message)
-                    proposal_order[game_msg.sender] = parse_arrangement(game_msg.message)
+                    proposal_order[game_msg.sender] = parse_arrangement(
+                        game_msg.message
+                    )
                     # print(proposal_order[game_msg.sender])
 
             best_proposer, _ = get_best_orders(self, proposal_order, shared_order)

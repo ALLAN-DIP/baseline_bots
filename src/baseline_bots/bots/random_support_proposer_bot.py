@@ -107,7 +107,7 @@ class RandomSupportProposerBot(BaselineBot):
         self.orders_obj.add_orders(orders)
 
         return messages_obj
-    
+
     def gen_orders(self):
         return self.orders_obj.get_list_of_orders()
 

@@ -16,14 +16,15 @@ from diplomacy import Game, Message
 from tornado import gen
 
 POWER_NAMES_DICT = {
-	"RUS": "RUSSIA",
-	"AUS": "AUSTRIA",
-	"ITA": "ITALY",
-	"ENG": "ENGLAND",
-	"FRA": "FRANCE",
-	"TUR": "TURKEY",
-	"GER": "GERMANY"
+    "RUS": "RUSSIA",
+    "AUS": "AUSTRIA",
+    "ITA": "ITALY",
+    "ENG": "ENGLAND",
+    "FRA": "FRANCE",
+    "TUR": "TURKEY",
+    "GER": "GERMANY",
 }
+
 
 def get_order_tokens(order):
     """Retrieves the order tokens used in an order
@@ -116,7 +117,7 @@ def parse_FCT(msg) -> str:
     if "FCT" not in msg:
         raise ParseError("This is not an FCT message")
     try:
-        return msg[msg.find("(") + 1:-1]
+        return msg[msg.find("(") + 1 : -1]
     except Exception:
         raise Exception(f"Cant parse FCT msg {msg}")
 
@@ -126,7 +127,7 @@ def parse_PRP(msg) -> str:
     if "PRP" not in msg:
         raise ParseError("This is not an PRP message")
     try:
-        return msg[msg.find("(") + 1:-1]
+        return msg[msg.find("(") + 1 : -1]
     except Exception:
         raise Exception(f"Cant parse PRP msg {msg}")
 
@@ -150,7 +151,7 @@ def parse_arrangement(msg: str, xdo_only=True) -> List[str]:
     """
     try:
         if "ORR" in msg:
-            msg = msg[msg.find("("):]
+            msg = msg[msg.find("(") :]
         # else:
         #     # remove else since it is a bug to 'XDO (order)'
         #     msg = msg[1:-1]
@@ -164,13 +165,13 @@ def parse_arrangement(msg: str, xdo_only=True) -> List[str]:
                 parts.append(msg[ind:].strip())
                 break
             else:
-                parts.append((msg[ind:ind+next_ind.start() + 1]).strip())
-                ind = ind+next_ind.end() - 1
+                parts.append((msg[ind : ind + next_ind.start() + 1]).strip())
+                ind = ind + next_ind.end() - 1
 
         def extract_suborder_indices(part: str) -> str:
             """
             Finds the start and end indices of suborder in an XDO message
-            For instance, 
+            For instance,
             "XDO (F BLK - CON)" returns (4, 16)
             "XDO(F BLK - CON)" returns (3, 15)
             "XDO ((RUS AMY WAR) MTO PRU)" returns (4, 26)
@@ -183,24 +184,26 @@ def parse_arrangement(msg: str, xdo_only=True) -> List[str]:
             suborder_type = match_obj.group()
             parenthesis_cnt = 0
             for i in range(start_in, len(part)):
-                if part[i] == '(':
+                if part[i] == "(":
                     parenthesis_cnt += 1
-                elif part[i] == ')':
+                elif part[i] == ")":
                     parenthesis_cnt -= 1
                 if parenthesis_cnt == 0:
                     return start_in, i, suborder_type
             return start_in, -1, suborder_type
-        
+
         ans = []
         for part in parts:
-            if part[0] == '(': # If there is a parenthesis in the beginning, just remove the extra set of parenthesis from both ends
+            if (
+                part[0] == "("
+            ):  # If there is a parenthesis in the beginning, just remove the extra set of parenthesis from both ends
                 part = part.strip()[1:-1].strip()
             start, end, suborder_type = extract_suborder_indices(part)
             if xdo_only:
-                ans.append(part[start+1:end])
+                ans.append(part[start + 1 : end])
             else:
                 if suborder_type == "XDO":
-                    ans.append((suborder_type, part[start+1:end]))
+                    ans.append((suborder_type, part[start + 1 : end]))
                 else:
                     ans.append((suborder_type, part))
         return ans
@@ -235,7 +238,10 @@ def parse_alliance_proposal(msg: str, recipient: str) -> List[str]:
     allies.remove(recipient)
 
     if allies:
-        return [POWER_NAMES_DICT[ally] if ally in POWER_NAMES_DICT else ally for ally in allies]
+        return [
+            POWER_NAMES_DICT[ally] if ally in POWER_NAMES_DICT else ally
+            for ally in allies
+        ]
     else:
         raise ParseError("A minimum of 2 powers are needed for an alliance")
 
@@ -308,6 +314,8 @@ def get_province_from_order(order):
         return parts[1]
     else:
         return order_tokens[0]
+
+
 class MessagesData:
     def __init__(self):
         self.messages = []

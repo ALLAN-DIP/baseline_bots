@@ -19,9 +19,7 @@ from baseline_bots.utils import (
     parse_arrangement,
 )
 
-from baseline_bots.parsing_utils import (
-    dipnet_to_daide_parsing
-)
+from baseline_bots.parsing_utils import dipnet_to_daide_parsing
 
 from typing import List
 
@@ -89,4 +87,7 @@ class TransparentBot(DipnetBot):
 
     @gen.coroutine
     def __call__(self, rcvd_messages: List[Message]):
-        return {"messages": self.gen_messages(rcvd_messages), "orders": self.gen_orders()}
+        return {
+            "messages": self.gen_messages(rcvd_messages),
+            "orders": self.gen_orders(),
+        }

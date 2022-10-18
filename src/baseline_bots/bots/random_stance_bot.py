@@ -12,7 +12,7 @@ from baseline_bots.utils import (
     get_other_powers,
     parse_arrangement,
     OrdersData,
-    MessagesData
+    MessagesData,
 )
 
 
@@ -115,6 +115,7 @@ class RandomStanceBot(BaselineBot):
 
     def gen_orders(self):
         return self.orders_obj.get_list_of_orders()
+
 
 if __name__ == "__main__":
     from diplomacy import Game

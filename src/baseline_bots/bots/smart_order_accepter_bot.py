@@ -15,12 +15,12 @@ from baseline_bots.utils import (
     get_other_powers,
     parse_alliance_proposal,
     parse_arrangement,
-    parse_PRP
+    parse_PRP,
 )
 from baseline_bots.parsing_utils import (
     dipnet_to_daide_parsing,
     daide_to_dipnet_parsing,
-    parse_proposal_messages
+    parse_proposal_messages,
 )
 
 from collections import defaultdict
@@ -58,7 +58,7 @@ class SmartOrderAccepterBot(DipnetBot):
         for pow in self.stance.stance[self.power_name]:
             if self.stance.stance[self.power_name][pow] > 0:
                 msgs_data.add_message(pow, str(orders_decided))
-    
+
     @gen.coroutine
     def gen_messages(self, orders_list: List[str]):
         msgs_data = MessagesData()
@@ -69,26 +69,28 @@ class SmartOrderAccepterBot(DipnetBot):
         return msgs_data
 
     @gen.coroutine
-    def gen_proposal_reply(self, best_proposer: str, prp_orders: dict, messages: MessagesData) -> MessagesData: 
+    def gen_proposal_reply(
+        self, best_proposer: str, prp_orders: dict, messages: MessagesData
+    ) -> MessagesData:
         """
         Reply back to allies regarding their proposals whether we follow or not follow
         """
         for proposer, orders in prp_orders.items():
-            if orders and self.power_name != proposer and self.stance.get_stance()[self.power_name][proposer]>0:
+            if (
+                orders
+                and self.power_name != proposer
+                and self.stance.get_stance()[self.power_name][proposer] > 0
+            ):
                 if proposer == best_proposer:
-                    msg = YES(
-                        PRP(ORR(XDO(dipnet_to_daide_parsing(orders))))
-                    )
+                    msg = YES(PRP(ORR(XDO(dipnet_to_daide_parsing(orders)))))
                 else:
-                    msg = REJ(
-                        PRP(ORR(XDO(dipnet_to_daide_parsing(orders))))
-                    )
-                messages.add_message(
-                    proposer, str(msg)
-                )
+                    msg = REJ(PRP(ORR(XDO(dipnet_to_daide_parsing(orders)))))
+                messages.add_message(proposer, str(msg))
         return messages
-    
-    def respond_to_invalid_orders(self, invalid_proposal_orders: Dict[str, List[str]], messages_data: MessagesData) -> None:
+
+    def respond_to_invalid_orders(
+        self, invalid_proposal_orders: Dict[str, List[str]], messages_data: MessagesData
+    ) -> None:
         """
         The bot responds by HUHing the invalid proposal orders received (this could occur if the move proposed is invalid)
 
@@ -98,11 +100,11 @@ class SmartOrderAccepterBot(DipnetBot):
         if not invalid_proposal_orders:
             return
         for sender in invalid_proposal_orders:
-            message = HUH(PRP(ORR(XDO(dipnet_to_daide_parsing(invalid_proposal_orders[sender])))))
-            messages_data.add_message(
-                sender, str(message)
+            message = HUH(
+                PRP(ORR(XDO(dipnet_to_daide_parsing(invalid_proposal_orders[sender]))))
             )
-        
+            messages_data.add_message(sender, str(message))
+
     def respond_to_alliance_messages(self, messages_data: MessagesData) -> None:
         """
         Send YES confirmation messages to all alliance proposals
@@ -127,12 +129,14 @@ class SmartOrderAccepterBot(DipnetBot):
         orders = yield self.brain.get_orders(self.game, self.power_name)
 
         # parse the proposal messages received by the bot
-        parsed_messages_dict = parse_proposal_messages(rcvd_messages, self.game, self.power_name)
-        valid_proposal_orders = parsed_messages_dict['valid_proposals']
-        invalid_proposal_orders = parsed_messages_dict['invalid_proposals']
-        shared_orders = parsed_messages_dict['shared_orders']
-        other_orders =  parsed_messages_dict['other_orders']
-        self.alliances =  parsed_messages_dict['alliance_proposals']
+        parsed_messages_dict = parse_proposal_messages(
+            rcvd_messages, self.game, self.power_name
+        )
+        valid_proposal_orders = parsed_messages_dict["valid_proposals"]
+        invalid_proposal_orders = parsed_messages_dict["invalid_proposals"]
+        shared_orders = parsed_messages_dict["shared_orders"]
+        other_orders = parsed_messages_dict["other_orders"]
+        self.alliances = parsed_messages_dict["alliance_proposals"]
 
         # include base order to prp_orders.
         # This is to avoid having double calculation for the best list of orders between (self-generated) base orders vs proposal orders
@@ -140,7 +144,9 @@ class SmartOrderAccepterBot(DipnetBot):
         # if there is any better proposal orders that has a state value more than ours, then do it. If not, just follow the base orders.
         valid_proposal_orders[self.power_name] = orders
 
-        best_proposer, best_orders = get_best_orders(self, valid_proposal_orders, shared_orders)
+        best_proposer, best_orders = get_best_orders(
+            self, valid_proposal_orders, shared_orders
+        )
 
         # add orders
         orders_data = OrdersData()
@@ -152,5 +158,7 @@ class SmartOrderAccepterBot(DipnetBot):
         self.respond_to_alliance_messages(msgs_data)
 
         # generate proposal response YES/NO to allies
-        msgs_data = self.gen_proposal_reply(best_proposer, valid_proposal_orders, msgs_data)
+        msgs_data = self.gen_proposal_reply(
+            best_proposer, valid_proposal_orders, msgs_data
+        )
         return {"messages": msgs_data, "orders": orders_data.get_list_of_orders()}

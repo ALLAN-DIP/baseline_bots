@@ -8,14 +8,18 @@ from diplomacy.utils.export import to_saved_game_format
 
 from baseline_bots.bots.baseline_bot import BaselineBot, BaselineMsgRoundBot
 
-class GamePlay():
+
+class GamePlay:
     """
     A simple framework to test multiple bots together
     """
-    def __init__(self, game:Game, bots:List[BaselineBot], msg_rounds:int, save_json=False):
-        assert(len(bots) <= 7), "too many bots"
+
+    def __init__(
+        self, game: Game, bots: List[BaselineBot], msg_rounds: int, save_json=False
+    ):
+        assert len(bots) <= 7, "too many bots"
         # if no game is passed, assume bots is a list of bot classes to
-        # be instantiated. 
+        # be instantiated.
         if game is None:
             # make game
             game = Game()
@@ -27,14 +31,14 @@ class GamePlay():
                 inst_bots.append(bot_class(power_names[i], game))
             self.bots = inst_bots
         else:
-            self.bots = bots 
+            self.bots = bots
 
         self.game = game
         self.msg_rounds = msg_rounds
         self.save_json = save_json
         self.cur_local_message_round = 0
         self.phase_init_bots()
-        
+
     def play(self):
         """play a game with the bots"""
 
@@ -42,7 +46,7 @@ class GamePlay():
             self.step()
 
         if self.save_json:
-            to_saved_game_format(self.game, output_path='GamePlayFramework.json')
+            to_saved_game_format(self.game, output_path="GamePlayFramework.json")
 
     def phase_init_bots(self):
         self.cur_local_message_round = 0
@@ -56,11 +60,11 @@ class GamePlay():
 
         if self.game.is_game_done:
             return True
-        
+
         # if message rounds over
         if self.cur_local_message_round == self.msg_rounds:
-           self.phase_init_bots()
-        while self.game.get_current_phase()[-1] != 'M':
+            self.phase_init_bots()
+        while self.game.get_current_phase()[-1] != "M":
             if self.game.is_game_done:
                 return True
 
@@ -68,17 +72,19 @@ class GamePlay():
         msgs_to_send = {}
         for bot in self.bots:
             # retrieve messages sent to bot
-            rcvd_messages = self.game.filter_messages(messages=round_msgs, game_role=bot.power_name)
-            
+            rcvd_messages = self.game.filter_messages(
+                messages=round_msgs, game_role=bot.power_name
+            )
+
             # an array of Message objects
             rcvd_messages = list(rcvd_messages.values())
-            
+
             # get messages to be sent from bot
             ret_dict = bot(rcvd_messages)
 
             if "messages" in ret_dict:
-                bot_messages = ret_dict["messages"]#bot.gen_messages(rcvd_messages)
-                
+                bot_messages = ret_dict["messages"]  # bot.gen_messages(rcvd_messages)
+
                 msgs_to_send[bot.power_name] = bot_messages
 
         # Send all messages after all bots decide
@@ -87,8 +93,8 @@ class GamePlay():
             for msg in msgs:
                 msg_obj = Message(
                     sender=power_name,
-                    recipient=msg['recipient'],
-                    message=msg['message'],
+                    recipient=msg["recipient"],
+                    message=msg["message"],
                     phase=self.game.get_current_phase(),
                 )
                 self.game.add_message(message=msg_obj)
@@ -98,21 +104,19 @@ class GamePlay():
             if hasattr(bot, "orders"):
                 orders = bot.orders
                 if orders is not None:
-                    self.game.set_orders(power_name=bot.power_name, orders=orders.get_list_of_orders())
+                    self.game.set_orders(
+                        power_name=bot.power_name, orders=orders.get_list_of_orders()
+                    )
 
-        self.cur_local_message_round+=1
+        self.cur_local_message_round += 1
 
         self.game.process()
         return {"messages": msgs_to_send}, self.game.is_game_done
-            
-            
 
-            
-        
 
-                
 if __name__ == "__main__":
     import sys
+
     sys.path.append("..")
     from utils import OrdersData, MessagesData, get_order_tokens
     from baseline_bots.bots.random_proposer_bot import RandomProposerBot
