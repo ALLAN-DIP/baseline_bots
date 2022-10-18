@@ -8,4 +8,4 @@
 /_/  |_/_____/_____/_/  |_/_/ |_/   
 ```                                    
 
-See documentation site here: https://allan-dip.github.io/baseline_bots/
+See documentation site here: https://baseline-bots-git-updatedocs-allan-dip.vercel.app
