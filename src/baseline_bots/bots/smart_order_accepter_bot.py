@@ -1,9 +1,9 @@
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Set
 from tornado import gen
-from DAIDE import FCT, ORR, XDO, PRP, HUH, YES 
+from DAIDE import FCT, ORR, XDO, PRP, HUH, YES
 from diplomacy import Message
 from stance_vector import ScoreBasedStance
 import random
@@ -14,6 +14,7 @@ from baseline_bots.utils import (
     OrdersData,
     get_order_tokens,
     get_other_powers,
+    smart_select_support_proposals,
     REJ
 )
 from baseline_bots.parsing_utils import (
@@ -126,47 +127,22 @@ class SmartOrderAccepterBot(DipnetBot):
             print("Alliances accepted")
             print(self.alliances)
 
-    def is_support_for_selected_orders(self, support_order):
+    def is_support_for_selected_orders(self, support_order: str) -> bool:
         """Determine if selected support order for neighbour corresponds to a self order selected"""
         order_tokens = get_order_tokens(support_order)
         selected_order = get_order_tokens(
             self.orders.orders[order_tokens[2].split()[1]]
         )
 
-        if (
-            len(order_tokens[2:]) == len(selected_order)
-            and order_tokens[2:] == selected_order
-        ):
+        if len(order_tokens[2:]) == len(selected_order) and order_tokens[2:] == selected_order:
             # Attack move
             return True
-        elif selected_order[1].strip() == "H" and (
-            len(order_tokens[2:]) == len(selected_order) - 1
-        ):
+        elif selected_order[1].strip() == "H" and (len(order_tokens[2:]) == len(selected_order) - 1):
             # Hold move
             return True
         return False
 
-    def is_support_for_given_orders(self, support_order, orders):
-        """Determine if selected support order for neighbour corresponds to given list of orders"""
-        order_tokens = get_order_tokens(support_order)
-        if order_tokens[2].split()[1] not in orders:
-            return True  # it's okay to support other power than allies
-        selected_order = get_order_tokens(orders[order_tokens[2].split()[1]])
-
-        if (
-            len(order_tokens[2:]) == len(selected_order)
-            and order_tokens[2:] == selected_order
-        ):
-            # Attack move
-            return True
-        elif selected_order[1].strip() == "H" and (
-            len(order_tokens[2:]) == len(selected_order) - 1
-        ):
-            # Hold move
-            return True
-        return False
-    
-    def get_2_neigh_provinces(self):
+    def get_2_neigh_provinces(self) -> Set[str]:
         """
         Determine set of orderable locations of allies which are 1-hop/2-hops away from the current power's orderable locations
         """
@@ -209,7 +185,7 @@ class SmartOrderAccepterBot(DipnetBot):
         n2n_provs.update(n_provs)
         return n2n_provs
 
-    def bad_move(self, order):
+    def bad_move(self, order: str) -> bool:
         """If order indicates attack on one of its provinces, return True, else return False"""
         order_tokens = get_order_tokens(order)
 
@@ -224,7 +200,7 @@ class SmartOrderAccepterBot(DipnetBot):
 
         return False
 
-    def support_move(self, order):
+    def support_move(self, order: str) -> bool:
         """Indicates if order is a support order and is not attacking on one of its provinces"""
         order_tokens = get_order_tokens(order)
         if (
@@ -236,13 +212,13 @@ class SmartOrderAccepterBot(DipnetBot):
         else:
             return False
 
-    def cache_allies_influence(self):
+    def cache_allies_influence(self) -> None:
         """Cache allies' influence"""
         self.allies_influence = set()
         for pow in self.alliances:
             self.allies_influence.update(set(self.game.get_power(pow).influence))
         
-    def get_allies_orderable_locs(self):
+    def get_allies_orderable_locs(self) -> Set[str]:
         """Gets provinces which are orderable for the allies"""
         provinces = set()
         if self.alliances:
@@ -253,7 +229,13 @@ class SmartOrderAccepterBot(DipnetBot):
                 provinces.update(new_provs)
         return provinces
 
-    def generate_support_proposals(self, comms_obj):
+    def generate_support_proposals(self, comms_obj: MessagesData) -> Dict[str, str]:
+        """
+        Using the orders already decided, search the neighbourhood provinces for allies' units and generate support proposals accordingly
+
+        :param comms_obj: MessagesData object
+        :return: Dictionary of recipient - support proposals message
+        """
         # for powe in get_other_powers([self.power_name], self.game):
         #     self.alliances[powe] = [(powe, "ALY VSS temp msg")]
         self.possible_orders = self.game.get_all_possible_orders()
@@ -261,17 +243,12 @@ class SmartOrderAccepterBot(DipnetBot):
         self.my_influence = set(self.game.get_power(self.power_name).influence)
         final_messages = defaultdict(list)
 
-        # TODO: Some scenario is getting missed out | Sanity check: If current phase fetched is not matching with server phase, skip execution
         if self.game.get_current_phase()[-1] == "M":
             # Fetch neighbour's orderable provinces
             n2n_provs = self.get_2_neigh_provinces()
 
-            # print(f"\n\nPower: {self.power_name}")
-            # print("My influence")
-            # print(self.my_influence)
-            # print(self.orders.orders)
             possible_support_proposals = defaultdict(list)
-            # print(n2n_provs)
+            
             for n2n_p in n2n_provs:
                 if not (self.possible_orders[n2n_p]):
                     continue
@@ -280,34 +257,29 @@ class SmartOrderAccepterBot(DipnetBot):
                 subset_possible_orders = [
                     ord for ord in self.possible_orders[n2n_p] if self.support_move(ord)
                 ]
-                # print(f"Province: {n2n_p}")
-                # print(subset_possible_orders)
                 for order in subset_possible_orders:
                     order_tokens = get_order_tokens(order)
-                    if order_tokens[2].split()[
-                        1
-                    ] in self.orders.orders and self.is_support_for_selected_orders(
-                        order
-                    ):
+                    if order_tokens[2].split()[1] in self.orders.orders and self.is_support_for_selected_orders(order):
                         # If this support move corresponds to one of the orders the current bot has selected, exec following
 
-                        # Generate (source, destination) tuple for move or (source,) tuple for hold
-                        # location_comb = tuple([oc.split()[1] for oc in order_tokens[2:]])
+                        # Use neighbour's unit to keep track of multiple support orders possible
                         location_comb = order_tokens[0].split()[1]
 
                         # Add to list of possible support proposals for this location combination
                         possible_support_proposals[location_comb].append(
-                            (order_tokens[0], order)
+                            (order_tokens[0], " ".join(order_tokens[2:]), order)
                         )
 
-            # print(possible_support_proposals)
+            possible_support_proposals = smart_select_support_proposals(possible_support_proposals)
+
             for attack_key in possible_support_proposals:
-                # For each location combination, randomly select one of the support orders
+                # For each location, randomly select one of the support orders
+                #TODO: instead of randomly picking support proposals from each, use some algorithm which will pick coordinated support proposals that maximize chances of us winning
                 selected_order = random.choice(possible_support_proposals[attack_key])
                 if self.game._unit_owner(selected_order[0]) is None:
                     raise "Coding Error"
                 final_messages[self.game._unit_owner(selected_order[0]).name].append(
-                    selected_order[1]
+                    selected_order[2]
                 )
             
             for recipient in final_messages:
