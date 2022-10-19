@@ -20,6 +20,7 @@ from diplomacy import Game, connect, Message
 from baseline_bots.bots.dipnet.no_press_bot import NoPressDipBot
 from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
 from baseline_bots.bots.smart_order_accepter_bot import SmartOrderAccepterBot
+from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
 
 from diplomacy_research.utils.cluster import is_port_opened
 
@@ -66,6 +67,7 @@ async def launch(hostname:str, port:int, game_id:str, power_name:str, bot_type:s
 	:param bot_type: the type of bot to be launched - NoPressDipBot/TransparentBot/SmartOrderAccepterBot/..
 	:param outdir: the output directory where game json files should be stored
 	"""
+
 	print("Waiting for tensorflow server to come online", end=' ')
 	serving_flag = False
 	while not serving_flag:
@@ -92,7 +94,7 @@ async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str
 	# Connect to the game
 	print("DipNetSL joining game: " + game_id + " as " + power_name)
 	connection = await connect(hostname, port)
-	channel = await connection.authenticate('dipnet_' + power_name, 'password')
+	channel = await connection.authenticate("allan" + "_" + bot_type.lower() + '_' + power_name, 'password')
 	game = await channel.join_game(game_id=game_id, power_name=power_name)
 
 
@@ -102,6 +104,8 @@ async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str
 		bot = NoPressDipBot(power_name, game)
 	elif bot_type == "TransparentBot":
 		bot = TransparentBot(power_name, game)
+	elif bot_type == "RandomProposerBot_AsyncBot":
+		bot = RandomProposerBot_AsyncBot(power_name, game)
 	elif bot_type == "SmartOrderAccepterBot":
 		bot = SmartOrderAccepterBot(power_name, game)
 		
@@ -131,10 +135,11 @@ async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str
 	
 		if not game.powers[bot.power_name].is_eliminated():
 			# Send messages to bots and fetch messages from bot
-			messages_data = await bot.gen_messages(rcvd_messages)
-
 			# Fetch orders from bot
-			orders_data = await bot.gen_orders()
+			ret_data = await bot(rcvd_messages)
+			messages_data = ret_data['messages']
+			orders_data = ret_data['orders']
+
 
 			# If messages are to be sent, send them
 			if messages_data and messages_data.messages:
