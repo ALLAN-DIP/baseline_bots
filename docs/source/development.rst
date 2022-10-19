@@ -1,3 +1,8 @@
+Getting Started
+================
+
+First set-up your TACC account by following the instructions on `SHADE AIE's onboarding page <https://www.shade-aie.org/learning-center/>`_
+
 Development 
 ================
 
@@ -62,3 +67,8 @@ Development on TACC and using diplomacy_research:
     conda activate shade
     # add path to diplomacy_research to PYTHONPATH--your path should be different
     export PYTHONPATH=$PYTHONPATH:/home1/08764/trigaten/research/diplomacy_research
+
+How to run bots
+****************************************************************************************************************
+
+Check the `Google Doc <https://docs.google.com/document/d/1TTHKx09io3pWXqcH7FexeDOvCN_-HqgUp5WQyx7rBbk/edit?usp=sharing>`_ here for instructions on how to connect the bot to a TACC game and how to run them locally
