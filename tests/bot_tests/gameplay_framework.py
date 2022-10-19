@@ -8,7 +8,6 @@ from diplomacy.utils.export import to_saved_game_format
 
 from baseline_bots.bots.baseline_bot import BaselineBot, BaselineMsgRoundBot
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
-from baseline_bots.bots.smart_order_accepter_bot import SmartOrderAccepterBot
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 import sys
 sys.path.append("../../../dipnet_press")
@@ -116,7 +115,7 @@ class GamePlay():
 
 @gen.coroutine            
 def game_loop():
-    game_play_obj = GamePlay(None, [RandomProposerBot_AsyncBot, RandomProposerBot_AsyncBot, RandomProposerBot_AsyncBot, SmartOrderAccepterBot, SmartOrderAccepterBot, SmartOrderAccepterBot, SmartOrderAccepterBot], 3, True)
+    game_play_obj = GamePlay(None, [RandomProposerBot_AsyncBot, RandomProposerBot_AsyncBot, RandomProposerBot_AsyncBot], 3, True)
     yield game_play_obj.play()
     stop_io_loop()
                 
