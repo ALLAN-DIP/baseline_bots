@@ -215,18 +215,20 @@ class SmartOrderAccepterBot(DipnetBot):
     def cache_allies_influence(self) -> None:
         """Cache allies' influence"""
         self.allies_influence = set()
-        for pow in self.alliances:
+        # for pow in self.alliances:
+        for pow in [pow1 for pow1 in self.stance.stance[self.power_name] if pow1 != self.power_name and self.stance.stance[self.power_name][pow1] > 0]:
             self.allies_influence.update(set(self.game.get_power(pow).influence))
         
     def get_allies_orderable_locs(self) -> Set[str]:
         """Gets provinces which are orderable for the allies"""
         provinces = set()
-        if self.alliances:
-            for ally in self.alliances:
-                new_provs = {
-                    loc.upper() for loc in self.game.get_orderable_locations(ally)
-                }
-                provinces.update(new_provs)
+        # if self.alliances:
+        # for ally in self.alliances:
+        for ally in [pow1 for pow1 in self.stance.stance[self.power_name] if pow1 != self.power_name and self.stance.stance[self.power_name][pow1] > 0]:
+            new_provs = {
+                loc.upper() for loc in self.game.get_orderable_locations(ally)
+            }
+            provinces.update(new_provs)
         return provinces
 
     def generate_support_proposals(self, comms_obj: MessagesData) -> Dict[str, str]:
