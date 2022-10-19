@@ -344,7 +344,7 @@ class SmartOrderAccepterBot(DipnetBot):
         # if there is any better proposal orders that has a state value more than ours, then do it. If not, just follow the base orders.
         valid_proposal_orders[self.power_name] = orders
 
-        # best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
+        best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
         best_orders, best_proposer = orders, list(self.alliances.keys())[0] if self.alliances else ""
         # print("debug: Fetched best orders")
 

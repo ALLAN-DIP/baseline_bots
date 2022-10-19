@@ -418,7 +418,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
             cls = list(game.__class__.__bases__)[0]
             result = cls.__new__(cls)
         else:
-            cls = self.__class__
+            cls = game.__class__
             result = cls.__new__(cls)
 
 

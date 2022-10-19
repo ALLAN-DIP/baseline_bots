@@ -227,7 +227,7 @@ class TestSOABot():
                 
                 state_value[power_name] = yield get_state_value(soa_bot, sim_game, soa_bot.power_name)
             
-            print(state_value)
+            print('state value from power proposals',state_value)
 
             best_proposer, best_orders = yield get_best_orders(soa_bot, valid_proposal_orders, shared_orders)
             max_sv = max(state_value.values())
