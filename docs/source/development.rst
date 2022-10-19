@@ -71,4 +71,4 @@ Development on TACC and using diplomacy_research:
 How to run bots
 ****************************************************************************************************************
 
-Check the `Google Doc <https://docs.google.com/document/d/1TTHKx09io3pWXqcH7FexeDOvCN_-HqgUp5WQyx7rBbk/edit?usp=sharing>`_ here for instructions on how to run the bot
+Check the `Google Doc <https://docs.google.com/document/d/1TTHKx09io3pWXqcH7FexeDOvCN_-HqgUp5WQyx7rBbk/edit?usp=sharing>`_ here for instructions on how to connect the bot to a TACC game and how to run them locally
