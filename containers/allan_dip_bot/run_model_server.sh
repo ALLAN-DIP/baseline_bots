@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-sleep 4
-
 batch_file="batch.txt"
 echo "" > $batch_file
 printf "max_batch_size { value: %s }\n" $MAX_BATCH_SIZE >> $batch_file
