@@ -461,6 +461,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
                 # if they are not sharing any info about their orders then assume that they are DipNet-based
                 if other_power in shared_order:
                     power_orders = shared_order[other_power]
+                    print('{} shared order: {}'.format(other_power,shared_order[other_power]))
                 else:
                     power_orders = yield bot.brain.get_orders(simulated_game, other_power)
                 simulated_game.set_orders(power_name=other_power, orders=power_orders)
