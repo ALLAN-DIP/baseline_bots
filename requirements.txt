@@ -1,7 +1,8 @@
 diplomacy
 sphinx
 pytest
-karma-sphinx-theme
+git+https://github.com/trigaten/DAIDE.git
+karma_sphinx_theme
 black
 isort
 numpy
