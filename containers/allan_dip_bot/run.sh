@@ -1,5 +1,9 @@
 #!/bin/bash
 
+printf "Sleeping for 4s"
+sleep 4
+printf "Slept for 4s"
+
 # launch model server
 /model/src/model_server/run_model_server.sh &
 
