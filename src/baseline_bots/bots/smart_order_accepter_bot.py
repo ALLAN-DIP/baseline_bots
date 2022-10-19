@@ -6,16 +6,14 @@ from tornado import gen
 from DAIDE import FCT, ORR, XDO, PRP, HUH, YES 
 from diplomacy import Message
 from stance_vector import ScoreBasedStance
+import random
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from baseline_bots.utils import (
     MessagesData,
     OrdersData,
-    get_best_orders,
+    get_order_tokens,
     get_other_powers,
-    parse_alliance_proposal,
-    parse_arrangement,
-    parse_PRP,
     REJ
 )
 from baseline_bots.parsing_utils import (
@@ -48,6 +46,9 @@ class SmartOrderAccepterBot(DipnetBot):
         self.alliances = defaultdict(list)
         self.rollout_length = 10
         self.rollout_n_order = 5
+        self.allies_influence = set()
+        self.orders = None
+        self.my_influence = set()
 
     def gen_pos_stance_messages(
         self, msgs_data: MessagesData, orders_list: List[str]
@@ -125,11 +126,204 @@ class SmartOrderAccepterBot(DipnetBot):
             print("Alliances accepted")
             print(self.alliances)
 
+    def is_support_for_selected_orders(self, support_order):
+        """Determine if selected support order for neighbour corresponds to a self order selected"""
+        order_tokens = get_order_tokens(support_order)
+        selected_order = get_order_tokens(
+            self.orders.orders[order_tokens[2].split()[1]]
+        )
+
+        if (
+            len(order_tokens[2:]) == len(selected_order)
+            and order_tokens[2:] == selected_order
+        ):
+            # Attack move
+            return True
+        elif selected_order[1].strip() == "H" and (
+            len(order_tokens[2:]) == len(selected_order) - 1
+        ):
+            # Hold move
+            return True
+        return False
+
+    def is_support_for_given_orders(self, support_order, orders):
+        """Determine if selected support order for neighbour corresponds to given list of orders"""
+        order_tokens = get_order_tokens(support_order)
+        if order_tokens[2].split()[1] not in orders:
+            return True  # it's okay to support other power than allies
+        selected_order = get_order_tokens(orders[order_tokens[2].split()[1]])
+
+        if (
+            len(order_tokens[2:]) == len(selected_order)
+            and order_tokens[2:] == selected_order
+        ):
+            # Attack move
+            return True
+        elif selected_order[1].strip() == "H" and (
+            len(order_tokens[2:]) == len(selected_order) - 1
+        ):
+            # Hold move
+            return True
+        return False
+    
+    def get_2_neigh_provinces(self):
+        """
+        Determine set of orderable locations of allies which are 1-hop/2-hops away from the current power's orderable locations
+        """
+        provs = [
+            loc.upper() for loc in self.game.get_orderable_locations(self.power_name)
+        ]
+
+        # Agent's 1-neighbourhood provinces
+        n_provs = set()
+        for prov in provs:
+            n_provs.update(
+                set(
+                    [
+                        prov2.upper()
+                        for prov2 in self.game.map.abut_list(prov)
+                        if prov2.upper().split("/")[0] not in provs
+                        and prov2.upper().split("/")[0] in self.allies_influence
+                    ]
+                )
+            )
+
+        # Agent's alliances provinces set:
+        allies_provs = self.get_allies_orderable_locs()
+
+        # Agent's 2-neighbourhood provinces (retained only alliance's provinces)
+        n2n_provs = set()
+        for prov in n_provs:
+            if prov in allies_provs:
+                n2n_provs.update(
+                    set(
+                        [
+                            prov2.upper()
+                            for prov2 in self.game.map.abut_list(prov)
+                            if prov2.upper().split("/")[0] not in provs
+                            and prov2.upper().split("/")[0] not in n_provs
+                            and prov2.upper().split("/")[0] in self.allies_influence
+                        ]
+                    )
+                )
+        n2n_provs.update(n_provs)
+        return n2n_provs
+
+    def bad_move(self, order):
+        """If order indicates attack on one of its provinces, return True, else return False"""
+        order_tokens = get_order_tokens(order)
+
+        if len(order_tokens) == 2:
+            # Attack move
+            if order_tokens[1].split()[-1] in self.my_influence:
+                return True
+        elif len(order_tokens) == 4 and order_tokens[1] == "S":
+            # Support move
+            if order_tokens[3].split()[-1] in self.my_influence:
+                return True
+
+        return False
+
+    def support_move(self, order):
+        """Indicates if order is a support order and is not attacking on one of its provinces"""
+        order_tokens = get_order_tokens(order)
+        if (
+            3 <= len(order_tokens) <= 4
+            and order_tokens[1] == "S"
+            and not self.bad_move(order)
+        ):
+            return True
+        else:
+            return False
+
+    def cache_allies_influence(self):
+        """Cache allies' influence"""
+        self.allies_influence = set()
+        for pow in self.alliances:
+            self.allies_influence.update(set(self.game.get_power(pow).influence))
+        
+    def get_allies_orderable_locs(self):
+        """Gets provinces which are orderable for the allies"""
+        provinces = set()
+        if self.alliances:
+            for ally in self.alliances:
+                new_provs = {
+                    loc.upper() for loc in self.game.get_orderable_locations(ally)
+                }
+                provinces.update(new_provs)
+        return provinces
+
+    def generate_support_proposals(self, comms_obj):
+        # for powe in get_other_powers([self.power_name], self.game):
+        #     self.alliances[powe] = [(powe, "ALY VSS temp msg")]
+        self.possible_orders = self.game.get_all_possible_orders()
+        self.cache_allies_influence()
+        self.my_influence = set(self.game.get_power(self.power_name).influence)
+        final_messages = defaultdict(list)
+
+        # TODO: Some scenario is getting missed out | Sanity check: If current phase fetched is not matching with server phase, skip execution
+        if self.game.get_current_phase()[-1] == "M":
+            # Fetch neighbour's orderable provinces
+            n2n_provs = self.get_2_neigh_provinces()
+
+            # print(f"\n\nPower: {self.power_name}")
+            # print("My influence")
+            # print(self.my_influence)
+            # print(self.orders.orders)
+            possible_support_proposals = defaultdict(list)
+            # print(n2n_provs)
+            for n2n_p in n2n_provs:
+                if not (self.possible_orders[n2n_p]):
+                    continue
+
+                # Filter out support orders from list of all possible orders
+                subset_possible_orders = [
+                    ord for ord in self.possible_orders[n2n_p] if self.support_move(ord)
+                ]
+                # print(f"Province: {n2n_p}")
+                # print(subset_possible_orders)
+                for order in subset_possible_orders:
+                    order_tokens = get_order_tokens(order)
+                    if order_tokens[2].split()[
+                        1
+                    ] in self.orders.orders and self.is_support_for_selected_orders(
+                        order
+                    ):
+                        # If this support move corresponds to one of the orders the current bot has selected, exec following
+
+                        # Generate (source, destination) tuple for move or (source,) tuple for hold
+                        # location_comb = tuple([oc.split()[1] for oc in order_tokens[2:]])
+                        location_comb = order_tokens[0].split()[1]
+
+                        # Add to list of possible support proposals for this location combination
+                        possible_support_proposals[location_comb].append(
+                            (order_tokens[0], order)
+                        )
+
+            # print(possible_support_proposals)
+            for attack_key in possible_support_proposals:
+                # For each location combination, randomly select one of the support orders
+                selected_order = random.choice(possible_support_proposals[attack_key])
+                if self.game._unit_owner(selected_order[0]) is None:
+                    raise "Coding Error"
+                final_messages[self.game._unit_owner(selected_order[0]).name].append(
+                    selected_order[1]
+                )
+            
+            for recipient in final_messages:
+                # Construct message for each support proposal
+                if not(final_messages[recipient]):
+                    continue
+                suggested_proposals = PRP(ORR([XDO(ord) for ord in dipnet_to_daide_parsing(final_messages[recipient], self.game, unit_power_tuples_included=False)]))
+                final_messages[recipient] = str(suggested_proposals)
+                comms_obj.add_message(recipient, str(suggested_proposals))
+        return final_messages
+
     @gen.coroutine
     def __call__(self, rcvd_messages: List[Tuple[int, Message]]):
         # compute pos/neg stance on other bots using Tony's stance vector
         self.stance.get_stance()
-        print("debug: Fetched stance")
+        # print("debug: Fetched stance")
 
         # get dipnet order
         orders = yield from self.brain.get_orders(self.game, self.power_name)
@@ -142,7 +336,7 @@ class SmartOrderAccepterBot(DipnetBot):
         shared_orders = parsed_messages_dict['shared_orders']
         other_orders =  parsed_messages_dict['other_orders']
         self.alliances =  parsed_messages_dict['alliance_proposals']
-        print("debug: Parsed proposal messages")
+        # print("debug: Parsed proposal messages")
 
         # include base order to prp_orders.
         # This is to avoid having double calculation for the best list of orders between (self-generated) base orders vs proposal orders
@@ -152,11 +346,13 @@ class SmartOrderAccepterBot(DipnetBot):
 
         # best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
         best_orders, best_proposer = orders, list(self.alliances.keys())[0] if self.alliances else ""
-        print("debug: Fetched best orders")
+        # print("debug: Fetched best orders")
 
         # add orders
         orders_data = OrdersData()
         orders_data.add_orders(best_orders)
+
+        self.orders = orders_data
 
         # generate messages for FCT sharing info orders
         msgs_data = self.gen_messages(orders_data.get_list_of_orders())
@@ -170,4 +366,10 @@ class SmartOrderAccepterBot(DipnetBot):
 
         # generate proposal response YES/NO to allies
         msgs_data = self.gen_proposal_reply(best_proposer, valid_proposal_orders, msgs_data)
+
+        # generate support proposals to allies
+        proposals = self.generate_support_proposals(msgs_data)
+        print("Support proposals:")
+        print(proposals)
+
         return {"messages": msgs_data, "orders": orders_data.get_list_of_orders()}
