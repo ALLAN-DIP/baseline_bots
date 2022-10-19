@@ -96,7 +96,7 @@ def random_list_orders(orders: List) -> List:
                         replacements.append(
                             (move[2], move[1], move[0], move[3], move[4])
                         )
-                        replacements.append(((move[4], move[3], move[2])))
+                        replacements.append(((move[2], move[3], move[4])))
 
         cor_orders = list(
             map(lambda order: randomize(order), cor_orders)
