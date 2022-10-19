@@ -414,8 +414,13 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
     
     def __deepcopy__(game):
         """ Fast deep copy implementation, from Paquette's game engine https://github.com/diplomacy/diplomacy """
-        cls = list(game.__class__.__bases__)[0]
-        result = cls.__new__(cls)
+        if game.__class__.__name__ != "Game":
+            cls = list(game.__class__.__bases__)[0]
+            result = cls.__new__(cls)
+        else:
+            cls = self.__class__
+            result = cls.__new__(cls)
+
 
         # Deep copying
         for key in game._slots:
