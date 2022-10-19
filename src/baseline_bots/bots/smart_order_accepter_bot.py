@@ -12,6 +12,7 @@ from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from baseline_bots.utils import (
     MessagesData,
     OrdersData,
+    get_best_orders,
     get_order_tokens,
     get_other_powers,
     REJ
