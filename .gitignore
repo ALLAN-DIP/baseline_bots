@@ -12,5 +12,5 @@ build
 ./joblogs/*
 ./jobs/*
 */batch.txt
-**/bot_neurips2019-sl_model
-**/neurips2019-sl_model.zip
+*/bot_neurips2019-sl_model
+*/neurips2019-sl_model.zip
