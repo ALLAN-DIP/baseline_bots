@@ -215,15 +215,12 @@ class SmartOrderAccepterBot(DipnetBot):
     def cache_allies_influence(self) -> None:
         """Cache allies' influence"""
         self.allies_influence = set()
-        # for pow in self.alliances:
         for pow in [pow1 for pow1 in self.stance.stance[self.power_name] if pow1 != self.power_name and self.stance.stance[self.power_name][pow1] > 0]:
             self.allies_influence.update(set(self.game.get_power(pow).influence))
         
     def get_allies_orderable_locs(self) -> Set[str]:
         """Gets provinces which are orderable for the allies"""
         provinces = set()
-        # if self.alliances:
-        # for ally in self.alliances:
         for ally in [pow1 for pow1 in self.stance.stance[self.power_name] if pow1 != self.power_name and self.stance.stance[self.power_name][pow1] > 0]:
             new_provs = {
                 loc.upper() for loc in self.game.get_orderable_locations(ally)
@@ -238,8 +235,6 @@ class SmartOrderAccepterBot(DipnetBot):
         :param comms_obj: MessagesData object
         :return: Dictionary of recipient - support proposals message
         """
-        # for powe in get_other_powers([self.power_name], self.game):
-        #     self.alliances[powe] = [(powe, "ALY VSS temp msg")]
         self.possible_orders = self.game.get_all_possible_orders()
         self.cache_allies_influence()
         self.my_influence = set(self.game.get_power(self.power_name).influence)
@@ -276,7 +271,6 @@ class SmartOrderAccepterBot(DipnetBot):
 
             for attack_key in possible_support_proposals:
                 # For each location, randomly select one of the support orders
-                #TODO: instead of randomly picking support proposals from each, use some algorithm which will pick coordinated support proposals that maximize chances of us winning
                 selected_order = random.choice(possible_support_proposals[attack_key])
                 if self.game._unit_owner(selected_order[0]) is None:
                     raise "Coding Error"
@@ -297,7 +291,6 @@ class SmartOrderAccepterBot(DipnetBot):
     def __call__(self, rcvd_messages: List[Tuple[int, Message]]):
         # compute pos/neg stance on other bots using Tony's stance vector
         self.stance.get_stance()
-        # print("debug: Fetched stance")
 
         # get dipnet order
         orders = yield from self.brain.get_orders(self.game, self.power_name)
@@ -310,7 +303,6 @@ class SmartOrderAccepterBot(DipnetBot):
         shared_orders = parsed_messages_dict['shared_orders']
         other_orders =  parsed_messages_dict['other_orders']
         self.alliances =  parsed_messages_dict['alliance_proposals']
-        # print("debug: Parsed proposal messages")
 
         # include base order to prp_orders.
         # This is to avoid having double calculation for the best list of orders between (self-generated) base orders vs proposal orders
@@ -320,7 +312,6 @@ class SmartOrderAccepterBot(DipnetBot):
 
         # best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
         best_orders, best_proposer = orders, list(self.alliances.keys())[0] if self.alliances else ""
-        # print("debug: Fetched best orders")
 
         # add orders
         orders_data = OrdersData()
