@@ -152,7 +152,7 @@ class TestSOABot():
         print(soa_bot_stance)
         game_play.game.process()
         soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
-        print(game_play.game.get_centers())
+
         print('expected stance ENGLAND >0, GERMANY<0')
         print('soa stance', soa_bot_stance)
         assert soa_bot_stance['ENGLAND'] >0.0  , "Positive stance error"
