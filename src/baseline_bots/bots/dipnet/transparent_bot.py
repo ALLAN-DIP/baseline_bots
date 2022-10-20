@@ -3,27 +3,20 @@ __email__ = "kartik.shenoyy@gmail.com"
 
 import random
 from collections import defaultdict
+from typing import List
 
+from DAIDE import FCT, ORR, XDO
+from diplomacy import Game, Message
 from tornado import gen
 
-from diplomacy import Game, Message
-
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
+from baseline_bots.parsing_utils import daide_to_dipnet_parsing, dipnet_to_daide_parsing
 from baseline_bots.utils import (
     MessagesData,
     get_other_powers,
-    parse_FCT,
     parse_arrangement,
+    parse_FCT,
 )
-
-from DAIDE import FCT, ORR, XDO
-
-from baseline_bots.parsing_utils import (
-    dipnet_to_daide_parsing,
-    daide_to_dipnet_parsing
-)
-
-from typing import List
 
 
 class TransparentBot(DipnetBot):
@@ -59,7 +52,9 @@ class TransparentBot(DipnetBot):
         if self.game.get_current_phase()[-1] != "M":
             return comms_obj
         parsed_orders = self.parse_messages(rcvd_messages)
-        parsed_orders = [list(daide_to_dipnet_parsing(order))[0] for order in parsed_orders]
+        parsed_orders = [
+            list(daide_to_dipnet_parsing(order))[0] for order in parsed_orders
+        ]
 
         # My orders' messages if not already sent
         if not self.my_orders_informed:
@@ -74,7 +69,16 @@ class TransparentBot(DipnetBot):
 
         for other_power in get_other_powers([self.power_name], self.game):
             if final_orders:
-                msg = FCT(ORR([XDO(order) for order in dipnet_to_daide_parsing(final_orders, self.game)]))
+                msg = FCT(
+                    ORR(
+                        [
+                            XDO(order)
+                            for order in dipnet_to_daide_parsing(
+                                final_orders, self.game
+                            )
+                        ]
+                    )
+                )
                 comms_obj.add_message(other_power, str(msg))
 
         return comms_obj

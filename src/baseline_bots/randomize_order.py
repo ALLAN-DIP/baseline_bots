@@ -293,9 +293,9 @@ def random_movement(order: Tuple, chance_of_move=0.5):
     ):  # There is a 50/50 chance of switching a move to a hold, 0 for a retreat since that may make one less believable
         all_adjacent = ADJACENCY[loc].copy()
         if dest in all_adjacent:
-             all_adjacent.remove(
-                 dest
-             )  # removing the already picked choice from the possible destinations
+            all_adjacent.remove(
+                dest
+            )  # removing the already picked choice from the possible destinations
         new_dest = random.choice(all_adjacent)
         return ((country, unit_type, loc), tag, new_dest)
     else:
