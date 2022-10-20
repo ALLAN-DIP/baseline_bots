@@ -432,7 +432,6 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
         for power in game.powers.values():
             result.powers[power.name] = deepcopy(power)
             setattr(result.powers[power.name], 'game', result)
-        # result.role = strings.SERVER_TYPE
         return result
 
     # initialize state value for each proposal

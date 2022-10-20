@@ -312,8 +312,7 @@ class SmartOrderAccepterBot(DipnetBot):
         valid_proposal_orders[self.power_name] = orders
 
         best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
-        # best_orders, best_proposer = orders, list(self.alliances.keys())[0] if self.alliances else ""
-
+        
         # add orders
         orders_data = OrdersData()
         orders_data.add_orders(best_orders)
