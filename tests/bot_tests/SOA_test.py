@@ -26,8 +26,9 @@ from baseline_bots.parsing_utils import (
 
 class TestSOABot():
     def test(self):
-        start_io_loop(self.test_play)
+        # start_io_loop(self.test_play)
         # start_io_loop(self.test_score_stance)
+        start_io_loop(self.test_action_stance)
         # start_io_loop(self.test_auxilary_functions)
         # start_io_loop(self.test_parse_proposals)
         # start_io_loop(self.test_get_best_orders)
@@ -120,28 +121,38 @@ class TestSOABot():
         game_play.game.set_orders('FRANCE', ['A MAR H', 'A PAR H', 'F BRE - PIC'])
         game_play.game.set_orders('ENGLAND', ['A LVP - WAL', 'F EDI - NTH', 'F LON - ENG'])
         game_play.game.set_orders('GERMANY', ['A BER - MUN', 'A MUN - BUR', 'F KIE - HOL'])
+        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
+        print(soa_bot_stance)
         game_play.game.process()
         game_play.game.set_orders('FRANCE', ['A MAR - BUR', 'A PAR - BRE', 'F PIC H'])
         game_play.game.set_orders('ENGLAND', ['A WAL - BEL VIA', 'F ENG C A WAL - BEL', 'F NTH - HEL'])
         game_play.game.set_orders('GERMANY', ['A BUR - MAR', 'A MUN - RUH', 'F HOL H'])
+        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
+        print(soa_bot_stance)
         game_play.game.process()
         game_play.game.set_orders('ENGLAND', ['A LON B'])
         game_play.game.set_orders('GERMANY', ['A MUN B'])
+        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
+        print(soa_bot_stance)
         game_play.game.process()
         game_play.game.set_orders('FRANCE', ['A BRE H', 'A MAR - GAS', 'F PIC H'])
         game_play.game.set_orders('ENGLAND', ['A BEL S F PIC', 'F ENG S A BRE', 'F HEL - HOL'])
         game_play.game.set_orders('GERMANY', ['A BUR - PAR', 'A RUH - BUR', 'F HOL H'])
+        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
+        print(soa_bot_stance)
         game_play.game.process()
         game_play.game.set_orders('FRANCE', ['A BRE - PAR', 'A GAS - BUR', 'F PIC - BEL'])
         game_play.game.set_orders('ENGLAND', ['A BEL - HOL', 'F ENG S F PIC - BEL', 'F HEL S A BEL - HOL'])
         game_play.game.set_orders('GERMANY', ['A BUR S A PAR - PIC', 'A PAR - PIC', 'F HOL H'])
+        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
+        print(soa_bot_stance)
         game_play.game.process()
         soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
-        print(game_play.game.get_centers())
+ 
         print('expected stance ENGLAND >0, GERMANY<0')
         print('soa stance', soa_bot_stance)
-        assert soa_bot_stance['ENGLAND'] >0  , "Positive stance error"
-        assert soa_bot_stance['GERMANY'] <0, "Negative stance error"
+        assert soa_bot_stance['ENGLAND'] >0.0  , "Positive stance error"
+        assert soa_bot_stance['GERMANY'] <0.0, "Negative stance error"
 
         print('finish test_stance')
         stop_io_loop()

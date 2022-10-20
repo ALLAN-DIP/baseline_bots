@@ -5,7 +5,7 @@ from typing import Dict, List, Tuple, Set
 from tornado import gen
 from DAIDE import FCT, ORR, XDO, PRP, HUH, YES
 from diplomacy import Message
-from stance_vector import ActionBasedStance
+from stance_vector import ActionBasedStance, ScoreBasedStance
 import random
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
@@ -44,7 +44,7 @@ class SmartOrderAccepterBot(DipnetBot):
     def __init__(self, power_name, game) -> None:
         super().__init__(power_name, game)
         self.alliance_props_sent = False
-        self.stance = ScoreBasedStance(power_name, game)
+        self.stance = ActionBasedStance(power_name, game)
         self.alliances = defaultdict(list)
         self.rollout_length = 10
         self.rollout_n_order = 5
