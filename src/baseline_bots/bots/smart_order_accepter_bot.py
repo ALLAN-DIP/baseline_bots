@@ -12,6 +12,7 @@ from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from baseline_bots.utils import (
     MessagesData,
     OrdersData,
+    get_best_orders,
     get_order_tokens,
     get_other_powers,
     smart_select_support_proposals,
@@ -310,7 +311,7 @@ class SmartOrderAccepterBot(DipnetBot):
         # if there is any better proposal orders that has a state value more than ours, then do it. If not, just follow the base orders.
         valid_proposal_orders[self.power_name] = orders
 
-        # best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
+        best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
         best_orders, best_proposer = orders, list(self.alliances.keys())[0] if self.alliances else ""
 
         # add orders
