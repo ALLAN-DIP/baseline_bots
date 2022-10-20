@@ -22,6 +22,8 @@ from baseline_bots.parsing_utils import (
     parse_proposal_messages
 )
 
+from baseline_bots.randomize_order import random_list_orders, string_to_tuple, tuple_to_string
+
 from collections import defaultdict
 from tornado import gen
 
@@ -343,7 +345,6 @@ class SmartOrderAccepterBot(DipnetBot):
         # e.g. if we are playing as ENG and the base orders are generated from DipNet, we would want to consider
         # if there is any better proposal orders that has a state value more than ours, then do it. If not, just follow the base orders.
         valid_proposal_orders[self.power_name] = orders
-
         # best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
         best_orders, best_proposer = orders, list(self.alliances.keys())[0] if self.alliances else ""
         # print("debug: Fetched best orders")
@@ -363,13 +364,21 @@ class SmartOrderAccepterBot(DipnetBot):
         msg_neutral = ','.join([pow for pow in self.stance.stance[self.power_name] if (pow != self.power_name and self.stance.stance[self.power_name][pow] == 0)])
         msgs_data.add_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
                         {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
-
-        # generate proposal response YES/NO to allies
+        # generate proposal response YES/NO to alliesi
         msgs_data = self.gen_proposal_reply(best_proposer, valid_proposal_orders, msgs_data)
-
+        
+        # randomize dipnet orders and send random orders to enemies
+        dipnet_ords = list(self.orders.orders.values()) 
+        daide_style_orders = dipnet_to_daide_parsing(dipnet_ords, self.game)
+        lst_rand = list(map(lambda st: string_to_tuple("("+ st + ")"), daide_style_orders))
+        randomized_orders = random_list_orders(lst_rand)
+        random_str_orders = list(map(lambda ord: tuple_to_string(ord), randomized_orders))        
+        for foe in [pow for pow in self.stance.stance[self.power_name] if (pow != self.power_name and self.stance.stance[self.power_name][pow] < 0)]:
+             msgs_data.add_message(foe, str(random_str_orders))
+        
         # generate support proposals to allies
         proposals = self.generate_support_proposals(msgs_data)
-        print("Support proposals:")
-        print(proposals)
+	# print("Support proposals:")
+	# print(proposals)
 
         return {"messages": msgs_data, "orders": orders_data.get_list_of_orders()}
