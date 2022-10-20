@@ -5,7 +5,7 @@ from typing import Dict, List, Tuple, Set
 from tornado import gen
 from DAIDE import FCT, ORR, XDO, PRP, HUH, YES
 from diplomacy import Message
-from stance_vector import ScoreBasedStance
+from stance_vector import ActionBasedStance
 import random
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
@@ -312,7 +312,7 @@ class SmartOrderAccepterBot(DipnetBot):
         valid_proposal_orders[self.power_name] = orders
 
         best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
-        best_orders, best_proposer = orders, list(self.alliances.keys())[0] if self.alliances else ""
+        # best_orders, best_proposer = orders, list(self.alliances.keys())[0] if self.alliances else ""
 
         # add orders
         orders_data = OrdersData()
