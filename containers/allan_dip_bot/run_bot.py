@@ -67,6 +67,7 @@ async def launch(hostname:str, port:int, game_id:str, power_name:str, bot_type:s
 	:param bot_type: the type of bot to be launched - NoPressDipBot/TransparentBot/SmartOrderAccepterBot/..
 	:param outdir: the output directory where game json files should be stored
 	"""
+
 	print("Waiting for tensorflow server to come online", end=' ')
 	serving_flag = False
 	while not serving_flag:

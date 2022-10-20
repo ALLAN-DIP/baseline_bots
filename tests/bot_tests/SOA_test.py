@@ -26,11 +26,11 @@ from baseline_bots.parsing_utils import (
 
 class TestSOABot():
     def test(self):
-        # start_io_loop(self.test_play)
+        start_io_loop(self.test_play)
         # start_io_loop(self.test_stance)
         # start_io_loop(self.test_auxilary_functions)
         # start_io_loop(self.test_parse_proposals)
-        start_io_loop(self.test_get_best_orders)
+        # start_io_loop(self.test_get_best_orders)
         # start_io_loop(self.test_gen_pos_stance_messages)
     
     @gen.coroutine
@@ -227,7 +227,7 @@ class TestSOABot():
                 
                 state_value[power_name] = yield get_state_value(soa_bot, sim_game, soa_bot.power_name)
             
-            print(state_value)
+            print('state value from power proposals',state_value)
 
             best_proposer, best_orders = yield get_best_orders(soa_bot, valid_proposal_orders, shared_orders)
             max_sv = max(state_value.values())

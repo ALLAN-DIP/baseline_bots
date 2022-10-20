@@ -421,9 +421,13 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
     """
 
     def __deepcopy__(game):
-        """Fast deep copy implementation, from Paquette's game engine https://github.com/diplomacy/diplomacy"""
-        cls = list(game.__class__.__bases__)[0]
-        result = cls.__new__(cls)
+        """ Fast deep copy implementation, from Paquette's game engine https://github.com/diplomacy/diplomacy """
+        if game.__class__.__name__ != "Game":
+            cls = list(game.__class__.__bases__)[0]
+            result = cls.__new__(cls)
+        else:
+            cls = game.__class__
+            result = cls.__new__(cls)
 
         # Deep copying
         for key in game._slots:
@@ -493,3 +497,24 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
     # get power name that gives the max state value
     best_proposer = max(state_value, key=state_value.get)
     return best_proposer, proposal_order[best_proposer]
+
+
+def smart_select_support_proposals(possible_support_proposals: Dict[str, List[Tuple[str, str, str]]]):
+    optimal_possible_support_proposals = defaultdict(list)
+    optimal_ordering_units = set()
+    order_proposal_mapping = defaultdict(list)
+    for ord_list in possible_support_proposals.values():
+        for ordering_unit, move_to_support, order in ord_list:
+            order_proposal_mapping[move_to_support].append((ordering_unit, move_to_support, order))
+    order_proposal_mapping_sorted = [x for x in order_proposal_mapping.items()]
+    order_proposal_mapping_sorted.sort(key=lambda x: len(x[1]), reverse=True)
+    for move_to_support, order_list in order_proposal_mapping_sorted:
+        for ordering_unit, move_to_support, order in order_list:
+            if ordering_unit not in optimal_ordering_units:
+                optimal_possible_support_proposals[ordering_unit].append((ordering_unit, move_to_support, order))
+            if len(order_list) > 1:
+                optimal_ordering_units.add(ordering_unit)
+    return optimal_possible_support_proposals
+
+if __name__ == "__main__":
+    pass

@@ -1,4 +1,4 @@
-from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, parse_FCT, parse_PRP, parse_arrangement
+from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, parse_FCT, parse_PRP, parse_arrangement, smart_select_support_proposals
 from baseline_bots.parsing_utils import dipnet_to_daide_parsing, daide_to_dipnet_parsing, parse_proposal_messages
 from diplomacy import Game, Message
 
@@ -284,3 +284,23 @@ class TestUtils:
         
         for tc_ip, tc_op in ORR_XDO_ALY_TCS:
             assert parse_arrangement(tc_ip, xdo_only=False) == tc_op, (parse_arrangement(tc_ip, xdo_only=False), tc_op)
+
+        SMART_SELECT_SUPPORT_PROPOSALS = [
+            [
+                {
+                    "A BOH": [("A BOH", "A BUD - GAL", "A BOH S A BUD - GAL"), ("A BOH", "A BER - MUN", "A BOH S A BER - MUN"), ("A BOH", "A MUN - TYR", "A BOH S A MUN - TYR")],
+                    "A VIE": [("A VIE", "A BUD - GAL", "A VIE S A BUD - GAL"), ("A VIE", "A MUN - TYR", "A VIE S A MUN - TYR")],
+                    "A SIL": [("A SIL", "A BUD - GAL", "A SIL S A BUD - GAL")],
+                    "A SER": [("A SER", "F BUL/EC - RUM", "A SER S F BUL/EC - RUM"), ("A SER", "F GRE H", "A SER F GRE H")],
+                },
+                {
+                    "A BOH": [("A BOH", "A BUD - GAL", "A BOH S A BUD - GAL")],
+                    "A VIE": [("A VIE", "A BUD - GAL", "A VIE S A BUD - GAL")],
+                    "A SIL": [("A SIL", "A BUD - GAL", "A SIL S A BUD - GAL")],
+                    "A SER": [("A SER", "F BUL/EC - RUM", "A SER S F BUL/EC - RUM"), ("A SER", "F GRE H", "A SER F GRE H")],
+                }
+            ]
+        ]
+
+        for tc_ip, tc_op in SMART_SELECT_SUPPORT_PROPOSALS:
+            assert smart_select_support_proposals(tc_ip) == tc_op
