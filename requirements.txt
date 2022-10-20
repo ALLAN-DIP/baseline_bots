@@ -2,7 +2,7 @@ diplomacy
 sphinx
 pytest
 git+https://github.com/trigaten/DAIDE.git
-karma-sphinx-theme
+karma_sphinx_theme
 black
 isort
 git+https://github.com/ALLAN-DIP/stance_vector.git

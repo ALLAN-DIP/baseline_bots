@@ -1,4 +1,4 @@
-from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, parse_FCT, parse_PRP, parse_arrangement
+from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, parse_FCT, parse_PRP, parse_arrangement, smart_select_support_proposals
 from baseline_bots.parsing_utils import dipnet_to_daide_parsing, daide_to_dipnet_parsing, parse_proposal_messages
 from diplomacy import Game, Message
 
@@ -57,8 +57,7 @@ class TestUtils:
         for tc_ip, tc_op, unit_power_tuples_included in PARSING_TEST_CASES:
             assert dipnet_to_daide_parsing(tc_ip, Game(), unit_power_tuples_included=unit_power_tuples_included) == tc_op, dipnet_to_daide_parsing(tc_ip, Game(), unit_power_tuples_included=unit_power_tuples_included)
             comparison_tc_op = tc_ip[0].replace(" R ", " - ") if type(tc_ip[0]) == str else tc_ip[0][0].replace(" R ", " - ")
-            assert daide_to_dipnet_parsing(tc_op[0])[0] == comparison_tc_op, daide_to_dipnet_parsing(tc_op[0])
-            print(tc_ip, " --> ", tc_op)
+            assert daide_to_dipnet_parsing(tc_op[0])[0] == comparison_tc_op, (daide_to_dipnet_parsing(tc_op[0]), comparison_tc_op)
         
 
 
@@ -72,10 +71,9 @@ class TestUtils:
         game_tc.set_units("ITALY", ["A TUN", "F ION", "F EAS"])
 
         for tc_ip, tc_op in PARSING_CVY_TEST_CASES:
-            assert dipnet_to_daide_parsing(tc_ip, game_tc) == tc_op, dipnet_to_daide_parsing(tc_ip, game_tc)
-            print(tc_ip, " --> ", tc_op)
+            assert dipnet_to_daide_parsing(tc_ip, game_tc) == tc_op, (dipnet_to_daide_parsing(tc_ip, game_tc), tc_op)
             for tc_ip_ord, tc_op_ord in zip(tc_ip, tc_op):
-                assert daide_to_dipnet_parsing(tc_op_ord)[0] == tc_ip_ord.replace(" R ", " - "), daide_to_dipnet_parsing(tc_op_ord)
+                assert daide_to_dipnet_parsing(tc_op_ord)[0] == tc_ip_ord.replace(" R ", " - "), (daide_to_dipnet_parsing(tc_op_ord), tc_ip_ord.replace(" R ", " - "))
         
 
 
@@ -180,7 +178,8 @@ class TestUtils:
                     phase=game_GTP.get_current_phase(),
                 )
                 game_GTP.add_message(message=msg_obj)
-            parsed_orders_dict = parse_proposal_messages(game_GTP.filter_messages(messages=game_GTP.messages, game_role=power_name), game_GTP, power_name)
+            msgs = (game_GTP.filter_messages(messages=game_GTP.messages, game_role=power_name)).items()
+            parsed_orders_dict = parse_proposal_messages(msgs, game_GTP, power_name)
             # print(tc_ip)
             # print(parsed_orders_dict)
 
@@ -285,3 +284,23 @@ class TestUtils:
         
         for tc_ip, tc_op in ORR_XDO_ALY_TCS:
             assert parse_arrangement(tc_ip, xdo_only=False) == tc_op, (parse_arrangement(tc_ip, xdo_only=False), tc_op)
+
+        SMART_SELECT_SUPPORT_PROPOSALS = [
+            [
+                {
+                    "A BOH": [("A BOH", "A BUD - GAL", "A BOH S A BUD - GAL"), ("A BOH", "A BER - MUN", "A BOH S A BER - MUN"), ("A BOH", "A MUN - TYR", "A BOH S A MUN - TYR")],
+                    "A VIE": [("A VIE", "A BUD - GAL", "A VIE S A BUD - GAL"), ("A VIE", "A MUN - TYR", "A VIE S A MUN - TYR")],
+                    "A SIL": [("A SIL", "A BUD - GAL", "A SIL S A BUD - GAL")],
+                    "A SER": [("A SER", "F BUL/EC - RUM", "A SER S F BUL/EC - RUM"), ("A SER", "F GRE H", "A SER F GRE H")],
+                },
+                {
+                    "A BOH": [("A BOH", "A BUD - GAL", "A BOH S A BUD - GAL")],
+                    "A VIE": [("A VIE", "A BUD - GAL", "A VIE S A BUD - GAL")],
+                    "A SIL": [("A SIL", "A BUD - GAL", "A SIL S A BUD - GAL")],
+                    "A SER": [("A SER", "F BUL/EC - RUM", "A SER S F BUL/EC - RUM"), ("A SER", "F GRE H", "A SER F GRE H")],
+                }
+            ]
+        ]
+
+        for tc_ip, tc_op in SMART_SELECT_SUPPORT_PROPOSALS:
+            assert smart_select_support_proposals(tc_ip) == tc_op

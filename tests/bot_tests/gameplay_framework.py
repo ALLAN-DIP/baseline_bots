@@ -3,10 +3,14 @@ __email__ = "sanderschulhoff@gmail.com"
 
 from typing import List
 from tornado import gen
-from diplomacy import Game, Message
+from diplomacy import Game, Message, connect
 from diplomacy.utils.export import to_saved_game_format
 
 from baseline_bots.bots.baseline_bot import BaselineBot, BaselineMsgRoundBot
+from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
+from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
+import sys
+sys.path.append("../../../dipnet_press")
 
 class GamePlay():
     """
@@ -73,10 +77,11 @@ class GamePlay():
             rcvd_messages = self.game.filter_messages(messages=round_msgs, game_role=bot.power_name)
             
             # an array of Message objects
-            rcvd_messages = list(rcvd_messages.values())
+            rcvd_messages = list(rcvd_messages.items())
             
             # get messages to be sent from bot
             ret_dict = yield bot(rcvd_messages)
+
 
             if "messages" in ret_dict:
                 bot_messages = ret_dict["messages"]#bot.gen_messages(rcvd_messages)
@@ -107,18 +112,14 @@ class GamePlay():
         self.game.process()
         return {"messages": msgs_to_send}, self.game.is_game_done
             
-            
 
-            
-        
-
+@gen.coroutine            
+def game_loop():
+    game_play_obj = GamePlay(None, [RandomProposerBot_AsyncBot, RandomProposerBot_AsyncBot, RandomProposerBot_AsyncBot], 3, True)
+    yield game_play_obj.play()
+    stop_io_loop()
                 
 if __name__ == "__main__":
-    import sys
-    sys.path.append("..")
-    from utils import OrdersData, MessagesData, get_order_tokens
-    from bots.random_proposer_bot import RandomProposerBot
+    # from utils import OrdersData, MessagesData, get_order_tokens
 
-    game_play_obj = GamePlay(None, [RandomProposerBot, RandomProposerBot], 3, True)
-
-    # game_play_obj.play()
+    start_io_loop(game_loop)
