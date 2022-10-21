@@ -347,5 +347,4 @@ class SmartOrderAccepterBot(DipnetBot):
         proposals = self.generate_support_proposals(msgs_data)
         print("Support proposals:")
         print(proposals)
-
         return {"messages": msgs_data, "orders": orders_data.get_list_of_orders()}
