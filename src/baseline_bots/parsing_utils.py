@@ -12,9 +12,7 @@ from DAIDE.utils.exceptions import ParseError
 from diplomacy import Game, Message
 from baseline_bots.utils import *
 
-def dipnet_to_daide_parsing(
-    dipnet_style_order_strs: List[str], game: Game
-) -> List[str]:
+def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, str]]], game: Game, unit_power_tuples_included=False) -> List[str]:
 
     """
     Convert dipnet style single order to DAIDE style order. Needs game instance to determine the powers owning the units
