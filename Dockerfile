@@ -69,5 +69,9 @@ WORKDIR /diplomacy-playground
 RUN pip install hashids==1.3.1
 RUN pip install -r requirements.txt
 
+# pytest
+RUN pip install pytest
+RUN pytest /model/src/model_server/baseline_bots/tests
+
 WORKDIR /
 ENTRYPOINT [ "/model/src/model_server/baseline_bots/containers/run.sh" ]
