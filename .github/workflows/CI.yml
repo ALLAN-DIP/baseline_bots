@@ -9,6 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - name: "Build"
+        run: |
+          pip install -r requirements.txt
+          pip install -e .
+
       - name: pytest
         run: |
           pytest tests/utils_test.py
