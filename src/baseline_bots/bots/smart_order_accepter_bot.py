@@ -293,9 +293,13 @@ class SmartOrderAccepterBot(DipnetBot):
         # compute pos/neg stance on other bots using Tony's stance vector
         self.stance.get_stance()
 
+        all_opposing = self.stance.stance[self.power_name]
+        
         # get dipnet order
         orders = yield from self.brain.get_orders(self.game, self.power_name)
         print("debug: Fetched orders", orders)
+
+                
 
         # parse the proposal messages received by the bot
         parsed_messages_dict = parse_proposal_messages(rcvd_messages, self.game, self.power_name)
@@ -322,14 +326,21 @@ class SmartOrderAccepterBot(DipnetBot):
 
         # generate messages for FCT sharing info orders
         msgs_data = self.gen_messages(orders_data.get_list_of_orders())
+        if self.game.phase == "S1901":
+            for pow in all_opposing:
+                msgs_data.add_message(pow, f"ALY ({self.power_name} {pow}) VSS ()")
+
+        # send ALY requests at the start of the game
+        msgs_data.add_message()
         self.respond_to_invalid_orders(invalid_proposal_orders, msgs_data)
         self.respond_to_alliance_messages(msgs_data)
-        msg_allies = ','.join([pow for pow in self.stance.stance[self.power_name] if (pow != self.power_name and self.stance.stance[self.power_name][pow] > 0)])
-        msg_foes = ','.join([pow for pow in self.stance.stance[self.power_name] if (pow != self.power_name and self.stance.stance[self.power_name][pow] < 0)])
-        msg_neutral = ','.join([pow for pow in self.stance.stance[self.power_name] if (pow != self.power_name and self.stance.stance[self.power_name][pow] == 0)])
+        # fmt: off
+        msg_allies = ','.join([pow for pow in all_opposing if (pow != self.power_name and all_opposing[pow] > 0)])
+        msg_foes = ','.join([pow for pow in all_opposing if (pow != self.power_name and all_opposing[pow] < 0)])
+        msg_neutral = ','.join([pow for pow in all_opposing if (pow != self.power_name and all_opposing[pow] == 0)])
         msgs_data.add_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
                         {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
-
+        # fmt: on
         # generate proposal response YES/NO to allies
         msgs_data = self.gen_proposal_reply(best_proposer, valid_proposal_orders, msgs_data)
 
@@ -337,5 +348,8 @@ class SmartOrderAccepterBot(DipnetBot):
         proposals = self.generate_support_proposals(msgs_data)
         print("Support proposals:")
         print(proposals)
+
+        for i in msgs_data.messages:
+            print(i)
 
         return {"messages": msgs_data, "orders": orders_data.get_list_of_orders()}
