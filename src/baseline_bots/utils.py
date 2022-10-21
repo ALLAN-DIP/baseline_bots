@@ -446,7 +446,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
         setattr(result, "powers", {})
         for power in game.powers.values():
             result.powers[power.name] = deepcopy(power)
-            setattr(result.powers[power.name], "game", result)
+            setattr(result.powers[power.name], 'game', result)
         result.role = strings.SERVER_TYPE
         return result
 
@@ -467,6 +467,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
             unit_orders = get_non_aggressive_orders(
                 unit_orders, bot.power_name, bot.game
             )
+
             # set orders as a proposal order
             simulated_game.set_orders(power_name=bot.power_name, orders=unit_orders)
 
@@ -489,11 +490,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
             state_value[proposer] = yield get_state_value(
                 bot, simulated_game, bot.power_name
             )
-    print(
-        "rollout for {} steps with {} dipnet orders to get state values: {}".format(
-            bot.rollout_length, bot.rollout_n_order, state_value
-        )
-    )
+
     # get power name that gives the max state value
     best_proposer = max(state_value, key=state_value.get)
     return best_proposer, proposal_order[best_proposer]

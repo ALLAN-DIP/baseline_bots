@@ -7,8 +7,9 @@ from typing import Dict, List, Set, Tuple
 
 from DAIDE import FCT, HUH, ORR, PRP, XDO, YES
 from diplomacy import Message
-from stance_vector import ScoreBasedStance
-from tornado import gen
+from stance_vector import ActionBasedStance, ScoreBasedStance
+import random
+
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from baseline_bots.parsing_utils import (
@@ -48,7 +49,7 @@ class SmartOrderAccepterBot(DipnetBot):
     def __init__(self, power_name, game) -> None:
         super().__init__(power_name, game)
         self.alliance_props_sent = False
-        self.stance = ScoreBasedStance(power_name, game)
+        self.stance = ActionBasedStance(power_name, game)
         self.alliances = defaultdict(list)
         self.rollout_length = 10
         self.rollout_n_order = 5
@@ -412,12 +413,8 @@ class SmartOrderAccepterBot(DipnetBot):
         # if there is any better proposal orders that has a state value more than ours, then do it. If not, just follow the base orders.
         valid_proposal_orders[self.power_name] = orders
 
-        # best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
-        best_orders, best_proposer = (
-            orders,
-            list(self.alliances.keys())[0] if self.alliances else "",
-        )
-
+        best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
+        
         # add orders
         orders_data = OrdersData()
         orders_data.add_orders(best_orders)
