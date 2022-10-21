@@ -57,7 +57,7 @@ async def test(hostname: str = "localhost", port: int = 8432) -> None:
 
 
 async def launch(
-    hostname: str, port: int, game_id: str, power_name: str, bot_type: str, outdir: str
+    hostname: str, port: int, game_id: str, bot_type: str
 ) -> None:
     """
     Waits for dipnet model to load and then starts the bot execution
@@ -69,6 +69,8 @@ async def launch(
     :param bot_type: the type of bot to be launched - NoPressDipBot/TransparentBot/SmartOrderAccepterBot/..
     :param outdir: the output directory where game json files should be stored
     """
+    POWERS = ['AUSTRIA', 'ENGLAND', 'FRANCE', 'GERMANY', 'ITALY', 'RUSSIA', 'TURKEY']
+
     print("Waiting for tensorflow server to come online", end=" ")
     serving_flag = False
     while not serving_flag:
@@ -78,7 +80,8 @@ async def launch(
     print()
     print("Tensorflow server online")
     # await test(hostname, port)
-    await play(hostname, port, game_id, power_name, bot_type, outdir)
+    await asyncio.gather(*[play(game_id, power_name) for power_name in POWERS])
+    # await play(hostname, port, game_id, power_name, bot_type, outdir)
 
 
 async def play(
@@ -98,6 +101,8 @@ async def play(
     print("DipNetSL joining game: " + game_id + " as " + power_name)
     connection = await connect(hostname, port)
     channel = await connection.authenticate("dipnet_" + power_name, "password")
+    while not (await channel.list_games(game_id=game_id)):
+        await asyncio.sleep(1.)
     game = await channel.join_game(game_id=game_id, power_name=power_name)
 
     bot = None
@@ -193,26 +198,16 @@ if __name__ == "__main__":
         "--game_id", type=str, help="game id of game created in DATC diplomacy game"
     )
     parser.add_argument(
-        "--power",
-        type=str,
-        help="power name (AUSTRIA, ENGLAND, FRANCE, GERMANY, ITALY, RUSSIA, TURKEY)",
-    )
-    parser.add_argument(
         "--bot_type",
         type=str,
         default="TransparentBot",
         help="type of bot to be launched (NoPressDipBot, TransparentBot, SmartOrderAccepterBot)",
-    )
-    parser.add_argument(
-        "--outdir", type=str, help="output directory for game json to be stored"
     )
     args = parser.parse_args()
     host = args.host
     port = args.port
     game_id = args.game_id
     bot_type = args.bot_type
-    outdir = args.outdir
-    power = args.power
 
     if game_id == None:
         print("Game ID required")
@@ -223,8 +218,6 @@ if __name__ == "__main__":
             hostname=host,
             port=port,
             game_id=game_id,
-            power_name=power,
             bot_type=bot_type,
-            outdir=outdir,
         )
     )
