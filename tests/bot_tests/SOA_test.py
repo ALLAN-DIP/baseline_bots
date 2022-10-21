@@ -26,12 +26,13 @@ from baseline_bots.parsing_utils import (
 
 class TestSOABot():
     def test(self):
-        start_io_loop(self.test_play)
+        # start_io_loop(self.test_play)
         # start_io_loop(self.test_stance)
         # start_io_loop(self.test_auxilary_functions)
         # start_io_loop(self.test_parse_proposals)
         # start_io_loop(self.test_get_best_orders)
         # start_io_loop(self.test_gen_pos_stance_messages)
+        start_io_loop(self.test_ally_move_filter)
     
     @gen.coroutine
     def test_auxilary_functions(self):
@@ -111,6 +112,34 @@ class TestSOABot():
         stop_io_loop()
 
         # to do: add action-based stance test
+
+    @gen.coroutine
+    def test_ally_move_filter(self):
+        # assume that stance is correct using score-based
+        game = Game()
+        soa_bot = SmartOrderAccepterBot('FRANCE', game)
+        soa_bot.ally_threshold = 1.0
+        bot_instances = [RandomProposerBot_AsyncBot('ENGLAND', game), RandomProposerBot_AsyncBot('GERMANY', game), soa_bot]
+        game_play = GamePlay(game, bot_instances, 3, True)
+        game_play.game.set_centers('ENGLAND', ['LON'], reset=True)
+        game_play.game.set_centers('GERMANY', ['MUN', 'KIE', 'BER','BEL'])
+        game_play.game.set_centers(soa_bot.power_name, ['PAR','BRE', 'MAR'])
+        game_play.game.set_orders('FRANCE', ['A MAR - BUR', 'A PAR - PIC', 'F BRE H'])
+        game_play.game.set_orders('ENGLAND', ['A LVP - WAL', 'F EDI - NTH', 'F LON - ENG'])
+        game_play.game.process()
+        orders = ['F BRE - ENG', 'A PIC - BEL', 'A BUR - PIC']
+        orders_data = OrdersData()
+        orders_data.add_orders(orders)
+        soa_bot.orders = orders_data
+
+        print("aggressive order: ", orders)
+        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
+        print('soa stance', {k: v for k,v in soa_bot_stance.items() if v >= soa_bot.ally_threshold})
+        yield soa_bot.replace_aggressive_order_to_allies()
+        print("remove non-aggressive", soa_bot.orders.get_list_of_orders())
+
+        print('finish test ally move filter')
+        stop_io_loop()
 
     @gen.coroutine
     def test_parse_proposals(self):

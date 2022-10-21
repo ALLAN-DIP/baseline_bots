@@ -334,6 +334,7 @@ class SmartOrderAccepterBot(DipnetBot):
                             return True
         return False
 
+    @gen.coroutine
     def get_non_aggressive_order(self, order: str, powers: List[str]):
         """
         return a non-aggressive order with other options in dipnet beam order, if none left, support its own unit. if none around, support self hold.
@@ -352,16 +353,17 @@ class SmartOrderAccepterBot(DipnetBot):
             for i in range(1,len(list_order)):
                 dipnet_order = list_order[i]
                 for candidate_order in dipnet_order:
-                    if order_unit in candidate_order and not self.is_order_aggressive_to_powers(candidate_order, powers):
+                    if unit in candidate_order and not self.is_order_aggressive_to_powers(candidate_order, powers):
                         return candidate_order
         
         # if none in dipnet beam orders
-        for current_order in self.orders:
+        for current_order in self.orders.get_list_of_orders():
             if current_order != order and not self.is_order_aggressive_to_powers(current_order, powers) and current_order in self.game.get_all_possible_orders()[loc_unit]:
                 return unit + ' S ' + current_order
         
         return unit + ' H'
-                            
+
+    @gen.coroutine                   
     def replace_aggressive_order_to_allies(self):
         """
         replace aggressive orders with non-aggressive orders (in-place replace self.orders)
@@ -373,9 +375,9 @@ class SmartOrderAccepterBot(DipnetBot):
         if not len(ally):
             return
         final_orders = []
-        for order in self.orders:
+        for order in self.orders.get_list_of_orders():
             if self.is_order_aggressive_to_powers(order, ally):
-                new_order = self.get_non_aggressive_order(order, ally)
+                new_order = yield from self.get_non_aggressive_order(order, ally)
             else:
                 new_order = order
             final_orders.append(new_order)
@@ -414,13 +416,9 @@ class SmartOrderAccepterBot(DipnetBot):
         orders_data = OrdersData()
         orders_data.add_orders(best_orders)
         self.orders = orders_data
-        print('current stance', self.stance.stance[self.power_name])
-        print('dipnet order (+proposal):', self.orders.get_list_of_orders())
 
         # filter out aggressive orders to allies
-        self.replace_aggressive_order_to_allies()
-
-        print('after non-agg replacement:', self.orders.get_list_of_orders())
+        yield self.replace_aggressive_order_to_allies()
 
         # generate messages for FCT sharing info orders
         msgs_data = self.gen_messages(orders_data.get_list_of_orders())
