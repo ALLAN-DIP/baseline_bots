@@ -9,6 +9,7 @@ from DAIDE import FCT, HUH, ORR, PRP, XDO, YES
 from diplomacy import Message
 from stance_vector import ActionBasedStance, ScoreBasedStance
 import random
+import numpy as np
 
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
@@ -56,6 +57,8 @@ class SmartOrderAccepterBot(DipnetBot):
         self.allies_influence = set()
         self.orders = None
         self.my_influence = set()
+        self.ally_threshold = 2.0
+        self.enemy_threshold = 1.0
 
     def gen_pos_stance_messages(
         self, msgs_data: MessagesData, orders_list: List[str]
@@ -387,6 +390,102 @@ class SmartOrderAccepterBot(DipnetBot):
                 final_messages[recipient] = str(suggested_proposals)
                 comms_obj.add_message(recipient, str(suggested_proposals))
         return final_messages
+        
+    def is_order_aggressive_to_powers(self, order: str, powers: List[str]):
+        """
+        check if the order is aggressive by
+        1. to attack allies unit
+        2. to move to allies' SC
+        3. support attack allies unit
+        4. support move to allies' SC
+
+        :param order: an order as string, e.g. "A BUD S F TRI"
+        :param powers: powers that we want to check if a bot is having aggressive move to
+        :return: Boolean
+
+        """
+        order_token = get_order_tokens(order)
+        if order_token[0][0] == "A" or order_token[0][0] == "F":
+            # for 1 and 2
+            if order_token[1][0] == "-":
+                # get location - add order_token[0] ('A' or 'F') at front to check if it collides with other powers' units
+                order_unit = order_token[0][0] + order_token[1][1:]
+                for power in powers:
+                    if self.power_name != power:
+                        # if the order is to attack allies' units
+                        if order_unit in self.game.powers[power].units:
+                            return True
+                        # if the order is a move to allies' SC
+                        if order_token[1][2:] in self.game.powers[power].centers:
+                            return True
+            # for 3 and 4
+            if order_token[1][0] == "S":
+                # if support hold
+                if len(order_token) == 3:  # ['A BUD', 'S', 'A VIE']
+                    return False
+                order_unit = order_token[2][0] + order_token[3][1:]
+                for power in powers:
+                    if self.power_name != power:
+                        # if the order is to attack allies' units
+                        if order_unit in self.game.powers[power].units:
+                            return True
+                        # if the order is a move to allies' SC
+                        if order_token[3][2:] in self.game.powers[power].centers:
+                            return True
+        return False
+
+    @gen.coroutine
+    def get_non_aggressive_order(self, order: str, powers: List[str]):
+        """
+        return a non-aggressive order with other options in dipnet beam order, if none left, support its own unit. if none around, support self hold.
+
+        :param order: an order as string, e.g. "A BUD S F TRI"
+        :param powers: powers that we want to check if a bot is having aggressive move to
+        :return: order
+
+        """
+        order_token = get_order_tokens(order)
+        unit = order_token[0]
+        loc_unit = unit[2:]
+        list_order, prob_order = yield self.brain.get_beam_orders(self.game, self.power_name)
+    
+        if len(list_order)>1:
+            for i in range(1,len(list_order)):
+                dipnet_order = list_order[i]
+                for candidate_order in dipnet_order:
+                    if unit in candidate_order and not self.is_order_aggressive_to_powers(candidate_order, powers):
+                        return candidate_order
+        
+        # if none in dipnet beam orders
+        for current_order in self.orders.get_list_of_orders():
+            if current_order != order and not self.is_order_aggressive_to_powers(current_order, powers) and current_order in self.game.get_all_possible_orders()[loc_unit]:
+                return unit + ' S ' + current_order
+        
+        return unit + ' H'
+
+    @gen.coroutine                   
+    def replace_aggressive_order_to_allies(self):
+        """
+        replace aggressive orders with non-aggressive orders (in-place replace self.orders)
+
+        :return: nothing
+        """
+        ally = [power for power in self.game.map.powers if power!=self.power_name and self.stance.stance[self.power_name][power] >= self.ally_threshold]
+
+        if not len(ally):
+            return
+        final_orders = []
+        for order in self.orders.get_list_of_orders():
+            if self.is_order_aggressive_to_powers(order, ally):
+                new_order = yield from self.get_non_aggressive_order(order, ally)
+            else:
+                new_order = order
+            final_orders.append(new_order)
+        
+        orders_data = OrdersData()
+        orders_data.add_orders(final_orders)
+        self.orders = orders_data
+
 
     @gen.coroutine
     def __call__(self, rcvd_messages: List[Tuple[int, Message]]):
@@ -418,8 +517,10 @@ class SmartOrderAccepterBot(DipnetBot):
         # add orders
         orders_data = OrdersData()
         orders_data.add_orders(best_orders)
-
         self.orders = orders_data
+
+        # filter out aggressive orders to allies
+        yield self.replace_aggressive_order_to_allies()
 
         # generate messages for FCT sharing info orders
         msgs_data = self.gen_messages(orders_data.get_list_of_orders())
