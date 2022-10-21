@@ -10,16 +10,18 @@ from diplomacy import Game, Message
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from baseline_bots.utils import (
-    FCT,
-    ORR,
-    XDO,
     MessagesData,
     get_other_powers,
     parse_FCT,
     parse_arrangement,
 )
 
-from baseline_bots.parsing_utils import dipnet_to_daide_parsing
+from DAIDE import FCT, ORR, XDO
+
+from baseline_bots.parsing_utils import (
+    dipnet_to_daide_parsing,
+    daide_to_dipnet_parsing
+)
 
 from typing import List
 
@@ -54,8 +56,10 @@ class TransparentBot(DipnetBot):
         self.orders.add_orders(orders, overwrite=True)
         self.my_orders_informed = False
         comms_obj = MessagesData()
-
+        if self.game.get_current_phase()[-1] != "M":
+            return comms_obj
         parsed_orders = self.parse_messages(rcvd_messages)
+        parsed_orders = [list(daide_to_dipnet_parsing(order))[0] for order in parsed_orders]
 
         # My orders' messages if not already sent
         if not self.my_orders_informed:
@@ -70,8 +74,8 @@ class TransparentBot(DipnetBot):
 
         for other_power in get_other_powers([self.power_name], self.game):
             if final_orders:
-                msg = FCT(ORR(XDO(final_orders)))
-                comms_obj.add_message(other_power, msg)
+                msg = FCT(ORR([XDO(order) for order in dipnet_to_daide_parsing(final_orders, self.game)]))
+                comms_obj.add_message(other_power, str(msg))
 
         return comms_obj
 

@@ -3,12 +3,20 @@ __email__ = "sanderschulhoff@gmail.com"
 
 import random
 
-from DAIDE import ORR, XDO
+from DAIDE import FCT, ORR, XDO, PRP, HUH, YES
 from diplomacy import Message
 from tornado import gen
 
 from baseline_bots.bots.baseline_bot import BaselineBot
-from baseline_bots.utils import MessagesData, get_other_powers
+from baseline_bots.utils import MessagesData, OrdersData, get_other_powers
+
+from baseline_bots.parsing_utils import (
+    dipnet_to_daide_parsing,
+    daide_to_dipnet_parsing,
+    parse_proposal_messages
+)
+
+
 
 
 class RandomProposerBot(BaselineBot):
@@ -23,6 +31,8 @@ class RandomProposerBot(BaselineBot):
         # Return data initialization
         ret_obj = MessagesData()
 
+        if self.game.get_current_phase()[-1] != "M":
+            return ret_obj
         # Getting the list of possible orders for all locations
         possible_orders = self.game.get_all_possible_orders()
 
@@ -33,16 +43,30 @@ class RandomProposerBot(BaselineBot):
                 for loc in self.game.get_orderable_locations(other_power)
                 if possible_orders[loc]
             ]
-            suggested_random_orders = ORR(
-                [XDO(order) for order in suggested_random_orders]
-            )
-            # send the other power a message containing the orders
-            ret_obj.add_message(other_power, str(suggested_random_orders))
+            suggested_random_orders = list(filter(lambda x: x != 'WAIVE', suggested_random_orders))
+            if len(suggested_random_orders) > 0:
+                suggested_random_orders = PRP(ORR(
+                    [XDO(order) for order in dipnet_to_daide_parsing(suggested_random_orders, self.game)]
+                )
+                )
+                # send the other power a message containing the orders
+                ret_obj.add_message(other_power, str(suggested_random_orders))
 
         return ret_obj
 
     def gen_orders(self):
-        return None
+        self.orders = OrdersData()
+        possible_orders = self.game.get_all_possible_orders()
+
+        orders = [
+            random.choice([ord for ord in possible_orders[loc]])
+            for loc in self.game.get_orderable_locations(self.power_name)
+            if possible_orders[loc]
+        ]
+
+        self.orders.add_orders(orders)
+
+        return self.orders.get_list_of_orders()
 
     def __call__(self, rcvd_messages):
         return super().__call__(rcvd_messages)
@@ -59,6 +83,16 @@ class RandomProposerBot_AsyncBot(RandomProposerBot):
     def gen_orders(self):
         return super().gen_orders()
 
+    @gen.coroutine
+    def __call__(self, rcvd_messages):
+        """
+        :return: dict containing messages and orders
+        """
+        messages = yield self.gen_messages(rcvd_messages)
+        orders = yield self.gen_orders()
+        # maintain current orders
+        self.orders = orders
+        return {"messages": messages, "orders": orders}
 
 if __name__ == "__main__":
     from diplomacy import Game
