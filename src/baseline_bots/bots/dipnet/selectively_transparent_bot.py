@@ -11,8 +11,8 @@ from baseline_bots.utils import (
     MessagesData,
     get_other_powers,
     is_order_aggressive,
-    parse_FCT,
     parse_arrangement,
+    parse_FCT,
 )
 
 config.ORDERS_DAIDE = False

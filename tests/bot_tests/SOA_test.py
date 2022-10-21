@@ -26,12 +26,14 @@ from baseline_bots.parsing_utils import (
 
 class TestSOABot():
     def test(self):
-        start_io_loop(self.test_play)
-        # start_io_loop(self.test_stance)
+        # start_io_loop(self.test_play)
+        # start_io_loop(self.test_score_stance)
+        start_io_loop(self.test_action_stance)
         # start_io_loop(self.test_auxilary_functions)
         # start_io_loop(self.test_parse_proposals)
         # start_io_loop(self.test_get_best_orders)
         # start_io_loop(self.test_gen_pos_stance_messages)
+        start_io_loop(self.test_ally_move_filter)
     
     @gen.coroutine
     def test_auxilary_functions(self):
@@ -88,7 +90,7 @@ class TestSOABot():
         stop_io_loop()
 
     @gen.coroutine
-    def test_stance(self):
+    def test_score_stance(self):
         # score-based
         game = Game()
         soa_bot = SmartOrderAccepterBot('FRANCE', game)
@@ -110,7 +112,70 @@ class TestSOABot():
         print('finish test_stance')
         stop_io_loop()
 
-        # to do: add action-based stance test
+    @gen.coroutine
+    def test_action_stance(self):
+        # score-based
+        game = Game()
+        soa_bot = SmartOrderAccepterBot('FRANCE', game)
+        bot_instances = [RandomProposerBot_AsyncBot('ENGLAND', game), RandomProposerBot_AsyncBot('GERMANY', game), soa_bot]
+        game_play = GamePlay(game, bot_instances, 3, True)
+        game_play.game.set_orders('FRANCE', ['A MAR H', 'A PAR H', 'F BRE - PIC'])
+        game_play.game.set_orders('ENGLAND', ['A LVP - WAL', 'F EDI - NTH', 'F LON - ENG'])
+        game_play.game.set_orders('GERMANY', ['A BER - MUN', 'A MUN - BUR', 'F KIE - HOL'])
+        game_play.game.process()
+        game_play.game.set_orders('FRANCE', ['A MAR - BUR', 'A PAR - BRE', 'F PIC H'])
+        game_play.game.set_orders('ENGLAND', ['A WAL - BEL VIA', 'F ENG C A WAL - BEL', 'F NTH - HEL'])
+        game_play.game.set_orders('GERMANY', ['A BUR - MAR', 'A MUN - RUH', 'F HOL H'])
+        game_play.game.process()
+        game_play.game.set_orders('ENGLAND', ['A LON B'])
+        game_play.game.set_orders('GERMANY', ['A MUN B'])
+        game_play.game.process()
+        game_play.game.set_orders('FRANCE', ['A BRE H', 'A MAR - GAS', 'F PIC H'])
+        game_play.game.set_orders('ENGLAND', ['A BEL S F PIC', 'F ENG S A BRE', 'F HEL - HOL'])
+        game_play.game.set_orders('GERMANY', ['A BUR - PAR', 'A RUH - BUR', 'F HOL H'])
+        game_play.game.process()
+        game_play.game.set_orders('FRANCE', ['A BRE - PAR', 'A GAS - BUR', 'F PIC - BEL'])
+        game_play.game.set_orders('ENGLAND', ['A BEL - HOL', 'F ENG S F PIC - BEL', 'F HEL S A BEL - HOL'])
+        game_play.game.set_orders('GERMANY', ['A BUR S A PAR - PIC', 'A PAR - PIC', 'F HOL H'])
+        game_play.game.process()
+        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
+        print(soa_bot_stance)
+
+        print('expected stance ENGLAND >0, GERMANY<0')
+        print('soa stance', soa_bot_stance)
+        assert soa_bot_stance['ENGLAND'] >0.0  , "Positive stance error"
+        assert soa_bot_stance['GERMANY'] <0.0, "Negative stance error"
+
+        print('finish test_stance')
+        stop_io_loop()
+
+    @gen.coroutine
+    def test_ally_move_filter(self):
+        # assume that stance is correct using score-based
+        game = Game()
+        soa_bot = SmartOrderAccepterBot('FRANCE', game)
+        soa_bot.ally_threshold = 1.0
+        bot_instances = [RandomProposerBot_AsyncBot('ENGLAND', game), RandomProposerBot_AsyncBot('GERMANY', game), soa_bot]
+        game_play = GamePlay(game, bot_instances, 3, True)
+        game_play.game.set_centers('ENGLAND', ['LON'], reset=True)
+        game_play.game.set_centers('GERMANY', ['MUN', 'KIE', 'BER','BEL'])
+        game_play.game.set_centers(soa_bot.power_name, ['PAR','BRE', 'MAR'])
+        game_play.game.set_orders('FRANCE', ['A MAR - BUR', 'A PAR - PIC', 'F BRE H'])
+        game_play.game.set_orders('ENGLAND', ['A LVP - WAL', 'F EDI - NTH', 'F LON - ENG'])
+        game_play.game.process()
+        orders = ['F BRE - ENG', 'A PIC - BEL', 'A BUR - PIC']
+        orders_data = OrdersData()
+        orders_data.add_orders(orders)
+        soa_bot.orders = orders_data
+
+        print("aggressive order: ", orders)
+        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
+        print('soa stance', {k: v for k,v in soa_bot_stance.items() if v >= soa_bot.ally_threshold})
+        yield soa_bot.replace_aggressive_order_to_allies()
+        print("remove non-aggressive", soa_bot.orders.get_list_of_orders())
+
+        print('finish test ally move filter')
+        stop_io_loop()
 
     @gen.coroutine
     def test_parse_proposals(self):
