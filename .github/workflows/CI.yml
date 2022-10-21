@@ -11,12 +11,15 @@ jobs:
       - uses: actions/checkout@v2
       - name: pytest
         run: |
-        pytest tests/utils_test.py
-        # pytest tests/bot_tests/bots_test.py
-        pytest tests/randomize_order_test.py
-        # pytest tests/bot_tests/soa_bot_functions_test.py
-      - run: wget https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-sl_model.zip
-      - run: mkdir bot_neurips2019-sl_model
-      - run: unzip neurips2019-sl_model.zip -d bot_neurips2019-sl_model/
-      - run: docker build -t allan_test_env .
-      - run: docker run allan_test_env
+          pytest tests/utils_test.py
+          # pytest tests/bot_tests/bots_test.py
+          pytest tests/randomize_order_test.py
+          # pytest tests/bot_tests/soa_bot_functions_test.py
+      
+      - name: TACC
+        run: |
+          wget https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-sl_model.zip
+          mkdir bot_neurips2019-sl_model
+          unzip neurips2019-sl_model.zip -d bot_neurips2019-sl_model/
+          docker build -t allan_test_env .
+          docker run allan_test_env
