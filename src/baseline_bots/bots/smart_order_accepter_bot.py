@@ -119,7 +119,6 @@ class SmartOrderAccepterBot(DipnetBot):
             messages_data.add_message(
                 sender, str(message)
             )
-            messages_data.add_message(sender, str(message))
 
     def respond_to_alliance_messages(self, messages_data: MessagesData) -> None:
         """
