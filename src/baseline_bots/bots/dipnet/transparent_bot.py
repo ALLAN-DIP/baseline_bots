@@ -91,7 +91,6 @@ class TransparentBot(DipnetBot):
 
     @gen.coroutine
     def __call__(self, rcvd_messages: List[Message]):
-        return {
-            "messages": self.gen_messages(rcvd_messages),
-            "orders": self.gen_orders(),
-        }
+        messages = yield from self.gen_messages(rcvd_messages)
+        orders = yield from self.gen_orders()
+        return {"messages": messages, "orders": orders}
