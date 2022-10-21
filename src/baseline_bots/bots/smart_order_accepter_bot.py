@@ -490,7 +490,10 @@ class SmartOrderAccepterBot(DipnetBot):
     @gen.coroutine
     def __call__(self, rcvd_messages: List[Tuple[int, Message]]):
         # compute pos/neg stance on other bots using Tony's stance vector
-        self.stance.get_stance()
+
+        # avoid get_stance in the first phase of game
+        if self.game.get_current_phase()!='S1901M':
+            self.stance.get_stance()
 
         # get dipnet order
         orders = yield from self.brain.get_orders(self.game, self.power_name)
