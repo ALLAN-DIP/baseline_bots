@@ -10,9 +10,15 @@ from typing import Dict, List, Tuple, Union
 
 from DAIDE.utils.exceptions import ParseError
 from diplomacy import Game, Message
+
 from baseline_bots.utils import *
 
-def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, str]]], game: Game, unit_power_tuples_included=False) -> List[str]:
+
+def dipnet_to_daide_parsing(
+    dipnet_style_order_strs: List[Union[str, Tuple[str, str]]],
+    game: Game,
+    unit_power_tuples_included=False,
+) -> List[str]:
     """
     Convert dipnet style single order to DAIDE style order. Needs game instance to determine the powers owning the units
 
@@ -23,6 +29,7 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, 
     :param unit_power_tuples_included: this means the unit power will also be included in the input dipnet_style_order_strs along with the orders like this: ("A SEV - RUM", "RUS")
     :return: DAIDE style order string
     """
+
     def daidefy_suborder(dipnet_suborder: str) -> str:
         """
         Translates dipnet style units to DAIDE style units
@@ -36,29 +43,48 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, 
         :return: DAIDE-style suborder
         """
         if dipnet_suborder not in unit_game_mapping:
-            raise Exception(f"error from utils.dipnet_to_daide_parsing: unit {dipnet_suborder} not present in unit_game_mapping")
-        return "(" + (" ".join(
-                [
-                    unit_game_mapping[dipnet_suborder],
-                    "AMY" if dipnet_suborder[0] == "A" else "FLT",
-                    dipnet_suborder.split()[-1]
-                ]
-            ) ) + ")"
-        
+            raise Exception(
+                f"error from utils.dipnet_to_daide_parsing: unit {dipnet_suborder} not present in unit_game_mapping"
+            )
+        return (
+            "("
+            + (
+                " ".join(
+                    [
+                        unit_game_mapping[dipnet_suborder],
+                        "AMY" if dipnet_suborder[0] == "A" else "FLT",
+                        dipnet_suborder.split()[-1],
+                    ]
+                )
+            )
+            + ")"
+        )
+
     convoy_map = defaultdict(list)
     dipnet_style_order_strs_tokens = [None for _ in range(len(dipnet_style_order_strs))]
 
     # Convert strings to order tokens and store a dictionary mapping of armies to be convoyed and fleets helping to convoy
     for i in range(len(dipnet_style_order_strs)):
-        if not(unit_power_tuples_included):
-            dipnet_style_order_strs_tokens[i] = get_order_tokens(dipnet_style_order_strs[i])
-            if dipnet_style_order_strs_tokens[i][1] == 'C':
-                convoy_map[dipnet_style_order_strs_tokens[i][2] + dipnet_style_order_strs_tokens[i][3]].append(dipnet_style_order_strs_tokens[i][0].split()[-1])
-        else: # If unit powers are also included in the input, then use the right values
-            dipnet_style_order_strs_tokens[i] = get_order_tokens(dipnet_style_order_strs[i][0]), dipnet_style_order_strs[i][1]
-            if dipnet_style_order_strs_tokens[i][0][1] == 'C':
-                convoy_map[dipnet_style_order_strs_tokens[i][0][2] + dipnet_style_order_strs_tokens[i][0][3]].append(dipnet_style_order_strs_tokens[i][0][0].split()[-1])
-    
+        if not (unit_power_tuples_included):
+            dipnet_style_order_strs_tokens[i] = get_order_tokens(
+                dipnet_style_order_strs[i]
+            )
+            if dipnet_style_order_strs_tokens[i][1] == "C":
+                convoy_map[
+                    dipnet_style_order_strs_tokens[i][2]
+                    + dipnet_style_order_strs_tokens[i][3]
+                ].append(dipnet_style_order_strs_tokens[i][0].split()[-1])
+        else:  # If unit powers are also included in the input, then use the right values
+            dipnet_style_order_strs_tokens[i] = (
+                get_order_tokens(dipnet_style_order_strs[i][0]),
+                dipnet_style_order_strs[i][1],
+            )
+            if dipnet_style_order_strs_tokens[i][0][1] == "C":
+                convoy_map[
+                    dipnet_style_order_strs_tokens[i][0][2]
+                    + dipnet_style_order_strs_tokens[i][0][3]
+                ].append(dipnet_style_order_strs_tokens[i][0][0].split()[-1])
+
     daide_orders = []
 
     # For each order
@@ -74,15 +100,19 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, 
             for unit in game.get_units(power):
                 unit_game_mapping[unit] = power[:3]
 
-        # If unit powers are also included in the input, then add the unit - unit power mapping for DAIDE construction 
+        # If unit powers are also included in the input, then add the unit - unit power mapping for DAIDE construction
         if unit_power_tuples_included:
             unit_game_mapping[dipnet_order_tokens[0]] = unit_power
-        
+
         daide_order = []
 
         if dipnet_order_tokens[0] not in unit_game_mapping:
             continue
-        if len(dipnet_order_tokens)>=3 and dipnet_order_tokens[2] != "VIA" and dipnet_order_tokens[2] not in unit_game_mapping:    
+        if (
+            len(dipnet_order_tokens) >= 3
+            and dipnet_order_tokens[2] != "VIA"
+            and dipnet_order_tokens[2] not in unit_game_mapping
+        ):
             continue
 
         # Daidefy and add source unit as it is
@@ -96,7 +126,9 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, 
                 daide_order.append("MTO")
                 daide_order.append(dipnet_order_tokens[3].split()[-1])
             elif len(dipnet_order_tokens) > 4:
-                raise Exception(f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!")
+                raise Exception(
+                    f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
+                )
         elif dipnet_order_tokens[1] == "H":
             # Hold orders
             daide_order.append("HLD")
@@ -112,15 +144,21 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, 
             daide_order.append(dipnet_order_tokens[1].split()[-1])
             daide_order.append("VIA")
             if dipnet_order_tokens[0] + dipnet_order_tokens[1] in convoy_map:
-                daide_order.append(f"({' '.join(convoy_map[dipnet_order_tokens[0] + dipnet_order_tokens[1]])})")
+                daide_order.append(
+                    f"({' '.join(convoy_map[dipnet_order_tokens[0] + dipnet_order_tokens[1]])})"
+                )
             else:
-                print(f"unexpected situation at utils.dipnet_to_daide_parsing. Found order {dipnet_order_tokens} which doesn't have convoying fleet in its own set of orders")
+                print(
+                    f"unexpected situation at utils.dipnet_to_daide_parsing. Found order {dipnet_order_tokens} which doesn't have convoying fleet in its own set of orders"
+                )
         else:
             # Move orders
             daide_order.append("MTO")
             daide_order.append(dipnet_order_tokens[1].split()[-1])
             if len(dipnet_order_tokens) > 2:
-                raise Exception(f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!")
+                raise Exception(
+                    f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
+                )
         daide_orders.append(" ".join(daide_order))
 
     return daide_orders
@@ -135,6 +173,7 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
     :param daide_style_order_str: DAIDE style string to be converted to dipnet style
     :return: dipnet style order string and unit's power name
     """
+
     def split_into_groups(daide_style_order_str: str) -> List[str]:
         """
         Split the string based on parenthesis or spaces
@@ -148,18 +187,19 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
         stack = ""
         grouped_order = []
         for char in daide_style_order_str:
-            if (not(open_brack) and char == ' ') or char == ')':
+            if (not (open_brack) and char == " ") or char == ")":
                 if stack:
                     grouped_order.append(stack)
                     stack = ""
                     open_brack = False
-            elif char == '(':
+            elif char == "(":
                 open_brack = True
             else:
                 stack += char
         if stack:
             grouped_order.append(stack)
         return grouped_order
+
     daide_style_order_groups = split_into_groups(daide_style_order_str)
 
     def dipnetify_suborder(suborder: str) -> str:
@@ -189,7 +229,9 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
             dipnet_order.append("-")
             dipnet_order.append(daide_style_order_groups[4])
         elif len(daide_style_order_groups) > 5:
-            raise Exception(f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!")
+            raise Exception(
+                f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
+            )
     elif daide_style_order_groups[1] == "HLD":
         # Hold order
         dipnet_order.append("H")
@@ -209,27 +251,30 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
         dipnet_order.append("-")
         dipnet_order.append(daide_style_order_groups[2])
         if len(daide_style_order_groups) > 3:
-            raise Exception(f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!")
+            raise Exception(
+                f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
+            )
     else:
-        raise Exception(f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!")
+        raise Exception(
+            f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
+        )
 
     return " ".join(dipnet_order), unit_power
 
+
 def parse_proposal_messages(
-        rcvd_messages: List[Tuple[int, Message]],
-        game: Game, 
-        power_name: str
-    ) -> Dict[str, Dict[str, List[str]]]:
+    rcvd_messages: List[Tuple[int, Message]], game: Game, power_name: str
+) -> Dict[str, Dict[str, List[str]]]:
     """
     From received messages, extract the proposals (categorize as valid and invalid), shared orders and other orders. Use specified game state and power_name to check for validity of moves
 
     :param rcvd_messages: list of messages received from other players
     :param game: Game state
     :param power_name: power name against which the validity of moves need to be checked
-    :return: dictionary of 
-        valid proposals, 
-        invalid proposals, 
-        shared orders (orders that the other power said it would execute), 
+    :return: dictionary of
+        valid proposals,
+        invalid proposals,
+        shared orders (orders that the other power said it would execute),
         other orders (orders that the other power shared as gossip),
         alliance proposals
     """
@@ -247,10 +292,21 @@ def parse_proposal_messages(
 
     for order_msg in order_msgs:
         try:
-            if "AND" in order_msg.message: # works when AND is present in this format: XDO () AND XDO () AND XDO()
-                daide_style_orders = [order_1 for order in (parse_PRP(order_msg.message)).split("AND") for order_1 in parse_arrangement(order.strip(), xdo_only=False)]
-            else: # works for cases where ORR is present in PRP or nothing is present: ORR ( (XDO()) (XDO()))
-                daide_style_orders = [order for order in parse_arrangement(parse_PRP(order_msg.message), xdo_only=False)]
+            if (
+                "AND" in order_msg.message
+            ):  # works when AND is present in this format: XDO () AND XDO () AND XDO()
+                daide_style_orders = [
+                    order_1
+                    for order in (parse_PRP(order_msg.message)).split("AND")
+                    for order_1 in parse_arrangement(order.strip(), xdo_only=False)
+                ]
+            else:  # works for cases where ORR is present in PRP or nothing is present: ORR ( (XDO()) (XDO()))
+                daide_style_orders = [
+                    order
+                    for order in parse_arrangement(
+                        parse_PRP(order_msg.message), xdo_only=False
+                    )
+                ]
             for order_type, order in daide_style_orders:
                 if order_type == "XDO":
                     proposals[order_msg.sender].append(daide_to_dipnet_parsing(order))
@@ -261,21 +317,32 @@ def parse_proposal_messages(
                     other_orders[order_msg.sender].append(order)
         except Exception as e:
             raise Exception(f"Exception raised for {order_msg.message}")
-    
+
     # Generate set of possible orders for the given power
     orderable_locs = game.get_orderable_locations(power_name)
     all_possible_orders = game.get_all_possible_orders()
-    possible_orders = set([ord for ord_key in all_possible_orders for ord in all_possible_orders[ord_key] if ord_key in orderable_locs])
+    possible_orders = set(
+        [
+            ord
+            for ord_key in all_possible_orders
+            for ord in all_possible_orders[ord_key]
+            if ord_key in orderable_locs
+        ]
+    )
 
     # For the set of proposed moves from each sender, check if the specified orders would be allowed. If not, mark them as invalid.
     for sender in proposals:
         for order, unit_power_name in proposals[sender]:
-            if unit_power_name == power_name[:3]: # These are supposed to be proposal messages to me
-                if order in possible_orders: # These would be valid proposals to me
+            if (
+                unit_power_name == power_name[:3]
+            ):  # These are supposed to be proposal messages to me
+                if order in possible_orders:  # These would be valid proposals to me
                     valid_proposals[sender].append(order)
-                else: # These would be invalid proposals
+                else:  # These would be invalid proposals
                     invalid_proposals[sender].append((order, unit_power_name))
-            elif unit_power_name == sender[:3]: # These are supposed to be conditional orders that the sender is going to execute
+            elif (
+                unit_power_name == sender[:3]
+            ):  # These are supposed to be conditional orders that the sender is going to execute
                 shared_orders[sender].append(order)
             else:
                 other_orders[sender].append(order)
@@ -285,11 +352,11 @@ def parse_proposal_messages(
         print([msg.message for msg in order_msgs])
         print("Other orders found:")
         print(other_orders)
-    
+
     return {
-        'valid_proposals': valid_proposals, 
-        'invalid_proposals': invalid_proposals, 
-        'shared_orders': shared_orders, 
-        'other_orders': other_orders, 
-        'alliance_proposals': alliance_proposals
+        "valid_proposals": valid_proposals,
+        "invalid_proposals": invalid_proposals,
+        "shared_orders": shared_orders,
+        "other_orders": other_orders,
+        "alliance_proposals": alliance_proposals,
     }

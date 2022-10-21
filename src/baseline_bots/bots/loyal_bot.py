@@ -45,7 +45,9 @@ class LoyalBot(BaselineBot):
             if last_message.sender in self.allies:
                 try:
                     orders = get_non_aggressive_orders(
-                        parse_arrangement(last_message.message), self.power_name, self.game
+                        parse_arrangement(last_message.message),
+                        self.power_name,
+                        self.game,
                     )
                     self.orders.add_orders(orders)
 

@@ -1,32 +1,37 @@
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
-from typing import Dict, List, Tuple, Set
-from tornado import gen
-from DAIDE import FCT, ORR, XDO, PRP, HUH, YES
+import random
+from collections import defaultdict
+from typing import Dict, List, Set, Tuple
+
+from DAIDE import FCT, HUH, ORR, PRP, XDO, YES
 from diplomacy import Message
-from stance_vector import ScoreBasedStance
+from stance_vector import ActionBasedStance, ScoreBasedStance
 import random
 import numpy as np
 
+
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
+from baseline_bots.parsing_utils import (
+    daide_to_dipnet_parsing,
+    dipnet_to_daide_parsing,
+    parse_proposal_messages,
+)
+from baseline_bots.randomize_order import (
+    random_list_orders,
+    string_to_tuple,
+    tuple_to_string,
+)
 from baseline_bots.utils import (
+    REJ,
     MessagesData,
     OrdersData,
     get_best_orders,
     get_order_tokens,
     get_other_powers,
     smart_select_support_proposals,
-    REJ
 )
-from baseline_bots.parsing_utils import (
-    dipnet_to_daide_parsing,
-    daide_to_dipnet_parsing,
-    parse_proposal_messages
-)
-
-from collections import defaultdict
-from tornado import gen
 
 
 class SmartOrderAccepterBot(DipnetBot):
@@ -45,7 +50,7 @@ class SmartOrderAccepterBot(DipnetBot):
     def __init__(self, power_name, game) -> None:
         super().__init__(power_name, game)
         self.alliance_props_sent = False
-        self.stance = ScoreBasedStance(power_name, game)
+        self.stance = ActionBasedStance(power_name, game)
         self.alliances = defaultdict(list)
         self.rollout_length = 10
         self.rollout_n_order = 5
@@ -63,12 +68,22 @@ class SmartOrderAccepterBot(DipnetBot):
         These messages would contain factual information about the orders that current power would execute in current round
         """
         if orders_list:
-            orders_decided = FCT(ORR([XDO(order) for order in dipnet_to_daide_parsing(orders_list, self.game)]))
+            orders_decided = FCT(
+                ORR(
+                    [
+                        XDO(order)
+                        for order in dipnet_to_daide_parsing(orders_list, self.game)
+                    ]
+                )
+            )
             if str(orders_decided) != "FCT ()":
                 for pow in self.stance.stance[self.power_name]:
-                    if pow != self.power_name and self.stance.stance[self.power_name][pow] > 0:
+                    if (
+                        pow != self.power_name
+                        and self.stance.stance[self.power_name][pow] > 0
+                    ):
                         msgs_data.add_message(pow, str(orders_decided))
-    
+
     def gen_messages(self, orders_list: List[str]):
         msgs_data = MessagesData()
 
@@ -77,26 +92,52 @@ class SmartOrderAccepterBot(DipnetBot):
 
         return msgs_data
 
-    def gen_proposal_reply(self, best_proposer: str, prp_orders: dict, messages: MessagesData) -> MessagesData: 
+    def gen_proposal_reply(
+        self, best_proposer: str, prp_orders: dict, messages: MessagesData
+    ) -> MessagesData:
         """
         Reply back to allies regarding their proposals whether we follow or not follow
         """
         for proposer, orders in prp_orders.items():
-            if orders and self.power_name != proposer and self.stance.get_stance()[self.power_name][proposer]>=0:
+            if (
+                orders
+                and self.power_name != proposer
+                and self.stance.get_stance()[self.power_name][proposer] >= 0
+            ):
                 if proposer == best_proposer:
                     msg = YES(
-                        PRP(ORR([XDO(order) for order in dipnet_to_daide_parsing(orders, self.game)]))
+                        PRP(
+                            ORR(
+                                [
+                                    XDO(order)
+                                    for order in dipnet_to_daide_parsing(
+                                        orders, self.game
+                                    )
+                                ]
+                            )
+                        )
                     )
                 else:
                     msg = REJ(
-                        PRP(ORR([XDO(order) for order in dipnet_to_daide_parsing(orders, self.game)]))
+                        PRP(
+                            ORR(
+                                [
+                                    XDO(order)
+                                    for order in dipnet_to_daide_parsing(
+                                        orders, self.game
+                                    )
+                                ]
+                            )
+                        )
                     )
-                messages.add_message(
-                    proposer, str(msg)
-                )
+                messages.add_message(proposer, str(msg))
         return messages
-    
-    def respond_to_invalid_orders(self, invalid_proposal_orders: Dict[str, List[Tuple[str, str]]], messages_data: MessagesData) -> None:
+
+    def respond_to_invalid_orders(
+        self,
+        invalid_proposal_orders: Dict[str, List[Tuple[str, str]]],
+        messages_data: MessagesData,
+    ) -> None:
         """
         The bot responds by HUHing the invalid proposal orders received (this could occur if the move proposed is invalid)
 
@@ -108,11 +149,22 @@ class SmartOrderAccepterBot(DipnetBot):
         for sender in invalid_proposal_orders:
             if sender == self.power_name:
                 continue
-            message = HUH(PRP(ORR([XDO(order) for order in dipnet_to_daide_parsing(invalid_proposal_orders[sender], self.game, unit_power_tuples_included=True)])))
-            messages_data.add_message(
-                sender, str(message)
+            message = HUH(
+                PRP(
+                    ORR(
+                        [
+                            XDO(order)
+                            for order in dipnet_to_daide_parsing(
+                                invalid_proposal_orders[sender],
+                                self.game,
+                                unit_power_tuples_included=True,
+                            )
+                        ]
+                    )
+                )
             )
-        
+            messages_data.add_message(sender, str(message))
+
     def respond_to_alliance_messages(self, messages_data: MessagesData) -> None:
         """
         Send YES confirmation messages to all alliance proposals
@@ -138,10 +190,35 @@ class SmartOrderAccepterBot(DipnetBot):
             self.orders.orders[order_tokens[2].split()[1]]
         )
 
-        if len(order_tokens[2:]) == len(selected_order) and order_tokens[2:] == selected_order:
+        if (
+            len(order_tokens[2:]) == len(selected_order)
+            and order_tokens[2:] == selected_order
+        ):
             # Attack move
             return True
-        elif selected_order[1].strip() == "H" and (len(order_tokens[2:]) == len(selected_order) - 1):
+        elif selected_order[1].strip() == "H" and (
+            len(order_tokens[2:]) == len(selected_order) - 1
+        ):
+            # Hold move
+            return True
+        return False
+
+    def is_support_for_given_orders(self, support_order, orders):
+        """Determine if selected support order for neighbour corresponds to given list of orders"""
+        order_tokens = get_order_tokens(support_order)
+        if order_tokens[2].split()[1] not in orders:
+            return True  # it's okay to support other power than allies
+        selected_order = get_order_tokens(orders[order_tokens[2].split()[1]])
+
+        if (
+            len(order_tokens[2:]) == len(selected_order)
+            and order_tokens[2:] == selected_order
+        ):
+            # Attack move
+            return True
+        elif selected_order[1].strip() == "H" and (
+            len(order_tokens[2:]) == len(selected_order) - 1
+        ):
             # Hold move
             return True
         return False
@@ -219,16 +296,22 @@ class SmartOrderAccepterBot(DipnetBot):
     def cache_allies_influence(self) -> None:
         """Cache allies' influence"""
         self.allies_influence = set()
-        for pow in [pow1 for pow1 in self.stance.stance[self.power_name] if pow1 != self.power_name and self.stance.stance[self.power_name][pow1] > 0]:
+        for pow in [
+            pow1
+            for pow1 in self.stance.stance[self.power_name]
+            if pow1 != self.power_name and self.stance.stance[self.power_name][pow1] > 0
+        ]:
             self.allies_influence.update(set(self.game.get_power(pow).influence))
-        
+
     def get_allies_orderable_locs(self) -> Set[str]:
         """Gets provinces which are orderable for the allies"""
         provinces = set()
-        for ally in [pow1 for pow1 in self.stance.stance[self.power_name] if pow1 != self.power_name and self.stance.stance[self.power_name][pow1] > 0]:
-            new_provs = {
-                loc.upper() for loc in self.game.get_orderable_locations(ally)
-            }
+        for ally in [
+            pow1
+            for pow1 in self.stance.stance[self.power_name]
+            if pow1 != self.power_name and self.stance.stance[self.power_name][pow1] > 0
+        ]:
+            new_provs = {loc.upper() for loc in self.game.get_orderable_locations(ally)}
             provinces.update(new_provs)
         return provinces
 
@@ -249,7 +332,7 @@ class SmartOrderAccepterBot(DipnetBot):
             n2n_provs = self.get_2_neigh_provinces()
 
             possible_support_proposals = defaultdict(list)
-            
+
             for n2n_p in n2n_provs:
                 if not (self.possible_orders[n2n_p]):
                     continue
@@ -260,7 +343,11 @@ class SmartOrderAccepterBot(DipnetBot):
                 ]
                 for order in subset_possible_orders:
                     order_tokens = get_order_tokens(order)
-                    if order_tokens[2].split()[1] in self.orders.orders and self.is_support_for_selected_orders(order):
+                    if order_tokens[2].split()[
+                        1
+                    ] in self.orders.orders and self.is_support_for_selected_orders(
+                        order
+                    ):
                         # If this support move corresponds to one of the orders the current bot has selected, exec following
 
                         # Use neighbour's unit to keep track of multiple support orders possible
@@ -271,7 +358,9 @@ class SmartOrderAccepterBot(DipnetBot):
                             (order_tokens[0], " ".join(order_tokens[2:]), order)
                         )
 
-            possible_support_proposals = smart_select_support_proposals(possible_support_proposals)
+            possible_support_proposals = smart_select_support_proposals(
+                possible_support_proposals
+            )
 
             for attack_key in possible_support_proposals:
                 # For each location, randomly select one of the support orders
@@ -281,12 +370,23 @@ class SmartOrderAccepterBot(DipnetBot):
                 final_messages[self.game._unit_owner(selected_order[0]).name].append(
                     selected_order[2]
                 )
-            
+
             for recipient in final_messages:
                 # Construct message for each support proposal
-                if not(final_messages[recipient]):
+                if not (final_messages[recipient]):
                     continue
-                suggested_proposals = PRP(ORR([XDO(ord) for ord in dipnet_to_daide_parsing(final_messages[recipient], self.game, unit_power_tuples_included=False)]))
+                suggested_proposals = PRP(
+                    ORR(
+                        [
+                            XDO(ord)
+                            for ord in dipnet_to_daide_parsing(
+                                final_messages[recipient],
+                                self.game,
+                                unit_power_tuples_included=False,
+                            )
+                        ]
+                    )
+                )
                 final_messages[recipient] = str(suggested_proposals)
                 comms_obj.add_message(recipient, str(suggested_proposals))
         return final_messages
@@ -397,12 +497,14 @@ class SmartOrderAccepterBot(DipnetBot):
         print("debug: Fetched orders", orders)
 
         # parse the proposal messages received by the bot
-        parsed_messages_dict = parse_proposal_messages(rcvd_messages, self.game, self.power_name)
-        valid_proposal_orders = parsed_messages_dict['valid_proposals']
-        invalid_proposal_orders = parsed_messages_dict['invalid_proposals']
-        shared_orders = parsed_messages_dict['shared_orders']
-        other_orders =  parsed_messages_dict['other_orders']
-        self.alliances =  parsed_messages_dict['alliance_proposals']
+        parsed_messages_dict = parse_proposal_messages(
+            rcvd_messages, self.game, self.power_name
+        )
+        valid_proposal_orders = parsed_messages_dict["valid_proposals"]
+        invalid_proposal_orders = parsed_messages_dict["invalid_proposals"]
+        shared_orders = parsed_messages_dict["shared_orders"]
+        other_orders = parsed_messages_dict["other_orders"]
+        self.alliances = parsed_messages_dict["alliance_proposals"]
 
         # include base order to prp_orders.
         # This is to avoid having double calculation for the best list of orders between (self-generated) base orders vs proposal orders
@@ -411,7 +513,7 @@ class SmartOrderAccepterBot(DipnetBot):
         valid_proposal_orders[self.power_name] = orders
 
         best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
-
+        
         # add orders
         orders_data = OrdersData()
         orders_data.add_orders(best_orders)
@@ -424,18 +526,43 @@ class SmartOrderAccepterBot(DipnetBot):
         msgs_data = self.gen_messages(orders_data.get_list_of_orders())
         self.respond_to_invalid_orders(invalid_proposal_orders, msgs_data)
         self.respond_to_alliance_messages(msgs_data)
-        msg_allies = ','.join([pow for pow in self.stance.stance[self.power_name] if (pow != self.power_name and self.stance.stance[self.power_name][pow] > 0)])
-        msg_foes = ','.join([pow for pow in self.stance.stance[self.power_name] if (pow != self.power_name and self.stance.stance[self.power_name][pow] < 0)])
-        msg_neutral = ','.join([pow for pow in self.stance.stance[self.power_name] if (pow != self.power_name and self.stance.stance[self.power_name][pow] == 0)])
-        msgs_data.add_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
-                        {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
-
+        # fmt: off
+        allies = [pow for pow in self.stance.stance[self.power_name] 
+            if (pow != self.power_name and self.stance.stance[self.power_name][pow] > 0)]
+        foes = [pow for pow in self.stance.stance[self.power_name]
+            if (pow != self.power_name and self.stance.stance[self.power_name][pow] < 0)]
+        nuetral = [pow for pow in self.stance.stance[self.power_name] 
+            if (pow != self.power_name and self.stance.stance[self.power_name][pow] == 0)]
+        msg_allies = ",".join(allies)
+        msg_foes = ",".join(foes)
+        msg_neutral = ",".join(nuetral)
+        # fmt: on
+        msgs_data.add_message(
+            "GLOBAL",
+            str(
+                f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
+                        {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"
+            ),
+        )
         # generate proposal response YES/NO to allies
-        msgs_data = self.gen_proposal_reply(best_proposer, valid_proposal_orders, msgs_data)
+        msgs_data = self.gen_proposal_reply(
+            best_proposer, valid_proposal_orders, msgs_data
+        )
+
+        # randomize dipnet orders and send random orders to enemies
+        dipnet_ords = list(self.orders.orders.values())
+        daide_style_orders = dipnet_to_daide_parsing(dipnet_ords, self.game)
+        lst_rand = list(
+            map(lambda st: string_to_tuple("(" + st + ")"), daide_style_orders)
+        )
+        randomized_orders = random_list_orders(lst_rand)
+        random_str_orders = list(
+            map(lambda ord: tuple_to_string(ord), randomized_orders)
+        )
+        for foe in foes:
+            msgs_data.add_message(foe, str(random_str_orders))
 
         # generate support proposals to allies
         proposals = self.generate_support_proposals(msgs_data)
-        print("Support proposals:")
-        print(proposals)
 
         return {"messages": msgs_data, "orders": orders_data.get_list_of_orders()}
