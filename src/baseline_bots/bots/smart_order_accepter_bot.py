@@ -10,6 +10,7 @@ from diplomacy import Message
 from stance_vector import ActionBasedStance, ScoreBasedStance
 import random
 import numpy as np
+from tornado import gen
 
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
@@ -470,6 +471,8 @@ class SmartOrderAccepterBot(DipnetBot):
 
         :return: nothing
         """
+        print(self.game.map.powers)
+        print(self.power_name)
         ally = [power for power in self.game.map.powers if power!=self.power_name and self.stance.stance[self.power_name][power] >= self.ally_threshold]
 
         if not len(ally):
@@ -521,6 +524,7 @@ class SmartOrderAccepterBot(DipnetBot):
         orders_data = OrdersData()
         orders_data.add_orders(best_orders)
         self.orders = orders_data
+
 
         # filter out aggressive orders to allies
         yield self.replace_aggressive_order_to_allies()
