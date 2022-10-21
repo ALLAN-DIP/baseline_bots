@@ -471,8 +471,6 @@ class SmartOrderAccepterBot(DipnetBot):
 
         :return: nothing
         """
-        print(self.game.map.powers)
-        print(self.power_name)
         ally = [power for power in self.game.map.powers if power!=self.power_name and self.stance.stance[self.power_name][power] >= self.ally_threshold]
 
         if not len(ally):
