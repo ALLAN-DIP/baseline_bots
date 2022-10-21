@@ -538,9 +538,7 @@ class SmartOrderAccepterBot(DipnetBot):
         allies = [pow for pow in powers if (pow != self.power_name and powers[pow] > 0)]
         foes = [pow for pow in powers if (pow != self.power_name and powers[pow] < 0)]
         neutral = [pow for pow in powers if (pow != self.power_name and powers[pow] == 0)]
-        msg_allies = ','.join(allies)
-        msg_foes = ','.join(foes)
-        msg_neutral = ','.join(neutral)
+        msg_allies, msg_foes, msg_neutral = ','.join(allies), ','.join(foes), ','.join(neutral)
         msgs_data.add_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
                         {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
         # fmt: on
