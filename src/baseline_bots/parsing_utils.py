@@ -69,7 +69,8 @@ def dipnet_to_daide_parsing(dipnet_style_order_strs: List[Union[str, Tuple[str, 
             dipnet_style_order_strs_tokens[i] = get_order_tokens(dipnet_style_order_strs[i][0]), dipnet_style_order_strs[i][1]
             if dipnet_style_order_strs_tokens[i][0][1] == 'C':
                 convoy_map[dipnet_style_order_strs_tokens[i][0][2] + dipnet_style_order_strs_tokens[i][0][3]].append(dipnet_style_order_strs_tokens[i][0][0].split()[-1])
-        daide_orders = []
+    
+    daide_orders = []
 
     # For each order
     for dipnet_order_tokens in dipnet_style_order_strs_tokens:
