@@ -1,4 +1,4 @@
-__author__ = "Kartik Shenoy"
+__authors__ = ["Kartik Shenoy", "Feng Gu"]
 __email__ = "kartik.shenoyy@gmail.com"
 
 import sys, os
@@ -80,12 +80,12 @@ async def launch(
     print()
     print("Tensorflow server online")
     # await test(hostname, port)
-    await asyncio.gather(*[play(game_id, power_name) for power_name in POWERS])
+    await asyncio.gather(*[play(hostname, port, game_id, power_name, bot_type) for power_name in POWERS])
     # await play(hostname, port, game_id, power_name, bot_type, outdir)
 
 
 async def play(
-    hostname: str, port: int, game_id: str, power_name: str, bot_type: str, outdir: str
+    hostname: str, port: int, game_id: str, power_name: str, bot_type: str
 ) -> None:
     """
     Launches the bot for game play
