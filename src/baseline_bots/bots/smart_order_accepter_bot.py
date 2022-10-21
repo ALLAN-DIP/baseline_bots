@@ -292,14 +292,11 @@ class SmartOrderAccepterBot(DipnetBot):
     def __call__(self, rcvd_messages: List[Tuple[int, Message]]):
         # compute pos/neg stance on other bots using Tony's stance vector
         self.stance.get_stance()
-
-        all_opposing = self.stance.stance[self.power_name]
+        powers = self.stance.stance[self.power_name]
         
         # get dipnet order
         orders = yield from self.brain.get_orders(self.game, self.power_name)
         print("debug: Fetched orders", orders)
-
-                
 
         # parse the proposal messages received by the bot
         parsed_messages_dict = parse_proposal_messages(rcvd_messages, self.game, self.power_name)
@@ -325,21 +322,21 @@ class SmartOrderAccepterBot(DipnetBot):
         self.orders = orders_data
 
         # generate messages for FCT sharing info orders
-        just_opposing = list(all_opposing.keys()).copy()
-        just_opposing.remove(self.power_name)
+        opps = list(powers.keys()).copy()
+        opps.remove(self.power_name) # list of opposing powers
         msgs_data = self.gen_messages(orders_data.get_list_of_orders())
-        print(self.game.phase)
         if self.game.phase == "SPRING 1901 MOVEMENT":
-            for pow in just_opposing:
-                msgs_data.add_message(pow, f"ALY ({self.power_name} {pow}) VSS ({[country for country in list(all_opposing.copy().keys()) if country != pow and country != self.power_name]})")
+            for pow in opps:
+                msgs_data.add_message(pow, f"ALY ({self.power_name} {pow}) VSS ({[country for country in list(powers.copy().keys()) if country != pow and country != self.power_name]})")
 
         # send ALY requests at the start of the game
         self.respond_to_invalid_orders(invalid_proposal_orders, msgs_data)
         self.respond_to_alliance_messages(msgs_data)
         # fmt: off
-        msg_allies = ','.join([pow for pow in all_opposing if (pow != self.power_name and all_opposing[pow] > 0)])
-        msg_foes = ','.join([pow for pow in all_opposing if (pow != self.power_name and all_opposing[pow] < 0)])
-        msg_neutral = ','.join([pow for pow in all_opposing if (pow != self.power_name and all_opposing[pow] == 0)])
+        
+        msg_allies = ','.join([pow for pow in powers if (pow != self.power_name and powers[pow] > 0)])
+        msg_foes = ','.join([pow for pow in powers if (pow != self.power_name and powers[pow] < 0)])
+        msg_neutral = ','.join([pow for pow in powers if (pow != self.power_name and powers[pow] == 0)])
         msgs_data.add_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
                         {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
         # fmt: on
@@ -350,8 +347,5 @@ class SmartOrderAccepterBot(DipnetBot):
         proposals = self.generate_support_proposals(msgs_data)
         print("Support proposals:")
         print(proposals)
-
-        for i in msgs_data.messages:
-            print(i)
 
         return {"messages": msgs_data, "orders": orders_data.get_list_of_orders()}
