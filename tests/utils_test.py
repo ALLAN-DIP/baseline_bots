@@ -12,15 +12,9 @@ from baseline_bots.parsing_utils import (
 )
 
 from diplomacy import Game, Message
-from diplomacy_research.players.benchmark_player import DipNetSLPlayer
 
 
 class TestUtils:
-    def test_dipnet(self):
-        player = DipNetSLPlayer()
-        # intentionally fail
-        print(0 / 0)
-
     def test(self):
         EXAMPLE_ORDER = "A VIE S A BUD - GAL"
         EXAMPLE_ORDER_2 = "A VIE H"
