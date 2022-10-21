@@ -325,13 +325,15 @@ class SmartOrderAccepterBot(DipnetBot):
         self.orders = orders_data
 
         # generate messages for FCT sharing info orders
+        just_opposing = list(all_opposing.keys()).copy()
+        just_opposing.remove(self.power_name)
         msgs_data = self.gen_messages(orders_data.get_list_of_orders())
-        if self.game.phase == "S1901":
-            for pow in all_opposing:
-                msgs_data.add_message(pow, f"ALY ({self.power_name} {pow}) VSS ()")
+        print(self.game.phase)
+        if self.game.phase == "SPRING 1901 MOVEMENT":
+            for pow in just_opposing:
+                msgs_data.add_message(pow, f"ALY ({self.power_name} {pow}) VSS ({[country for country in list(all_opposing.copy().keys()) if country != pow and country != self.power_name]})")
 
         # send ALY requests at the start of the game
-        msgs_data.add_message()
         self.respond_to_invalid_orders(invalid_proposal_orders, msgs_data)
         self.respond_to_alliance_messages(msgs_data)
         # fmt: off
