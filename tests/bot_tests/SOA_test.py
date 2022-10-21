@@ -125,33 +125,20 @@ class TestSOABot():
         game_play.game.set_orders('FRANCE', ['A MAR - BUR', 'A PAR - BRE', 'F PIC H'])
         game_play.game.set_orders('ENGLAND', ['A WAL - BEL VIA', 'F ENG C A WAL - BEL', 'F NTH - HEL'])
         game_play.game.set_orders('GERMANY', ['A BUR - MAR', 'A MUN - RUH', 'F HOL H'])
-        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
-        print(soa_bot_stance)
         game_play.game.process()
-        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
-        print(soa_bot_stance)
         game_play.game.set_orders('ENGLAND', ['A LON B'])
         game_play.game.set_orders('GERMANY', ['A MUN B'])
-        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
-        print(soa_bot_stance)
         game_play.game.process()
-        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
-        print(soa_bot_stance)
         game_play.game.set_orders('FRANCE', ['A BRE H', 'A MAR - GAS', 'F PIC H'])
         game_play.game.set_orders('ENGLAND', ['A BEL S F PIC', 'F ENG S A BRE', 'F HEL - HOL'])
         game_play.game.set_orders('GERMANY', ['A BUR - PAR', 'A RUH - BUR', 'F HOL H'])
-        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
-        print(soa_bot_stance)
         game_play.game.process()
-        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
-        print(soa_bot_stance)
         game_play.game.set_orders('FRANCE', ['A BRE - PAR', 'A GAS - BUR', 'F PIC - BEL'])
         game_play.game.set_orders('ENGLAND', ['A BEL - HOL', 'F ENG S F PIC - BEL', 'F HEL S A BEL - HOL'])
         game_play.game.set_orders('GERMANY', ['A BUR S A PAR - PIC', 'A PAR - PIC', 'F HOL H'])
-        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
-        print(soa_bot_stance)
         game_play.game.process()
         soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
+        print(soa_bot_stance)
 
         print('expected stance ENGLAND >0, GERMANY<0')
         print('soa stance', soa_bot_stance)
