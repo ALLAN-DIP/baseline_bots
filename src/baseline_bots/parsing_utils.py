@@ -91,7 +91,8 @@ def dipnet_to_daide_parsing(
 
     # For each order
     for dipnet_order_tokens in dipnet_style_order_strs_tokens:
-
+        if dipnet_order_tokens is None:
+            continue
         # If unit powers are also included in the input, then update representation
         if unit_power_tuples_included:
             dipnet_order_tokens, unit_power = dipnet_order_tokens
