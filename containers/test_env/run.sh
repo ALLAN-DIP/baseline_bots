@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # launch model server
-/model/src/model_server/run_model_server.sh &
+/model/src/model_server/baseline_bots/containers/test_env/run_model_server.sh &
 
 # ASCII art
 printf "Running ALLAN bot\n"
@@ -22,4 +22,4 @@ echo "creating game: ${game_id}"
 # create a game
 python diplomacy-playground/scripts/create_game.py --host shade.tacc.utexas.edu --game_id ${game_id} --deadline 30
 # launch bot script
-python /model/src/model_server/baseline_bots/containers/run_bot.py --host shade.tacc.utexas.edu --game_id ${game_id}
+python /model/src/model_server/baseline_bots/containers/test_env/run_bot.py --host shade.tacc.utexas.edu --game_id ${game_id}
