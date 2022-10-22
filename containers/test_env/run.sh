@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # launch model server
-/model/src/model_server/baseline_bots/containers/test_env/run_model_server.sh &
+/model/src/model_server/run_model_server.sh &
 
 # ASCII art
 printf "Running ALLAN bot\n"
