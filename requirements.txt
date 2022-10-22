@@ -5,5 +5,5 @@ git+https://github.com/trigaten/DAIDE.git
 karma_sphinx_theme
 black
 isort
-git+https://github.com/ALLAN-DIP/stance_vector.git
+git+https://github.com/ALLAN-DIP/stance_vector.git@test_stance
 numpy
