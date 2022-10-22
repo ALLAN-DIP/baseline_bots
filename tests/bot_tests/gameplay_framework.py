@@ -67,6 +67,7 @@ class GamePlay():
         if self.cur_local_message_round == self.msg_rounds:
            self.phase_init_bots()
         while self.game.get_current_phase()[-1] != 'M':
+            self.game.process()
             if self.game.is_game_done:
                 return True
 

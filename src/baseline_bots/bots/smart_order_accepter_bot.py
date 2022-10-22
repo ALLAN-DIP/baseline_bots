@@ -103,7 +103,7 @@ class SmartOrderAccepterBot(DipnetBot):
             if (
                 orders
                 and self.power_name != proposer
-                and self.stance.get_stance()[self.power_name][proposer] >= 0
+                and self.stance.stance[self.power_name][proposer] >= 0
             ):
                 if proposer == best_proposer:
                     msg = YES(
@@ -523,7 +523,6 @@ class SmartOrderAccepterBot(DipnetBot):
         orders_data.add_orders(best_orders)
         self.orders = orders_data
 
-
         # filter out aggressive orders to allies
         yield self.replace_aggressive_order_to_allies()
 
@@ -553,7 +552,6 @@ class SmartOrderAccepterBot(DipnetBot):
         msgs_data = self.gen_proposal_reply(
             best_proposer, valid_proposal_orders, msgs_data
         )
-
         # randomize dipnet orders and send random orders to enemies
         dipnet_ords = list(self.orders.orders.values())
         daide_style_orders = dipnet_to_daide_parsing(dipnet_ords, self.game)
@@ -566,7 +564,6 @@ class SmartOrderAccepterBot(DipnetBot):
         )
         for foe in foes:
             msgs_data.add_message(foe, str(random_str_orders))
-
         # generate support proposals to allies
         proposals = self.generate_support_proposals(msgs_data)
 

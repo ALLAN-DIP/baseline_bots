@@ -26,14 +26,14 @@ from baseline_bots.parsing_utils import (
 
 class TestSOABot():
     def test(self):
-        # start_io_loop(self.test_play)
+        start_io_loop(self.test_play)
         # start_io_loop(self.test_score_stance)
-        start_io_loop(self.test_action_stance)
+        # start_io_loop(self.test_action_stance)
         # start_io_loop(self.test_auxilary_functions)
         # start_io_loop(self.test_parse_proposals)
         # start_io_loop(self.test_get_best_orders)
         # start_io_loop(self.test_gen_pos_stance_messages)
-        start_io_loop(self.test_ally_move_filter)
+        # start_io_loop(self.test_ally_move_filter)
     
     @gen.coroutine
     def test_auxilary_functions(self):
@@ -85,7 +85,8 @@ class TestSOABot():
         game_play = GamePlay(game, [RandomProposerBot_AsyncBot('AUSTRIA', game), RandomProposerBot_AsyncBot('ENGLAND', game), soa_bot], 3, True)
         msgs, done = yield game_play.step()
         game_play = GamePlay(game, [RandomProposerBot_AsyncBot('AUSTRIA', game), RandomProposerBot_AsyncBot('ENGLAND', game), soa_bot], 3, True)
-        game_play.play()
+        while not game_play.game.is_game_done:
+            msgs, done = yield game_play.step()
         print('finish test_play')
         stop_io_loop()
 
