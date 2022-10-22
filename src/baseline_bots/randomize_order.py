@@ -292,9 +292,10 @@ def random_movement(order: Tuple, chance_of_move=0.5):
         random.random() < chance_of_move or tag == "RTO"
     ):  # There is a 50/50 chance of switching a move to a hold, 0 for a retreat since that may make one less believable
         all_adjacent = ADJACENCY[loc].copy()
-        all_adjacent.remove(
-            dest
-        )  # removing the already picked choice from the possible destinations
+        if dest in all_adjacent:
+            all_adjacent.remove(
+                dest
+            )  # removing the already picked choice from the possible destinations
         new_dest = random.choice(all_adjacent)
         return ((country, unit_type, loc), tag, new_dest)
     else:
@@ -362,6 +363,6 @@ def string_to_tuple(orders: str) -> Tuple:
         r"(.*?[^(])\s+?([^)].*?)", r"\1, \2", orders
     )  # inserts commas in between tuples and strings
     with_quotes = re.sub(
-        r"([(, ])([A-Z]+)([), ])", r"\1'\2'\3", with_commas
+        r"([(, ])([A-Z|\/]+)([), ])", r"\1'\2'\3", with_commas
     )  # inserts quotes around strings
     return eval(with_quotes)

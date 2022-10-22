@@ -8,16 +8,16 @@ __email__ = "sanderschulhoff@gmail.com"
 
 # from diplomacy_research.models.state_space import get_order_tokens
 import re
-import numpy as np
-from copy import deepcopy
 from collections import defaultdict
+from copy import deepcopy
 from typing import Dict, List, Tuple, Union
 
-from DAIDE import ALY, PRP, ORR, XDO, HUH, FCT
+import numpy as np
+from DAIDE import ALY, FCT, HUH, ORR, PRP, XDO
 from DAIDE.utils.exceptions import ParseError
 from diplomacy import Game, Message
-from tornado import gen
 from diplomacy.utils import strings
+from tornado import gen
 
 POWER_NAMES_DICT = {
     "RUS": "RUSSIA",
@@ -386,15 +386,15 @@ def get_state_value(bot, game, power_name, option="default"):
         for power in game.map.powers:
             if option == "samplingbeam":
                 list_order, prob_order = yield bot.brain.get_beam_orders(game, power)
-            
-                if len(list_order)>0:
+
+                if len(list_order) > 0:
                     prob_order = np.array(prob_order)
                     prob_order /= prob_order.sum()
                     orders_index = [i for i in range(len(list_order))]
                     select_index = np.random.choice(orders_index, p=prob_order)
                     orders = list_order[select_index]
                 else:
-                    orders = yield bot.brain.get_orders(game, power)                
+                    orders = yield bot.brain.get_orders(game, power)
             elif option == "default":
                 orders = yield bot.brain.get_orders(game, power)
 
@@ -419,9 +419,9 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
         best_proposer: best power that propose the best orders to a bot, this can be itself
         proposal_order[best_proposer]: the orders from the best proposer
     """
-    
+
     def __deepcopy__(game):
-        """ Fast deep copy implementation, from Paquette's game engine https://github.com/diplomacy/diplomacy """
+        """Fast deep copy implementation, from Paquette's game engine https://github.com/diplomacy/diplomacy"""
         if game.__class__.__name__ != "Game":
             cls = list(game.__class__.__bases__)[0]
             result = cls.__new__(cls)
@@ -429,14 +429,21 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
             cls = game.__class__
             result = cls.__new__(cls)
 
-
         # Deep copying
         for key in game._slots:
-            if key in ['map', 'renderer', 'powers','channel','notification_callbacks','data','__weakref__']:
+            if key in [
+                "map",
+                "renderer",
+                "powers",
+                "channel",
+                "notification_callbacks",
+                "data",
+                "__weakref__",
+            ]:
                 continue
             setattr(result, key, deepcopy(getattr(game, key)))
-        setattr(result, 'map', game.map)
-        setattr(result, 'powers', {})
+        setattr(result, "map", game.map)
+        setattr(result, "powers", {})
         for power in game.powers.values():
             result.powers[power.name] = deepcopy(power)
             setattr(result.powers[power.name], 'game', result)
@@ -460,6 +467,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
             unit_orders = get_non_aggressive_orders(
                 unit_orders, bot.power_name, bot.game
             )
+
             # set orders as a proposal order
             simulated_game.set_orders(power_name=bot.power_name, orders=unit_orders)
 
@@ -470,7 +478,9 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
                 if other_power in shared_order:
                     power_orders = shared_order[other_power]
                 else:
-                    power_orders = yield bot.brain.get_orders(simulated_game, other_power)
+                    power_orders = yield bot.brain.get_orders(
+                        simulated_game, other_power
+                    )
                 simulated_game.set_orders(power_name=other_power, orders=power_orders)
 
             # process current turn
@@ -480,29 +490,36 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
             state_value[proposer] = yield get_state_value(
                 bot, simulated_game, bot.power_name
             )
-    print("rollout for {} steps with {} dipnet orders to get state values: {}".format(bot.rollout_length, bot.rollout_n_order, state_value))
+
     # get power name that gives the max state value
     best_proposer = max(state_value, key=state_value.get)
 
     return best_proposer, proposal_order[best_proposer]
 
 
-def smart_select_support_proposals(possible_support_proposals: Dict[str, List[Tuple[str, str, str]]]):
+def smart_select_support_proposals(
+    possible_support_proposals: Dict[str, List[Tuple[str, str, str]]]
+):
     optimal_possible_support_proposals = defaultdict(list)
     optimal_ordering_units = set()
     order_proposal_mapping = defaultdict(list)
     for ord_list in possible_support_proposals.values():
         for ordering_unit, move_to_support, order in ord_list:
-            order_proposal_mapping[move_to_support].append((ordering_unit, move_to_support, order))
+            order_proposal_mapping[move_to_support].append(
+                (ordering_unit, move_to_support, order)
+            )
     order_proposal_mapping_sorted = [x for x in order_proposal_mapping.items()]
     order_proposal_mapping_sorted.sort(key=lambda x: len(x[1]), reverse=True)
     for move_to_support, order_list in order_proposal_mapping_sorted:
         for ordering_unit, move_to_support, order in order_list:
             if ordering_unit not in optimal_ordering_units:
-                optimal_possible_support_proposals[ordering_unit].append((ordering_unit, move_to_support, order))
+                optimal_possible_support_proposals[ordering_unit].append(
+                    (ordering_unit, move_to_support, order)
+                )
             if len(order_list) > 1:
                 optimal_ordering_units.add(ordering_unit)
     return optimal_possible_support_proposals
+
 
 if __name__ == "__main__":
     pass

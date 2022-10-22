@@ -21,8 +21,8 @@ from baseline_bots.utils import (
     get_order_tokens,
     get_other_powers,
     get_state_value,
-    parse_FCT,
     parse_arrangement,
+    parse_FCT,
 )
 
 

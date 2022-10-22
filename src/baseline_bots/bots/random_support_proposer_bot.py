@@ -8,7 +8,7 @@ from DAIDE import ORR, XDO
 from diplomacy import Message
 
 from baseline_bots.bots.baseline_bot import BaselineBot
-from baseline_bots.utils import get_order_tokens, OrdersData, MessagesData
+from baseline_bots.utils import MessagesData, OrdersData, get_order_tokens
 
 
 class RandomSupportProposerBot(BaselineBot):

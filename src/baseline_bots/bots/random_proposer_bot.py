@@ -3,20 +3,17 @@ __email__ = "sanderschulhoff@gmail.com"
 
 import random
 
-from DAIDE import FCT, ORR, XDO, PRP, HUH, YES
+from DAIDE import FCT, HUH, ORR, PRP, XDO, YES
 from diplomacy import Message
 from tornado import gen
 
 from baseline_bots.bots.baseline_bot import BaselineBot
-from baseline_bots.utils import MessagesData, OrdersData, get_other_powers
-
 from baseline_bots.parsing_utils import (
-    dipnet_to_daide_parsing,
     daide_to_dipnet_parsing,
-    parse_proposal_messages
+    dipnet_to_daide_parsing,
+    parse_proposal_messages,
 )
-
-
+from baseline_bots.utils import MessagesData, OrdersData, get_other_powers
 
 
 class RandomProposerBot(BaselineBot):
@@ -43,11 +40,19 @@ class RandomProposerBot(BaselineBot):
                 for loc in self.game.get_orderable_locations(other_power)
                 if possible_orders[loc]
             ]
-            suggested_random_orders = list(filter(lambda x: x != 'WAIVE', suggested_random_orders))
+            suggested_random_orders = list(
+                filter(lambda x: x != "WAIVE", suggested_random_orders)
+            )
             if len(suggested_random_orders) > 0:
-                suggested_random_orders = PRP(ORR(
-                    [XDO(order) for order in dipnet_to_daide_parsing(suggested_random_orders, self.game)]
-                )
+                suggested_random_orders = PRP(
+                    ORR(
+                        [
+                            XDO(order)
+                            for order in dipnet_to_daide_parsing(
+                                suggested_random_orders, self.game
+                            )
+                        ]
+                    )
                 )
                 # send the other power a message containing the orders
                 ret_obj.add_message(other_power, str(suggested_random_orders))
@@ -93,6 +98,7 @@ class RandomProposerBot_AsyncBot(RandomProposerBot):
         # maintain current orders
         self.orders = orders
         return {"messages": messages, "orders": orders}
+
 
 if __name__ == "__main__":
     from diplomacy import Game
