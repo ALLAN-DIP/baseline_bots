@@ -535,7 +535,9 @@ class SmartOrderAccepterBot(DipnetBot):
         msgs_data = self.gen_messages(orders_data.get_list_of_orders())
         if self.game.phase == "SPRING 1901 MOVEMENT":
             for pow in opps:
-                msgs_data.add_message(pow, f"ALY ({self.power_name} {pow}) VSS ({[country for country in list(powers.copy().keys()) if country != pow and country != self.power_name]})")
+                vss = [country for country in list(powers.copy().keys()) if country != pow and country != self.power_name]
+                vss_str = " ".join(vss)
+                msgs_data.add_message(pow, f"ALY ({self.power_name} {pow}) VSS ({vss_str})")
 
         # send ALY requests at the start of the game
         self.respond_to_invalid_orders(invalid_proposal_orders, msgs_data)
