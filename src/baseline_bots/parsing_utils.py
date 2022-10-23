@@ -65,8 +65,6 @@ def dipnet_to_daide_parsing(
 
     # Convert strings to order tokens and store a dictionary mapping of armies to be convoyed and fleets helping to convoy
     for i in range(len(dipnet_style_order_strs)):
-        if dipnet_style_order_strs == 'WAIVE':
-            continue
         if not (unit_power_tuples_included):
             dipnet_style_order_strs_tokens[i] = get_order_tokens(
                 dipnet_style_order_strs[i]
@@ -91,8 +89,6 @@ def dipnet_to_daide_parsing(
 
     # For each order
     for dipnet_order_tokens in dipnet_style_order_strs_tokens:
-        if dipnet_order_tokens is None:
-            continue
         # If unit powers are also included in the input, then update representation
         if unit_power_tuples_included:
             dipnet_order_tokens, unit_power = dipnet_order_tokens
