@@ -148,10 +148,7 @@ def dipnet_to_daide_parsing(
                     f"({' '.join(convoy_map[dipnet_order_tokens[0] + dipnet_order_tokens[1]])})"
                 )
             else:
-                daide_order.append(())
-                print(
-                    f"unexpected situation at utils.dipnet_to_daide_parsing. Found order {dipnet_order_tokens} which doesn't have convoying fleet in its own set of orders"
-                )
+                continue
         else:
             # Move orders
             daide_order.append("MTO")
