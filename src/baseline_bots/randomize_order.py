@@ -244,6 +244,9 @@ def random_support(order: Tuple) -> Tuple:
             ADJACENCY[supporter_loc],
             ADJACENCY[supported_loc],
         )
+        dest_choices = COMBOS[supporter_type][
+            supported_type
+        ]  # Set of possible destinations
         adj_to_both = [
             adjacency
             for adjacency in supporter_adjacent  # this finds all provinces adjacent to the supportee and suporter locations
@@ -252,9 +255,6 @@ def random_support(order: Tuple) -> Tuple:
         ]
         # fmt: on
         chance_of_move = 0.5  # the chance of a support hold becoming a move is 50/50
-        dest_choices = COMBOS[supporter_type][
-            supported_type
-        ]  # Set of possible destinations
         if adj_to_both and random.random() < chance_of_move:
             return (order[0], "SUP", order[2], "MTO", random.choice(adj_to_both))
         else:
