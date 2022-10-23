@@ -21,7 +21,7 @@ RUN chmod -R 777 /model/src/model_server/bot_neurips2019-sl_model
 # Clone repos
 RUN git clone https://github.com/SHADE-AI/diplomacy.git
 RUN git clone https://github.com/SHADE-AI/research.git
-RUN git clone --branch fix_gen_proposal_reply https://github.com/ALLAN-DIP/baseline_bots.git
+RUN git clone https://github.com/ALLAN-DIP/baseline_bots.git
 
 # Environment variables
 ENV PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp
