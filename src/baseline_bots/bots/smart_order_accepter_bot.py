@@ -10,6 +10,7 @@ from diplomacy import Message
 from stance_vector import ActionBasedStance, ScoreBasedStance
 import random
 import numpy as np
+from tornado import gen
 
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
@@ -490,9 +491,12 @@ class SmartOrderAccepterBot(DipnetBot):
     @gen.coroutine
     def __call__(self, rcvd_messages: List[Tuple[int, Message]]):
         # compute pos/neg stance on other bots using Tony's stance vector
-        self.stance.get_stance()
         powers = self.stance.stance[self.power_name]
-        
+
+        # avoid get_stance in the first phase of game
+        if self.game.get_current_phase()!='S1901M':
+            self.stance.get_stance()
+
         # get dipnet order
         orders = yield from self.brain.get_orders(self.game, self.power_name)
         print("debug: Fetched orders", orders)
@@ -519,6 +523,7 @@ class SmartOrderAccepterBot(DipnetBot):
         orders_data = OrdersData()
         orders_data.add_orders(best_orders)
         self.orders = orders_data
+
 
         # filter out aggressive orders to allies
         yield self.replace_aggressive_order_to_allies()
