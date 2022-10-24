@@ -568,12 +568,12 @@ class SmartOrderAccepterBot(DipnetBot):
             lst_rand = list(
                 map(lambda st: string_to_tuple("(" + st + ")"), daide_style_orders)
             )
-            randomized_orders = random_list_orders(lst_rand)
-            random_str_orders = list(
-                map(lambda ord: tuple_to_string(ord), randomized_orders)
-            )
-            for foe in foes:
-                msgs_data.add_message(foe, str(random_str_orders))
+            # randomized_orders = random_list_orders(lst_rand)
+            # random_str_orders = list(
+            #     map(lambda ord: tuple_to_string(ord), randomized_orders)
+            # )
+            # for foe in foes:
+            #     msgs_data.add_message(foe, str(random_str_orders))
             # generate support proposals to allies
             proposals = self.generate_support_proposals(msgs_data)
 
