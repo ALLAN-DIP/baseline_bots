@@ -57,7 +57,7 @@ async def test(hostname:str='localhost', port:int=8432) -> None:
 	print(games)
 
 
-async def launch(hostname:str, port:int, game_id:str, power_name:str, bot_type:str, outdir:str) -> None:
+async def launch(hostname:str, port:int, game_id:str, power_name:str, bot_type:str, sleep_delay:bool, outdir:str) -> None:
 	"""
 	Waits for dipnet model to load and then starts the bot execution
 
@@ -66,6 +66,7 @@ async def launch(hostname:str, port:int, game_id:str, power_name:str, bot_type:s
 	:param game_id: game id to connect to on host
 	:param power_name: power name of the bot to be launched
 	:param bot_type: the type of bot to be launched - NoPressDipBot/TransparentBot/SmartOrderAccepterBot/..
+	:param sleep_delay: bool to indicate if bot should sleep randomly for 1-3s before execution
 	:param outdir: the output directory where game json files should be stored
 	"""
 
