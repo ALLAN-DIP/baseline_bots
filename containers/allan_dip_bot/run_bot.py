@@ -3,8 +3,6 @@ __email__ = "kartik.shenoyy@gmail.com"
 
 import sys, os
 
-from scipy import rand
-
 sys.path.append("..") # Adds higher directory to python modules path.
 
 # inside container
