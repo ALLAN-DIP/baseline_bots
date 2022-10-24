@@ -128,7 +128,7 @@ async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str
 	while not game.is_game_done:
 
 		current_phase = game.get_current_phase()
-		await asyncio.sleep(random.random() * 2 + 1) # sleep randomly for 1-3s
+		await asyncio.sleep(random.random() * 2 + 1) # sleep randomly for 1-3s before retrieving new messages for the power
 
 		# Retrieve messages
 		rcvd_messages = game.filter_messages(messages=game.messages, game_role=bot.power_name)
@@ -146,18 +146,18 @@ async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str
 
 
 			# If messages are to be sent, send them
-			if messages_data and messages_data.messages:
-				to_send_msgs[bot.power_name] = messages_data.messages
+			# if messages_data and messages_data.messages:
+			# 	to_send_msgs[bot.power_name] = messages_data.messages
 
-			for sender in to_send_msgs:
-				for msg in to_send_msgs[sender]:
-					msg_obj = Message(
-						sender=sender,
-						recipient=msg['recipient'],
-						message=msg['message'],
-						phase=game.get_current_phase(),
-					)
-					await game.send_game_message(message=msg_obj)
+			# for sender in to_send_msgs:
+			# 	for msg in to_send_msgs[sender]:
+			# 		msg_obj = Message(
+			# 			sender=sender,
+			# 			recipient=msg['recipient'],
+			# 			message=msg['message'],
+			# 			phase=game.get_current_phase(),
+			# 		)
+			# 		await game.send_game_message(message=msg_obj)
 
 			if len(to_send_msgs):
 				print(f"Messages sent: {len(to_send_msgs)}")
