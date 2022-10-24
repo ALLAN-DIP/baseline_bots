@@ -54,8 +54,7 @@ RUN pip install --upgrade pip
 RUN pip install -r /model/src/model_server/baseline_bots/requirements.txt
 RUN pip install -e /model/src/model_server/baseline_bots
 
-RUN pytest /model/src/model_server/baseline_bots/tests/utils_test.py
-RUN pytest /model/src/model_server/baseline_bots/tests/randomize_order_test.py
+RUN pytest /model/src/model_server/baseline_bots/tests/
 
 # Install diplomacy research requirements
 WORKDIR /model/src/model_server/research
