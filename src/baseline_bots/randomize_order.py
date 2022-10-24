@@ -76,7 +76,7 @@ def random_list_orders(orders: List) -> List:
     )  # this returns a list of tuples representing correspondences or an empty list
 
     if correspondences:
-        cor_orders = orders
+        cor_orders = orders.copy()
         replacements = (
             []
         )  # this represents the orders that the corresponding orders will get replaced with
@@ -89,7 +89,8 @@ def random_list_orders(orders: List) -> List:
                     )  # the corresponding order is replaced with a HLD or MTO order
                 elif move[1] == "SUP":
                     cor_orders.remove(move)  # the corresponding are removed
-                    cor_orders.remove((move[2], move[3], move[4]))
+                    if (move[2], move[3], move[4]) in cor_orders:
+                        cor_orders.remove((move[2], move[3], move[4]))
                     if len(move) <= 3:  # if it is supporting a hold
                         replacements.append((move[2], move[1], move[0]))
                     else:  # if it is supporting a move
@@ -244,6 +245,9 @@ def random_support(order: Tuple) -> Tuple:
             ADJACENCY[supporter_loc],
             ADJACENCY[supported_loc],
         )
+        dest_choices = COMBOS[supporter_type][
+            supported_type
+        ]  # Set of possible destinations
         adj_to_both = [
             adjacency
             for adjacency in supporter_adjacent  # this finds all provinces adjacent to the supportee and suporter locations
@@ -252,9 +256,6 @@ def random_support(order: Tuple) -> Tuple:
         ]
         # fmt: on
         chance_of_move = 0.5  # the chance of a support hold becoming a move is 50/50
-        dest_choices = COMBOS[supporter_type][
-            supported_type
-        ]  # Set of possible destinations
         if adj_to_both and random.random() < chance_of_move:
             return (order[0], "SUP", order[2], "MTO", random.choice(adj_to_both))
         else:
