@@ -76,7 +76,7 @@ def random_list_orders(orders: List) -> List:
     )  # this returns a list of tuples representing correspondences or an empty list
 
     if correspondences:
-        cor_orders = orders
+        cor_orders = orders.copy()
         replacements = (
             []
         )  # this represents the orders that the corresponding orders will get replaced with
@@ -89,7 +89,8 @@ def random_list_orders(orders: List) -> List:
                     )  # the corresponding order is replaced with a HLD or MTO order
                 elif move[1] == "SUP":
                     cor_orders.remove(move)  # the corresponding are removed
-                    cor_orders.remove((move[2], move[3], move[4]))
+                    if (move[2], move[3], move[4]) in cor_orders:
+                        cor_orders.remove((move[2], move[3], move[4]))
                     if len(move) <= 3:  # if it is supporting a hold
                         replacements.append((move[2], move[1], move[0]))
                     else:  # if it is supporting a move
