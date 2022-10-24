@@ -161,8 +161,8 @@ async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str
 			# 		)
 			# 		await game.send_game_message(message=msg_obj)
 
-			if len(to_send_msgs):
-				print(f"Messages sent: {len(to_send_msgs)}")
+			if len(messages_data.messages):
+				print(f"Messages sent: {len(messages_data.messages)}")
 
 			# If orders are present, send them
 			if orders_data is not None:
