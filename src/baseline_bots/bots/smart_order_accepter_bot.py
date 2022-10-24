@@ -569,7 +569,7 @@ class SmartOrderAccepterBot(DipnetBot):
             msgs_data = yield self.gen_proposal_reply(
                 best_proposer, valid_proposal_orders, msgs_data
             )
-            
+
             # fmt: off
             allies = [pow for pow in powers if (pow != self.power_name and powers[pow] >= self.ally_threshold)]
             foes = [pow for pow in powers if (pow != self.power_name and powers[pow] < 0)]
@@ -594,6 +594,6 @@ class SmartOrderAccepterBot(DipnetBot):
             # for foe in foes:
             #     msgs_data.add_message(foe, str(random_str_orders))
             # generate support proposals to allies
-            proposals = self.generate_support_proposals(msgs_data)
+            proposals = yield self.generate_support_proposals(msgs_data)
 
         return {"messages": msgs_data, "orders": orders_data.get_list_of_orders()}
