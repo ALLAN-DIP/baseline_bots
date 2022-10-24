@@ -511,7 +511,7 @@ class SmartOrderAccepterBot(DipnetBot):
         if self.game.get_current_phase()!='S1901M':
             self.stance.get_stance()
         print(f"Stance vector for {self.power_name}")
-        print(self.stance.stance)
+        print(self.stance.stance[self.power_name])
             
         powers = self.stance.stance[self.power_name]
 
