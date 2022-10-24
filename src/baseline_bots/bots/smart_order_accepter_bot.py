@@ -530,7 +530,7 @@ class SmartOrderAccepterBot(DipnetBot):
             
             # add orders
             
-            orders_data.add_orders(best_orders)
+            orders_data.add_orders(best_orders, overwrite=True)
             self.orders = orders_data
 
             # filter out aggressive orders to allies
