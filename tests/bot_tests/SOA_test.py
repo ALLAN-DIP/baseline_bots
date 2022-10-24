@@ -82,9 +82,9 @@ class TestSOABot():
     def test_play(self):
         game = Game()
         soa_bot = SmartOrderAccepterBot('FRANCE', game)
-        game_play = GamePlay(game, [RandomProposerBot_AsyncBot('AUSTRIA', game), RandomProposerBot_AsyncBot('ENGLAND', game), soa_bot], 3, True)
+        game_play = GamePlay(game, [SmartOrderAccepterBot('TURKEY', game), RandomProposerBot_AsyncBot('AUSTRIA', game), RandomProposerBot_AsyncBot('ENGLAND', game), soa_bot], 3, True)
         msgs, done = yield game_play.step()
-        game_play = GamePlay(game, [RandomProposerBot_AsyncBot('AUSTRIA', game), RandomProposerBot_AsyncBot('ENGLAND', game), soa_bot], 3, True)
+        game_play = GamePlay(game, [SmartOrderAccepterBot('TURKEY', game),RandomProposerBot_AsyncBot('AUSTRIA', game), RandomProposerBot_AsyncBot('ENGLAND', game), soa_bot], 3, True)
         while not game_play.game.is_game_done:
             msgs, done = yield game_play.step()
         print('finish test_play')
