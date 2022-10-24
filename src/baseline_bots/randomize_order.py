@@ -178,9 +178,7 @@ def random_convoy_to(order: Tuple) -> Tuple:
     :rtype: Tuple
     """
     (_, _, amy_loc), _, province, _, (sea_provinces) = order
-    print(order)
     sea_provinces = list(reversed(sea_provinces))
-    print(sea_provinces)
     for i, sea in enumerate(
         sea_provinces
     ):  # searches through the sea provinces in reversed order to find the longest possible alternate convoy
