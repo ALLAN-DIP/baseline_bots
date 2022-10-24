@@ -81,10 +81,11 @@ class TestSOABot():
     @gen.coroutine
     def test_play(self):
         game = Game()
-        soa_bot = SmartOrderAccepterBot('FRANCE', game)
-        game_play = GamePlay(game, [SmartOrderAccepterBot('TURKEY', game), RandomProposerBot_AsyncBot('AUSTRIA', game), RandomProposerBot_AsyncBot('ENGLAND', game), soa_bot], 3, True)
+        soa_bot1 = SmartOrderAccepterBot('FRANCE', game)
+        soa_bot2 = SmartOrderAccepterBot('RUSSIA', game)
+        game_play = GamePlay(game, [RandomProposerBot_AsyncBot('AUSTRIA', game), RandomProposerBot_AsyncBot('ENGLAND', game), soa_bot1, soa_bot2, RandomProposerBot_AsyncBot('GERMANY', game), RandomProposerBot_AsyncBot('ITALY', game), RandomProposerBot_AsyncBot('TURKEY', game)], 3, True)
         msgs, done = yield game_play.step()
-        game_play = GamePlay(game, [SmartOrderAccepterBot('TURKEY', game),RandomProposerBot_AsyncBot('AUSTRIA', game), RandomProposerBot_AsyncBot('ENGLAND', game), soa_bot], 3, True)
+        game_play = GamePlay(game, [RandomProposerBot_AsyncBot('AUSTRIA', game), RandomProposerBot_AsyncBot('ENGLAND', game), soa_bot1, soa_bot2, RandomProposerBot_AsyncBot('GERMANY', game), RandomProposerBot_AsyncBot('ITALY', game), RandomProposerBot_AsyncBot('TURKEY', game)], 3, True)
         while not game_play.game.is_game_done:
             msgs, done = yield game_play.step()
         print('finish test_play')
