@@ -131,6 +131,7 @@ async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str
 		if sleep_delay:
 			await asyncio.sleep(random.random() * 2 + 1) # sleep randomly for 1-3s before retrieving new messages for the power
 
+		phase_start_time = time.time()
 		# Retrieve messages
 		rcvd_messages = game.filter_messages(messages=game.messages, game_role=bot.power_name)
 		rcvd_messages = list(rcvd_messages.items())
@@ -170,6 +171,8 @@ async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str
 			print("Phase: " + current_phase)
 			print("Orders: ")
 			print(orders_data)
+		phase_end_time = time.time()
+		print(f"Time taken for phase {current_phase}: {phase_end_time - phase_start_time}s")
 
 		while current_phase == game.get_current_phase():
 			await asyncio.sleep(2)
