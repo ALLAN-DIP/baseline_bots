@@ -89,7 +89,7 @@ def dipnet_to_daide_parsing(
 
     # For each order
     for dipnet_order_tokens in dipnet_style_order_strs_tokens:
-
+    
         # If unit powers are also included in the input, then update representation
         if unit_power_tuples_included:
             dipnet_order_tokens, unit_power = dipnet_order_tokens
@@ -151,6 +151,7 @@ def dipnet_to_daide_parsing(
                 print(
                     f"unexpected situation at utils.dipnet_to_daide_parsing. Found order {dipnet_order_tokens} which doesn't have convoying fleet in its own set of orders"
                 )
+                continue
         else:
             # Move orders
             daide_order.append("MTO")

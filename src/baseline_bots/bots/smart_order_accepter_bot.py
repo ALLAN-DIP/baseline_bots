@@ -103,7 +103,7 @@ class SmartOrderAccepterBot(DipnetBot):
             if (
                 orders
                 and self.power_name != proposer
-                and self.stance.get_stance()[self.power_name][proposer] >= 0
+                and self.stance.stance[self.power_name][proposer] >= 0
             ):
                 if proposer == best_proposer:
                     msg = YES(
@@ -495,6 +495,8 @@ class SmartOrderAccepterBot(DipnetBot):
         # avoid get_stance in the first phase of game
         if self.game.get_current_phase()!='S1901M':
             self.stance.get_stance()
+            
+        powers = self.stance.stance[self.power_name]
 
         # get dipnet order
         orders = yield from self.brain.get_orders(self.game, self.power_name)
@@ -523,37 +525,35 @@ class SmartOrderAccepterBot(DipnetBot):
         orders_data.add_orders(best_orders)
         self.orders = orders_data
 
-
         # filter out aggressive orders to allies
         yield self.replace_aggressive_order_to_allies()
 
         # generate messages for FCT sharing info orders
+        opps = list(powers.keys()).copy()
+        opps.remove(self.power_name) # list of opposing powers
         msgs_data = self.gen_messages(orders_data.get_list_of_orders())
+        if self.game.phase == "SPRING 1901 MOVEMENT":
+            for pow in opps:
+                vss = [country for country in list(powers.copy().keys()) if country != pow and country != self.power_name]
+                vss_str = " ".join(vss)
+                msgs_data.add_message(pow, f"ALY ({self.power_name} {pow}) VSS ({vss_str})")
+
+        # send ALY requests at the start of the game
         self.respond_to_invalid_orders(invalid_proposal_orders, msgs_data)
         self.respond_to_alliance_messages(msgs_data)
         # fmt: off
-        allies = [pow for pow in self.stance.stance[self.power_name] 
-            if (pow != self.power_name and self.stance.stance[self.power_name][pow] > 0)]
-        foes = [pow for pow in self.stance.stance[self.power_name]
-            if (pow != self.power_name and self.stance.stance[self.power_name][pow] < 0)]
-        nuetral = [pow for pow in self.stance.stance[self.power_name] 
-            if (pow != self.power_name and self.stance.stance[self.power_name][pow] == 0)]
-        msg_allies = ",".join(allies)
-        msg_foes = ",".join(foes)
-        msg_neutral = ",".join(nuetral)
+        allies = [pow for pow in powers if (pow != self.power_name and powers[pow] > 0)]
+        foes = [pow for pow in powers if (pow != self.power_name and powers[pow] < 0)]
+        neutral = [pow for pow in powers if (pow != self.power_name and powers[pow] == 0)]
+        msg_allies, msg_foes, msg_neutral = ','.join(allies), ','.join(foes), ','.join(neutral)
+        msgs_data.add_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
+                        {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
         # fmt: on
-        msgs_data.add_message(
-            "GLOBAL",
-            str(
-                f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
-                        {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"
-            ),
-        )
+
         # generate proposal response YES/NO to allies
         msgs_data = self.gen_proposal_reply(
             best_proposer, valid_proposal_orders, msgs_data
         )
-
         # randomize dipnet orders and send random orders to enemies
         dipnet_ords = list(self.orders.orders.values())
         daide_style_orders = dipnet_to_daide_parsing(dipnet_ords, self.game)
@@ -566,7 +566,6 @@ class SmartOrderAccepterBot(DipnetBot):
         )
         for foe in foes:
             msgs_data.add_message(foe, str(random_str_orders))
-
         # generate support proposals to allies
         proposals = self.generate_support_proposals(msgs_data)
 
