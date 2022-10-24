@@ -500,73 +500,81 @@ class SmartOrderAccepterBot(DipnetBot):
 
         # get dipnet order
         orders = yield from self.brain.get_orders(self.game, self.power_name)
+        orders_data = OrdersData()
+        orders_data.add_orders(orders)
+
+        msgs_data = MessagesData()
+
         print("debug: Fetched orders", orders)
 
-        # parse the proposal messages received by the bot
-        parsed_messages_dict = parse_proposal_messages(
-            rcvd_messages, self.game, self.power_name
-        )
-        valid_proposal_orders = parsed_messages_dict["valid_proposals"]
-        invalid_proposal_orders = parsed_messages_dict["invalid_proposals"]
-        shared_orders = parsed_messages_dict["shared_orders"]
-        other_orders = parsed_messages_dict["other_orders"]
-        self.alliances = parsed_messages_dict["alliance_proposals"]
+        # only in movement phase, we send PRP/ALY/FCT and consider get_best_proposer
+        if self.game.get_current_phase()[-1]=='M':
 
-        # include base order to prp_orders.
-        # This is to avoid having double calculation for the best list of orders between (self-generated) base orders vs proposal orders
-        # e.g. if we are playing as ENG and the base orders are generated from DipNet, we would want to consider
-        # if there is any better proposal orders that has a state value more than ours, then do it. If not, just follow the base orders.
-        valid_proposal_orders[self.power_name] = orders
+            # parse the proposal messages received by the bot
+            parsed_messages_dict = parse_proposal_messages(
+                rcvd_messages, self.game, self.power_name
+            )
+            valid_proposal_orders = parsed_messages_dict["valid_proposals"]
+            invalid_proposal_orders = parsed_messages_dict["invalid_proposals"]
+            shared_orders = parsed_messages_dict["shared_orders"]
+            other_orders = parsed_messages_dict["other_orders"]
+            self.alliances = parsed_messages_dict["alliance_proposals"]
 
-        best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
-        
-        # add orders
-        orders_data = OrdersData()
-        orders_data.add_orders(best_orders)
-        self.orders = orders_data
+            # include base order to prp_orders.
+            # This is to avoid having double calculation for the best list of orders between (self-generated) base orders vs proposal orders
+            # e.g. if we are playing as ENG and the base orders are generated from DipNet, we would want to consider
+            # if there is any better proposal orders that has a state value more than ours, then do it. If not, just follow the base orders.
+            valid_proposal_orders[self.power_name] = orders
 
-        # filter out aggressive orders to allies
-        yield self.replace_aggressive_order_to_allies()
+            best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
+            
+            # add orders
+            
+            orders_data.add_orders(best_orders)
+            self.orders = orders_data
 
-        # generate messages for FCT sharing info orders
-        opps = list(powers.keys()).copy()
-        opps.remove(self.power_name) # list of opposing powers
-        msgs_data = self.gen_messages(orders_data.get_list_of_orders())
-        if self.game.phase == "SPRING 1901 MOVEMENT":
-            for pow in opps:
-                vss = [country for country in list(powers.copy().keys()) if country != pow and country != self.power_name]
-                vss_str = " ".join(vss)
-                msgs_data.add_message(pow, f"ALY ({self.power_name} {pow}) VSS ({vss_str})")
+            # filter out aggressive orders to allies
+            yield self.replace_aggressive_order_to_allies()
 
-        # send ALY requests at the start of the game
-        self.respond_to_invalid_orders(invalid_proposal_orders, msgs_data)
-        self.respond_to_alliance_messages(msgs_data)
-        # fmt: off
-        allies = [pow for pow in powers if (pow != self.power_name and powers[pow] > 0)]
-        foes = [pow for pow in powers if (pow != self.power_name and powers[pow] < 0)]
-        neutral = [pow for pow in powers if (pow != self.power_name and powers[pow] == 0)]
-        msg_allies, msg_foes, msg_neutral = ','.join(allies), ','.join(foes), ','.join(neutral)
-        msgs_data.add_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
-                        {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
-        # fmt: on
+            # generate messages for FCT sharing info orders
+            opps = list(powers.keys()).copy()
+            opps.remove(self.power_name) # list of opposing powers
+            msgs_data = self.gen_messages(orders_data.get_list_of_orders())
+            if self.game.phase == "SPRING 1901 MOVEMENT":
+                for pow in opps:
+                    vss = [country for country in list(powers.copy().keys()) if country != pow and country != self.power_name]
+                    vss_str = " ".join(vss)
+                    msgs_data.add_message(pow, f"ALY ({self.power_name} {pow}) VSS ({vss_str})")
 
-        # generate proposal response YES/NO to allies
-        msgs_data = self.gen_proposal_reply(
-            best_proposer, valid_proposal_orders, msgs_data
-        )
-        # randomize dipnet orders and send random orders to enemies
-        dipnet_ords = list(self.orders.orders.values())
-        daide_style_orders = dipnet_to_daide_parsing(dipnet_ords, self.game)
-        lst_rand = list(
-            map(lambda st: string_to_tuple("(" + st + ")"), daide_style_orders)
-        )
-        randomized_orders = random_list_orders(lst_rand)
-        random_str_orders = list(
-            map(lambda ord: tuple_to_string(ord), randomized_orders)
-        )
-        for foe in foes:
-            msgs_data.add_message(foe, str(random_str_orders))
-        # generate support proposals to allies
-        proposals = self.generate_support_proposals(msgs_data)
+            # send ALY requests at the start of the game
+            self.respond_to_invalid_orders(invalid_proposal_orders, msgs_data)
+            self.respond_to_alliance_messages(msgs_data)
+            # fmt: off
+            allies = [pow for pow in powers if (pow != self.power_name and powers[pow] > 0)]
+            foes = [pow for pow in powers if (pow != self.power_name and powers[pow] < 0)]
+            neutral = [pow for pow in powers if (pow != self.power_name and powers[pow] == 0)]
+            msg_allies, msg_foes, msg_neutral = ','.join(allies), ','.join(foes), ','.join(neutral)
+            msgs_data.add_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
+                            {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
+            # fmt: on
+
+            # generate proposal response YES/NO to allies
+            msgs_data = self.gen_proposal_reply(
+                best_proposer, valid_proposal_orders, msgs_data
+            )
+            # randomize dipnet orders and send random orders to enemies
+            dipnet_ords = list(self.orders.orders.values())
+            daide_style_orders = dipnet_to_daide_parsing(dipnet_ords, self.game)
+            lst_rand = list(
+                map(lambda st: string_to_tuple("(" + st + ")"), daide_style_orders)
+            )
+            randomized_orders = random_list_orders(lst_rand)
+            random_str_orders = list(
+                map(lambda ord: tuple_to_string(ord), randomized_orders)
+            )
+            for foe in foes:
+                msgs_data.add_message(foe, str(random_str_orders))
+            # generate support proposals to allies
+            proposals = self.generate_support_proposals(msgs_data)
 
         return {"messages": msgs_data, "orders": orders_data.get_list_of_orders()}
