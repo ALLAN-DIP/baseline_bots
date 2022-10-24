@@ -18,19 +18,13 @@ RUN chmod -R 777 /model/src/model_server/bot_neurips2019-sl_model
 
 # TODO: Get this to work for RL model as well
 
-# Avoid pip issues
-RUN pip install --upgrade pip
-
 # Clone repos
 RUN git clone https://github.com/SHADE-AI/diplomacy.git
 RUN git clone https://github.com/SHADE-AI/research.git
 RUN mkdir /model/src/model_server/baseline_bots
 
 # Run pytests
-RUN pip install -r requirements.txt
-RUN pip install -e .
-RUN pytest tests/utils_test.py
-RUN pytest tests/randomize_order_test.py
+
 
 COPY . /model/src/model_server/baseline_bots
 
@@ -52,6 +46,16 @@ ENV PAD_VARIABLE_LENGTH_INPUTS='true'
 RUN git config --global --add safe.directory /model/src/model_server/diplomacy
 RUN git config --global --add safe.directory /model/src/model_server/research
 RUN git config --global --add safe.directory /model/src/model_server/baseline_bots
+
+# Avoid pip issues
+RUN pip install --upgrade pip
+
+# pytest
+RUN pip install -r /model/src/model_server/baseline_bots/requirements.txt
+RUN pip install -e /model/src/model_server/baseline_bots
+
+RUN pytest tests/utils_test.py
+RUN pytest tests/randomize_order_test.py
 
 # Install diplomacy research requirements
 WORKDIR /model/src/model_server/research
