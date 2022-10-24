@@ -395,10 +395,12 @@ class SmartOrderAccepterBot(DipnetBot):
     def is_order_aggressive_to_powers(self, order: str, powers: List[str]):
         """
         check if the order is aggressive by
-        1. to attack allies unit
-        2. to move to allies' SC
-        3. support attack allies unit
-        4. support move to allies' SC
+        1. to attack ally unit
+        2. to move to ally SC
+        3. support attack ally unit
+        4. support move to ally SC
+        5. convoy attack ally unit
+        6. convoy move to ally SC
 
         :param order: an order as string, e.g. "A BUD S F TRI"
         :param powers: powers that we want to check if a bot is having aggressive move to
@@ -427,10 +429,23 @@ class SmartOrderAccepterBot(DipnetBot):
                 order_unit = order_token[2][0] + order_token[3][1:]
                 for power in powers:
                     if self.power_name != power:
-                        # if the order is to attack allies' units
+                        # if the order is to support attack allies' units
                         if order_unit in self.game.powers[power].units:
                             return True
-                        # if the order is a move to allies' SC
+                        # if the order is a support move to allies' SC
+                        if order_token[3][2:] in self.game.powers[power].centers:
+                            return True
+                        # for 3 and 4
+
+            if order_token[1][0] == "C":
+                # if convoy
+                order_unit = order_token[2][0] + order_token[3][1:]
+                for power in powers:
+                    if self.power_name != power:
+                        # if the order is to convoy attack allies' units
+                        if order_unit in self.game.powers[power].units:
+                            return True
+                        # if the order is a convoy move to allies' SC
                         if order_token[3][2:] in self.game.powers[power].centers:
                             return True
         return False
@@ -497,6 +512,8 @@ class SmartOrderAccepterBot(DipnetBot):
             self.stance.get_stance()
             
         powers = self.stance.stance[self.power_name]
+
+        print('current stance: ', powers)
 
         # get dipnet order
         orders = yield from self.brain.get_orders(self.game, self.power_name)
