@@ -130,6 +130,13 @@ async def play(
 
         current_phase = game.get_current_phase()
 
+        # break if dipnet bots are halted
+        if current_phase == "F1950M":
+            print("-----------------")
+            print("DipNetSL halted at F1950M")
+            print("-----------------")
+            break
+
         # Retrieve messages
         rcvd_messages = game.filter_messages(
             messages=game.messages, game_role=bot.power_name
