@@ -3,6 +3,8 @@ __email__ = "kartik.shenoyy@gmail.com"
 
 import sys, os
 
+from scipy import rand
+
 sys.path.append("..") # Adds higher directory to python modules path.
 
 # inside container
@@ -15,6 +17,7 @@ import asyncio
 import ujson as json
 from tornado import gen
 from diplomacy import Game, connect, Message
+import random
 
 # import required bots
 from baseline_bots.bots.dipnet.no_press_bot import NoPressDipBot
@@ -125,6 +128,7 @@ async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str
 	while not game.is_game_done:
 
 		current_phase = game.get_current_phase()
+		await asyncio.sleep(random.random() * 2 + 1) # sleep randomly for 1-3s
 
 		# Retrieve messages
 		rcvd_messages = game.filter_messages(messages=game.messages, game_role=bot.power_name)
