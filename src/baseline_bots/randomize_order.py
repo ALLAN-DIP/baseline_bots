@@ -178,7 +178,9 @@ def random_convoy_to(order: Tuple) -> Tuple:
     :rtype: Tuple
     """
     (_, _, amy_loc), _, province, _, (sea_provinces) = order
+    print(order)
     sea_provinces = list(reversed(sea_provinces))
+    print(sea_provinces)
     for i, sea in enumerate(
         sea_provinces
     ):  # searches through the sea provinces in reversed order to find the longest possible alternate convoy
@@ -212,7 +214,7 @@ def random_convoy(order: Tuple) -> Tuple:
     """
     # fmt: off
     tag = order[1]
-    ((amy_country, amy_type, amy_loc), _, (flt_country, flt_type, flt_loc), _, province) = order
+    ((flt_country, flt_type, flt_loc), _, (amy_country, amy_type, amy_loc), _, province) = order
     assert (amy_type == "AMY" and flt_type == "FLT"), "The unit type is neither army nor fleet so it is invalid."
     # It is necessary to check whether a possible alternate "convoy-to" location is adjacent to the unit being convoyed
     # since convoying to a province adjacent to you would be less believable
