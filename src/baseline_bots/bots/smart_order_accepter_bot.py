@@ -560,7 +560,7 @@ class SmartOrderAccepterBot(DipnetBot):
 
             # GLOBAL message and filter aggressive moves to allies are disabled in S1901M
             if self.game.get_current_phase()!='S1901M':
-                msg_allies, msg_foes, msg_neutral = ','.join(allies), ','.join(foes), ','.join(neutral)
+                msg_allies, msg_foes, msg_neutral = ','.join(self.allies), ','.join(self.foes), ','.join(self.neutral)
                 msgs_data.add_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
                                 {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
                 yield self.send_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
