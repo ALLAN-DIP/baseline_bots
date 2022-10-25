@@ -41,7 +41,7 @@ def dipnet_to_daide_parsing(
         """
         if "/" in prov:
             prov = prov.replace("/", " ")
-            prov = prov.append("S")
+            prov = prov + "S"
             prov = "(" + prov + ")"
         return prov
 
