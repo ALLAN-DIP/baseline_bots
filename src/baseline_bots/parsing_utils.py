@@ -30,6 +30,21 @@ def dipnet_to_daide_parsing(
     :return: DAIDE style order string
     """
 
+    def expand_prov_coast(prov: str) -> str:
+        """
+        If `prov` is a coastal province, expand coastal province from dipnet to DAIDE format
+        Else return original `prov`
+        E.g.
+        BUL/EC         --> BUL ECS
+        STP/SC         --> STP SCS
+        PAR            --> PAR
+        """
+        if "/" in prov:
+            prov = prov.replace("/", " ")
+            prov = prov.append("S")
+            prov = "(" + prov + ")"
+        return prov
+
     def daidefy_suborder(dipnet_suborder: str) -> str:
         """
         Translates dipnet style units to DAIDE style units
@@ -46,14 +61,19 @@ def dipnet_to_daide_parsing(
             raise Exception(
                 f"error from utils.dipnet_to_daide_parsing: unit {dipnet_suborder} not present in unit_game_mapping"
             )
+        
+        power = unit_game_mapping[dipnet_suborder]
+        unit_type = "AMY" if dipnet_suborder[0] == "A" else "FLT"
+        unit = expand_prov_coast(dipnet_suborder.split()[-1])
+
         return (
             "("
             + (
                 " ".join(
                     [
-                        unit_game_mapping[dipnet_suborder],
-                        "AMY" if dipnet_suborder[0] == "A" else "FLT",
-                        dipnet_suborder.split()[-1],
+                        power,
+                        unit_type,
+                        unit,
                     ]
                 )
             )
@@ -124,11 +144,12 @@ def dipnet_to_daide_parsing(
 
             if len(dipnet_order_tokens) == 4 and dipnet_order_tokens[3] != "H":
                 daide_order.append("MTO")
-                daide_order.append(dipnet_order_tokens[3].split()[-1])
+                daide_order.append(expand_prov_coast(dipnet_order_tokens[3].split()[-1]))
             elif len(dipnet_order_tokens) > 4:
-                raise Exception(
+                print(
                     f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
                 )
+                continue
         elif dipnet_order_tokens[1] == "H":
             # Hold orders
             daide_order.append("HLD")
@@ -137,11 +158,11 @@ def dipnet_to_daide_parsing(
             daide_order.append("CVY")
             daide_order.append(daidefy_suborder(dipnet_order_tokens[2]))
             daide_order.append("CTO")
-            daide_order.append(dipnet_order_tokens[3].split()[-1])
+            daide_order.append(expand_prov_coast(dipnet_order_tokens[3].split()[-1]))
         elif len(dipnet_order_tokens) >= 3 and dipnet_order_tokens[2] == "VIA":
             # VIA/CTO orders
             daide_order.append("CTO")
-            daide_order.append(dipnet_order_tokens[1].split()[-1])
+            daide_order.append(expand_prov_coast(dipnet_order_tokens[1].split()[-1]))
             daide_order.append("VIA")
             if dipnet_order_tokens[0] + dipnet_order_tokens[1] in convoy_map:
                 daide_order.append(
@@ -155,11 +176,12 @@ def dipnet_to_daide_parsing(
         else:
             # Move orders
             daide_order.append("MTO")
-            daide_order.append(dipnet_order_tokens[1].split()[-1])
+            daide_order.append(expand_prov_coast(dipnet_order_tokens[1].split()[-1]))
             if len(dipnet_order_tokens) > 2:
-                raise Exception(
+                print(
                     f"error from utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
                 )
+                continue
         daide_orders.append(" ".join(daide_order))
 
     return daide_orders
@@ -179,7 +201,7 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
         """
         Split the string based on parenthesis or spaces
         E.g.
-        "(FRA AMY PAR) SUP (FRA AMY MAR) MTO BUR" --> "(FRA AMY PAR)", "SUP", "(FRA AMY MAR)", "MTO", "BUR"
+        "(FRA AMY PAR) SUP (FRA AMY MAR) MTO BUR" --> "FRA AMY PAR", "SUP", "FRA AMY MAR", "MTO", "BUR"
 
         :param daide_style_order_str: DAIDE style string
         :return: list of strings containing components of the order which makes it easy to convert to dipnet-style order
@@ -203,6 +225,19 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
 
     daide_style_order_groups = split_into_groups(daide_style_order_str)
 
+    def compress_prov_coast(prov: str) -> str:
+        """
+        If `prov` is a coastal province, compress coastal province from DAIDE to dipnet format
+        Else return original `prov`
+        E.g.
+        BUL ECS         --> BUL/EC
+        STP SCS         --> STP/SC
+        PAR             --> PAR
+        """
+        if prov.split() == 2:
+            prov = "".join(prov.split())[:-1]
+        return prov
+
     def dipnetify_suborder(suborder: str) -> str:
         """
         Translates DAIDE style units to dipnet style units
@@ -210,9 +245,9 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
         :param suborder: DAIDE-style suborder to be encoded
         :return: dipnet suborder
         """
-        suborder_tokens = suborder.split()
+        suborder_tokens = split_into_groups(suborder)
         try:
-            ans = suborder_tokens[1][0] + " " + suborder_tokens[2]
+            ans = suborder_tokens[1][0] + " " + compress_prov_coast(suborder_tokens[2])
         except Exception:
             raise Exception(f"Failed for suborder: {suborder_tokens}")
         return ans, suborder_tokens[0]
@@ -228,37 +263,40 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
         dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2])[0])
         if len(daide_style_order_groups) == 5 and daide_style_order_groups[3] == "MTO":
             dipnet_order.append("-")
-            dipnet_order.append(daide_style_order_groups[4])
+            dipnet_order.append(compress_prov_coast(daide_style_order_groups[4]))
         elif len(daide_style_order_groups) > 5:
-            raise Exception(
+            print(
                 f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
             )
+            return None
     elif daide_style_order_groups[1] == "HLD":
         # Hold order
         dipnet_order.append("H")
     elif daide_style_order_groups[1] == "CTO":
         # CTO order
         dipnet_order.append("-")
-        dipnet_order.append(daide_style_order_groups[2])
+        dipnet_order.append(compress_prov_coast(daide_style_order_groups[2]))
         dipnet_order.append("VIA")
     elif daide_style_order_groups[1] == "CVY":
         # Convoy order
         dipnet_order.append("C")
         dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2])[0])
         dipnet_order.append("-")
-        dipnet_order.append(daide_style_order_groups[4])
+        dipnet_order.append(compress_prov_coast(daide_style_order_groups[4]))
     elif daide_style_order_groups[1] == "MTO":
         # Move orders
         dipnet_order.append("-")
-        dipnet_order.append(daide_style_order_groups[2])
+        dipnet_order.append(compress_prov_coast(daide_style_order_groups[2]))
         if len(daide_style_order_groups) > 3:
-            raise Exception(
+            print(
                 f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
             )
+            return None
     else:
-        raise Exception(
+        print(
             f"error from utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
         )
+        return None
 
     return " ".join(dipnet_order), unit_power
 
@@ -312,7 +350,9 @@ def parse_proposal_messages(
                 ]
             for order_type, order in daide_style_orders:
                 if order_type == "XDO":
-                    proposals[order_msg.sender].append(daide_to_dipnet_parsing(order))
+                    temp_message = daide_to_dipnet_parsing(order)
+                    if temp_message:
+                        proposals[order_msg.sender].append(temp_message)
                 elif order_type == "ALY":
                     for ally in parse_alliance_proposal(order, power_name):
                         alliance_proposals[ally].append((order_msg.sender, order))

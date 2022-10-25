@@ -1,4 +1,4 @@
-from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, parse_FCT, parse_PRP, parse_arrangement, smart_select_support_proposals
+from baseline_bots.utils import OrdersData, sort_messages_by_most_recent, parse_FCT, parse_PRP, parse_arrangement, smart_select_support_proposals, get_order_tokens
 from baseline_bots.parsing_utils import dipnet_to_daide_parsing, daide_to_dipnet_parsing, parse_proposal_messages
 from diplomacy import Game, Message
 
@@ -47,15 +47,25 @@ class TestUtils:
         # Tests for utils.dipnet_to_daide_parsing
         PARSING_TEST_CASES = [
             (["A PAR H"], ["(FRA AMY PAR) HLD"], False),
+            (["F STP/SC H"], ["(RUS FLT (STP SCS)) HLD"], False),
             ([("A PAR H", "ENG")], ["(ENG AMY PAR) HLD"], True),
             (["A PAR - MAR"], ["(FRA AMY PAR) MTO MAR"], False),
             (["A PAR R MAR"], ["(FRA AMY PAR) MTO MAR"], False),
+            (["F STP/SC - BOT"], ["(RUS FLT (STP SCS)) MTO BOT"], False),
+            (["A CON - BUL"], ["(TUR AMY CON) MTO BUL"], False),
+            (["F BLA - BUL/EC"], ["(TUR FLT BLA) MTO (BUL ECS)"], False),
             (["A BUD S F TRI"], ["(AUS AMY BUD) SUP (AUS FLT TRI)"], False),
             (["A PAR S A MAR - BUR"], ["(FRA AMY PAR) SUP (FRA AMY MAR) MTO BUR"], False),
+            (["A MOS S F STP/SC - LVN"], ["(RUS AMY MOS) SUP (RUS FLT (STP SCS)) MTO LVN"], False),
+            (["A SMY S A CON - BUL"], ["(TUR AMY MOS) SUP (TUR AMY CON) MTO BUL"], False),
+            (["A CON S F BLA - BUL/EC"], ["(TUR AMY CON) SUP (TUR FLT BLA) MTO (BUL ECS)"], False),
         ]
 
+        game_tc = Game()
+        game_tc.set_units("TURKEY", ["F BLA"])
+
         for tc_ip, tc_op, unit_power_tuples_included in PARSING_TEST_CASES:
-            assert dipnet_to_daide_parsing(tc_ip, Game(), unit_power_tuples_included=unit_power_tuples_included) == tc_op, dipnet_to_daide_parsing(tc_ip, Game(), unit_power_tuples_included=unit_power_tuples_included)
+            assert dipnet_to_daide_parsing(tc_ip, game_tc, unit_power_tuples_included=unit_power_tuples_included) == tc_op, dipnet_to_daide_parsing(tc_ip, game_tc, unit_power_tuples_included=unit_power_tuples_included)
             comparison_tc_op = tc_ip[0].replace(" R ", " - ") if type(tc_ip[0]) == str else tc_ip[0][0].replace(" R ", " - ")
             assert daide_to_dipnet_parsing(tc_op[0])[0] == comparison_tc_op, (daide_to_dipnet_parsing(tc_op[0]), comparison_tc_op)
         
@@ -65,10 +75,11 @@ class TestUtils:
         # Tests for convoy orders
         PARSING_CVY_TEST_CASES = [
             (["A TUN - SYR VIA", "F ION C A TUN - SYR", "F EAS C A TUN - SYR"], ["(ITA AMY TUN) CTO SYR VIA (ION EAS)", "(ITA FLT ION) CVY (ITA AMY TUN) CTO SYR", "(ITA FLT EAS) CVY (ITA AMY TUN) CTO SYR"])
+            (["A TUN - BUL VIA", "F ION C A TUN - BUL", "F AEG C A TUN - BUL"], ["(ITA AMY TUN) CTO BUL VIA (ION EAS)", "(ITA FLT ION) CVY (ITA AMY TUN) CTO BUL", "(ITA FLT EAS) CVY (ITA AMY TUN) CTO BUL"])
         ]
 
         game_tc = Game()
-        game_tc.set_units("ITALY", ["A TUN", "F ION", "F EAS"])
+        game_tc.set_units("ITALY", ["A TUN", "F ION", "F EAS", "F AEG"])
 
         for tc_ip, tc_op in PARSING_CVY_TEST_CASES:
             assert dipnet_to_daide_parsing(tc_ip, game_tc) == tc_op, (dipnet_to_daide_parsing(tc_ip, game_tc), tc_op)
@@ -304,3 +315,34 @@ class TestUtils:
 
         for tc_ip, tc_op in SMART_SELECT_SUPPORT_PROPOSALS:
             assert smart_select_support_proposals(tc_ip) == tc_op
+
+        
+        GET_ORDER_TOKENS_TCS = [
+            [
+                "A PAR S A MAR - BUR",
+                ['A PAR', 'S', 'A MAR', '- BUR']
+            ],
+            [
+                "A MAR - BUR",
+                ['A MAR', '- BUR']
+            ],
+            [
+                "A MAR R BUR",
+                ['A MAR', '- BUR']
+            ],
+            [
+                "A MAR H",
+                ['A MAR', 'H']
+            ],
+            [
+                "F BUL/EC - RUM",
+                ['F BUL/EC', '- RUM']
+            ],
+            [
+                "F RUM - BUL/EC",
+                ['F RUM', '- BUL/EC']
+            ]
+        ]
+
+        for tc_ip, tc_op in GET_ORDER_TOKENS_TCS:
+            assert get_order_tokens(tc_ip) == tc_op
