@@ -590,14 +590,16 @@ class SmartOrderAccepterBot(DipnetBot):
             lst_rand = list(
                 map(lambda st: string_to_tuple("(" + st + ")"), lst_style_orders)
             )
-            # randomized_orders = random_list_orders(lst_rand)
-            # random_str_orders = list(
-            #     map(lambda ord: tuple_to_string(ord), randomized_orders)
-            # )
-            # daide_orders = lst_to_daide(random_str_orders)
-            # for foe in foes:
-            #     msgs_data.add_message(foe, daide_orders)
-            #     yield self.send_message(foe, daide_orders)
+            randomized_orders = random_list_orders(lst_rand)
+            random_str_orders = list(
+                map(lambda ord: tuple_to_string(ord), randomized_orders)
+            )
+            daide_orders = lst_to_daide(random_str_orders)
+            print(f">>> {self.power_name} Actual Orders", dipnet_ords)
+            print(f">>> {self.power_name} Random Orders to {foes}", daide_orders)
+            for foe in foes:
+                msgs_data.add_message(foe, daide_orders)
+                yield self.send_message(foe, daide_orders)
 
             # generate support proposals to allies
             proposals = yield self.generate_support_proposals(msgs_data)
