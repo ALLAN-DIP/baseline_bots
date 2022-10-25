@@ -602,8 +602,8 @@ class SmartOrderAccepterBot(DipnetBot):
                 )
                 daide_orders = lst_to_daide(random_str_orders)
                 print(f">>> {self.power_name} Actual Orders", dipnet_ords)
-                print(f">>> {self.power_name} Random Orders to {foes}", daide_orders)
-                for foe in foes:
+                print(f">>> {self.power_name} Random Orders to {self.foes}", daide_orders)
+                for foe in self.foes:
                     msgs_data.add_message(foe, daide_orders)
                     yield self.send_message(foe, daide_orders)
             except Exception as e:
