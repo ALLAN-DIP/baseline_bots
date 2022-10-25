@@ -190,7 +190,7 @@ if __name__ == '__main__':
 	parser.add_argument("--power", type=str, help='power name (AUSTRIA, ENGLAND, FRANCE, GERMANY, ITALY, RUSSIA, TURKEY)')
 	parser.add_argument("--bot_type", type=str, default="TransparentBot", help='type of bot to be launched (NoPressDipBot, TransparentBot, SmartOrderAccepterBot)')
 	parser.add_argument("--sleep_delay", type=bool, default=True, help='bool to indicate if bot should sleep randomly for 1-3s before execution (default: True)')
-	parser.add_argument("--discount_factor", type=float, default=0.8, help='discount factor for ActionBasedStance (default: 0.8)')
+	parser.add_argument("--discount_factor", type=float, default=0.5, help='discount factor for ActionBasedStance (default: 0.5)')
 	parser.add_argument('--outdir', type=str, help='output directory for game json to be stored')
 	args = parser.parse_args()
 	host = args.host
