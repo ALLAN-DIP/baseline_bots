@@ -598,6 +598,8 @@ class SmartOrderAccepterBot(DipnetBot):
             # daide_orders = lst_to_daide(random_str_orders)
             # for foe in foes:
             #     msgs_data.add_message(foe, daide_orders)
+            #     yield self.send_message(foe, daide_orders)
+
             # generate support proposals to allies
             proposals = yield self.generate_support_proposals(msgs_data)
 
