@@ -74,8 +74,8 @@ class TestUtils:
 
         # Tests for convoy orders
         PARSING_CVY_TEST_CASES = [
-            (["A TUN - SYR VIA", "F ION C A TUN - SYR", "F EAS C A TUN - SYR"], ["(ITA AMY TUN) CTO SYR VIA (ION EAS)", "(ITA FLT ION) CVY (ITA AMY TUN) CTO SYR", "(ITA FLT EAS) CVY (ITA AMY TUN) CTO SYR"])
-            (["A TUN - BUL VIA", "F ION C A TUN - BUL", "F AEG C A TUN - BUL"], ["(ITA AMY TUN) CTO BUL VIA (ION EAS)", "(ITA FLT ION) CVY (ITA AMY TUN) CTO BUL", "(ITA FLT EAS) CVY (ITA AMY TUN) CTO BUL"])
+            (["A TUN - SYR VIA", "F ION C A TUN - SYR", "F EAS C A TUN - SYR"], ["(ITA AMY TUN) CTO SYR VIA (ION EAS)", "(ITA FLT ION) CVY (ITA AMY TUN) CTO SYR", "(ITA FLT EAS) CVY (ITA AMY TUN) CTO SYR"]),
+            (["A TUN - BUL VIA", "F ION C A TUN - BUL", "F AEG C A TUN - BUL"], ["(ITA AMY TUN) CTO BUL VIA (ION AEG)", "(ITA FLT ION) CVY (ITA AMY TUN) CTO BUL", "(ITA FLT AEG) CVY (ITA AMY TUN) CTO BUL"])
         ]
 
         game_tc = Game()

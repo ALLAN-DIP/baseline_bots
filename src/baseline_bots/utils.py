@@ -520,7 +520,7 @@ def smart_select_support_proposals(
             if len(order_list) > 1:
                 optimal_ordering_units.add(ordering_unit)
     return optimal_possible_support_proposals
-    
+
 
 if __name__ == "__main__":
     pass
