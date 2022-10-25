@@ -59,7 +59,7 @@ class SmartOrderAccepterBot(DipnetBot):
         self.allies_influence = set()
         self.orders = None
         self.my_influence = set()
-        self.ally_threshold = 2.0
+        self.ally_threshold = 0.5
         self.enemy_threshold = 1.0
 
     async def send_message(self, recipient, message):
