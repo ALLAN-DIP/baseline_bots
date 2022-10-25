@@ -15,6 +15,7 @@ import asyncio
 import ujson as json
 from tornado import gen
 from diplomacy import Game, connect, Message
+import random
 
 # import required bots
 from baseline_bots.bots.dipnet.no_press_bot import NoPressDipBot
@@ -56,7 +57,7 @@ async def test(hostname:str='localhost', port:int=8432) -> None:
 	print(games)
 
 
-async def launch(hostname:str, port:int, game_id:str, power_name:str, bot_type:str, outdir:str) -> None:
+async def launch(hostname:str, port:int, game_id:str, power_name:str, bot_type:str, sleep_delay:bool, outdir:str) -> None:
 	"""
 	Waits for dipnet model to load and then starts the bot execution
 
@@ -65,6 +66,7 @@ async def launch(hostname:str, port:int, game_id:str, power_name:str, bot_type:s
 	:param game_id: game id to connect to on host
 	:param power_name: power name of the bot to be launched
 	:param bot_type: the type of bot to be launched - NoPressDipBot/TransparentBot/SmartOrderAccepterBot/..
+	:param sleep_delay: bool to indicate if bot should sleep randomly for 1-3s before execution
 	:param outdir: the output directory where game json files should be stored
 	"""
 
@@ -77,10 +79,10 @@ async def launch(hostname:str, port:int, game_id:str, power_name:str, bot_type:s
 	print()
 	print("Tensorflow server online")
 
-	await play(hostname, port, game_id, power_name, bot_type, outdir)
+	await play(hostname, port, game_id, power_name, bot_type, sleep_delay, outdir)
 
 
-async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str, outdir:str) -> None:
+async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str, sleep_delay:bool, outdir:str) -> None:
 	"""
 	Launches the bot for game play
 
@@ -89,6 +91,7 @@ async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str
 	:param game_id: game id to connect to on host
 	:param power_name: power name of the bot to be launched
 	:param bot_type: the type of bot to be launched - NoPressDipBot/TransparentBot/SmartOrderAccepterBot/..
+	:param sleep_delay: bool to indicate if bot should sleep randomly for 1-3s before execution
 	:param outdir: the output directory where game json files should be stored
 	"""
 	# Connect to the game
@@ -125,7 +128,10 @@ async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str
 	while not game.is_game_done:
 
 		current_phase = game.get_current_phase()
+		if sleep_delay:
+			await asyncio.sleep(random.random() * 80) # sleep randomly for 1-3s before retrieving new messages for the power
 
+		phase_start_time = time.time()
 		# Retrieve messages
 		rcvd_messages = game.filter_messages(messages=game.messages, game_role=bot.power_name)
 		rcvd_messages = list(rcvd_messages.items())
@@ -142,21 +148,21 @@ async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str
 
 
 			# If messages are to be sent, send them
-			if messages_data and messages_data.messages:
-				to_send_msgs[bot.power_name] = messages_data.messages
+			# if messages_data and messages_data.messages:
+			# 	to_send_msgs[bot.power_name] = messages_data.messages
 
-			for sender in to_send_msgs:
-				for msg in to_send_msgs[sender]:
-					msg_obj = Message(
-						sender=sender,
-						recipient=msg['recipient'],
-						message=msg['message'],
-						phase=game.get_current_phase(),
-					)
-					await game.send_game_message(message=msg_obj)
+			# for sender in to_send_msgs:
+			# 	for msg in to_send_msgs[sender]:
+			# 		msg_obj = Message(
+			# 			sender=sender,
+			# 			recipient=msg['recipient'],
+			# 			message=msg['message'],
+			# 			phase=game.get_current_phase(),
+			# 		)
+			# 		await game.send_game_message(message=msg_obj)
 
-			if len(to_send_msgs):
-				print(f"Messages sent: {len(to_send_msgs)}")
+			if len(messages_data.messages):
+				print(f"Messages sent: {len(messages_data.messages)}")
 
 			# If orders are present, send them
 			if orders_data is not None:
@@ -165,6 +171,8 @@ async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str
 			print("Phase: " + current_phase)
 			print("Orders: ")
 			print(orders_data)
+		phase_end_time = time.time()
+		print(f"Time taken for phase {current_phase}: {phase_end_time - phase_start_time}s")
 
 		while current_phase == game.get_current_phase():
 			await asyncio.sleep(2)
@@ -181,12 +189,14 @@ if __name__ == '__main__':
 	parser.add_argument('--game_id', type=str, help='game id of game created in DATC diplomacy game')
 	parser.add_argument("--power", type=str, help='power name (AUSTRIA, ENGLAND, FRANCE, GERMANY, ITALY, RUSSIA, TURKEY)')
 	parser.add_argument("--bot_type", type=str, default="TransparentBot", help='type of bot to be launched (NoPressDipBot, TransparentBot, SmartOrderAccepterBot)')
+	parser.add_argument("--sleep_delay", type=bool, default=True, help='bool to indicate if bot should sleep randomly for 1-3s before execution (default: True)')
 	parser.add_argument('--outdir', type=str, help='output directory for game json to be stored')
 	args = parser.parse_args()
 	host = args.host
 	port = args.port
 	game_id = args.game_id
 	bot_type = args.bot_type
+	sleep_delay = args.sleep_delay
 	outdir = args.outdir
 	power = args.power
 
@@ -194,4 +204,4 @@ if __name__ == '__main__':
 		print("Game ID required")
 		sys.exit(1)
 
-	asyncio.run(launch(hostname=host, port=port, game_id=game_id,power_name=power, bot_type=bot_type, outdir=outdir))
+	asyncio.run(launch(hostname=host, port=port, game_id=game_id,power_name=power, bot_type=bot_type, sleep_delay=sleep_delay, outdir=outdir))
