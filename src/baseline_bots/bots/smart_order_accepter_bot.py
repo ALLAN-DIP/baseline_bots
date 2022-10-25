@@ -94,7 +94,6 @@ class SmartOrderAccepterBot(DipnetBot):
                 for pow in self.allies:
                     if (
                         pow != self.power_name
-                        and pow in self.allies
                     ):
                         msgs_data.add_message(pow, str(orders_decided))
                         await self.send_message(pow, str(orders_decided))
