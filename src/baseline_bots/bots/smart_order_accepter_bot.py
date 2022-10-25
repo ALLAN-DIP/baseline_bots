@@ -48,10 +48,11 @@ class SmartOrderAccepterBot(DipnetBot):
     If the order is rejected, a negative response will be sent to the proposer.
     """
 
-    def __init__(self, power_name, game) -> None:
+    def __init__(self, power_name, game, discount_factor=0.8) -> None:
         super().__init__(power_name, game)
         self.alliance_props_sent = False
-        self.stance = ActionBasedStance(power_name, game, discount_factor=0.8)
+        self.discount_factor = discount_factor
+        self.stance = ActionBasedStance(power_name, game, discount_factor=self.discount_factor)
         self.alliances = defaultdict(list)
         self.rollout_length = 10
         self.rollout_n_order = 5

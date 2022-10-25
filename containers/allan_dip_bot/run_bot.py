@@ -57,7 +57,7 @@ async def test(hostname:str='localhost', port:int=8432) -> None:
 	print(games)
 
 
-async def launch(hostname:str, port:int, game_id:str, power_name:str, bot_type:str, sleep_delay:bool, outdir:str) -> None:
+async def launch(hostname:str, port:int, game_id:str, power_name:str, bot_type:str, sleep_delay:bool, outdir:str, discount_factor:float) -> None:
 	"""
 	Waits for dipnet model to load and then starts the bot execution
 
@@ -79,10 +79,10 @@ async def launch(hostname:str, port:int, game_id:str, power_name:str, bot_type:s
 	print()
 	print("Tensorflow server online")
 
-	await play(hostname, port, game_id, power_name, bot_type, sleep_delay, outdir)
+	await play(hostname, port, game_id, power_name, bot_type, sleep_delay, outdir, discount_factor)
 
 
-async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str, sleep_delay:bool, outdir:str) -> None:
+async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str, sleep_delay:bool, outdir:str, discount_factor:float) -> None:
 	"""
 	Launches the bot for game play
 
@@ -110,7 +110,7 @@ async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str
 	elif bot_type == "RandomProposerBot_AsyncBot":
 		bot = RandomProposerBot_AsyncBot(power_name, game)
 	elif bot_type == "SmartOrderAccepterBot":
-		bot = SmartOrderAccepterBot(power_name, game)
+		bot = SmartOrderAccepterBot(power_name, game, discount_factor)
 		
 	# Wait while game is still being formed
 	print("Waiting for game to start", end=' ')
@@ -190,6 +190,7 @@ if __name__ == '__main__':
 	parser.add_argument("--power", type=str, help='power name (AUSTRIA, ENGLAND, FRANCE, GERMANY, ITALY, RUSSIA, TURKEY)')
 	parser.add_argument("--bot_type", type=str, default="TransparentBot", help='type of bot to be launched (NoPressDipBot, TransparentBot, SmartOrderAccepterBot)')
 	parser.add_argument("--sleep_delay", type=bool, default=True, help='bool to indicate if bot should sleep randomly for 1-3s before execution (default: True)')
+	parser.add_argument("--discount_factor", type=float, default=0.8, help='discount factor for ActionBasedStance (default: 0.8)')
 	parser.add_argument('--outdir', type=str, help='output directory for game json to be stored')
 	args = parser.parse_args()
 	host = args.host
@@ -197,6 +198,7 @@ if __name__ == '__main__':
 	game_id = args.game_id
 	bot_type = args.bot_type
 	sleep_delay = args.sleep_delay
+	discount_factor = args.discount_factor
 	outdir = args.outdir
 	power = args.power
 
@@ -204,4 +206,4 @@ if __name__ == '__main__':
 		print("Game ID required")
 		sys.exit(1)
 
-	asyncio.run(launch(hostname=host, port=port, game_id=game_id,power_name=power, bot_type=bot_type, sleep_delay=sleep_delay, outdir=outdir))
+	asyncio.run(launch(hostname=host, port=port, game_id=game_id,power_name=power, bot_type=bot_type, sleep_delay=sleep_delay, outdir=outdir, discount_factor=discount_factor))
