@@ -177,6 +177,7 @@ def random_convoy_to(order: Tuple) -> Tuple:
     :return: A deviant order (with some chance of being the same order).
     :rtype: Tuple
     """
+    print(order)
     (_, _, amy_loc), _, province, _, (sea_provinces) = order
     sea_provinces = list(reversed(sea_provinces))
     for i, sea in enumerate(
