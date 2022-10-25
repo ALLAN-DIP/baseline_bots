@@ -129,7 +129,7 @@ async def play(hostname:str, port:int, game_id:str, power_name:str, bot_type:str
 
 		current_phase = game.get_current_phase()
 		if sleep_delay:
-			await asyncio.sleep(random.random() * 2 + 1) # sleep randomly for 1-3s before retrieving new messages for the power
+			await asyncio.sleep(random.random() * 80) # sleep randomly for 1-3s before retrieving new messages for the power
 
 		phase_start_time = time.time()
 		# Retrieve messages
