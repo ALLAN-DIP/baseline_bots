@@ -509,6 +509,8 @@ class SmartOrderAccepterBot(DipnetBot):
 
         # avoid get_stance in the first phase of game
         if self.game.get_current_phase()!='S1901M':
+            print("baseline_bots >> phase_hist")
+            print([ph.name for ph in self.game.get_phase_history()])
             self.stance.get_stance()
         print(f"Stance vector for {self.power_name}")
         print(self.stance.stance[self.power_name])
