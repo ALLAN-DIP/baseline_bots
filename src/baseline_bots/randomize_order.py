@@ -374,6 +374,6 @@ def lst_to_daide(orders: List) -> str:
     '''
     daide_ords = "FCT (ORR"
     for ord in orders:
-        daide_ords += " (XDO " + ord + ")"
+        daide_ords += " (XDO (" + ord + "))"
     daide_ords += ")"
     return daide_ords
