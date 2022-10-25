@@ -41,7 +41,7 @@ def dipnet_to_daide_parsing(
         """
         if "/" in prov:
             prov = prov.replace("/", " ")
-            prov = prov.append("S")
+            prov = prov + "S"
             prov = "(" + prov + ")"
         return prov
 
@@ -206,17 +206,20 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
         :param daide_style_order_str: DAIDE style string
         :return: list of strings containing components of the order which makes it easy to convert to dipnet-style order
         """
-        open_brack = False
+        brack_cnt = 0
         stack = ""
         grouped_order = []
         for char in daide_style_order_str:
-            if (not (open_brack) and char == " ") or char == ")":
-                if stack:
+            if char == ")":
+                brack_cnt -= 1
+            if (brack_cnt == 0 and char == " ") or (brack_cnt == 0 and char == ")"):
+                if brack_cnt == 0 and stack:
                     grouped_order.append(stack)
                     stack = ""
-                    open_brack = False
             elif char == "(":
-                open_brack = True
+                if brack_cnt > 0:
+                    stack += char
+                brack_cnt += 1
             else:
                 stack += char
         if stack:
@@ -234,8 +237,8 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
         STP SCS         --> STP/SC
         PAR             --> PAR
         """
-        if prov.split() == 2:
-            prov = "".join(prov.split())[:-1]
+        if len(prov.split()) == 2:
+            prov = "/".join(prov.split())[:-1]
         return prov
 
     def dipnetify_suborder(suborder: str) -> str:
