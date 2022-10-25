@@ -554,11 +554,13 @@ class SmartOrderAccepterBot(DipnetBot):
 
 
             # fmt: off
-            # stance is not yet considered in first phase
+
+            self.allies = [pow for pow in powers if (pow != self.power_name and powers[pow] >= self.ally_threshold)]
+            self.foes = [pow for pow in powers if (pow != self.power_name and powers[pow] <= self.enemy_threshold)]
+            self.neutral = [pow for pow in powers if (pow != self.power_name and powers[pow] > self.enemy_threshold and powers[pow] < self.ally_threshold)]
+
+            # GLOBAL message and filter aggressive moves to allies are disabled in S1901M
             if self.game.get_current_phase()!='S1901M':
-                self.allies = [pow for pow in powers if (pow != self.power_name and powers[pow] >= self.ally_threshold)]
-                self.foes = [pow for pow in powers if (pow != self.power_name and powers[pow] <= self.enemy_threshold)]
-                self.neutral = [pow for pow in powers if (pow != self.power_name and powers[pow] > self.enemy_threshold and powers[pow] < self.ally_threshold)]
                 msg_allies, msg_foes, msg_neutral = ','.join(allies), ','.join(foes), ','.join(neutral)
                 msgs_data.add_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
                                 {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
@@ -566,9 +568,8 @@ class SmartOrderAccepterBot(DipnetBot):
                                 {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
             # fmt: on
 
-
-            # filter out aggressive orders to allies
-            yield self.replace_aggressive_order_to_allies()
+                # filter out aggressive orders to allies
+                yield self.replace_aggressive_order_to_allies()
 
             # generate messages for FCT sharing info orders
             opps = list(powers.keys()).copy()
