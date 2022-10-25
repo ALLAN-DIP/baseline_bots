@@ -590,7 +590,7 @@ class SmartOrderAccepterBot(DipnetBot):
             lst_rand = list(
                 map(lambda st: string_to_tuple("(" + st + ")"), lst_style_orders)
             )
-            print(lst_rand)
+            # print(lst_rand)
             try:
                 randomized_orders = random_list_orders(lst_rand)
                 random_str_orders = list(
