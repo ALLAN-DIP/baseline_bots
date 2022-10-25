@@ -64,7 +64,7 @@ class SmartOrderAccepterBot(DipnetBot):
         self.allies = []
         self.foes = []
         self.neutral = []
-
+        
     async def send_message(self, recipient, message):
         msg_obj = Message(
             sender=self.power_name,
