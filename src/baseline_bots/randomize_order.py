@@ -75,40 +75,40 @@ def random_list_orders(orders: List) -> List:
         orders
     )  # this returns a list of tuples representing correspondences or an empty list
 
-    if correspondences:
-        cor_orders = orders.copy()
-        replacements = (
-            []
-        )  # this represents the orders that the corresponding orders will get replaced with
-        for correspondence in correspondences:
-            for move in correspondence:
-                if move[1] == "CTO" or move[1] == "CVY":
-                    cor_orders.remove(move)  # the corresponding are removed
-                    replacements.append(
-                        random_hold((move[0], "HLD"))
-                    )  # the corresponding order is replaced with a HLD or MTO order
-                elif move[1] == "SUP":
-                    cor_orders.remove(move)  # the corresponding are removed
-                    if (move[2], move[3], move[4]) in cor_orders:
-                        cor_orders.remove((move[2], move[3], move[4]))
-                    if len(move) <= 3:  # if it is supporting a hold
-                        replacements.append((move[2], move[1], move[0]))
-                    else:  # if it is supporting a move
-                        replacements.append(
-                            (move[2], move[1], move[0], move[3], move[4])
-                        )
-                        replacements.append(((move[2], move[3], move[4])))
+    # if correspondences:
+    #     cor_orders = orders.copy()
+    #     replacements = (
+    #         []
+    #     )  # this represents the orders that the corresponding orders will get replaced with
+    #     for correspondence in correspondences:
+    #         for move in correspondence:
+    #             if move[1] == "CTO" or move[1] == "CVY":
+    #                 cor_orders.remove(move)  # the corresponding are removed
+    #                 replacements.append(
+    #                     random_hold((move[0], "HLD"))
+    #                 )  # the corresponding order is replaced with a HLD or MTO order
+    #             elif move[1] == "SUP":
+    #                 cor_orders.remove(move)  # the corresponding are removed
+    #                 if (move[2], move[3], move[4]) in cor_orders:
+    #                     cor_orders.remove((move[2], move[3], move[4]))
+    #                 if len(move) <= 3:  # if it is supporting a hold
+    #                     replacements.append((move[2], move[1], move[0]))
+    #                 else:  # if it is supporting a move
+    #                     replacements.append(
+    #                         (move[2], move[1], move[0], move[3], move[4])
+    #                     )
+    #                     replacements.append(((move[2], move[3], move[4])))
 
-        cor_orders = list(
-            map(lambda order: randomize(order), cor_orders)
-        )  # all the orders that don't correspond are randomized by themselves
-        cor_orders.extend(replacements)  # replacements are added back to the list
-        return cor_orders
-    else:
-        cor_orders = list(
-            map(lambda order: randomize(order), orders)
-        )  # if there are no correspondences, every order is randomized alone
-        return cor_orders
+    #     cor_orders = list(
+    #         map(lambda order: randomize(order), cor_orders)
+    #     )  # all the orders that don't correspond are randomized by themselves
+    #     cor_orders.extend(replacements)  # replacements are added back to the list
+    #     return cor_orders
+    # else:
+    cor_orders = list(
+        map(lambda order: randomize(order), orders)
+    )  # if there are no correspondences, every order is randomized alone
+    return cor_orders
 
 
 def orders_correspondence(orders: List) -> List:
@@ -212,7 +212,7 @@ def random_convoy(order: Tuple) -> Tuple:
     """
     # fmt: off
     tag = order[1]
-    ((amy_country, amy_type, amy_loc), _, (flt_country, flt_type, flt_loc), _, province) = order
+    ((flt_country, flt_type, flt_loc), _, (amy_country, amy_type, amy_loc), _, province) = order
     assert (amy_type == "AMY" and flt_type == "FLT"), "The unit type is neither army nor fleet so it is invalid."
     # It is necessary to check whether a possible alternate "convoy-to" location is adjacent to the unit being convoyed
     # since convoying to a province adjacent to you would be less believable
@@ -367,3 +367,13 @@ def string_to_tuple(orders: str) -> Tuple:
         r"([(, ])([A-Z|\/]+)([), ])", r"\1'\2'\3", with_commas
     )  # inserts quotes around strings
     return eval(with_quotes)
+
+def lst_to_daide(orders: List) -> str:
+    '''
+    This function should take DAIDE orders as a list of strings and wrap them so: FCT ( ORR ( XDO(ORD1) XDO(ORD2) ) )
+    '''
+    daide_ords = "FCT (ORR"
+    for ord in orders:
+        daide_ords += " (XDO " + ord + ")"
+    daide_ords += ")"
+    return daide_ords

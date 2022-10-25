@@ -33,7 +33,7 @@ from baseline_bots.utils import (
     get_other_powers,
     smart_select_support_proposals,
 )
-
+from baseline_bots.randomize_order import lst_to_daide
 
 class SmartOrderAccepterBot(DipnetBot):
     """
@@ -587,16 +587,17 @@ class SmartOrderAccepterBot(DipnetBot):
 
             # randomize dipnet orders and send random orders to enemies
             dipnet_ords = list(self.orders.orders.values())
-            daide_style_orders = dipnet_to_daide_parsing(dipnet_ords, self.game)
+            lst_style_orders = dipnet_to_daide_parsing(dipnet_ords, self.game)
             lst_rand = list(
-                map(lambda st: string_to_tuple("(" + st + ")"), daide_style_orders)
+                map(lambda st: string_to_tuple("(" + st + ")"), lst_style_orders)
             )
-            # randomized_orders = random_list_orders(lst_rand)
-            # random_str_orders = list(
-            #     map(lambda ord: tuple_to_string(ord), randomized_orders)
-            # )
-            # for foe in foes:
-            #     msgs_data.add_message(foe, str(random_str_orders))
+            randomized_orders = random_list_orders(lst_rand)
+            random_str_orders = list(
+                map(lambda ord: tuple_to_string(ord), randomized_orders)
+            )
+            daide_orders = lst_to_daide(random_str_orders)
+            for foe in foes:
+                msgs_data.add_message(foe, daide_orders)
             # generate support proposals to allies
             proposals = yield self.generate_support_proposals(msgs_data)
 
