@@ -51,7 +51,7 @@ class SmartOrderAccepterBot(DipnetBot):
     def __init__(self, power_name, game) -> None:
         super().__init__(power_name, game)
         self.alliance_props_sent = False
-        self.stance = ActionBasedStance(power_name, game)
+        self.stance = ActionBasedStance(power_name, game, discount_factor=0.8)
         self.alliances = defaultdict(list)
         self.rollout_length = 10
         self.rollout_n_order = 5
