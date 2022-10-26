@@ -177,6 +177,21 @@ class TestUtils:
                         "ITALY": [("RUSSIA", "ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)")],
                     }
                 }
+            ],
+            [
+                "ENGLAND",
+                {
+                    "FRANCE": "PRP(AND(XDO((ENG AMY LVP) MTO WAL))(XDO((ENG FLT EDI) MTO NTH))(XDO((ENG FLT LON) MTO ENG)))"
+                },
+                {
+                    'valid_proposals': {
+                        "FRANCE": ["A LVP - WAL", "F EDI - NTH", "F LON - ENG"]
+                    },
+                    'invalid_proposals': {},
+                    'shared_orders': {},
+                    'other_orders': {},
+                    'alliance_proposals': {}
+                }
             ]
         ]
         for power_name, tc_ip, tc_op in PARSE_PROPOSALS_TC:
