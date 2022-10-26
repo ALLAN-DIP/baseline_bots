@@ -54,14 +54,17 @@ class SmartOrderAccepterBot(DipnetBot):
         self.discount_factor = discount_factor
         self.stance = ActionBasedStance(power_name, game, discount_factor=self.discount_factor)
         self.alliances = defaultdict(list)
-        self.rollout_length = 10
+        self.rollout_length = 5
         self.rollout_n_order = 5
         self.allies_influence = set()
         self.orders = None
         self.my_influence = set()
-        self.ally_threshold = 0.5
-        self.enemy_threshold = 1.0
-
+        self.ally_threshold = -0.1
+        self.enemy_threshold = -0.5
+        self.allies = []
+        self.foes = []
+        self.neutral = []
+        
     async def send_message(self, recipient, message):
         msg_obj = Message(
             sender=self.power_name,
@@ -88,16 +91,14 @@ class SmartOrderAccepterBot(DipnetBot):
                 )
             )
             if str(orders_decided) != "FCT ()":
-                for pow in self.stance.stance[self.power_name]:
+                for pow in self.allies:
                     if (
                         pow != self.power_name
-                        and self.stance.stance[self.power_name][pow] > 0
                     ):
                         msgs_data.add_message(pow, str(orders_decided))
                         await self.send_message(pow, str(orders_decided))
 
-    async def gen_messages(self, orders_list: List[str]):
-        msgs_data = MessagesData()
+    async def gen_messages(self, orders_list: List[str], msgs_data: MessagesData):
 
         # generate messages: we should  be sending our true orders to allies (positive stance)
         await self.gen_pos_stance_messages(msgs_data, orders_list)
@@ -114,9 +115,8 @@ class SmartOrderAccepterBot(DipnetBot):
             if (
                 orders
                 and self.power_name != proposer
-                and self.stance.stance[self.power_name][proposer] >= 0
             ):
-                if proposer == best_proposer:
+                if proposer == best_proposer and proposer in self.allies:
                     msg = YES(
                         PRP(
                             ORR(
@@ -314,7 +314,7 @@ class SmartOrderAccepterBot(DipnetBot):
         for pow in [
             pow1
             for pow1 in self.stance.stance[self.power_name]
-            if pow1 != self.power_name and self.stance.stance[self.power_name][pow1] > 0
+            if pow1 != self.power_name and pow1 in self.allies
         ]:
             self.allies_influence.update(set(self.game.get_power(pow).influence))
 
@@ -324,7 +324,7 @@ class SmartOrderAccepterBot(DipnetBot):
         for ally in [
             pow1
             for pow1 in self.stance.stance[self.power_name]
-            if pow1 != self.power_name and self.stance.stance[self.power_name][pow1] > 0
+            if pow1 != self.power_name and pow1 in self.allies
         ]:
             new_provs = {loc.upper() for loc in self.game.get_orderable_locations(ally)}
             provinces.update(new_provs)
@@ -487,7 +487,7 @@ class SmartOrderAccepterBot(DipnetBot):
 
         :return: nothing
         """
-        ally = [power for power in self.game.map.powers if power!=self.power_name and self.stance.stance[self.power_name][power] >= self.ally_threshold]
+        ally = self.allies
 
         if not len(ally):
             return
@@ -544,6 +544,20 @@ class SmartOrderAccepterBot(DipnetBot):
             # if there is any better proposal orders that has a state value more than ours, then do it. If not, just follow the base orders.
             valid_proposal_orders[self.power_name] = orders
 
+
+
+
+            # fmt: off
+
+            self.allies = [pow for pow in powers if (pow != self.power_name and powers[pow] >= self.ally_threshold)]
+            self.foes = [pow for pow in powers if (pow != self.power_name and powers[pow] <= self.enemy_threshold)]
+            self.neutral = [pow for pow in powers if (pow != self.power_name and powers[pow] > self.enemy_threshold and powers[pow] < self.ally_threshold)]
+
+            non_allies = self.foes+self.neutral
+
+            for power in non_allies: 
+                valid_proposal_orders[power] = None
+
             best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
             
             # add orders
@@ -551,13 +565,22 @@ class SmartOrderAccepterBot(DipnetBot):
             orders_data.add_orders(best_orders, overwrite=True)
             self.orders = orders_data
 
-            # filter out aggressive orders to allies
-            yield self.replace_aggressive_order_to_allies()
+            # GLOBAL message and filter aggressive moves to allies are disabled in S1901M
+            if self.game.get_current_phase()!='S1901M':
+                msg_allies, msg_foes, msg_neutral = ','.join(self.allies), ','.join(self.foes), ','.join(self.neutral)
+                msgs_data.add_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
+                                {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
+                yield self.send_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
+                                {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
+            # fmt: on
+
+                # filter out aggressive orders to allies
+                yield self.replace_aggressive_order_to_allies()
 
             # generate messages for FCT sharing info orders
             opps = list(powers.keys()).copy()
             opps.remove(self.power_name) # list of opposing powers
-            msgs_data = yield self.gen_messages(orders_data.get_list_of_orders())
+            msgs_data = yield self.gen_messages(orders_data.get_list_of_orders(), msgs_data)
             if self.game.phase == "SPRING 1901 MOVEMENT":
                 for pow in opps:
                     vss = [country for country in list(powers.copy().keys()) if country != pow and country != self.power_name]
@@ -573,17 +596,6 @@ class SmartOrderAccepterBot(DipnetBot):
                 best_proposer, valid_proposal_orders, msgs_data
             )
 
-            # fmt: off
-            allies = [pow for pow in powers if (pow != self.power_name and powers[pow] >= self.ally_threshold)]
-            foes = [pow for pow in powers if (pow != self.power_name and powers[pow] < 0)]
-            neutral = [pow for pow in powers if (pow != self.power_name and powers[pow] >= 0 and powers[pow] < self.ally_threshold)]
-            msg_allies, msg_foes, msg_neutral = ','.join(allies), ','.join(foes), ','.join(neutral)
-            msgs_data.add_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
-                            {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
-            yield self.send_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
-                            {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
-            # fmt: on
-
             # randomize dipnet orders and send random orders to enemies
             dipnet_ords = list(self.orders.orders.values())
             lst_style_orders = dipnet_to_daide_parsing(dipnet_ords, self.game)
@@ -597,8 +609,8 @@ class SmartOrderAccepterBot(DipnetBot):
                 )
                 daide_orders = lst_to_daide(random_str_orders)
                 print(f">>> {self.power_name} Actual Orders", dipnet_ords)
-                print(f">>> {self.power_name} Random Orders to {foes}", daide_orders)
-                for foe in foes:
+                print(f">>> {self.power_name} Random Orders to {self.foes}", daide_orders)
+                for foe in self.foes:
                     msgs_data.add_message(foe, daide_orders)
                     yield self.send_message(foe, daide_orders)
             except Exception as e:

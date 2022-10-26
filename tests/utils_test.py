@@ -57,7 +57,7 @@ class TestUtils:
             (["A BUD S F TRI"], ["(AUS AMY BUD) SUP (AUS FLT TRI)"], False),
             (["A PAR S A MAR - BUR"], ["(FRA AMY PAR) SUP (FRA AMY MAR) MTO BUR"], False),
             (["A MOS S F STP/SC - LVN"], ["(RUS AMY MOS) SUP (RUS FLT (STP SCS)) MTO LVN"], False),
-            (["A SMY S A CON - BUL"], ["(TUR AMY MOS) SUP (TUR AMY CON) MTO BUL"], False),
+            (["A SMY S A CON - BUL"], ["(TUR AMY SMY) SUP (TUR AMY CON) MTO BUL"], False),
             (["A CON S F BLA - BUL/EC"], ["(TUR AMY CON) SUP (TUR FLT BLA) MTO (BUL ECS)"], False),
         ]
 
@@ -65,7 +65,7 @@ class TestUtils:
         game_tc.set_units("TURKEY", ["F BLA"])
 
         for tc_ip, tc_op, unit_power_tuples_included in PARSING_TEST_CASES:
-            assert dipnet_to_daide_parsing(tc_ip, game_tc, unit_power_tuples_included=unit_power_tuples_included) == tc_op, dipnet_to_daide_parsing(tc_ip, game_tc, unit_power_tuples_included=unit_power_tuples_included)
+            assert dipnet_to_daide_parsing(tc_ip, game_tc, unit_power_tuples_included=unit_power_tuples_included) == tc_op, (dipnet_to_daide_parsing(tc_ip, game_tc, unit_power_tuples_included=unit_power_tuples_included), tc_op)
             comparison_tc_op = tc_ip[0].replace(" R ", " - ") if type(tc_ip[0]) == str else tc_ip[0][0].replace(" R ", " - ")
             assert daide_to_dipnet_parsing(tc_op[0])[0] == comparison_tc_op, (daide_to_dipnet_parsing(tc_op[0]), comparison_tc_op)
         
@@ -74,8 +74,8 @@ class TestUtils:
 
         # Tests for convoy orders
         PARSING_CVY_TEST_CASES = [
-            (["A TUN - SYR VIA", "F ION C A TUN - SYR", "F EAS C A TUN - SYR"], ["(ITA AMY TUN) CTO SYR VIA (ION EAS)", "(ITA FLT ION) CVY (ITA AMY TUN) CTO SYR", "(ITA FLT EAS) CVY (ITA AMY TUN) CTO SYR"])
-            (["A TUN - BUL VIA", "F ION C A TUN - BUL", "F AEG C A TUN - BUL"], ["(ITA AMY TUN) CTO BUL VIA (ION EAS)", "(ITA FLT ION) CVY (ITA AMY TUN) CTO BUL", "(ITA FLT EAS) CVY (ITA AMY TUN) CTO BUL"])
+            (["A TUN - SYR VIA", "F ION C A TUN - SYR", "F EAS C A TUN - SYR"], ["(ITA AMY TUN) CTO SYR VIA (ION EAS)", "(ITA FLT ION) CVY (ITA AMY TUN) CTO SYR", "(ITA FLT EAS) CVY (ITA AMY TUN) CTO SYR"]),
+            (["A TUN - BUL VIA", "F ION C A TUN - BUL", "F AEG C A TUN - BUL"], ["(ITA AMY TUN) CTO BUL VIA (ION AEG)", "(ITA FLT ION) CVY (ITA AMY TUN) CTO BUL", "(ITA FLT AEG) CVY (ITA AMY TUN) CTO BUL"])
         ]
 
         game_tc = Game()
