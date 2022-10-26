@@ -54,7 +54,7 @@ class SmartOrderAccepterBot(DipnetBot):
         self.discount_factor = discount_factor
         self.stance = ActionBasedStance(power_name, game, discount_factor=self.discount_factor)
         self.alliances = defaultdict(list)
-        self.rollout_length = 10
+        self.rollout_length = 5
         self.rollout_n_order = 5
         self.allies_influence = set()
         self.orders = None
@@ -544,12 +544,7 @@ class SmartOrderAccepterBot(DipnetBot):
             # if there is any better proposal orders that has a state value more than ours, then do it. If not, just follow the base orders.
             valid_proposal_orders[self.power_name] = orders
 
-            best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
-            
-            # add orders
-            
-            orders_data.add_orders(best_orders, overwrite=True)
-            self.orders = orders_data
+
 
 
             # fmt: off
@@ -557,6 +552,18 @@ class SmartOrderAccepterBot(DipnetBot):
             self.allies = [pow for pow in powers if (pow != self.power_name and powers[pow] >= self.ally_threshold)]
             self.foes = [pow for pow in powers if (pow != self.power_name and powers[pow] <= self.enemy_threshold)]
             self.neutral = [pow for pow in powers if (pow != self.power_name and powers[pow] > self.enemy_threshold and powers[pow] < self.ally_threshold)]
+
+            non_allies = self.foes+self.neutral
+
+            for power in non_allies: 
+                valid_proposal_orders[power] = None
+
+            best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
+            
+            # add orders
+            
+            orders_data.add_orders(best_orders, overwrite=True)
+            self.orders = orders_data
 
             # GLOBAL message and filter aggressive moves to allies are disabled in S1901M
             if self.game.get_current_phase()!='S1901M':
