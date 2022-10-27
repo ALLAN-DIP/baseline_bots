@@ -386,6 +386,8 @@ def get_state_value(bot, game, power_name, option="default"):
     for i in range(bot.rollout_length):
 
         for power in game.map.powers:
+            print('rollout at step {} for power: {}'.format(i+1, power))
+            
             if option == "samplingbeam":
                 list_order, prob_order = yield bot.brain.get_beam_orders(game, power)
 
