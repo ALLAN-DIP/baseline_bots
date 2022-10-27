@@ -404,7 +404,12 @@ def get_state_value(bot, game, power_name, option="default"):
                 power_name=power,
                 orders=orders[: min(bot.rollout_n_order, len(orders))],
             )
+        print('at {}, {} moves: {}'.format(i+1,power, power_orders))
         game.process()
+    
+    centers= game.get_centers()
+    state_value = [len(centers[power]) for power in game.map.powers]
+    print('done rollout with state values: ', state_value)
     return len(game.get_centers(power_name))
 
 
@@ -459,8 +464,8 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
     for proposer, unit_orders in proposal_order.items():
 
         # if there is a proposal from this power
-        if unit_orders:
-            proposed = True
+        if unit_orders and proposer in bot.allies:
+            print('considering {} proposal moves: {}'.format(proposer, unit_orders))
 
             # simulate game by copying the current one
             simulated_game = __deepcopy__(bot.game)
@@ -483,6 +488,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
                     power_orders = yield bot.brain.get_orders(
                         simulated_game, other_power
                     )
+                print('at 0, {} moves: {}'.format(other_power, power_orders))
                 simulated_game.set_orders(power_name=other_power, orders=power_orders)
 
             # process current turn
@@ -493,8 +499,27 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
                 bot, simulated_game, bot.power_name
             )
 
-    # get power name that gives the max state value
-    best_proposer = max(state_value, key=state_value.get)
+    best_proposer_list = []        
+    max_state_value = max(state_value.values())
+
+    for proposer in state_value:
+        if state_value[proposer] == max_state_value:
+            best_proposer_list += proposer
+
+    # if there is one max state value proposer
+    if len(best_proposer_list)==1:
+        best_proposer = best_proposer_list[0]
+
+    # if there are more than 1 proposers with max state values, select the most positive stance    
+    else:
+        
+        max_stance_power = [bot.ally_threshold, None]
+        for proposer in best_proposer_list:
+            if bot.stance.stance[bot.power_name][proposer] >= max_stance_power[0]:
+                max_stance_power[0] = bot.stance.stance[bot.power_name][proposer]
+                max_stance_power[1] = proposer
+        best_proposer = max_stance_power[1]
+
     return best_proposer, proposal_order[best_proposer]
 
 
