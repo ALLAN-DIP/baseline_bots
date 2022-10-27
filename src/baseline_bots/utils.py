@@ -504,7 +504,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
 
     for proposer in state_value:
         if state_value[proposer] == max_state_value:
-            best_proposer_list += proposer
+            best_proposer_list.append(proposer)
 
     # if there is one max state value proposer
     if len(best_proposer_list)==1:
