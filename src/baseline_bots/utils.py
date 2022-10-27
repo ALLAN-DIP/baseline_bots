@@ -456,7 +456,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
         for power in game.powers.values():
             result.powers[power.name] = deepcopy(power)
             setattr(result.powers[power.name], 'game', result)
-        result.role = strings.SERVER_TYPE
+        # result.role = strings.SERVER_TYPE
         return result
 
     # initialize state value for each proposal
@@ -474,33 +474,34 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
             print('real game phase {} unit info:'.format(bot.game.get_current_phase()))
             for power in bot.game.powers:
                 print('power: {} currently has units {}'.format(power,bot.game.powers[power].units))
-                
+
             print('simulated game phase {} unit info:'.format(simulated_game.get_current_phase()))
             for power in simulated_game.powers:
                 print('power: {} currently has units {}'.format(power,simulated_game.powers[power].units))
 
 
-            # censor aggressive orders
-            unit_orders = get_non_aggressive_orders(
-                unit_orders, bot.power_name, bot.game
-            )
+            # # censor aggressive orders
+            # unit_orders = get_non_aggressive_orders(
+            #     unit_orders, bot.power_name, bot.game
+            # )
 
             # set orders as a proposal order
             simulated_game.set_orders(power_name=bot.power_name, orders=unit_orders)
 
             # consider shared orders in a simulated game
             for other_power in simulated_game.powers:
+                if other_power!= bot.power_name:
+                    # if they are not sharing any info about their orders then assume that they are DipNet-based
+                    if other_power in shared_order and shared_order[other_power:
+                        power_orders = shared_order[other_power]
+                    else:
+                        power_orders = yield bot.brain.get_orders(
+                            simulated_game, other_power
+                        )
+                    print('at 0, {} moves: {}'.format(other_power, power_orders))
+                    simulated_game.set_orders(power_name=other_power, orders=power_orders)
 
-                # if they are not sharing any info about their orders then assume that they are DipNet-based
-                if other_power in shared_order:
-                    power_orders = shared_order[other_power]
-                else:
-                    power_orders = yield bot.brain.get_orders(
-                        simulated_game, other_power
-                    )
-                print('at 0, {} moves: {}'.format(other_power, power_orders))
-                simulated_game.set_orders(power_name=other_power, orders=power_orders)
-
+            print('process game')
             # process current turn
             simulated_game.process()
 
