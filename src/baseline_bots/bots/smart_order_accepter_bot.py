@@ -553,11 +553,6 @@ class SmartOrderAccepterBot(DipnetBot):
             self.foes = [pow for pow in powers if (pow != self.power_name and powers[pow] <= self.enemy_threshold)]
             self.neutral = [pow for pow in powers if (pow != self.power_name and powers[pow] > self.enemy_threshold and powers[pow] < self.ally_threshold)]
 
-            non_allies = self.foes+self.neutral
-
-            for power in non_allies: 
-                valid_proposal_orders[power] = None
-
             best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
             
             # add orders
