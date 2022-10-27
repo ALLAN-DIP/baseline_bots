@@ -466,7 +466,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
     for proposer, unit_orders in proposal_order.items():
 
         # if there is a proposal from this power
-        if unit_orders and proposer in bot.allies:
+        if unit_orders and (proposer in bot.allies or proposer==bot.power_name):
             print('considering {} proposal moves: {}'.format(proposer, unit_orders))
 
             # simulate game by copying the current one
