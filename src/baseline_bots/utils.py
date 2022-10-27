@@ -471,6 +471,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
 
             # simulate game by copying the current one
             simulated_game = __deepcopy__(bot.game)
+            simulated_game.process()
 
             # censor aggressive orders
             unit_orders = get_non_aggressive_orders(
