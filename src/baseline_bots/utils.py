@@ -490,7 +490,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
             # unit_orders = get_non_aggressive_orders(
             #     unit_orders, bot.power_name, bot.game
             # )
-
+            simulated_game.clear_orders()
             # set orders as a proposal order
             simulated_game.set_orders(power_name=bot.power_name, orders=unit_orders)
 
