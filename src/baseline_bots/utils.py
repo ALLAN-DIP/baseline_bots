@@ -404,7 +404,7 @@ def get_state_value(bot, game, power_name, option="default"):
                 power_name=power,
                 orders=orders[: min(bot.rollout_n_order, len(orders))],
             )
-        print('at {}, {} moves: {}'.format(i+1,power, power_orders))
+        print('at {}, {} moves: {}'.format(i+1,power, orders))
         game.process()
     
     centers= game.get_centers()
