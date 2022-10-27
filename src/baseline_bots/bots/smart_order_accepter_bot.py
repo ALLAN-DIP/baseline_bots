@@ -54,7 +54,7 @@ class SmartOrderAccepterBot(DipnetBot):
         self.discount_factor = discount_factor
         self.stance = ActionBasedStance(power_name, game, discount_factor=self.discount_factor)
         self.alliances = defaultdict(list)
-        self.rollout_length = 5
+        self.rollout_length = 7
         self.rollout_n_order = 5
         self.allies_influence = set()
         self.orders = None
