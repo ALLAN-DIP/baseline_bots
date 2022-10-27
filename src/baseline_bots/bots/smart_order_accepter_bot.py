@@ -59,7 +59,7 @@ class SmartOrderAccepterBot(DipnetBot):
         self.allies_influence = set()
         self.orders = None
         self.my_influence = set()
-        self.ally_threshold = -0.1
+        self.ally_threshold = 0
         self.enemy_threshold = -0.5
         self.allies = []
         self.foes = []
@@ -549,9 +549,9 @@ class SmartOrderAccepterBot(DipnetBot):
 
             # fmt: off
 
-            self.allies = [pow for pow in powers if (pow != self.power_name and powers[pow] >= self.ally_threshold)]
+            self.allies = [pow for pow in powers if (pow != self.power_name and powers[pow] > self.ally_threshold)]
             self.foes = [pow for pow in powers if (pow != self.power_name and powers[pow] <= self.enemy_threshold)]
-            self.neutral = [pow for pow in powers if (pow != self.power_name and powers[pow] > self.enemy_threshold and powers[pow] < self.ally_threshold)]
+            self.neutral = [pow for pow in powers if (pow != self.power_name and powers[pow] > self.enemy_threshold and powers[pow] <= self.ally_threshold)]
 
             best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
             
