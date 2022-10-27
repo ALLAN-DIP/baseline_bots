@@ -476,14 +476,14 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
             for power in bot.game.powers:
                 print('power: {} currently has units {}'.format(power,bot.game.powers[power].units))
                 for unit in bot.game.powers[power].units:
-                    print('{} belongs to {} in real game while unit_owner = {}'.format(unit, power, bot.game._unit_owner(unit)))
+                    print('{} belongs to {} in real game while unit_owner = {}'.format(unit, power, bot.game._unit_owner(unit).name))
 
             print('simulated game phase {} unit info:'.format(simulated_game.get_current_phase()))
             print('simulated game rules {}'.format(simulated_game.rules))
             for power in simulated_game.powers:
                 print('power: {} currently has units {}'.format(power,simulated_game.powers[power].units))
                 for unit in simulated_game.powers[power].units:
-                    print('{} belongs to {} in simulated game while unit_owner = {}'.format(unit, power, simulated_game._unit_owner(unit)))
+                    print('{} belongs to {} in simulated game while unit_owner = {}'.format(unit, power, simulated_game._unit_owner(unit).name))
 
 
             # # censor aggressive orders
