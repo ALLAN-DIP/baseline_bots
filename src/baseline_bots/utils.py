@@ -386,7 +386,7 @@ def get_state_value(bot, game, power_name, option="default"):
     for i in range(bot.rollout_length):
 
         for power in game.map.powers:
-            print('rollout at step {} for power: {}'.format(i+1, power))
+            # print('rollout at step {} for power: {}'.format(i+1, power))
             
             if option == "samplingbeam":
                 list_order, prob_order = yield bot.brain.get_beam_orders(game, power)
@@ -406,12 +406,12 @@ def get_state_value(bot, game, power_name, option="default"):
                 power_name=power,
                 orders=orders[: min(bot.rollout_n_order, len(orders))],
             )
-            print('at {}, {} moves: {}'.format(i+1,power, orders))
+            # print('at {}, {} moves: {}'.format(i+1,power, orders))
         game.process()
     
     centers= game.get_centers()
     state_value = [len(centers[power]) for power in game.map.powers]
-    print('done rollout with state values: ', state_value)
+    # print('done rollout with state values: ', state_value)
     return len(game.get_centers(power_name))
 
 
@@ -471,7 +471,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
 
             # simulate game by copying the current one
             simulated_game = __deepcopy__(bot.game)
-            simulated_game.process()
+            print('real game phase {} and simulated game phase {}'.format(bot.game.get_current_phase(), simulated_game.game.get_current_phase()))
 
             # censor aggressive orders
             unit_orders = get_non_aggressive_orders(
@@ -501,6 +501,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
             state_value[proposer] = yield get_state_value(
                 bot, simulated_game, bot.power_name
             )
+            print('done rollout with state values: ', state_value)
 
     best_proposer_list = []        
     max_state_value = max(state_value.values())
