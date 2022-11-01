@@ -50,23 +50,24 @@ RUN git config --global --add safe.directory /model/src/model_server/baseline_bo
 # Avoid pip issues
 RUN pip install --upgrade pip
 
-# pytest
-RUN pip install -r /model/src/model_server/baseline_bots/requirements.txt
-RUN pip install -e /model/src/model_server/baseline_bots
-
-RUN pytest /model/src/model_server/baseline_bots/tests/
-
 # Install diplomacy research requirements
 WORKDIR /model/src/model_server/research
 RUN sed -i 's/gym>/gym=/g'  requirements.txt
 RUN pip install -r requirements.txt
 RUN pip install -e .
 
+# pytest
+# RUN pip install -r /model/src/model_server/baseline_bots/requirements.txt
+# RUN pip install -e /model/src/model_server/baseline_bots
+
 # Install baseline_bots requirements
 WORKDIR /model/src/model_server/baseline_bots
 RUN pwd && ls -al
 RUN pip install -r requirements.txt
 RUN pip install -e .
+
+# run pytest
+RUN pytest /model/src/model_server/baseline_bots/tests/
 
 # Script executors
 RUN chmod 777 /model/src/model_server/baseline_bots/containers/test_env/run_bot.py
