@@ -156,6 +156,8 @@ def parse_arrangement(msg: str, xdo_only=True) -> List[str]:
     try:
         if "ORR" in msg:
             msg = msg[msg.find("(") :]
+        elif "AND" in msg:
+            msg = msg[msg.find("(") :]
         # else:
         #     # remove else since it is a bug to 'XDO (order)'
         #     msg = msg[1:-1]

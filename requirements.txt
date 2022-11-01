@@ -5,8 +5,5 @@ git+https://github.com/trigaten/DAIDE.git
 karma_sphinx_theme
 black
 isort
-numpy
-# Sander's DAIDE parser/constructor
-git+https://github.com/trigaten/DAIDE.git
 git+https://github.com/ALLAN-DIP/stance_vector.git
-numpy
+numpy==1.21
