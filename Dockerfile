@@ -60,6 +60,7 @@ RUN pytest /model/src/model_server/baseline_bots/tests/
 WORKDIR /model/src/model_server/research
 RUN sed -i 's/gym>/gym=/g'  requirements.txt
 RUN pip install -r requirements.txt
+RUN pip install -e .
 
 # Install baseline_bots requirements
 WORKDIR /model/src/model_server/baseline_bots
