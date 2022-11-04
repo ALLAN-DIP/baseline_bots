@@ -53,6 +53,7 @@ RUN pip install --upgrade pip
 # Install diplomacy research requirements
 WORKDIR /model/src/model_server/research
 RUN sed -i 's/gym>/gym=/g'  requirements.txt
+RUN pip install -r requirements.txt
 RUN pip install -r requirements_dev.txt
 
 # Install baseline_bots requirements
