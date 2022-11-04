@@ -63,7 +63,7 @@ RUN pip install -e .
 
 # run pytest
 RUN pytest tests/utils_test.py
-RUN pytest randomize_order_test.py
+RUN pytest tests/randomize_order_test.py
 
 # Script executors
 RUN chmod 777 /model/src/model_server/baseline_bots/containers/test_env/run_bot.py
