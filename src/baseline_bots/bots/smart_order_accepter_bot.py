@@ -65,7 +65,13 @@ class SmartOrderAccepterBot(DipnetBot):
         self.foes = []
         self.neutral = []
         
-    async def send_message(self, recipient, message):
+    async def send_message(self, recipient: str, message: MessagesData) -> None:
+        """
+        Send message asynchronously to the server while the bot is still processing
+
+        :param recipient: The name of the recipient power
+        :param message: MessagesData object containing set of all messages
+        """
         msg_obj = Message(
             sender=self.power_name,
             recipient=recipient,
@@ -80,6 +86,9 @@ class SmartOrderAccepterBot(DipnetBot):
         """
         Add messages to be sent to powers with positive stance.
         These messages would contain factual information about the orders that current power would execute in current round
+
+        :param msgs_data: MessagesData object containing set of all messages
+        :param orders_list: set of orders that are going to be executed by the bot
         """
         if orders_list:
             orders_decided = FCT(
@@ -98,8 +107,14 @@ class SmartOrderAccepterBot(DipnetBot):
                         msgs_data.add_message(pow, str(orders_decided))
                         await self.send_message(pow, str(orders_decided))
 
-    async def gen_messages(self, orders_list: List[str], msgs_data: MessagesData):
+    async def gen_messages(self, orders_list: List[str], msgs_data: MessagesData) -> MessagesData:
+        """
+        This generates messages to be sent to the other powers. 
+        Note: Messages are also generated outside of this function invocation flow
 
+        :param orders_list: final list of orders decided by the bot
+        :param msgs_data: MessagesData object containing set of all messages
+        """
         # generate messages: we should  be sending our true orders to allies (positive stance)
         await self.gen_pos_stance_messages(msgs_data, orders_list)
 
@@ -110,6 +125,11 @@ class SmartOrderAccepterBot(DipnetBot):
     ) -> MessagesData:
         """
         Reply back to allies regarding their proposals whether we follow or not follow
+
+        :param best_proposer: the name of the best proposer as determined by the bot in utils.get_best_orders
+        :param prp_orders: dictionary of proposed orders
+        :param messages: MessagesData object containing set of all messages
+        :return: MessagesData object containing set of all messages
         """
         for proposer, orders in prp_orders.items():
             if (
@@ -199,32 +219,20 @@ class SmartOrderAccepterBot(DipnetBot):
             print(self.alliances)
 
     def is_support_for_selected_orders(self, support_order: str) -> bool:
-        """Determine if selected support order for neighbour corresponds to a self order selected"""
+        """
+        Determine if selected support order for neighbour corresponds to a self order selected
+
+        :param support_order: the support order to be determined for correspondance with self orders
+        :return: boolean indicating the above mentioned detail
+        """
         order_tokens = get_order_tokens(support_order)
+
+        # Fetch our order for which the support order is determined using supported province name
         selected_order = get_order_tokens(
             self.orders.orders[order_tokens[2].split()[1]]
         )
 
-        if (
-            len(order_tokens[2:]) == len(selected_order)
-            and order_tokens[2:] == selected_order
-        ):
-            # Attack move
-            return True
-        elif selected_order[1].strip() == "H" and (
-            len(order_tokens[2:]) == len(selected_order) - 1
-        ):
-            # Hold move
-            return True
-        return False
-
-    def is_support_for_given_orders(self, support_order, orders):
-        """Determine if selected support order for neighbour corresponds to given list of orders"""
-        order_tokens = get_order_tokens(support_order)
-        if order_tokens[2].split()[1] not in orders:
-            return True  # it's okay to support other power than allies
-        selected_order = get_order_tokens(orders[order_tokens[2].split()[1]])
-
+        # Check if the support order is in correspondance with the order we have selected for our province
         if (
             len(order_tokens[2:]) == len(selected_order)
             and order_tokens[2:] == selected_order
@@ -241,6 +249,8 @@ class SmartOrderAccepterBot(DipnetBot):
     def get_2_neigh_provinces(self) -> Set[str]:
         """
         Determine set of orderable locations of allies which are 1-hop/2-hops away from the current power's orderable locations
+
+        :return: set of orderable locations of neighbouring allies
         """
         provs = [
             loc.upper() for loc in self.game.get_orderable_locations(self.power_name)
@@ -282,7 +292,12 @@ class SmartOrderAccepterBot(DipnetBot):
         return n2n_provs
 
     def bad_move(self, order: str) -> bool:
-        """If order indicates attack on one of its provinces, return True, else return False"""
+        """
+        If order indicates attack on one of its provinces, return True, else return False
+
+        :param order: the order representing the move which is to be determined if it is bad or not
+        :return: boolean indicating the above detail
+        """
         order_tokens = get_order_tokens(order)
 
         if len(order_tokens) == 2:
@@ -297,7 +312,11 @@ class SmartOrderAccepterBot(DipnetBot):
         return False
 
     def support_move(self, order: str) -> bool:
-        """Indicates if order is a support order and is not attacking on one of its provinces"""
+        """
+        Indicates if order is a support order and is not attacking on one of its provinces
+
+        :param order: the order which is to be determined if it is a support move or not
+        """
         order_tokens = get_order_tokens(order)
         if (
             3 <= len(order_tokens) <= 4
@@ -319,7 +338,11 @@ class SmartOrderAccepterBot(DipnetBot):
             self.allies_influence.update(set(self.game.get_power(pow).influence))
 
     def get_allies_orderable_locs(self) -> Set[str]:
-        """Gets provinces which are orderable for the allies"""
+        """
+        Gets provinces which are orderable for the allies
+
+        :return: set of provinces which are orderable for the allies
+        """
         provinces = set()
         for ally in [
             pow1
