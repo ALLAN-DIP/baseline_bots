@@ -13,22 +13,22 @@ Building the container
 
 .. code-block:: python
 
-cd containers/allan_dip_bot/
+	cd containers/allan_dip_bot/
 
 2. Download and unzip the model file:
 
 .. code-block:: bash
 
-$ wget https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-sl_model.zip
-$ mkdir bot_neurips2019-sl_model
-$ unzip neurips2019-sl_model.zip -d bot_neurips2019-sl_model/
+	$ wget https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-sl_model.zip
+	$ mkdir bot_neurips2019-sl_model
+	$ unzip neurips2019-sl_model.zip -d bot_neurips2019-sl_model/
 
 3. Build the docker container with the tag to be used while pushing it to DockerHub:
 
 .. code-block:: bash
 
-$ docker build -t uname/allan_dip_bot .
-$ docker push uname/allan_dip_bot
+	$ docker build -t uname/allan_dip_bot .
+	$ docker push uname/allan_dip_bot
 
 Note, here ``uname`` is supposed to be your username on DockerHub. This is needed if you plan to push the image to DockerHub. If you intend to just create the image and run it locally, you can just write the tag name as ``allan_dip_bot``.
 
@@ -37,14 +37,14 @@ Usage
 
 .. code-block:: bash
 
-$ docker run -it allan_dip_bot --help
---host 		HOST [default localhost]
---port 		PORT [default 8432]
---game_id 	GAME_ID
---power		POWER
---bot_type  BOT_TYPE [default TransparentBot]
---outdir    OUT_DIR
+	$ docker run -it allan_dip_bot --help
+	--host 		HOST [default localhost]
+	--port 		PORT [default 8432]
+	--game_id 	GAME_ID
+	--power		POWER
+	--bot_type  BOT_TYPE [default TransparentBot]
+	--outdir    OUT_DIR
 
-#connect to remote game engine
-$ docker run uname/allan_dip_bot --game_id test_game --host shade.tacc.utexas.edu --power TURKEY
-$ singularity run uname/allan_dip_bot --game_id test_game --host shade.tacc.utexas.edu --power TURKEY
+	#connect to remote game engine
+	$ docker run uname/allan_dip_bot --game_id test_game --host shade.tacc.utexas.edu --power TURKEY
+	$ singularity run uname/allan_dip_bot --game_id test_game --host shade.tacc.utexas.edu --power TURKEY
