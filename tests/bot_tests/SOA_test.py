@@ -1,5 +1,5 @@
 """unit tests for smart order accepter bot"""
-from gameplay_framework import GamePlayAsync
+from gameplay_framework_async import GamePlayAsync
 from diplomacy import Game, Message
 from tornado import gen
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
