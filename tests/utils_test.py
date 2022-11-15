@@ -3,7 +3,7 @@ from baseline_bots.parsing_utils import dipnet_to_daide_parsing, daide_to_dipnet
 from diplomacy import Game, Message
 
 class TestUtils:
-    def test(self):
+    def test_get_list_of_orders(self):
         EXAMPLE_ORDER = 'A VIE S A BUD - GAL'
         EXAMPLE_ORDER_2 = 'A VIE H'
 
@@ -20,7 +20,7 @@ class TestUtils:
         orders_data.add_order(EXAMPLE_ORDER_2, overwrite=True)
         assert orders_data.get_list_of_orders() == ['A VIE H']
 
-
+    def test_sort_messages_by_most_recent(self):
         # test sort_messages_by_most_recent
         game = Game()
         powers = list(game.powers)
@@ -44,6 +44,7 @@ class TestUtils:
 
         assert sort_messages_by_most_recent(msgs)[0].message == "HELLO"
 
+    def test_dipnet_to_daide_parsing(self):
         # Tests for utils.dipnet_to_daide_parsing
         PARSING_TEST_CASES = [
             (["A PAR H"], ["(FRA AMY PAR) HLD"], False),
@@ -70,8 +71,7 @@ class TestUtils:
             assert daide_to_dipnet_parsing(tc_op[0])[0] == comparison_tc_op, (daide_to_dipnet_parsing(tc_op[0]), comparison_tc_op)
         
 
-
-
+    def test_dipnet_to_daide_parsing_convoys(self):
         # Tests for convoy orders
         PARSING_CVY_TEST_CASES = [
             (["A TUN - SYR VIA", "F ION C A TUN - SYR", "F EAS C A TUN - SYR"], ["(ITA AMY TUN) CTO SYR VIA (ION EAS)", "(ITA FLT ION) CVY (ITA AMY TUN) CTO SYR", "(ITA FLT EAS) CVY (ITA AMY TUN) CTO SYR"]),
@@ -87,9 +87,7 @@ class TestUtils:
                 assert daide_to_dipnet_parsing(tc_op_ord)[0] == tc_ip_ord.replace(" R ", " - "), (daide_to_dipnet_parsing(tc_op_ord), tc_ip_ord.replace(" R ", " - "))
         
 
-
-
-
+    def test_parse_proposal_messages(self):
         # Tests for parse_proposal_messages
         PARSE_PROPOSALS_TC = [
             [
@@ -217,9 +215,7 @@ class TestUtils:
                     assert set(parsed_orders_dict[pod_key][key]) == set(tc_op[pod_key][key]), (pod_key, key, set(parsed_orders_dict[pod_key][key]), set(tc_op[pod_key][key]))
 
 
-
-
-
+    def test_parse_FCT(self):
         # Tests for orders extraction
         FCT_TCS = [
             [
@@ -234,6 +230,7 @@ class TestUtils:
         for tc_ip, tc_op in FCT_TCS:
             assert parse_FCT(tc_ip) == tc_op, parse_FCT(tc_ip)
             
+    def test_parse_PRP(self):
         PRP_TCS = [
             [
                 "PRP (XDO (F BLK - CON))", 
@@ -247,6 +244,7 @@ class TestUtils:
         for tc_ip, tc_op in PRP_TCS:
             assert parse_PRP(tc_ip) == tc_op, parse_PRP(tc_ip)
 
+    def test_parse_arrangement(self):
         ORR_TCS = [
             [
                 "XDO (F BLK - CON)",
@@ -311,6 +309,8 @@ class TestUtils:
         for tc_ip, tc_op in ORR_XDO_ALY_TCS:
             assert parse_arrangement(tc_ip, xdo_only=False) == tc_op, (parse_arrangement(tc_ip, xdo_only=False), tc_op)
 
+
+    def test_smart_select_support_proposals(self):
         SMART_SELECT_SUPPORT_PROPOSALS = [
             [
                 {
@@ -332,6 +332,7 @@ class TestUtils:
             assert smart_select_support_proposals(tc_ip) == tc_op
 
         
+    def test_get_order_tokens(self):
         GET_ORDER_TOKENS_TCS = [
             [
                 "A PAR S A MAR - BUR",
