@@ -31,7 +31,7 @@ class GamePlayAsync(GamePlay):
         """one step of messaging"""
 
         if self.game.is_game_done:
-            return True
+            return None, True
         
         # if message rounds over
         if self.cur_local_message_round == self.msg_rounds:
@@ -39,7 +39,7 @@ class GamePlayAsync(GamePlay):
         while self.game.get_current_phase()[-1] != 'M':
             self.game.process()
             if self.game.is_game_done:
-                return True
+                return None, True
 
         round_msgs = self.game.messages
         msgs_to_send = {}
