@@ -178,6 +178,7 @@ def random_convoy_to(order: Tuple) -> Tuple:
     :rtype: Tuple
     """
     (_, _, amy_loc), _, province, _, (sea_provinces) = order
+    sea_provinces = sea_provinces.split()
     sea_provinces = list(reversed(sea_provinces))
     for i, sea in enumerate(
         sea_provinces
