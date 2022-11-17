@@ -21,6 +21,7 @@ class GamePlay:
     def __init__(
         self, game: Game, bots: List[BaselineBot], msg_rounds: int, save_json=False
     ):
+        print("Gameplay init")
         assert len(bots) <= 7, "too many bots"
         # if no game is passed, assume bots is a list of bot classes to
         # be instantiated.
@@ -122,7 +123,7 @@ class GamePlay:
 
 @gen.coroutine            
 def game_loop():
-    game_play_obj = GamePlay(None, [RandomProposerBot_AsyncBot, RandomProposerBot_AsyncBot, RandomProposerBot_AsyncBot], 3, True)
+    game_play_obj = GamePlay(None, [RandomProposerBot_AsyncBot, RandomProposerBot_AsyncBot, RandomProposerBot_AsyncBot], 3, False)
     yield game_play_obj.play()
     stop_io_loop()
                 
