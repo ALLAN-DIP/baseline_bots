@@ -13,7 +13,6 @@ class TestRPBot():
     def test(self):
         game_play = GamePlay(None, [RandomProposerBot, RandomProposerBot], 3, True)
         actions, done = game_play.step()
-        print(actions)
         game_play = GamePlay(None, [LoyalBot, RandomProposerBot], 3)
         game_play.play()
         # game_play = GamePlay(None, [RealPolitik, RandomProposerBot], 3)
