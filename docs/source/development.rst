@@ -57,6 +57,9 @@ Pushing code:
 
 Development on TACC and using diplomacy_research:
 **********************************************************************************************************************************************
+If using VSCode, run `unset PROMPT_COMMAND` in the terminal or add it to .bashrc
+Otherwise, you may see a lot of `__vsc_prompt_cmd_original`
+
 
 .. code-block:: bash
 
