@@ -32,11 +32,11 @@ class TestRandomizeDipnet:
 
         orders = [(("FRA", "FLT", "NTH"), "CVY", ('FRA', 'AMY', 'HOL'), 'CTO', "NWY"), (("FRA", "AMY", "HOL"), "CTO", 'NWY',"VIA", ('NTH'))]
         random.seed(1)
-        assert random_list_orders(orders) == [(('FRA', 'FLT', 'NTH'), 'MTO', 'DEN'), (('FRA', 'AMY', 'HOL'), 'MTO', 'NTH')]
+        assert random_list_orders(orders) == [(('FRA', 'FLT', 'NTH'), 'CVY', ('FRA', 'AMY', 'HOL'), 'CTO', 'EDI'), (('FRA', 'AMY', 'HOL'), 'CTO', 'NWY', 'VIA', ('NTH',))]
 
         orders = [(("FRA", "FLT", "NTH"), "CVY", ('FRA', 'AMY', 'HOL'), 'CTO', "NWY"), (("FRA", "AMY", "HOL"), "CTO", 'NWY',"VIA", ('NTH'))]
         random.seed(15)
-        assert random_list_orders(orders) ==[(('FRA', 'FLT', 'NTH'), 'HLD'), (('FRA', 'AMY', 'HOL'), 'MTO', 'BEL')]
+        assert random_list_orders(orders) ==[(('FRA', 'FLT', 'NTH'), 'CVY', ('FRA', 'AMY', 'HOL'), 'CTO', 'EDI'), (('FRA', 'AMY', 'HOL'), 'CTO', 'DEN', 'VIA', ('NTH',))]
         
         # This tests the ability for string_to_tuple to convert this string representing
         # a "convoy to" order properly
@@ -51,6 +51,7 @@ class TestRandomizeDipnet:
 
         # This tests the function randomize_joiner which makes sure that the orders ouput are different than the orders input
         test_string = "AND ((FRA AMY BUR) MTO BEL) ((FRA AMY PIC) CTO FIN VIA (NTH SKA DEN BAL BOT))"
+        print(randomize_order(test_string))
         assert test_string != randomize_order(test_string)
 
         # These following tests test the validity of orders that the randomizer can generate

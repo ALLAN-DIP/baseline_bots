@@ -94,13 +94,13 @@ class RandomProposerBot_AsyncBot(RandomProposerBot):
         :return: dict containing messages and orders
         """
         messages = yield self.gen_messages(rcvd_messages)
-        
+
         if messages and messages.messages:
             for msg in messages.messages:
                 msg_obj = Message(
                     sender=self.power_name,
-                    recipient=msg['recipient'],
-                    message=msg['message'],
+                    recipient=msg["recipient"],
+                    message=msg["message"],
                     phase=self.game.get_current_phase(),
                 )
                 yield self.game.send_game_message(message=msg_obj)
