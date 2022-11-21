@@ -51,7 +51,6 @@ class TestRandomizeDipnet:
 
         # This tests the function randomize_joiner which makes sure that the orders ouput are different than the orders input
         test_string = "AND ((FRA AMY BUR) MTO BEL) ((FRA AMY PIC) CTO FIN VIA (NTH SKA DEN BAL BOT))"
-        print(randomize_order(test_string))
         assert test_string != randomize_order(test_string)
 
         # These following tests test the validity of orders that the randomizer can generate
