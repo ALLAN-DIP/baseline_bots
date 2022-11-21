@@ -101,9 +101,9 @@ class RandomProposerBot_AsyncBot(RandomProposerBot):
                     sender=self.power_name,
                     recipient=msg['recipient'],
                     message=msg['message'],
-                    phase=game.get_current_phase(),
+                    phase=self.game.get_current_phase(),
                 )
-                yield game.send_game_message(message=msg_obj)
+                yield self.game.send_game_message(message=msg_obj)
         orders = yield self.gen_orders()
         # maintain current orders
         self.orders = orders

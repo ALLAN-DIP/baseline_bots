@@ -2,7 +2,7 @@
 from gameplay_framework import GamePlay
 
 from baseline_bots.bots.baseline_bot import BaselineBot
-from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
+from baseline_bots.bots.random_proposer_bot import RandomProposerBot
 from baseline_bots.bots.pushover_bot import PushoverBot
 from baseline_bots.bots.random_allier_proposer_bot import RandomAllierProposerBot
 from baseline_bots.bots.random_honest_bot import RandomHonestBot
@@ -14,10 +14,9 @@ from baseline_bots.bots.loyal_bot import LoyalBot
 
 class TestRPBot:
     def test(self):
-        game_play = GamePlay(None, [RandomProposerBot_AsyncBot, RandomProposerBot_AsyncBot], 3, True)
+        game_play = GamePlay(None, [RandomProposerBot, RandomProposerBot], 3, True)
         actions, done = game_play.step()
-        print(actions)
-        game_play = GamePlay(None, [LoyalBot, RandomProposerBot_AsyncBot], 3)
+        game_play = GamePlay(None, [LoyalBot, RandomProposerBot], 3)
         game_play.play()
         game_play = GamePlay(None, [RealPolitik, RandomProposerBot], 3)
         game_play.play()
