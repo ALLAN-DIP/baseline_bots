@@ -65,8 +65,10 @@ Development on TACC and using diplomacy_research:
     module load tacc-singularity
     # activate conda environment
     conda activate shade
+    # clone the diplomacy research code if you havent already
+    git clone https://github.com/diplomacy/research.git
     # add path to diplomacy_research to PYTHONPATH--your path should be different
-    export PYTHONPATH=$PYTHONPATH:/home1/08764/trigaten/research/diplomacy_research
+    export PYTHONPATH=$PYTHONPATH:/home1/08764/trigaten/research
 
 How to run bots
 ****************************************************************************************************************
