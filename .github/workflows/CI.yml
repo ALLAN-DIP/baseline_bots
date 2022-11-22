@@ -24,4 +24,8 @@ jobs:
           mkdir bot_neurips2019-sl_model
           unzip neurips2019-sl_model.zip -d bot_neurips2019-sl_model/
           docker build --no-cache -t allan_test_env .
-          docker run allan_test_env
+
+      - name: "Run Tests"
+        run: |
+          docker run --rm allan_test_env /bin/bash -c "pytest --ignore=tests/bot_tests/SOA_test.py --ignore=tests/randomize_order_test.py --ignore=tests/bot_tests/dipnet.py"
+
