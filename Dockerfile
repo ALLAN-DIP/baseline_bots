@@ -23,9 +23,6 @@ RUN git clone https://github.com/SHADE-AI/diplomacy.git
 RUN git clone https://github.com/SHADE-AI/research.git
 RUN mkdir /model/src/model_server/baseline_bots
 
-# Run pytests
-
-
 COPY . /model/src/model_server/baseline_bots
 
 # Environment variables
