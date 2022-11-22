@@ -495,7 +495,6 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
 
     # get power name that gives the max state value
     best_proposer = max(state_value, key=state_value.get)
-
     return best_proposer, proposal_order[best_proposer]
 
 

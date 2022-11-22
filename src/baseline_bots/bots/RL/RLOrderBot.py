@@ -12,14 +12,13 @@ import random
 from abc import ABC, abstractmethod
 from typing import List
 
+from bots.baseline_bot import BaselineMsgRoundBot
 from diplomacy import Game, Message
 from diplomacy_research.players.benchmark_player import DipNetRLPlayer
 from DiplomacyEnv import DiplomacyEnv
 from pytorch_DRL.MAA2C import MAA2C
 from tornado import gen
 from utils import MessagesData, OrdersData, get_order_tokens
-
-from baseline_bots.bots.baseline_bot import BaselineMsgRoundBot
 
 EPISODES_BEFORE_TRAIN = 2
 # roll out n steps
