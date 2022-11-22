@@ -177,9 +177,11 @@ def random_convoy_to(order: Tuple) -> Tuple:
     :return: A deviant order (with some chance of being the same order).
     :rtype: Tuple
     """
-    (_, _, amy_loc), _, province, _, (sea_provinces) = order
-    sea_provinces = sea_provinces.split()
-    sea_provinces = list(reversed(sea_provinces))
+    (_, _, amy_loc), _, province, _, sea_provinces = order
+    if isinstance(sea_provinces, Tuple):
+        sea_provinces = list(reversed(sea_provinces))
+    else:
+        sea_provinces = [sea_provinces]
     for i, sea in enumerate(
         sea_provinces
     ):  # searches through the sea provinces in reversed order to find the longest possible alternate convoy
@@ -369,10 +371,11 @@ def string_to_tuple(orders: str) -> Tuple:
     )  # inserts quotes around strings
     return eval(with_quotes)
 
+
 def lst_to_daide(orders: List) -> str:
-    '''
+    """
     This function should take DAIDE orders as a list of strings and wrap them so: FCT ( ORR ( XDO(ORD1) XDO(ORD2) ) )
-    '''
+    """
     daide_ords = "FCT (ORR"
     for ord in orders:
         daide_ords += " (XDO (" + ord + "))"

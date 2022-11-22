@@ -1,13 +1,15 @@
 __authors__ = ["Sander Schulhoff", "Kartik Shenoy"]
 __email__ = "sanderschulhoff@gmail.com"
 
+import sys
 from typing import List
-from tornado import gen
+
 from diplomacy import Game, Message, connect
 from diplomacy.utils.export import to_saved_game_format
+from tornado import gen
 
 from baseline_bots.bots.baseline_bot import BaselineBot, BaselineMsgRoundBot
-import sys
+
 sys.path.append("../../../dipnet_press")
 
 
@@ -19,7 +21,6 @@ class GamePlay:
     def __init__(
         self, game: Game, bots: List[BaselineBot], msg_rounds: int, save_json=False
     ):
-        print("Gameplay init")
         assert len(bots) <= 7, "too many bots"
         # if no game is passed, assume bots is a list of bot classes to
         # be instantiated.
@@ -63,11 +64,11 @@ class GamePlay:
 
         if self.game.is_game_done:
             return None, True
-        
+
         # if message rounds over
         if self.cur_local_message_round == self.msg_rounds:
-           self.phase_init_bots()
-        while self.game.get_current_phase()[-1] != 'M':
+            self.phase_init_bots()
+        while self.game.get_current_phase()[-1] != "M":
             self.game.process()
             if self.game.is_game_done:
                 return None, True
@@ -82,10 +83,9 @@ class GamePlay:
 
             # an array of Message objects
             rcvd_messages = list(rcvd_messages.items())
-            
+
             # get messages to be sent from bot
             ret_dict = bot(rcvd_messages)
-
 
             if "messages" in ret_dict:
                 bot_messages = ret_dict["messages"]  # bot.gen_messages(rcvd_messages)

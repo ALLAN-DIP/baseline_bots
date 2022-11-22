@@ -1,23 +1,25 @@
-
 #!/usr/bin/env python3
 # python dip_ui_bot_launcher.py -H shade.tacc.utexas.edu -p AUSTRIA,ITALY,ENGLAND,GERMANY,FRANCE -B np -g kshenoy-test10
 # python dip_ui_bot_launcher.py -H shade.tacc.utexas.edu -p RUSSIA -B rlspm -g kshenoy-test10
 # python dip_ui_bot_launcher.py -H shade.tacc.utexas.edu -p TURKEY -B rlsp -g kshenoy-test10
 
+import argparse
 import asyncio
 import random
+
 # from bots.dipnet import RealPolitik
 # from bots.dipnet.dipnet_proposer_bot import ProposerDipBot
 from bots.dipnet.loyal_support_proposal import LSP_DipBot
 from bots.dipnet.no_press_bot import NoPressDipBot
+from diplomacy import Message
 from diplomacy.client.connection import connect
 from diplomacy.utils import exceptions
-from diplomacy import Message
-import argparse
+
 # from bots.dipnet.selectively_transparent_bot import SelectivelyTransparentBot
 
 # from bots.dipnet.transparent_bot import TransparentBot
 # from bots.dipnet.transparent_proposer_bot import TransparentProposerDipBot
+
 
 def is_in_instance_list(obj, instance_list):
     boo_v = False
@@ -27,7 +29,8 @@ def is_in_instance_list(obj, instance_list):
             break
     return boo_v
 
-POWERS = ['AUSTRIA', 'ENGLAND', 'FRANCE', 'GERMANY', 'ITALY', 'RUSSIA', 'TURKEY']
+
+POWERS = ["AUSTRIA", "ENGLAND", "FRANCE", "GERMANY", "ITALY", "RUSSIA", "TURKEY"]
 # POWERS = ['TURKEY']
 
 # async def create_game(game_id, hostname='localhost', port=8432):
@@ -39,26 +42,26 @@ POWERS = ['AUSTRIA', 'ENGLAND', 'FRANCE', 'GERMANY', 'ITALY', 'RUSSIA', 'TURKEY'
 #     await channel.join_game(game_id=game_id)
 
 
-async def play(game_id, botname, power_name, hostname='localhost', port=8432):
-    """ Play as the specified power """
+async def play(game_id, botname, power_name, hostname="localhost", port=8432):
+    """Play as the specified power"""
     connection = await connect(hostname, port)
-    channel = await connection.authenticate('user_' + power_name, 'password')
+    channel = await connection.authenticate("user_" + power_name, "password")
 
     # Waiting for the game, then joining it
     while not (await channel.list_games(game_id=game_id)):
-        await asyncio.sleep(1.)
+        await asyncio.sleep(1.0)
     game = await channel.join_game(game_id=game_id, power_name=power_name)
     bot = None
     alliance_all_in = False
-    if botname == 'np':
-        bot = NoPressDipBot(power_name, game, dipnet_type='rlp')
-    elif botname.startswith('lsp'):
+    if botname == "np":
+        bot = NoPressDipBot(power_name, game, dipnet_type="rlp")
+    elif botname.startswith("lsp"):
         bot = LSP_DipBot(power_name, game, 3, alliance_all_in)
-        if botname.endswith('m'):
+        if botname.endswith("m"):
             bot.set_leader()
-    elif botname.startswith('rlsp'):
-        bot = LSP_DipBot(power_name, game, 3, alliance_all_in, dipnet_type='rlp')
-        if botname.endswith('m'):
+    elif botname.startswith("rlsp"):
+        bot = LSP_DipBot(power_name, game, 3, alliance_all_in, dipnet_type="rlp")
+        if botname.endswith("m"):
             bot.set_leader()
     # elif botname == 'random_honest_order_acceptor':
     #     bot = RandomHonestAccepterBot(power_name, game)
@@ -79,18 +82,23 @@ async def play(game_id, botname, power_name, hostname='localhost', port=8432):
     print("Started playing")
     while not game.is_game_done:
         current_phase = game.get_current_phase()
-        dip_instance_list = [NoPressDipBot, LSP_DipBot ]#TransparentBot, SelectivelyTransparentBot, TransparentProposerDipBot, ProposerDipBot, RealPolitik]
+        dip_instance_list = [
+            NoPressDipBot,
+            LSP_DipBot,
+        ]  # TransparentBot, SelectivelyTransparentBot, TransparentProposerDipBot, ProposerDipBot, RealPolitik]
         if is_in_instance_list(bot, dip_instance_list):
             bot.phase_init()
-        if game.get_current_phase()[-1] == 'M':
+        if game.get_current_phase()[-1] == "M":
             # Iterate through multiple rounds of comms during movement phases
             for _ in range(3):
                 round_msgs = game.messages
                 to_send_msgs = {}
-            
+
                 if not game.powers[bot.power_name].is_eliminated():
                     # Retrieve messages
-                    rcvd_messages = game.filter_messages(messages=round_msgs, game_role=bot.power_name)
+                    rcvd_messages = game.filter_messages(
+                        messages=round_msgs, game_role=bot.power_name
+                    )
                     rcvd_messages = list(rcvd_messages.items())
                     rcvd_messages.sort()
 
@@ -106,8 +114,8 @@ async def play(game_id, botname, power_name, hostname='localhost', port=8432):
                     for msg in to_send_msgs[sender]:
                         msg_obj = Message(
                             sender=sender,
-                            recipient=msg['recipient'],
-                            message=msg['message'],
+                            recipient=msg["recipient"],
+                            message=msg["message"],
                             phase=game.get_current_phase(),
                         )
                         await game.send_game_message(message=msg_obj)
@@ -157,27 +165,53 @@ async def play(game_id, botname, power_name, hostname='localhost', port=8432):
     # To download a copy of the game with messages from all powers, you need to export the game as an admin
     # by logging in as 'admin' / 'password'
 
+
 async def launch(game_id, hostname, botname, powers=None):
-    """ Creates and plays a network game """
+    """Creates and plays a network game"""
     # await create_game(game_id, hostname)
     if powers is None:
-        await asyncio.gather(*[play(game_id, botname, power_name, hostname) for power_name in POWERS])
+        await asyncio.gather(
+            *[play(game_id, botname, power_name, hostname) for power_name in POWERS]
+        )
     else:
-        await asyncio.gather(*[play(game_id, botname, power_name, hostname) for power_name in powers.split(",")])
+        await asyncio.gather(
+            *[
+                play(game_id, botname, power_name, hostname)
+                for power_name in powers.split(",")
+            ]
+        )
+
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='RAND-DIP: Random Diplomacy Agent')
-    parser.add_argument('--gameid', '-g', type=str, help='game id of game created in DATC diplomacy game')
-    parser.add_argument('--powers', '-p', type=str, help='comma-seperated country names (AUSTRIA, ENGLAND, FRANCE, GERMANY, ITALY, RUSSIA, TURKEY)')
-    parser.add_argument('--hostname', '-H', type=str, default='localhost', help='host IP address (defaults to localhost)')
-    parser.add_argument('--bots', '-B', type=str, default='random',
-                        help='botname for all powers')
+    parser = argparse.ArgumentParser(description="RAND-DIP: Random Diplomacy Agent")
+    parser.add_argument(
+        "--gameid",
+        "-g",
+        type=str,
+        help="game id of game created in DATC diplomacy game",
+    )
+    parser.add_argument(
+        "--powers",
+        "-p",
+        type=str,
+        help="comma-seperated country names (AUSTRIA, ENGLAND, FRANCE, GERMANY, ITALY, RUSSIA, TURKEY)",
+    )
+    parser.add_argument(
+        "--hostname",
+        "-H",
+        type=str,
+        default="localhost",
+        help="host IP address (defaults to localhost)",
+    )
+    parser.add_argument(
+        "--bots", "-B", type=str, default="random", help="botname for all powers"
+    )
 
     args = parser.parse_args()
     print(args)
     return args
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     args = parse_args()
     asyncio.run(launch(args.gameid, args.hostname, args.bots, args.powers))
-

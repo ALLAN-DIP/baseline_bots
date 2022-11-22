@@ -1,13 +1,14 @@
+import random
 from ssl import _ASN1Object
+from typing import Tuple
+
 from baseline_bots.randomize_order import (
+    ADJACENCY,
     random_list_orders,
+    randomize_order,
     string_to_tuple,
     tuple_to_string,
-    randomize_order,
-    ADJACENCY,
 )
-from typing import Tuple
-import random
 
 
 class TestRandomizeDipnet:
@@ -56,8 +57,8 @@ class TestRandomizeDipnet:
         ]
         random.seed(1)
         assert random_list_orders(orders) == [
-            (("FRA", "FLT", "NTH"), "MTO", "DEN"),
-            (("FRA", "AMY", "HOL"), "MTO", "NTH"),
+            (("FRA", "FLT", "NTH"), "CVY", ("FRA", "AMY", "HOL"), "CTO", "EDI"),
+            (("FRA", "AMY", "HOL"), "CTO", "NWY", "VIA", ("NTH",)),
         ]
 
         orders = [
@@ -66,8 +67,8 @@ class TestRandomizeDipnet:
         ]
         random.seed(15)
         assert random_list_orders(orders) == [
-            (("FRA", "FLT", "NTH"), "HLD"),
-            (("FRA", "AMY", "HOL"), "MTO", "BEL"),
+            (("FRA", "FLT", "NTH"), "CVY", ("FRA", "AMY", "HOL"), "CTO", "EDI"),
+            (("FRA", "AMY", "HOL"), "CTO", "DEN", "VIA", ("NTH",)),
         ]
 
         # This tests the ability for string_to_tuple to convert this string representing

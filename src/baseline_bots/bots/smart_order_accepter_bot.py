@@ -5,13 +5,11 @@ import random
 from collections import defaultdict
 from typing import Dict, List, Set, Tuple
 
+import numpy as np
 from DAIDE import FCT, HUH, ORR, PRP, XDO, YES
 from diplomacy import Message
 from stance_vector import ActionBasedStance, ScoreBasedStance
-import random
-import numpy as np
 from tornado import gen
-
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from baseline_bots.parsing_utils import (
@@ -20,6 +18,7 @@ from baseline_bots.parsing_utils import (
     parse_proposal_messages,
 )
 from baseline_bots.randomize_order import (
+    lst_to_daide,
     random_list_orders,
     string_to_tuple,
     tuple_to_string,
@@ -33,7 +32,7 @@ from baseline_bots.utils import (
     get_other_powers,
     smart_select_support_proposals,
 )
-from baseline_bots.randomize_order import lst_to_daide
+
 
 class SmartOrderAccepterBot(DipnetBot):
     """
@@ -52,7 +51,9 @@ class SmartOrderAccepterBot(DipnetBot):
         super().__init__(power_name, game)
         self.alliance_props_sent = False
         self.discount_factor = discount_factor
-        self.stance = ActionBasedStance(power_name, game, discount_factor=self.discount_factor)
+        self.stance = ActionBasedStance(
+            power_name, game, discount_factor=self.discount_factor
+        )
         self.alliances = defaultdict(list)
         self.rollout_length = 5
         self.rollout_n_order = 5
@@ -64,7 +65,7 @@ class SmartOrderAccepterBot(DipnetBot):
         self.allies = []
         self.foes = []
         self.neutral = []
-        
+
     async def send_message(self, recipient: str, message: MessagesData) -> None:
         """
         Send message asynchronously to the server while the bot is still processing
@@ -101,15 +102,15 @@ class SmartOrderAccepterBot(DipnetBot):
             )
             if str(orders_decided) != "FCT ()":
                 for pow in self.allies:
-                    if (
-                        pow != self.power_name
-                    ):
+                    if pow != self.power_name:
                         msgs_data.add_message(pow, str(orders_decided))
                         await self.send_message(pow, str(orders_decided))
 
-    async def gen_messages(self, orders_list: List[str], msgs_data: MessagesData) -> MessagesData:
+    async def gen_messages(
+        self, orders_list: List[str], msgs_data: MessagesData
+    ) -> MessagesData:
         """
-        This generates messages to be sent to the other powers. 
+        This generates messages to be sent to the other powers.
         Note: Messages are also generated outside of this function invocation flow
 
         :param orders_list: final list of orders decided by the bot
@@ -132,10 +133,7 @@ class SmartOrderAccepterBot(DipnetBot):
         :return: MessagesData object containing set of all messages
         """
         for proposer, orders in prp_orders.items():
-            if (
-                orders
-                and self.power_name != proposer
-            ):
+            if orders and self.power_name != proposer:
                 if proposer == best_proposer and proposer in self.allies:
                     msg = YES(
                         PRP(
@@ -353,7 +351,9 @@ class SmartOrderAccepterBot(DipnetBot):
             provinces.update(new_provs)
         return provinces
 
-    async def generate_support_proposals(self, comms_obj: MessagesData) -> Dict[str, str]:
+    async def generate_support_proposals(
+        self, comms_obj: MessagesData
+    ) -> Dict[str, str]:
         """
         Using the orders already decided, search the neighbourhood provinces for allies' units and generate support proposals accordingly
 
@@ -428,16 +428,18 @@ class SmartOrderAccepterBot(DipnetBot):
                 final_messages[recipient] = str(suggested_proposals)
                 comms_obj.add_message(recipient, str(suggested_proposals))
                 await self.send_message(recipient, str(suggested_proposals))
-                
+
         return final_messages
-        
+
     def is_order_aggressive_to_powers(self, order: str, powers: List[str]):
         """
         check if the order is aggressive by
-        1. to attack allies unit
-        2. to move to allies' SC
-        3. support attack allies unit
-        4. support move to allies' SC
+        1. to attack ally unit
+        2. to move to ally SC
+        3. support attack ally unit
+        4. support move to ally SC
+        5. convoy attack ally unit
+        6. convoy move to ally SC
 
         :param order: an order as string, e.g. "A BUD S F TRI"
         :param powers: powers that we want to check if a bot is having aggressive move to
@@ -466,10 +468,23 @@ class SmartOrderAccepterBot(DipnetBot):
                 order_unit = order_token[2][0] + order_token[3][1:]
                 for power in powers:
                     if self.power_name != power:
-                        # if the order is to attack allies' units
+                        # if the order is a support to attack allies' units
                         if order_unit in self.game.powers[power].units:
                             return True
-                        # if the order is a move to allies' SC
+                        # if the order is a support move to allies' SC
+                        if order_token[3][2:] in self.game.powers[power].centers:
+                            return True
+                        # for 3 and 4
+
+            if order_token[1][0] == "C":
+                # if convoy
+                order_unit = order_token[2][0] + order_token[3][1:]
+                for power in powers:
+                    if self.power_name != power:
+                        # if the order is to convoy attack allies' units
+                        if order_unit in self.game.powers[power].units:
+                            return True
+                        # if the order is a convoy move to allies' SC
                         if order_token[3][2:] in self.game.powers[power].centers:
                             return True
         return False
@@ -487,23 +502,34 @@ class SmartOrderAccepterBot(DipnetBot):
         order_token = get_order_tokens(order)
         unit = order_token[0]
         loc_unit = unit[2:]
-        list_order, prob_order = yield self.brain.get_beam_orders(self.game, self.power_name)
-    
-        if len(list_order)>1:
-            for i in range(1,len(list_order)):
+        list_order, prob_order = yield self.brain.get_beam_orders(
+            self.game, self.power_name
+        )
+
+        if len(list_order) > 1:
+            for i in range(1, len(list_order)):
                 dipnet_order = list_order[i]
                 for candidate_order in dipnet_order:
-                    if unit in candidate_order and not self.is_order_aggressive_to_powers(candidate_order, powers):
+                    if (
+                        unit in candidate_order
+                        and not self.is_order_aggressive_to_powers(
+                            candidate_order, powers
+                        )
+                    ):
                         return candidate_order
-        
+
         # if none in dipnet beam orders
         for current_order in self.orders.get_list_of_orders():
-            if current_order != order and not self.is_order_aggressive_to_powers(current_order, powers) and current_order in self.game.get_all_possible_orders()[loc_unit]:
-                return unit + ' S ' + current_order
-        
-        return unit + ' H'
+            if (
+                current_order != order
+                and not self.is_order_aggressive_to_powers(current_order, powers)
+                and current_order in self.game.get_all_possible_orders()[loc_unit]
+            ):
+                return unit + " S " + current_order
 
-    @gen.coroutine                   
+        return unit + " H"
+
+    @gen.coroutine
     def replace_aggressive_order_to_allies(self):
         """
         replace aggressive orders with non-aggressive orders (in-place replace self.orders)
@@ -521,23 +547,24 @@ class SmartOrderAccepterBot(DipnetBot):
             else:
                 new_order = order
             final_orders.append(new_order)
-        
+
         orders_data = OrdersData()
         orders_data.add_orders(final_orders)
         self.orders = orders_data
-
 
     @gen.coroutine
     def __call__(self, rcvd_messages: List[Tuple[int, Message]]):
         # compute pos/neg stance on other bots using Tony's stance vector
 
         # avoid get_stance in the first phase of game
-        if self.game.get_current_phase()!='S1901M':
+        if self.game.get_current_phase() != "S1901M":
             self.stance.get_stance(self.game)
         print(f"Stance vector for {self.power_name}")
         print(self.stance.stance[self.power_name])
-            
+
         powers = self.stance.stance[self.power_name]
+
+        print("current stance: ", powers)
 
         # get dipnet order
         orders = yield from self.brain.get_orders(self.game, self.power_name)
@@ -549,7 +576,7 @@ class SmartOrderAccepterBot(DipnetBot):
         print("debug: Fetched orders", orders)
 
         # only in movement phase, we send PRP/ALY/FCT and consider get_best_proposer
-        if self.game.get_current_phase()[-1]=='M':
+        if self.game.get_current_phase()[-1] == "M":
 
             # parse the proposal messages received by the bot
             parsed_messages_dict = parse_proposal_messages(
@@ -566,9 +593,6 @@ class SmartOrderAccepterBot(DipnetBot):
             # e.g. if we are playing as ENG and the base orders are generated from DipNet, we would want to consider
             # if there is any better proposal orders that has a state value more than ours, then do it. If not, just follow the base orders.
             valid_proposal_orders[self.power_name] = orders
-
-
-
 
             # fmt: off
 

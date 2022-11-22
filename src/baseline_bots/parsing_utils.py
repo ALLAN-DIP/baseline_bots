@@ -66,8 +66,7 @@ def dipnet_to_daide_parsing(
                 f"ALLAN: error from parsing_utils.dipnet_to_daide_parsing: unit {dipnet_suborder} not present in unit_game_mapping"
             )
             return None
-        
-        
+
         unit_type = "AMY" if dipnet_suborder[0] == "A" else "FLT"
         unit = expand_prov_coast(dipnet_suborder.split()[-1])
 
@@ -144,7 +143,9 @@ def dipnet_to_daide_parsing(
             if daidefy_suborder(dipnet_order_tokens[0]):
                 daide_order.append(daidefy_suborder(dipnet_order_tokens[0]))
             else:
-                print(f"ALLAN: error from parsing_utils.dipnet_to_daide_parsing() skipping message: {dipnet_order_tokens}")
+                print(
+                    f"ALLAN: error from parsing_utils.dipnet_to_daide_parsing() skipping message: {dipnet_order_tokens}"
+                )
                 continue
             if dipnet_order_tokens[1] == "S":
                 # Support orders
@@ -152,12 +153,16 @@ def dipnet_to_daide_parsing(
                 if daidefy_suborder(dipnet_order_tokens[2]):
                     daide_order.append(daidefy_suborder(dipnet_order_tokens[2]))
                 else:
-                    print(f"ALLAN: error from parsing_utils.dipnet_to_daide_parsing() skipping message: {dipnet_order_tokens}")
+                    print(
+                        f"ALLAN: error from parsing_utils.dipnet_to_daide_parsing() skipping message: {dipnet_order_tokens}"
+                    )
                     continue
 
                 if len(dipnet_order_tokens) == 4 and dipnet_order_tokens[3] != "H":
                     daide_order.append("MTO")
-                    daide_order.append(expand_prov_coast(dipnet_order_tokens[3].split()[-1]))
+                    daide_order.append(
+                        expand_prov_coast(dipnet_order_tokens[3].split()[-1])
+                    )
                 elif len(dipnet_order_tokens) > 4:
                     print(
                         f"ALLAN: error from parsing_utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
@@ -172,15 +177,21 @@ def dipnet_to_daide_parsing(
                 if daidefy_suborder(dipnet_order_tokens[2]):
                     daide_order.append(daidefy_suborder(dipnet_order_tokens[2]))
                 else:
-                    print(f"ALLAN: error from parsing_utils.dipnet_to_daide_parsing() skipping message: {dipnet_order_tokens}")
+                    print(
+                        f"ALLAN: error from parsing_utils.dipnet_to_daide_parsing() skipping message: {dipnet_order_tokens}"
+                    )
                     continue
 
                 daide_order.append("CTO")
-                daide_order.append(expand_prov_coast(dipnet_order_tokens[3].split()[-1]))
+                daide_order.append(
+                    expand_prov_coast(dipnet_order_tokens[3].split()[-1])
+                )
             elif len(dipnet_order_tokens) >= 3 and dipnet_order_tokens[2] == "VIA":
                 # VIA/CTO orders
                 daide_order.append("CTO")
-                daide_order.append(expand_prov_coast(dipnet_order_tokens[1].split()[-1]))
+                daide_order.append(
+                    expand_prov_coast(dipnet_order_tokens[1].split()[-1])
+                )
                 daide_order.append("VIA")
                 if dipnet_order_tokens[0] + dipnet_order_tokens[1] in convoy_map:
                     daide_order.append(
@@ -194,7 +205,9 @@ def dipnet_to_daide_parsing(
             else:
                 # Move orders
                 daide_order.append("MTO")
-                daide_order.append(expand_prov_coast(dipnet_order_tokens[1].split()[-1]))
+                daide_order.append(
+                    expand_prov_coast(dipnet_order_tokens[1].split()[-1])
+                )
                 if len(dipnet_order_tokens) > 2:
                     print(
                         f"ALLAN: error from parsing_utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
@@ -271,7 +284,9 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
         try:
             ans = suborder_tokens[1][0] + " " + compress_prov_coast(suborder_tokens[2])
         except Exception:
-            print(f"ALLAN: error from parsing_utils.daide_to_dipnet_parsing.dipnetify_suborder() Failed for suborder: {suborder_tokens}")
+            print(
+                f"ALLAN: error from parsing_utils.daide_to_dipnet_parsing.dipnetify_suborder() Failed for suborder: {suborder_tokens}"
+            )
             ans = suborder_tokens[1][0] + " " + suborder_tokens[2]
         return ans, suborder_tokens[0]
 
@@ -287,7 +302,10 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
             # Support order
             dipnet_order.append("S")
             dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2])[0])
-            if len(daide_style_order_groups) == 5 and daide_style_order_groups[3] == "MTO":
+            if (
+                len(daide_style_order_groups) == 5
+                and daide_style_order_groups[3] == "MTO"
+            ):
                 dipnet_order.append("-")
                 dipnet_order.append(compress_prov_coast(daide_style_order_groups[4]))
             elif len(daide_style_order_groups) > 5:
@@ -390,7 +408,9 @@ def parse_proposal_messages(
                     else:
                         other_orders[order_msg.sender].append(order)
             except Exception as e:
-                print(f"ALLAN: error from parsing_utils.parse_proposal_messages() Unexpected message format: {order_msg.message}")
+                print(
+                    f"ALLAN: error from parsing_utils.parse_proposal_messages() Unexpected message format: {order_msg.message}"
+                )
                 continue
 
         # Generate set of possible orders for the given power
