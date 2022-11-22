@@ -1,3 +1,3 @@
 format_code:
-	black src/
-	isort src/ --profile black
+	black .
+	isort . --profile black
