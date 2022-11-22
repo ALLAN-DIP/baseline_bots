@@ -109,7 +109,6 @@ class GamePlay:
             if hasattr(bot, "orders"):
                 orders = ret_dict["orders"]
                 if orders is not None:
-
                     self.game.set_orders(power_name=bot.power_name, orders=orders)
 
         self.cur_local_message_round += 1
