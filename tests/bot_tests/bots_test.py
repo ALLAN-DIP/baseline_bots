@@ -18,18 +18,3 @@ class TestRPBot:
         actions, done = game_play.step()
         game_play = GamePlay(None, [LoyalBot, RandomProposerBot], 3)
         game_play.play()
-        game_play = GamePlay(None, [RealPolitik, RandomProposerBot], 3)
-        game_play.play()
-
-
-# game_play = GamePlay(None, [PushoverBot, RandomProposerBot], 3)
-# game_play.play()
-
-# game_play = GamePlay(None, [RandomAllierProposerBot, RandomAllierProposerBot], 3)
-# game_play.play()
-
-# game_play = GamePlay(None, [RandomHonestBot, RandomHonestBot], 3)
-# game_play.play()
-
-# game_play = GamePlay(None, [RandomProposerBot, RandomHonestOrderAccepterBot], 3)
-# game_play.play()
