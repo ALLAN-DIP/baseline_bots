@@ -32,11 +32,11 @@ class TestRandomizeDipnet:
 
         orders = [(("FRA", "FLT", "NTH"), "CVY", ('FRA', 'AMY', 'HOL'), 'CTO', "NWY"), (("FRA", "AMY", "HOL"), "CTO", 'NWY',"VIA", ('NTH'))]
         random.seed(1)
-        assert random_list_orders(orders) == [(('FRA', 'FLT', 'NTH'), 'MTO', 'DEN'), (('FRA', 'AMY', 'HOL'), 'MTO', 'NTH')]
+        assert random_list_orders(orders) == [(('FRA', 'FLT', 'NTH'), 'CVY', ('FRA', 'AMY', 'HOL'), 'CTO', 'EDI'), (('FRA', 'AMY', 'HOL'), 'CTO', 'NWY', 'VIA', ('NTH',))]
 
         orders = [(("FRA", "FLT", "NTH"), "CVY", ('FRA', 'AMY', 'HOL'), 'CTO', "NWY"), (("FRA", "AMY", "HOL"), "CTO", 'NWY',"VIA", ('NTH'))]
         random.seed(15)
-        assert random_list_orders(orders) ==[(('FRA', 'FLT', 'NTH'), 'HLD'), (('FRA', 'AMY', 'HOL'), 'MTO', 'BEL')]
+        assert random_list_orders(orders) ==[(('FRA', 'FLT', 'NTH'), 'CVY', ('FRA', 'AMY', 'HOL'), 'CTO', 'EDI'), (('FRA', 'AMY', 'HOL'), 'CTO', 'DEN', 'VIA', ('NTH',))]
         
         # This tests the ability for string_to_tuple to convert this string representing
         # a "convoy to" order properly
