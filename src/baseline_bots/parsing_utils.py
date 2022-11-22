@@ -13,6 +13,7 @@ from diplomacy import Game, Message
 
 from baseline_bots.utils import *
 
+
 def dipnet_to_daide_parsing(
     dipnet_style_order_strs: List[Union[str, Tuple[str, str]]],
     game: Game,

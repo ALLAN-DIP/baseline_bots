@@ -1,7 +1,8 @@
 __authors__ = ["Kartik Shenoy", "Feng Gu"]
 __email__ = "kartik.shenoyy@gmail.com"
 
-import sys, os
+import os
+import sys
 
 sys.path.append("..")  # Adds higher directory to python modules path.
 
@@ -10,18 +11,18 @@ os.environ["WORKING_DIR"] = "/model/src/model_server/research/WORKING_DIR"
 os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "cpp"
 
 import argparse
-import time
 import asyncio
+import time
+
 import ujson as json
+from diplomacy import Game, Message, connect
+from diplomacy_research.utils.cluster import is_port_opened
 from tornado import gen
-from diplomacy import Game, connect, Message
 
 # import required bots
 from baseline_bots.bots.dipnet.no_press_bot import NoPressDipBot
 from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
 from baseline_bots.bots.smart_order_accepter_bot import SmartOrderAccepterBot
-
-from diplomacy_research.utils.cluster import is_port_opened
 
 POWERS = ["AUSTRIA", "ENGLAND", "FRANCE", "GERMANY", "ITALY", "RUSSIA", "TURKEY"]
 
@@ -56,9 +57,7 @@ async def test(hostname: str = "localhost", port: int = 8432) -> None:
     print(games)
 
 
-async def launch(
-    hostname: str, port: int, game_id: str, bot_type: str
-) -> None:
+async def launch(hostname: str, port: int, game_id: str, bot_type: str) -> None:
     """
     Waits for dipnet model to load and then starts the bot execution
 
@@ -69,7 +68,7 @@ async def launch(
     :param bot_type: the type of bot to be launched - NoPressDipBot/TransparentBot/SmartOrderAccepterBot/..
     :param outdir: the output directory where game json files should be stored
     """
-    POWERS = ['AUSTRIA', 'ENGLAND', 'FRANCE', 'GERMANY', 'ITALY', 'RUSSIA', 'TURKEY']
+    POWERS = ["AUSTRIA", "ENGLAND", "FRANCE", "GERMANY", "ITALY", "RUSSIA", "TURKEY"]
 
     print("Waiting for tensorflow server to come online", end=" ")
     serving_flag = False
@@ -80,7 +79,9 @@ async def launch(
     print()
     print("Tensorflow server online")
     # await test(hostname, port)
-    await asyncio.gather(*[play(hostname, port, game_id, power_name, bot_type) for power_name in POWERS])
+    await asyncio.gather(
+        *[play(hostname, port, game_id, power_name, bot_type) for power_name in POWERS]
+    )
     # await play(hostname, port, game_id, power_name, bot_type, outdir)
 
 
@@ -102,7 +103,7 @@ async def play(
     connection = await connect(hostname, port)
     channel = await connection.authenticate("dipnet_" + power_name, "password")
     while not (await channel.list_games(game_id=game_id)):
-        await asyncio.sleep(1.)
+        await asyncio.sleep(1.0)
     game = await channel.join_game(game_id=game_id, power_name=power_name)
 
     bot = None

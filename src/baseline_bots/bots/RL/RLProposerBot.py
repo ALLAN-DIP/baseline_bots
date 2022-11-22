@@ -12,7 +12,6 @@ import random
 from typing import List
 
 import ujson as json
-from baseline_bots.bots.RL.RLOrderBot import RLOrderBot
 from DAIDE import ORR, XDO
 from diplomacy import Game, Message
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
@@ -20,6 +19,8 @@ from DiplomacyEnv import DiplomacyEnv
 from pytorch_DRL.common.utils import dict_to_arr
 from tornado import gen
 from utils import MessagesData, OrdersData
+
+from baseline_bots.bots.RL.RLOrderBot import RLOrderBot
 
 
 class RLProposerBot(RLOrderBot):
