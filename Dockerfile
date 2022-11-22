@@ -60,27 +60,3 @@ RUN pip install -r requirements_dev.txt
 WORKDIR /model/src/model_server/baseline_bots
 RUN pip install -r requirements.txt
 RUN pip install -e .
-
-# run pytest
-RUN pytest tests/utils_test.py
-# RUN pytest tests/randomize_order_test.py  failed
-# RUN pytest tests/bot_tests/SOA_test.py    infinite loop
-# RUN pytest tests/bot_tests/bots_test.py   failed
-# RUN pytest tests/bot_tests/dipnet.py      infinite loop
-RUN pytest tests/bot_tests/gameplay_framework.py
-
-
-# Script executors
-RUN chmod 777 /model/src/model_server/baseline_bots/containers/test_env/run_bot.py
-RUN chmod 777 /model/src/model_server/baseline_bots/containers/test_env/run.sh
-
-# install diplomacy playground
-WORKDIR /
-RUN git clone -b dev --single-branch https://github.com/SHADE-AI/diplomacy-playground.git
-RUN git config --global --add safe.directory /model/src/model_server/diplomacy-playground
-WORKDIR /diplomacy-playground
-RUN pip install hashids==1.3.1
-RUN pip install -r requirements.txt
-
-WORKDIR /
-ENTRYPOINT [ "/model/src/model_server/baseline_bots/containers/test_env/run.sh" ]
