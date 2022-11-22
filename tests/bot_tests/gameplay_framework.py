@@ -42,11 +42,6 @@ class GamePlay:
         self.cur_local_message_round = 0
         self.phase_init_bots()
 
-<<<<<<< HEAD
-
-    @gen.coroutine  
-=======
->>>>>>> main
     def play(self):
         """play a game with the bots"""
 
@@ -67,13 +62,8 @@ class GamePlay:
         """one step of messaging"""
 
         if self.game.is_game_done:
-<<<<<<< HEAD
-            return True
-
-=======
             return None, True
         
->>>>>>> main
         # if message rounds over
         if self.cur_local_message_round == self.msg_rounds:
            self.phase_init_bots()
@@ -92,14 +82,9 @@ class GamePlay:
 
             # an array of Message objects
             rcvd_messages = list(rcvd_messages.items())
-<<<<<<< HEAD
-                        # get messages to be sent from bot
-            ret_dict = yield bot(rcvd_messages)
-=======
             
             # get messages to be sent from bot
             ret_dict = bot(rcvd_messages)
->>>>>>> main
 
 
             if "messages" in ret_dict:
@@ -130,19 +115,4 @@ class GamePlay:
         self.cur_local_message_round += 1
 
         self.game.process()
-<<<<<<< HEAD
-        return {"messages": msgs_to_send}, self.game.is_game_done       
-
-@gen.coroutine            
-def game_loop():
-    game_play_obj = GamePlay(None, [RandomProposerBot_AsyncBot, RandomProposerBot_AsyncBot, RandomProposerBot_AsyncBot], 3, False)
-    yield game_play_obj.play()
-    stop_io_loop()
-                
-if __name__ == "__main__":
-    # from utils import OrdersData, MessagesData, get_order_tokens
-
-    start_io_loop(game_loop)
-=======
         return {"messages": msgs_to_send}, self.game.is_game_done
->>>>>>> main
