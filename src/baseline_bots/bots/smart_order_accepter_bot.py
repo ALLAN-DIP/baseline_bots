@@ -564,7 +564,7 @@ class SmartOrderAccepterBot(DipnetBot):
 
         powers = self.stance.stance[self.power_name]
 
-        print('current stance: ', powers)
+        print("current stance: ", powers)
 
         # get dipnet order
         orders = yield from self.brain.get_orders(self.game, self.power_name)
