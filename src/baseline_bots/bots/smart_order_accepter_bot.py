@@ -429,7 +429,7 @@ class SmartOrderAccepterBot(DipnetBot):
                 order_unit = order_token[2][0] + order_token[3][1:]
                 for power in powers:
                     if self.power_name != power:
-                        # if the order is a support an attack to allies' units
+                        # if the order is a support to attack allies' units
                         if order_unit in self.game.powers[power].units:
                             return True
                         # if the order is a support move to allies' SC
