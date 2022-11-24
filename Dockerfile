@@ -12,8 +12,6 @@ RUN apt-get -y install lsof
 # Copy SL model
 RUN mkdir /model/src/model_server/bot_neurips2019-sl_model
 COPY bot_neurips2019-sl_model /model/src/model_server/bot_neurips2019-sl_model 
-COPY run_model_server.sh /model/src/model_server/run_model_server.sh
-RUN chmod 777 /model/src/model_server/run_model_server.sh
 RUN chmod -R 777 /model/src/model_server/bot_neurips2019-sl_model
 
 # TODO: Get this to work for RL model as well
@@ -54,9 +52,3 @@ RUN pip install -r requirements.txt
 WORKDIR /model/src/model_server/baseline_bots
 RUN pip install -r requirements.txt
 RUN pip install -e .
-
-# Script executors
-COPY run_bot.py /model/src/model_server/baseline_bots/run_bot.py
-COPY run.sh /model/src/model_server/baseline_bots/run.sh
-RUN chmod 777 /model/src/model_server/baseline_bots/run_bot.py
-RUN chmod 777 /model/src/model_server/baseline_bots/run.sh
