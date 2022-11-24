@@ -1,7 +1,7 @@
 name: CI test
 on:
   pull_request:
-    branches: [ main, test_CI ]
+    branches: [ main ]
   push:
     branches: [ main, test_CI ]
 
@@ -19,6 +19,9 @@ jobs:
 
     - name: "Build Docker Container"
         run: |
+          wget https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-sl_model.zip
+          mkdir bot_neurips2019-sl_model
+          unzip neurips2019-sl_model.zip -d bot_neurips2019-sl_model/
           docker build --no-cache -t allan_test_env .
 
     - name: "Run tests"
