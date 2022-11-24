@@ -1,9 +1,9 @@
 """unit tests for smart order accepter bot"""
+import tornado
 from diplomacy import Game, Message
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from gameplay_framework_async import GamePlayAsync
 from tornado import gen
-import tornado
 
 from baseline_bots.bots.baseline_bot import BaselineBot, BaselineMsgRoundBot
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
@@ -466,7 +466,7 @@ if __name__ == "__main__":
 
 @gen.coroutine
 def main():
-    """ Plays a local game with 7 bots """
+    """Plays a local game with 7 bots"""
     game = Game()
     player = SmartOrderAccepterBot("FRANCE", game)
     f = open("demofile2.txt", "a")

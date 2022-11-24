@@ -1,9 +1,9 @@
 """unit tests for smart order accepter bot"""
 from diplomacy import Game, Message
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
-from tornado import gen
-from tornado import testing
+from tornado import gen, testing
 from tornado.testing import AsyncTestCase
+
 from baseline_bots.bots.baseline_bot import BaselineBot, BaselineMsgRoundBot
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
 from baseline_bots.bots.smart_order_accepter_bot import SmartOrderAccepterBot
