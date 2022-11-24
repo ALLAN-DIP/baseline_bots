@@ -3,6 +3,7 @@ from diplomacy import Game, Message
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from gameplay_framework_async import GamePlayAsync
 from tornado import gen
+import tornado
 
 from baseline_bots.bots.baseline_bot import BaselineBot, BaselineMsgRoundBot
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
@@ -88,10 +89,11 @@ class TestSOABot:
 
         stop_io_loop()
 
-    @gen.coroutine
+    @tornado.testing.gen_test
     def test_play(self):
         game = Game()
         soa_bot1 = SmartOrderAccepterBot("FRANCE", game)
+
         soa_bot2 = SmartOrderAccepterBot("RUSSIA", game)
         game_play = GamePlayAsync(
             game,
@@ -460,3 +462,14 @@ class TestSOABot:
 if __name__ == "__main__":
     soa_test = TestSOABot()
     soa_test.test()
+
+
+@gen.coroutine
+def main():
+    """ Plays a local game with 7 bots """
+    game = Game()
+    player = SmartOrderAccepterBot("FRANCE", game)
+    f = open("demofile2.txt", "a")
+    f.write("Now the file has more content!")
+    f.close()
+    stop_io_loop()
