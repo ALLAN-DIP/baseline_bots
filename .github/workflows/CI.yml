@@ -18,8 +18,8 @@ jobs:
         python-version: '3.7'
 
     - name: "Build Docker Container"
-        run: |
-          docker build --no-cache -t allan_test_env .
+      run: |
+        docker build --no-cache -t allan_test_env .
 
     - name: "Run tests"
       run: |
