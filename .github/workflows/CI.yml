@@ -17,10 +17,9 @@ jobs:
       with:
         python-version: '3.7'
 
-    - name: "Build"
-      run: |
-        pip install -r requirements.txt
-        pip install -e .
+    - name: "Build Docker Container"
+        run: |
+          docker build --no-cache -t allan_test_env .
 
     - name: "Run tests"
       run: |
