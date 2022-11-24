@@ -19,7 +19,6 @@ jobs:
 
     - name: "Build Docker Container"
         run: |
-          echo "Building Docker Container"
           docker build --no-cache -t allan_test_env .
 
     - name: "Run tests"
