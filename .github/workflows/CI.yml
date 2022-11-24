@@ -1,7 +1,7 @@
 name: CI test
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ main, test_CI ]
   push:
     branches: [ main, test_CI ]
 
