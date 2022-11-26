@@ -12,8 +12,6 @@ RUN apt-get -y install lsof
 # Copy SL model
 RUN mkdir /model/src/model_server/bot_neurips2019-sl_model
 COPY bot_neurips2019-sl_model /model/src/model_server/bot_neurips2019-sl_model 
-COPY run_model_server.sh /model/src/model_server/run_model_server.sh
-RUN chmod 777 /model/src/model_server/run_model_server.sh
 RUN chmod -R 777 /model/src/model_server/bot_neurips2019-sl_model
 
 # TODO: Get this to work for RL model as well
@@ -21,7 +19,11 @@ RUN chmod -R 777 /model/src/model_server/bot_neurips2019-sl_model
 # Clone repos
 RUN git clone https://github.com/SHADE-AI/diplomacy.git
 RUN git clone https://github.com/SHADE-AI/research.git
-RUN git clone https://github.com/ALLAN-DIP/baseline_bots.git
+
+RUN mkdir /model/src/model_server/baseline_bots
+
+
+COPY . /model/src/model_server/baseline_bots
 
 # Environment variables
 ENV PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp
@@ -55,8 +57,5 @@ WORKDIR /model/src/model_server/baseline_bots
 RUN pip install -r requirements.txt
 RUN pip install -e .
 
-# Script executors
-COPY run_bot.py /model/src/model_server/baseline_bots/run_bot.py
-COPY run.sh /model/src/model_server/baseline_bots/run.sh
-RUN chmod 777 /model/src/model_server/baseline_bots/run_bot.py
-RUN chmod 777 /model/src/model_server/baseline_bots/run.sh
+RUN chmod 777 /model/src/model_server/baseline_bots/containers/allan_dip_bot/run_model_server.sh
+ENV PYTHONPATH=/model/src/model_server/research:$PYTHONPATH
