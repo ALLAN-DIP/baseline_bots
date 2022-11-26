@@ -1,7 +1,6 @@
 FROM pcpaquette/tensorflow-serving:20190226
 
-WORKDIR /model/src/model_server
-
+# install needed packages
 RUN apt-get -y update
 RUN apt-get -y install git
 RUN apt-get -y install vim
@@ -9,20 +8,20 @@ RUN apt-get -y install curl
 RUN apt-get -y install htop
 RUN apt-get -y install lsof
 
-# Copy SL model
-RUN mkdir /model/src/model_server/bot_neurips2019-sl_model
-COPY bot_neurips2019-sl_model /model/src/model_server/bot_neurips2019-sl_model 
-RUN chmod -R 777 /model/src/model_server/bot_neurips2019-sl_model
+WORKDIR /model/src/model_server
 
-# TODO: Get this to work for RL model as well
+# Copy SL model
+RUN wget https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-sl_model.zip
+RUN mkdir /model/src/model_server/bot_neurips2019-sl_model
+RUN unzip neurips2019-sl_model.zip -d /model/src/model_server/bot_neurips2019-sl_model 
+RUN chmod -R 777 /model/src/model_server/bot_neurips2019-sl_model
 
 # Clone repos
 RUN git clone https://github.com/SHADE-AI/diplomacy.git
 RUN git clone https://github.com/SHADE-AI/research.git
 
+# copy baseline bots code into the docker image
 RUN mkdir /model/src/model_server/baseline_bots
-
-
 COPY . /model/src/model_server/baseline_bots
 
 # Environment variables
@@ -57,5 +56,7 @@ WORKDIR /model/src/model_server/baseline_bots
 RUN pip install -r requirements.txt
 RUN pip install -e .
 
+# allow the tf server to be run
 RUN chmod 777 /model/src/model_server/baseline_bots/containers/allan_dip_bot/run_model_server.sh
+# add diplomacy research to python path
 ENV PYTHONPATH=/model/src/model_server/research:$PYTHONPATH
