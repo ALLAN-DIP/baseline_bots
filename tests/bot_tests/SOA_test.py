@@ -3,9 +3,7 @@ import tornado
 from diplomacy import Game, Message
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from gameplay_framework_async import GamePlayAsync
-from tornado import gen
-import tornado
-from tornado import testing
+from tornado import gen, testing
 from tornado.testing import AsyncTestCase
 
 from baseline_bots.bots.baseline_bot import BaselineBot, BaselineMsgRoundBot
@@ -121,7 +119,6 @@ class TestSOABot(AsyncTestCase):
 
         stop_io_loop()
 
-    
     @gen.coroutine
     def score_stance(self):
         # score-based
