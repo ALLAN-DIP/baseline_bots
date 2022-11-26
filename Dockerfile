@@ -19,7 +19,11 @@ RUN chmod -R 777 /model/src/model_server/bot_neurips2019-sl_model
 # Clone repos
 RUN git clone https://github.com/SHADE-AI/diplomacy.git
 RUN git clone https://github.com/SHADE-AI/research.git
-RUN git clone https://github.com/ALLAN-DIP/baseline_bots.git
+
+RUN mkdir /model/src/model_server/baseline_bots
+
+
+COPY . /model/src/model_server/baseline_bots
 
 # Environment variables
 ENV PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp
@@ -52,3 +56,6 @@ RUN pip install -r requirements.txt
 WORKDIR /model/src/model_server/baseline_bots
 RUN pip install -r requirements.txt
 RUN pip install -e .
+
+RUN chmod 777 /model/src/model_server/baseline_bots/containers/allan_dip_bot/run_model_server.sh
+ENV PYTHONPATH=/model/src/model_server/research:$PYTHONPATH

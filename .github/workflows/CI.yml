@@ -5,25 +5,28 @@ on:
   push:
     branches: [ main, test_CI ]
 
+# TODO: create a game
 jobs:
   testbuild:
     runs-on: ubuntu-latest
     steps:
-    - name: "Checkout"
-      uses: actions/checkout@v2
+      - name: "Checkout"
+        uses: actions/checkout@v2
 
-    - name: "Setup Python"
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.7'
+      - name: "Setup Python"
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+      
+      - name: "Build Docker Container"
+        run: |
+          wget https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-sl_model.zip
+          mkdir bot_neurips2019-sl_model
+          unzip neurips2019-sl_model.zip -d bot_neurips2019-sl_model/
+          docker build --no-cache -t ci_image .
 
-    - name: "Build Docker Container"
-      run: |
-        wget https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-sl_model.zip
-        mkdir bot_neurips2019-sl_model
-        unzip neurips2019-sl_model.zip -d bot_neurips2019-sl_model/
-        docker build --no-cache -t allan_test_env .
+      - name: "Run Tests"
+        run: |
+          docker run --rm ci_image /bin/bash -c "/model/src/model_server/baseline_bots/containers/allan_dip_bot/run_model_server.sh & pytest --ignore=tests/bot_tests/SOA_test.py --ignore=tests/bot_tests/bots_test.py --ignore=tests/bot_tests/dipnet.py"
 
-    - name: "Run tests"
-      run: |
-        docker run --rm allan_test_env /bin/bash -c "pytest --ignore=tests/bot_tests/SOA_test.py --ignore=tests/randomize_order_test.py --ignore=tests/bot_tests/dipnet.py"
+docker run --rm ci_image /bin/bash -c "/model/src/model_server/baseline_bots/containers/allan_dip_bot/run_model_server.sh & python t.py"
