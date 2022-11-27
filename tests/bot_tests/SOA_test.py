@@ -1,8 +1,10 @@
 """unit tests for smart order accepter bot"""
+import tornado
 from diplomacy import Game, Message
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from gameplay_framework_async import GamePlayAsync
-from tornado import gen
+from tornado import gen, testing
+from tornado.testing import AsyncTestCase
 
 from baseline_bots.bots.baseline_bot import BaselineBot, BaselineMsgRoundBot
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
@@ -25,19 +27,48 @@ from baseline_bots.utils import (
 )
 
 
-class TestSOABot:
-    def test(self):
-        start_io_loop(self.test_play)
-        # start_io_loop(self.test_score_stance)
-        # start_io_loop(self.test_action_stance)
-        # start_io_loop(self.test_auxilary_functions)
-        # start_io_loop(self.test_parse_proposals)
-        # start_io_loop(self.test_get_best_orders)
-        # start_io_loop(self.test_gen_pos_stance_messages)
-        # start_io_loop(self.test_ally_move_filter)
+class TestSOABot(AsyncTestCase):
+    @testing.gen_test
+    def test_play(self):
+        game = Game()
+        soa_bot1 = SmartOrderAccepterBot("FRANCE", game)
+
+        soa_bot2 = SmartOrderAccepterBot("RUSSIA", game)
+        game_play = GamePlayAsync(
+            game,
+            [
+                RandomProposerBot_AsyncBot("AUSTRIA", game),
+                RandomProposerBot_AsyncBot("ENGLAND", game),
+                soa_bot1,
+                soa_bot2,
+                RandomProposerBot_AsyncBot("GERMANY", game),
+                RandomProposerBot_AsyncBot("ITALY", game),
+                RandomProposerBot_AsyncBot("TURKEY", game),
+            ],
+            3,
+            True,
+        )
+        msgs, done = yield game_play.step()
+        game_play = GamePlayAsync(
+            game,
+            [
+                RandomProposerBot_AsyncBot("AUSTRIA", game),
+                RandomProposerBot_AsyncBot("ENGLAND", game),
+                soa_bot1,
+                soa_bot2,
+                RandomProposerBot_AsyncBot("GERMANY", game),
+                RandomProposerBot_AsyncBot("ITALY", game),
+                RandomProposerBot_AsyncBot("TURKEY", game),
+            ],
+            3,
+            True,
+        )
+        while not game_play.game.is_game_done:
+            msgs, done = yield game_play.step()
+        print("finish test_play")
 
     @gen.coroutine
-    def test_auxilary_functions(self):
+    def auxilary_functions(self):
         game = Game()
         soa_bot = SmartOrderAccepterBot("FRANCE", game)
         RESPOND_TO_INV_ORDERS_TC = [
@@ -89,46 +120,7 @@ class TestSOABot:
         stop_io_loop()
 
     @gen.coroutine
-    def test_play(self):
-        game = Game()
-        soa_bot1 = SmartOrderAccepterBot("FRANCE", game)
-        soa_bot2 = SmartOrderAccepterBot("RUSSIA", game)
-        game_play = GamePlayAsync(
-            game,
-            [
-                RandomProposerBot_AsyncBot("AUSTRIA", game),
-                RandomProposerBot_AsyncBot("ENGLAND", game),
-                soa_bot1,
-                soa_bot2,
-                RandomProposerBot_AsyncBot("GERMANY", game),
-                RandomProposerBot_AsyncBot("ITALY", game),
-                RandomProposerBot_AsyncBot("TURKEY", game),
-            ],
-            3,
-            True,
-        )
-        msgs, done = yield game_play.step()
-        game_play = GamePlayAsync(
-            game,
-            [
-                RandomProposerBot_AsyncBot("AUSTRIA", game),
-                RandomProposerBot_AsyncBot("ENGLAND", game),
-                soa_bot1,
-                soa_bot2,
-                RandomProposerBot_AsyncBot("GERMANY", game),
-                RandomProposerBot_AsyncBot("ITALY", game),
-                RandomProposerBot_AsyncBot("TURKEY", game),
-            ],
-            3,
-            True,
-        )
-        while not game_play.game.is_game_done:
-            msgs, done = yield game_play.step()
-        print("finish test_play")
-        stop_io_loop()
-
-    @gen.coroutine
-    def test_score_stance(self):
+    def score_stance(self):
         # score-based
         game = Game()
         soa_bot = SmartOrderAccepterBot("FRANCE", game)
@@ -156,7 +148,7 @@ class TestSOABot:
         stop_io_loop()
 
     @gen.coroutine
-    def test_action_stance(self):
+    def action_stance(self):
         # score-based
         game = Game()
         soa_bot = SmartOrderAccepterBot("FRANCE", game)
@@ -211,7 +203,7 @@ class TestSOABot:
         stop_io_loop()
 
     @gen.coroutine
-    def test_ally_move_filter(self):
+    def ally_move_filter(self):
         # assume that stance is correct using score-based
         game = Game()
         soa_bot = SmartOrderAccepterBot("FRANCE", game)
@@ -248,7 +240,7 @@ class TestSOABot:
         stop_io_loop()
 
     @gen.coroutine
-    def test_parse_proposals(self):
+    def arse_proposals(self):
         # proposal messages -> proposal dict {power_name: a list of proposal orders}
         # valid moves and power units must belong to SOA
         game = Game()
@@ -321,7 +313,7 @@ class TestSOABot:
         stop_io_loop()
 
     @gen.coroutine
-    def test_get_best_orders(self):
+    def get_best_orders(self):
         # proposal -> gen state value check if SOA select the best proposal
 
         # run test for n times
@@ -415,7 +407,7 @@ class TestSOABot:
         stop_io_loop()
 
     @gen.coroutine
-    def test_gen_pos_stance_messages(self):
+    def gen_pos_stance_messages(self):
         # gen for only allies
         game = Game()
         soa_bot = SmartOrderAccepterBot("FRANCE", game)
@@ -457,6 +449,12 @@ class TestSOABot:
         stop_io_loop()
 
 
-if __name__ == "__main__":
-    soa_test = TestSOABot()
-    soa_test.test()
+@gen.coroutine
+def main():
+    """Plays a local game with 7 bots"""
+    game = Game()
+    player = SmartOrderAccepterBot("FRANCE", game)
+    f = open("demofile2.txt", "a")
+    f.write("Now the file has more content!")
+    f.close()
+    stop_io_loop()
