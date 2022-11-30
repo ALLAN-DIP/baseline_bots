@@ -9,20 +9,26 @@ Development
 Setting up your development environment:
 ***********************************************************************
 
-1. Create a conda environment:
+1. Clone the repository
+
+.. code-block:: bash
+    git clone https://github.com/ALLAN-DIP/baseline_bots.git
+    cd baseline_bots/
+
+2. Create a conda environment:
 
 .. code-block:: python
 
     conda create -n "shade" python==3.7
     conda activate shade
 
-2. Install the dependencies:
+3. Install the dependencies:
 
 .. code-block:: python
 
     pip install -r requirements.txt
 
-3. Install the package in development mode:
+4. Install the package in development mode:
 
 .. code-block:: python
 
@@ -54,6 +60,10 @@ Pushing code:
 1. When beginning a new feature, checkout into a new branch
 2. Use conventional commits
 3. Always run the Makefile before pushing (it performs code styling)
+
+Development on TACC:
+***********************************************************
+
 
 Development on TACC and using diplomacy_research:
 **********************************************************************************************************************************************
