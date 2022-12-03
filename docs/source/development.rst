@@ -1,38 +1,63 @@
-Getting Started
-================
-
-First set-up your TACC account by following the instructions on `SHADE AIE's onboarding page <https://www.shade-aie.org/learning-center/>`_
-
-Development 
-================
 
 Setting up your development environment:
 ***********************************************************************
+If you do not have a TACC account, follow the instructions on `SHADE AIE's onboarding page <https://www.shade-aie.org/learning-center/>`_.
 
-1. Clone the repository
+Once you have a TACC account, you can follow these directions to set up your environment.
+
+1. SSH into a TACC server by substituting "uname" with your TACC User ID
+
+.. code-block:: bash
+    ssh uname@ls6.tacc.utexas.edu
+
+or 
+.. code-block:: bash
+    ssh uname@frontera.tacc.utexas.edu
+
+
+2. Clone the repository
 
 .. code-block:: bash
     git clone https://github.com/ALLAN-DIP/baseline_bots.git
     cd baseline_bots/
 
-2. Create a conda environment:
+3. Create a conda environment:
 
-.. code-block:: python
+.. code-block:: bash
 
     conda create -n "shade" python==3.7
     conda activate shade
 
-3. Install the dependencies:
+4. Install the dependencies:
 
-.. code-block:: python
+.. code-block:: bash
 
     pip install -r requirements.txt
-
-4. Install the package in development mode:
-
-.. code-block:: python
-
     pip install -e .
+
+6. Add the path to the diplomacy_research repository (replacing "uname" again) by running the following. It is also suggested to add these lines to .bashrc so you don't need to run it every time you log on.
+
+.. code-block:: bash
+
+    export WORKING_DIR=/home1/09102/uname/research/WORKING_DIR/
+    export PYTHONPATH=$PYTHON-PATH:/home1/09102/uname/research/
+    module load tacc-singularity
+
+7. Install the dependencies for diplomacy_research
+
+.. code-block:: bash
+    cd ~/research
+    pip install -r requirements.txt 
+
+Done! In the baseline_bots directory, you should now be able to run:
+
+.. code-block:: bash
+    pytest tests
+
+Every time you log on:
+***********************************************************
+
+Unless
 
 Modifying documentation:
 ***********************************************************************
@@ -61,30 +86,21 @@ Pushing code:
 2. Use conventional commits
 3. Always run the Makefile before pushing (it performs code styling)
 
-Development on TACC:
-***********************************************************
+More information about the CI practices can be found `here <https://www.youtube.com/watch?v=sw3v4Snopjc>`_
 
-
-Development on TACC and using diplomacy_research:
-**********************************************************************************************************************************************
-
-If using VSCode, run `unset PROMPT_COMMAND` in the terminal or add it to .bashrc
-Otherwise, you may see a lot of `__vsc_prompt_cmd_original`
-
-
-.. code-block:: bash
-
-    idev -m 60
-    export WORKING_DIR=~/dipnet_press/WORKING_DIR/
-    module load tacc-singularity
-    # activate conda environment
-    conda activate shade
-    # clone the diplomacy research code if you havent already
-    git clone https://github.com/diplomacy/research.git
-    # add path to diplomacy_research to PYTHONPATH--your path should be different
-    export PYTHONPATH=$PYTHONPATH:/home1/08764/trigaten/research
 
 How to run bots
 ****************************************************************************************************************
 
 Check the `Google Doc <https://docs.google.com/document/d/1TTHKx09io3pWXqcH7FexeDOvCN_-HqgUp5WQyx7rBbk/edit?usp=sharing>`_ here for instructions on how to connect the bot to a TACC game and how to run them locally
+
+General Tips:
+*****************************************************
+
+- Adding the following line to .bashrc will activate your shade environment on login.
+
+.. code-block:: bash
+    conda activate shade
+
+- If using VSCode, run `unset PROMPT_COMMAND` in the terminal or add it to .bashrc
+Otherwise, you may see a lot of `__vsc_prompt_cmd_original`
