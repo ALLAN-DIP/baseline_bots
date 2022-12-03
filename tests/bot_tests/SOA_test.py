@@ -67,7 +67,7 @@ class TestSOABot(AsyncTestCase):
             msgs, done = yield game_play.step()
         print("finish test_play")
 
-    @gen.coroutine
+    @testing.gen_test
     def auxilary_functions(self):
         game = Game()
         soa_bot = SmartOrderAccepterBot("FRANCE", game)
@@ -119,7 +119,7 @@ class TestSOABot(AsyncTestCase):
 
         stop_io_loop()
 
-    @gen.coroutine
+    @testing.gen_test
     def score_stance(self):
         # score-based
         game = Game()
@@ -147,7 +147,7 @@ class TestSOABot(AsyncTestCase):
         print("finish test_stance")
         stop_io_loop()
 
-    @gen.coroutine
+    @testing.gen_test
     def action_stance(self):
         # score-based
         game = Game()
@@ -202,7 +202,7 @@ class TestSOABot(AsyncTestCase):
         print("finish test_stance")
         stop_io_loop()
 
-    @gen.coroutine
+    @testing.gen_test
     def ally_move_filter(self):
         # assume that stance is correct using score-based
         game = Game()
@@ -239,7 +239,7 @@ class TestSOABot(AsyncTestCase):
         print("finish test ally move filter")
         stop_io_loop()
 
-    @gen.coroutine
+    @testing.gen_test
     def arse_proposals(self):
         # proposal messages -> proposal dict {power_name: a list of proposal orders}
         # valid moves and power units must belong to SOA
@@ -312,7 +312,7 @@ class TestSOABot(AsyncTestCase):
         print("finish test_parse_proposal")
         stop_io_loop()
 
-    @gen.coroutine
+    @testing.gen_test
     def get_best_orders(self):
         # proposal -> gen state value check if SOA select the best proposal
 
@@ -406,7 +406,7 @@ class TestSOABot(AsyncTestCase):
         print("finish test_best_prop_order")
         stop_io_loop()
 
-    @gen.coroutine
+    @testing.gen_test
     def gen_pos_stance_messages(self):
         # gen for only allies
         game = Game()
@@ -449,12 +449,12 @@ class TestSOABot(AsyncTestCase):
         stop_io_loop()
 
 
-@gen.coroutine
-def main():
-    """Plays a local game with 7 bots"""
-    game = Game()
-    player = SmartOrderAccepterBot("FRANCE", game)
-    f = open("demofile2.txt", "a")
-    f.write("Now the file has more content!")
-    f.close()
-    stop_io_loop()
+# @gen.coroutine
+# def main():
+#     """Plays a local game with 7 bots"""
+#     game = Game()
+#     player = SmartOrderAccepterBot("FRANCE", game)
+#     f = open("demofile2.txt", "a")
+#     f.write("Now the file has more content!")
+#     f.close()
+#     stop_io_loop()
