@@ -14,7 +14,6 @@ or
 .. code-block:: bash
     ssh uname@frontera.tacc.utexas.edu
 
-
 2. Clone the repository
 
 .. code-block:: bash
@@ -43,7 +42,17 @@ or
     export PYTHONPATH=$PYTHON-PATH:/home1/09102/uname/research/
     module load tacc-singularity
 
-7. Install the dependencies for diplomacy_research
+8. Connecting github account
+
+To connect your account, first, generate a Personal Access Token in Developer Settings on Github
+
+Then, replace "token" with the personal token you generated and run the following in the baseline_bots repo:
+
+.. code-block:: bash
+    git remote set-url origin https://token@github.com/ALLAN-DIP/baseline_bots.git
+
+
+9. Install the dependencies for diplomacy_research
 
 .. code-block:: bash
     cd ~/research
@@ -57,7 +66,10 @@ Done! In the baseline_bots directory, you should now be able to run:
 Every time you log on:
 ***********************************************************
 
-Unless
+Run:
+
+.. code-bloc:: bash
+    idev -m 120
 
 Modifying documentation:
 ***********************************************************************
