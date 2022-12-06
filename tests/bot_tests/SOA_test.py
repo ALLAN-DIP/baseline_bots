@@ -127,33 +127,33 @@ class TestSOABot(AsyncTestCase):
 
         stop_io_loop()
 
-    # @testing.gen_test
-    # def test_score_stance(self):
-    #     # score-based
-    #     game = Game()
-    #     soa_bot = SmartOrderAccepterBot("FRANCE", game, test_mode=True)
-    #     bot_instances = [
-    #         RandomProposerBot_AsyncBot("AUSTRIA", game, test_mode=True),
-    #         RandomProposerBot_AsyncBot("ENGLAND", game, test_mode=True),
-    #         RandomProposerBot_AsyncBot("GERMANY", game, test_mode=True),
-    #         soa_bot,
-    #     ]
-    #     game_play = GamePlayAsync(game, bot_instances, 3, True)
-    #     game_play.game.set_centers("AUSTRIA", ["VIE", "TRI", "BUD"], reset=True)
-    #     game_play.game.set_centers("ENGLAND", ["LON"], reset=True)
-    #     game_play.game.set_centers("GERMANY", ["MUN", "KIE", "BER", "BEL"])
-    #     game_play.game.set_centers(soa_bot.power_name, ["PAR", "BRE", "MAR"])
-    #     msgs, done = yield game_play.step()
-    #     soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
-    #     print(game_play.game.get_centers())
-    #     print("expected stance ENGLAND: 1, GERMANY: -1, AUTRIA:0")
-    #     print("soa stance", soa_bot_stance)
-    #     assert soa_bot_stance["ENGLAND"] == 1, "Positive stance error"
-    #     assert soa_bot_stance["GERMANY"] == -1, "Negative stance error"
-    #     assert soa_bot_stance["AUSTRIA"] == 0, "Neutral stance error"
+    @testing.gen_test
+    def test_score_stance(self):
+        # score-based
+        game = Game()
+        soa_bot = SmartOrderAccepterBot("FRANCE", game, test_mode=True, stance_type='S')
+        bot_instances = [
+            RandomProposerBot_AsyncBot("AUSTRIA", game, test_mode=True),
+            RandomProposerBot_AsyncBot("ENGLAND", game, test_mode=True),
+            RandomProposerBot_AsyncBot("GERMANY", game, test_mode=True),
+            soa_bot,
+        ]
+        game_play = GamePlayAsync(game, bot_instances, 3, True)
+        game_play.game.set_centers("AUSTRIA", ["VIE", "TRI", "BUD"], reset=True)
+        game_play.game.set_centers("ENGLAND", ["LON"], reset=True)
+        game_play.game.set_centers("GERMANY", ["MUN", "KIE", "BER", "BEL"])
+        game_play.game.set_centers(soa_bot.power_name, ["PAR", "BRE", "MAR"])
+        msgs, done = yield game_play.step()
+        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
+        print(game_play.game.get_centers())
+        print("expected stance ENGLAND: 1, GERMANY: -1, AUTRIA:0")
+        print("soa stance", soa_bot_stance)
+        assert soa_bot_stance["ENGLAND"] == 1, "Positive stance error"
+        assert soa_bot_stance["GERMANY"] == -1, "Negative stance error"
+        assert soa_bot_stance["AUSTRIA"] == 0, "Neutral stance error"
 
-    #     print("finish test_stance")
-    #     stop_io_loop()
+        print("finish test_stance")
+        stop_io_loop()
 
     @testing.gen_test
     def test_action_stance(self):
@@ -320,141 +320,40 @@ class TestSOABot(AsyncTestCase):
         print("finish test_parse_proposal")
         stop_io_loop()
 
-    # @testing.gen_test
-    # def test_get_best_orders(self):
-    #     # proposal -> gen state value check if SOA select the best proposal
+    @testing.gen_test
+    def test_gen_pos_stance_messages(self):
+        # gen for only allies
+        game = Game()
+        soa_bot = SmartOrderAccepterBot("FRANCE", game, test_mode=True, stance_type='S')
+        soa_bot.ally_threshold = 0.5
+        bot_instances = [
+            RandomProposerBot_AsyncBot("AUSTRIA", game, test_mode=True),
+            RandomProposerBot_AsyncBot("ENGLAND", game, test_mode=True),
+            RandomProposerBot_AsyncBot("GERMANY", game, test_mode=True),
+            RandomProposerBot_AsyncBot("RUSSIA", game, test_mode=True),
+            soa_bot,
+        ]
+        game_play = GamePlayAsync(game, bot_instances, 3, True)
 
-    #     # run test for n times
-    #     n = 10
+        # skip 1 game phase for the test to work correctly
+        game_play.game.process()
+        game_play.game.set_centers("AUSTRIA", ["VIE", "TRI", "BUD"], reset=True)
+        game_play.game.set_centers("ENGLAND", ["LON"], reset=True)
+        game_play.game.set_centers("RUSSIA", ["MOS"], reset=True)
+        game_play.game.set_centers("GERMANY", ["MUN", "KIE", "BER", "BEL"])
+        game_play.game.set_centers(soa_bot.power_name, ["PAR", "BRE", "MAR"])
+        rcvd_messages = game.filter_messages(
+            messages=game_play.game.messages, game_role=soa_bot.power_name
+        )
+        rcvd_messages = list(rcvd_messages.items())
+        rcvd_messages.sort()
+        ret_data = yield soa_bot(rcvd_messages)
+        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
+        print(game_play.game.get_centers())
+        print("expected stance ENGLAND: 1, RUSSIA: 1, GERMANY: -1, AUTRIA:0")
+        print("soa stance", soa_bot_stance)
+        print("recipients of messages:", [msg['recipient'] for msg in ret_data['messages']])
 
-    #     for i in range(n):
-    #         game = Game()
-    #         soa_bot = SmartOrderAccepterBot("FRANCE", game, test_mode=True)
-    #         soa_bot.rollout_length = 7
-    #         baseline1 = RandomProposerBot_AsyncBot("AUSTRIA", game, test_mode=True)
-    #         baseline2 = RandomProposerBot_AsyncBot("ENGLAND", game, test_mode=True)
-    #         bot_instances = [baseline1, baseline2, soa_bot]
-
-    #         rcvd_messages = game.filter_messages(
-    #             messages=game.messages, game_role="AUSTRIA"
-    #         )
-    #         bl1_msg = yield baseline1.gen_messages(rcvd_messages)
-    #         rcvd_messages = game.filter_messages(
-    #             messages=game.messages, game_role="ENGLAND"
-    #         )
-    #         bl2_msg = yield baseline2.gen_messages(rcvd_messages)
-
-    #         for msg in bl1_msg:
-    #             msg_obj1 = Message(
-    #                 sender=baseline1.power_name,
-    #                 recipient=msg["recipient"],
-    #                 message=msg["message"],
-    #                 phase=game.get_current_phase(),
-    #             )
-    #             game.add_message(message=msg_obj1)
-
-    #         for msg in bl2_msg:
-    #             msg_obj2 = Message(
-    #                 sender=baseline2.power_name,
-    #                 recipient=msg["recipient"],
-    #                 message=msg["message"],
-    #                 phase=game.get_current_phase(),
-    #             )
-    #             game.add_message(message=msg_obj2)
-
-    #         rcvd_messages = game.filter_messages(
-    #             messages=game.messages, game_role=soa_bot.power_name
-    #         )
-    #         rcvd_messages = list(rcvd_messages.items())
-    #         rcvd_messages.sort()
-    #         parsed_messages_dict = parse_proposal_messages(
-    #             rcvd_messages, game, soa_bot.power_name
-    #         )
-    #         valid_proposal_orders = parsed_messages_dict["valid_proposals"]
-    #         shared_orders = parsed_messages_dict["shared_orders"]
-    #         orders = yield soa_bot.brain.get_orders(game, soa_bot.power_name)
-    #         valid_proposal_orders[soa_bot.power_name] = orders
-
-    #         state_value = {power_name: -10000 for power_name in game.powers}
-
-    #         for power_name, orders in valid_proposal_orders.items():
-    #             sim_game = game.__deepcopy__(None)
-    #             sim_game.set_orders(power_name=soa_bot.power_name, orders=orders)
-
-    #             for other_power in game.powers:
-    #                 power_orders = yield soa_bot.brain.get_orders(sim_game, other_power)
-    #                 sim_game.set_orders(power_name=other_power, orders=power_orders)
-
-    #             sim_game.process()
-
-    #             state_value[power_name] = yield get_state_value(
-    #                 soa_bot, sim_game, soa_bot.power_name
-    #             )
-
-    #         print("state value from power proposals", state_value)
-
-    #         best_proposer, best_orders = yield get_best_orders(
-    #             soa_bot, valid_proposal_orders, shared_orders
-    #         )
-    #         max_sv = max(state_value.values())
-    #         max_sv_power = [
-    #             power_name
-    #             for power_name in state_value
-    #             if state_value[power_name] == max_sv
-    #         ]
-    #         print(
-    #             "expect to have " + best_proposer + " in max_state_value_powers: ",
-    #             max_sv_power,
-    #         )
-
-    #         assert (
-    #             best_proposer in max_sv_power
-    #         ), "best proposer did not return the maximum state value"
-
-    #     print("finish test_best_prop_order")
-    #     stop_io_loop()
-
-    # @testing.gen_test
-    # def test_gen_pos_stance_messages(self):
-    #     # gen for only allies
-    #     game = Game()
-    #     soa_bot = SmartOrderAccepterBot("FRANCE", game, test_mode=True)
-    #     bot_instances = [
-    #         RandomProposerBot_AsyncBot("AUSTRIA", game, test_mode=True),
-    #         RandomProposerBot_AsyncBot("ENGLAND", game, test_mode=True),
-    #         RandomProposerBot_AsyncBot("GERMANY", game, test_mode=True),
-    #         soa_bot,
-    #     ]
-    #     game_play = GamePlayAsync(game, bot_instances, 3, True)
-
-    #     # skip 1 game phase for the test to work correctly
-    #     game_play.game.process()
-    #     game_play.game.set_centers("AUSTRIA", ["VIE", "TRI", "BUD"], reset=True)
-    #     game_play.game.set_centers("ENGLAND", ["LON"], reset=True)
-    #     game_play.game.set_centers("GERMANY", ["MUN", "KIE", "BER", "BEL"])
-    #     game_play.game.set_centers(soa_bot.power_name, ["PAR", "BRE", "MAR"])
-    #     rcvd_messages = game.filter_messages(
-    #         messages=game_play.game.messages, game_role=soa_bot.power_name
-    #     )
-    #     rcvd_messages = list(rcvd_messages.items())
-    #     rcvd_messages.sort()
-    #     ret_data = yield soa_bot(rcvd_messages)
-    #     soa_bot_stance = soa_bot.stance.get_stance(game_play.game)[soa_bot.power_name]
-    #     print(game_play.game.get_centers())
-    #     print("expected stance ENGLAND: 1, GERMANY: -1, AUTRIA:0")
-    #     print("soa stance", soa_bot_stance)
-    #     print(ret_data["messages"])
-    #     ally = "ENGLAND"
-    #     sending_to_ally = False
-    #     for msg in ret_data["messages"]:
-    #         assert (
-    #             msg["recipient"] != "AUSTRIA" and msg["recipient"] != "GERMANY"
-    #         ), "SOA bot is sending FCT orders to non-ally powers (AUSTRIA, GERMANY)"
-
-    #         if msg["recipient"] == "ENGLAND":
-    #             sending_to_ally = True
-    #     assert (
-    #         sending_to_ally
-    #     ), "SOA bot is not sending FCT orders to ally power (ENGLAND)"
-    #     print("test pos_stance_msg")
-    #     stop_io_loop()
+        assert "ENGLAND" in soa_bot.allies and "RUSSIA" in soa_bot.allies, f"SOA bot is sending FCT orders to these powers: {soa_bot.allies}"
+        print("test pos_stance_msg")
+        stop_io_loop()
