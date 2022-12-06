@@ -432,7 +432,7 @@ class TestSOABot(AsyncTestCase):
         rcvd_messages = list(rcvd_messages.items())
         rcvd_messages.sort()
         ret_data = yield soa_bot(rcvd_messages)
-        soa_bot_stance = soa_bot.stance.get_stance(soa_bot.game)[soa_bot.power_name]
+        soa_bot_stance = soa_bot.stance.get_stance(game_play.game)[soa_bot.power_name]
         print(game_play.game.get_centers())
         print("expected stance ENGLAND: 1, GERMANY: -1, AUTRIA:0")
         print("soa stance", soa_bot_stance)
