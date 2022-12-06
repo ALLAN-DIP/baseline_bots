@@ -68,7 +68,7 @@ class TestSOABot(AsyncTestCase):
         print("finish test_play")
 
     @testing.gen_test
-    def test_auxilary_functions(self):
+    def test_respond_to_invalid_orders(self):
         game = Game()
         soa_bot = SmartOrderAccepterBot("FRANCE", game)
         RESPOND_TO_INV_ORDERS_TC = [
@@ -93,8 +93,12 @@ class TestSOABot(AsyncTestCase):
         for tc_ip, tc_op in RESPOND_TO_INV_ORDERS_TC:
             msg_data = MessagesData()
             soa_bot.respond_to_invalid_orders(tc_ip, msg_data)
-            assert msg_data.messages == tc_op
+            assert msg_data.messages == tc_op, (msg_data.messages, tc_op)
 
+    @testing.gen_test
+    def test_respond_to_alliance_messages(self):
+        game = Game()
+        soa_bot = SmartOrderAccepterBot("FRANCE", game)
         RESPOND_TO_ALLIANCES_TC = [
             [
                 {
@@ -191,7 +195,7 @@ class TestSOABot(AsyncTestCase):
             "GERMANY", ["A BUR S A PAR - PIC", "A PAR - PIC", "F HOL H"]
         )
         game_play.game.process()
-        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
+        soa_bot_stance = soa_bot.stance.get_stance(game_play.game)[soa_bot.power_name]
         print(soa_bot_stance)
 
         print("expected stance ENGLAND >0, GERMANY<0")
@@ -228,7 +232,7 @@ class TestSOABot(AsyncTestCase):
         soa_bot.orders = orders_data
 
         print("aggressive order: ", orders)
-        soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
+        soa_bot_stance = soa_bot.stance.get_stance(game_play.game)[soa_bot.power_name]
         print(
             "soa stance",
             {k: v for k, v in soa_bot_stance.items() if v >= soa_bot.ally_threshold},
@@ -447,14 +451,3 @@ class TestSOABot(AsyncTestCase):
         ), "SOA bot is not sending FCT orders to ally power (ENGLAND)"
         print("test pos_stance_msg")
         stop_io_loop()
-
-
-# @gen.coroutine
-# def main():
-#     """Plays a local game with 7 bots"""
-#     game = Game()
-#     player = SmartOrderAccepterBot("FRANCE", game)
-#     f = open("demofile2.txt", "a")
-#     f.write("Now the file has more content!")
-#     f.close()
-#     stop_io_loop()
