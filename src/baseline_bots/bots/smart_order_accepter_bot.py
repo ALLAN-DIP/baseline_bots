@@ -50,6 +50,13 @@ class SmartOrderAccepterBot(DipnetBot):
     def __init__(
         self, power_name, game, discount_factor=0.5, test_mode=False, stance_type="A"
     ) -> None:
+        """
+        :param power_name: The name of the power
+        :param game: Game object
+        :param discount_factor: discount factor for ActionBasedStance
+        :param test_mode: indicates if this bot is to be executed in test mode or not
+        :param stance_type: indicates if this bot should use ActionBasedStance (A) or ScoreBasedStance (S)
+        """
         super().__init__(power_name, game)
         self.alliance_props_sent = False
         self.discount_factor = discount_factor
