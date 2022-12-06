@@ -131,7 +131,7 @@ class TestSOABot(AsyncTestCase):
     def test_score_stance(self):
         # score-based
         game = Game()
-        soa_bot = SmartOrderAccepterBot("FRANCE", game, test_mode=True, stance_type='S')
+        soa_bot = SmartOrderAccepterBot("FRANCE", game, test_mode=True, stance_type="S")
         bot_instances = [
             RandomProposerBot_AsyncBot("AUSTRIA", game, test_mode=True),
             RandomProposerBot_AsyncBot("ENGLAND", game, test_mode=True),
@@ -324,7 +324,7 @@ class TestSOABot(AsyncTestCase):
     def test_gen_pos_stance_messages(self):
         # gen for only allies
         game = Game()
-        soa_bot = SmartOrderAccepterBot("FRANCE", game, test_mode=True, stance_type='S')
+        soa_bot = SmartOrderAccepterBot("FRANCE", game, test_mode=True, stance_type="S")
         soa_bot.ally_threshold = 0.5
         bot_instances = [
             RandomProposerBot_AsyncBot("AUSTRIA", game, test_mode=True),
@@ -352,8 +352,13 @@ class TestSOABot(AsyncTestCase):
         print(game_play.game.get_centers())
         print("expected stance ENGLAND: 1, RUSSIA: 1, GERMANY: -1, AUTRIA:0")
         print("soa stance", soa_bot_stance)
-        print("recipients of messages:", [msg['recipient'] for msg in ret_data['messages']])
+        print(
+            "recipients of messages:",
+            [msg["recipient"] for msg in ret_data["messages"]],
+        )
 
-        assert "ENGLAND" in soa_bot.allies and "RUSSIA" in soa_bot.allies, f"SOA bot is sending FCT orders to these powers: {soa_bot.allies}"
+        assert (
+            "ENGLAND" in soa_bot.allies and "RUSSIA" in soa_bot.allies
+        ), f"SOA bot is sending FCT orders to these powers: {soa_bot.allies}"
         print("test pos_stance_msg")
         stop_io_loop()
