@@ -31,4 +31,4 @@ class TestSimpleSOABot(AsyncTestCase):
         game = Game()
         soa_bot = SmartOrderAccepterBot("FRANCE", game)
         messages = MessagesData().add_message("FRANCE", "A PAR - BUR")
-        yield soa_bot.send_message("FRANCE", messages)
+        soa_bot.add_message("FRANCE", messages)

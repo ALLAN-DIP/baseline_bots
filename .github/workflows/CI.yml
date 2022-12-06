@@ -25,4 +25,4 @@ jobs:
       - name: "Run Tests"
         run: |
           docker run --rm ci_image /bin/bash -c "/model/src/model_server/baseline_bots/containers/allan_dip_bot/run_model_server.sh & \
-          pytest"
+          ENV_NAME='ASYNC_TEST_TIMEOUT' ENV_NUMBER='180' pytest"
