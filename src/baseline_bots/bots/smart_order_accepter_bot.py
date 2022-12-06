@@ -47,13 +47,19 @@ class SmartOrderAccepterBot(DipnetBot):
     If the order is rejected, a negative response will be sent to the proposer.
     """
 
-    def __init__(self, power_name, game, discount_factor=0.5, test_mode=False) -> None:
+    def __init__(self, power_name, game, discount_factor=0.5, test_mode=False, stance_type='A') -> None:
         super().__init__(power_name, game)
         self.alliance_props_sent = False
         self.discount_factor = discount_factor
-        self.stance = ActionBasedStance(
-            power_name, game, discount_factor=self.discount_factor
-        )
+        self.stance_type = stance_type
+        if self.stance_type == 'A':
+            self.stance = ActionBasedStance(
+                power_name, game, discount_factor=self.discount_factor
+            )
+        elif self.stance_type == 'S':
+            self.stance = ScoreBasedStance(
+                power_name, game
+            )
         self.alliances = defaultdict(list)
         self.rollout_length = 5
         self.rollout_n_order = 5
@@ -563,8 +569,10 @@ class SmartOrderAccepterBot(DipnetBot):
         # compute pos/neg stance on other bots using Tony's stance vector
 
         # avoid get_stance in the first phase of game
-        if self.game.get_current_phase() != "S1901M":
+        if self.game.get_current_phase() != "S1901M" and self.stance_type == 'A':
             self.stance.get_stance(self.game)
+        elif self.stance_type == 'S':
+            self.stance.get_stance()
         print(f"Stance vector for {self.power_name}")
         print(self.stance.stance[self.power_name])
 
