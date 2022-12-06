@@ -38,7 +38,7 @@ ENV NUM_BATCH_THREADS=8
 ENV PAD_VARIABLE_LENGTH_INPUTS='true'
 
 # Test parameter for async tests
-ENV ASYNC_TEST_TIMEOUT=600
+ENV ASYNC_TEST_TIMEOUT=180
 
 # Avoid git issues
 RUN git config --global --add safe.directory /model/src/model_server/diplomacy
