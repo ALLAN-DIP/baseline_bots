@@ -103,7 +103,7 @@ class RandomProposerBot_AsyncBot(RandomProposerBot):
                     message=msg["message"],
                     phase=self.game.get_current_phase(),
                 )
-                yield self.game.send_game_message(message=msg_obj)
+                yield self.game.send_message(message=msg_obj)
         orders = yield self.gen_orders()
         # maintain current orders
         self.orders = orders

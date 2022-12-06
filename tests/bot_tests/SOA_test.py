@@ -68,7 +68,7 @@ class TestSOABot(AsyncTestCase):
         print("finish test_play")
 
     @testing.gen_test
-    def auxilary_functions(self):
+    def test_auxilary_functions(self):
         game = Game()
         soa_bot = SmartOrderAccepterBot("FRANCE", game)
         RESPOND_TO_INV_ORDERS_TC = [
@@ -120,7 +120,7 @@ class TestSOABot(AsyncTestCase):
         stop_io_loop()
 
     @testing.gen_test
-    def score_stance(self):
+    def test_score_stance(self):
         # score-based
         game = Game()
         soa_bot = SmartOrderAccepterBot("FRANCE", game)
@@ -148,7 +148,7 @@ class TestSOABot(AsyncTestCase):
         stop_io_loop()
 
     @testing.gen_test
-    def action_stance(self):
+    def test_action_stance(self):
         # score-based
         game = Game()
         soa_bot = SmartOrderAccepterBot("FRANCE", game)
@@ -203,7 +203,7 @@ class TestSOABot(AsyncTestCase):
         stop_io_loop()
 
     @testing.gen_test
-    def ally_move_filter(self):
+    def test_ally_move_filter(self):
         # assume that stance is correct using score-based
         game = Game()
         soa_bot = SmartOrderAccepterBot("FRANCE", game)
@@ -240,7 +240,7 @@ class TestSOABot(AsyncTestCase):
         stop_io_loop()
 
     @testing.gen_test
-    def arse_proposals(self):
+    def test_parse_proposals(self):
         # proposal messages -> proposal dict {power_name: a list of proposal orders}
         # valid moves and power units must belong to SOA
         game = Game()
@@ -313,7 +313,7 @@ class TestSOABot(AsyncTestCase):
         stop_io_loop()
 
     @testing.gen_test
-    def get_best_orders(self):
+    def test_get_best_orders(self):
         # proposal -> gen state value check if SOA select the best proposal
 
         # run test for n times
@@ -407,7 +407,7 @@ class TestSOABot(AsyncTestCase):
         stop_io_loop()
 
     @testing.gen_test
-    def gen_pos_stance_messages(self):
+    def test_gen_pos_stance_messages(self):
         # gen for only allies
         game = Game()
         soa_bot = SmartOrderAccepterBot("FRANCE", game)
