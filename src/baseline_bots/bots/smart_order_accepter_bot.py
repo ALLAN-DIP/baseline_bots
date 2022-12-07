@@ -54,7 +54,7 @@ class SmartOrderAccepterBot(DipnetBot):
         :param power_name: The name of the power
         :param game: Game object
         :param discount_factor: discount factor for ActionBasedStance
-        :param test_mode: indicates if this bot is to be executed in test mode or not
+        :param test_mode: indicates if this bot is to be executed in test mode or not. In test_mode, async function `send_message` will not be used.
         :param stance_type: indicates if this bot should use ActionBasedStance (A) or ScoreBasedStance (S)
         """
         super().__init__(power_name, game)
