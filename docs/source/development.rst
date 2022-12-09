@@ -39,7 +39,7 @@ If you do not have a TACC account, follow the instructions on `SHADE AIE's onboa
     export PYTHONPATH=$PYTHON-PATH:/home1/09102/uname/research/
     module load tacc-singularity
 
-8. Connecting github account
+8. Connect github account
 
 To connect your account, first, generate a Personal Access Token in Developer Settings on Github. Then, replace "token" with the personal token you generated and run the following in the baseline_bots repo:
 
