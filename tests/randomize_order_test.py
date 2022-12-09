@@ -115,6 +115,11 @@ class TestRandomizeDipnet:
         assert valid_DSB((("FRA", "AMY", "BUR"), "DSB"))
         assert valid_WVE(("FRA", "WVE"))
 
+        # These following tests ensure that the randomizer can deal with messages that contain "AND"s that are not in DAIDE format.
+        # and "ORR"s.
+        assert randomize_order("PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (XDO ((RUS FLT SEV) MTO RUM)) (XDO ((RUS AMY PRU) MTO LVN)))")
+        assert randomize_order("PRP(XDO((TUR FLT ANK) MTO BLA) AND XDO((RUS AMY SEV) MTO RUM) AND (XDO((ENG AMY LVP) HLD)))")
+
 
 countries = {"FRA", "ENG", "GER", "ITA", "TUR", "RUS", "AUS"}
 utypes = {"AMY", "FLT"}  # unit types
