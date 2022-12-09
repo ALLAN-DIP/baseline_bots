@@ -69,9 +69,10 @@ Every time you log on to TACC, run the following command:
 
 Using VSCode
 ***********************************************************************
-1. Install the Remote-SSH extension on VSCode
+1. Install the Remote-SSH extension on VSCode.
 2. Open the Command Palette (Ctrl+Shift+P) and run the Remote-SSH: Connect to Host command.
-3. Enter the ssh command to access the server (e.g. ssh kkahadze@frontera.tacc.utexas.edu)
+3. Enter the ssh command to access the server (e.g. ssh kkahadze@frontera.tacc.utexas.edu).
+4. When it asks you which config file to use, select the one in the .ssh folder in your home directory on your local system.
 
 Modifying Documentation
 ***********************************************************************
