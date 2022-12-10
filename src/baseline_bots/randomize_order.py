@@ -40,6 +40,12 @@ def randomize_order(order: str) -> str:
     :return: A string in the same format as the input with deviant orders.
     :rtype: str
     """
+    order_copy = order
+    while bool(re.search(r"\)\s+AND (XDO|\(XDO)", order_copy)): # if the order has non-daide ANDs
+        order_copy = re.sub(r"([^{AND\s*}]XDO.*)AND\s*([{XDO}|{\(XDO}])", "r\1r\2", order_copy) # remove the AND
+
+
+    a = 'PRP',('XDO',(('TUR', 'FLT', 'ANK'), 'MTO', 'BLA'), 'AND', 'XDO',(('RUS', 'AMY', 'SEV'), 'MTO', 'RUM'), 'AND', ('XDO',(('ENG', 'AMY', 'LVP'), 'HLD')))
 
     with_head = re.sub(r"[\s+]?(AND|ORR|PRP|XDO)", r"\1", order)
     head = with_head[0:3]  # extracts the "AND" or "ORR" string
@@ -47,7 +53,8 @@ def randomize_order(order: str) -> str:
     rest = with_head[
         3:
     ]  # removes the "AND" or "ORR" with all preceding whitespace
-    if head == "PRP" or head == "XDO":
+
+    if head == "PRP" or head == "XDO":  
         # Removed the surrounding parentheses that would result from an input like "PRP(ORR (XDO(...) XDO(...))))".
         without_parentheses = re.sub(
             r"\((.*)\)", r"\1",rest

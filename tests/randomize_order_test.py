@@ -120,6 +120,9 @@ class TestRandomizeDipnet:
         assert randomize_order("AND ((FRA AMY BUR) MTO BEL) ((FRA AMY PIC) CTO FIN VIA (NTH SKA DEN BAL BOT))")
         assert randomize_order("PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (XDO ((RUS FLT SEV) MTO RUM)) (XDO ((RUS AMY PRU) MTO LVN)))")
         # assert randomize_order("PRP(XDO((TUR FLT ANK) MTO BLA) AND XDO((RUS AMY SEV) MTO RUM) AND (XDO((ENG AMY LVP) HLD)))")
+        order = "PRP(XDO((TUR FLT ANK) MTO BLA) AND XDO((RUS AMY SEV) MTO RUM) AND (XDO((ENG AMY LVP) HLD)))"
+        out = re.sub(r"(.*\)\s*)AND(\s*\(?XDO.*)", r"\1\2", order)
+        print("OUT:" + out)
         assert False
 
 
