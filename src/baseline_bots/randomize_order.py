@@ -32,7 +32,6 @@ joiners = {'AND', 'ORR'} # This represents the DAIDE commands that join orders w
 
 def randomize_order(order: str) -> str:
     """
-    PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (XDO ((RUS FLT SEV) MTO RUM)) (XDO ((RUS AMY PRU) MTO LVN)))
     This function only takes in non-nested ANDs or ORRs (joiners) and returns a randomized version
     of those orders.
 
@@ -42,15 +41,18 @@ def randomize_order(order: str) -> str:
     :rtype: str
     """
 
-    with_head = re.sub(r"[\s+]?(AND|ORR|PRP)", r"\1", order)
+    with_head = re.sub(r"[\s+]?(AND|ORR|PRP|XDO)", r"\1", order)
     head = with_head[0:3]  # extracts the "AND" or "ORR" string
 
     rest = with_head[
         3:
     ]  # removes the "AND" or "ORR" with all preceding whitespace
-
-    if head == "PRP":
-        return randomize_order(rest)
+    if head == "PRP" or head == "XDO":
+        # Removed the surrounding parentheses that would result from an input like "PRP(ORR (XDO(...) XDO(...))))".
+        without_parentheses = re.sub(
+            r"\((.*)\)", r"\1",rest
+        )
+        return head + "(" + randomize_order(without_parentheses) + ")"
 
     with_inner_commas = re.sub(
         r"(.*?[^(])\s+?([^)].*?)", r"\1, \2", rest
@@ -158,8 +160,12 @@ def randomize(order: Tuple) -> Tuple:
     :return: A deviant order (with some chance of being the same order).
     :rtype: Tuple
     """
-    
-    tag = order[1]
+
+    if order[0] == "XDO":
+        tag = "XDO"
+    else:
+        tag = order[1]
+
     tag_to_func = {
         "MTO": random_movement,
         "RTO": random_movement,
@@ -171,11 +177,11 @@ def randomize(order: Tuple) -> Tuple:
         "BLD": lambda order: order,
         "REM": lambda order: order,
         "DSB": lambda order: order,
+        "XDO": random_execute_order
     }
 
     return tag_to_func[tag](order)
 
-
 def random_execute_order(order: Tuple) -> Tuple:
     """
     This takes an execute order order and returns a randomized version of it.
@@ -185,19 +191,8 @@ def random_execute_order(order: Tuple) -> Tuple:
     :return: A deviant order (with some chance of being the same order).
     :rtype: Tuple
     """
-    print(order)
-
-
-def random_execute_order(order: Tuple) -> Tuple:
-    """
-    This takes an execute order order and returns a randomized version of it.
-
-    :param order: A "order" (XDO) order
-    :type order: Tuple
-    :return: A deviant order (with some chance of being the same order).
-    :rtype: Tuple
-    """
-    print(order)
+    tag, rest = order
+    return (tag, randomize(rest))
 
 
 def random_convoy_to(order: Tuple) -> Tuple:
