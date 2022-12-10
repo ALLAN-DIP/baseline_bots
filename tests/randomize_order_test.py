@@ -1,6 +1,6 @@
 import random
-from ssl import _ASN1Object
 from typing import Tuple
+import re
 
 from baseline_bots.randomize_order import (
     ADJACENCY,
@@ -117,8 +117,13 @@ class TestRandomizeDipnet:
 
         # These following tests ensure that the randomizer can deal with messages that contain "AND"s that are not in DAIDE format.
         # and "ORR"s.
-        assert randomize_order("PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (XDO ((RUS FLT SEV) MTO RUM)) (XDO ((RUS AMY PRU) MTO LVN)))")
-        assert randomize_order("PRP(XDO((TUR FLT ANK) MTO BLA) AND XDO((RUS AMY SEV) MTO RUM) AND (XDO((ENG AMY LVP) HLD)))")
+        # assert randomize_order("AND ((FRA AMY BUR) MTO BEL) ((FRA AMY PIC) CTO FIN VIA (NTH SKA DEN BAL BOT))")
+        # assert randomize_order("PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (XDO ((RUS FLT SEV) MTO RUM)) (XDO ((RUS AMY PRU) MTO LVN)))")
+        # assert randomize_order("PRP(XDO((TUR FLT ANK) MTO BLA) AND XDO((RUS AMY SEV) MTO RUM) AND (XDO((ENG AMY LVP) HLD)))")
+        ord = "PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (XDO ((RUS FLT SEV) MTO RUM)) (XDO ((RUS AMY PRU) MTO LVN)))"
+        after  = re.sub(r"[\s+]?(AND|ORR|PRP)", r"\1", ord)
+        print("AFTER" + after)
+        assert False
 
 
 countries = {"FRA", "ENG", "GER", "ITA", "TUR", "RUS", "AUS"}

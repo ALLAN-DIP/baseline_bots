@@ -32,6 +32,7 @@ joiners = {'AND', 'ORR'} # This represents the DAIDE commands that join orders w
 
 def randomize_order(order: str) -> str:
     """
+    PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (XDO ((RUS FLT SEV) MTO RUM)) (XDO ((RUS AMY PRU) MTO LVN)))
     This function only takes in non-nested ANDs or ORRs (joiners) and returns a randomized version
     of those orders.
 
@@ -40,13 +41,19 @@ def randomize_order(order: str) -> str:
     :return: A string in the same format as the input with deviant orders.
     :rtype: str
     """
-    with_joiner = re.sub(r"[\s+]?(AND|ORR)", r"\1", order)
-    joiner = with_joiner[0:3]  # extracts the "AND" or "ORR" string
-    just_moves = with_joiner[
+
+    with_head = re.sub(r"[\s+]?(AND|ORR|PRP)", r"\1", order)
+    head = with_head[0:3]  # extracts the "AND" or "ORR" string
+
+    rest = with_head[
         3:
     ]  # removes the "AND" or "ORR" with all preceding whitespace
+
+    if head == "PRP":
+        return randomize_order(rest)
+
     with_inner_commas = re.sub(
-        r"(.*?[^(])\s+?([^)].*?)", r"\1, \2", just_moves
+        r"(.*?[^(])\s+?([^)].*?)", r"\1, \2", rest
     )  # adds commas within tuples
     with_outer_commas = re.sub(
         r"(\(\(.+\)\)|\(.+?WVE\)) ", r"\1,", with_inner_commas
@@ -56,7 +63,7 @@ def randomize_order(order: str) -> str:
     )  # adds quotes around strings
     order_list = eval("[" + with_quotes + "]")  # turns string into list of tuples
     rand = random_list_orders(order_list)  # randomizing orders
-    str_orders = joiner + " "
+    str_orders = head + " "
     for ord in rand:
         str_orders += "(" + (tuple_to_string(ord)) + ") "
     return str_orders
@@ -151,6 +158,7 @@ def randomize(order: Tuple) -> Tuple:
     :return: A deviant order (with some chance of being the same order).
     :rtype: Tuple
     """
+    
     tag = order[1]
     tag_to_func = {
         "MTO": random_movement,
@@ -166,6 +174,30 @@ def randomize(order: Tuple) -> Tuple:
     }
 
     return tag_to_func[tag](order)
+
+
+def random_execute_order(order: Tuple) -> Tuple:
+    """
+    This takes an execute order order and returns a randomized version of it.
+
+    :param order: A "order" (XDO) order
+    :type order: Tuple
+    :return: A deviant order (with some chance of being the same order).
+    :rtype: Tuple
+    """
+    print(order)
+
+
+def random_execute_order(order: Tuple) -> Tuple:
+    """
+    This takes an execute order order and returns a randomized version of it.
+
+    :param order: A "order" (XDO) order
+    :type order: Tuple
+    :return: A deviant order (with some chance of being the same order).
+    :rtype: Tuple
+    """
+    print(order)
 
 
 def random_convoy_to(order: Tuple) -> Tuple:
