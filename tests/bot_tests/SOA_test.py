@@ -38,7 +38,7 @@ class TestSOABot(AsyncTestCase):
         game_id = "usc_soa_test_" + str(random.randint(0, 10000))
 
         connection = yield connect(hostname, port)
-        channel = yield connection.authenticate("userX", "password")
+        channel = yield connection.authenticate("userX", "")
 
         game = yield channel.create_game(
             game_id=game_id,
