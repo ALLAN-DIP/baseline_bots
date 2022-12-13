@@ -2,9 +2,12 @@
 import tornado
 from diplomacy import Game, Message
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
+from diplomacy.client.connection import connect
 from gameplay_framework_async import GamePlayAsync
 from tornado import gen, testing
 from tornado.testing import AsyncTestCase
+import asyncio
+import random
 
 from baseline_bots.bots.baseline_bot import BaselineBot, BaselineMsgRoundBot
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
@@ -30,35 +33,45 @@ from baseline_bots.utils import (
 class TestSOABot(AsyncTestCase):
     @testing.gen_test
     def test_play(self):
-        game = Game()
-        soa_bot1 = SmartOrderAccepterBot("FRANCE", game, test_mode=True)
+        hostname = 'shade.tacc.utexas.edu'
+        port = 8432
+        game_id = 'usc_soa_test_' + str(random.randint(0,10000))
 
-        soa_bot2 = SmartOrderAccepterBot("RUSSIA", game, test_mode=True)
-        game_play = GamePlayAsync(
-            game,
-            [
-                RandomProposerBot_AsyncBot("AUSTRIA", game, test_mode=True),
-                RandomProposerBot_AsyncBot("ENGLAND", game, test_mode=True),
-                soa_bot1,
-                soa_bot2,
-                RandomProposerBot_AsyncBot("GERMANY", game, test_mode=True),
-                RandomProposerBot_AsyncBot("ITALY", game, test_mode=True),
-                RandomProposerBot_AsyncBot("TURKEY", game, test_mode=True),
-            ],
-            3,
-            True,
+        connection = yield connect(hostname, port)
+        channel = yield connection.authenticate("userX", "password")
+
+        game = yield channel.create_game(
+            game_id=game_id,
+            rules=None,
+            deadline=30,
+            n_controls = 7,
+            registration_password='',
+            daide_port=None
         )
-        msgs, done = yield game_play.step()
+
+        # Waiting for the game, then joining it
+        while not (yield channel.list_games(game_id=game_id)):
+            yield asyncio.sleep(1.0)
+
+        pow_to_game_map = {}
+        for power in ['FRANCE', 'RUSSIA', 'AUSTRIA', 'ENGLAND', 'GERMANY', 'ITALY', 'TURKEY']:
+            connection = yield connect(hostname, port)
+            channel = yield connection.authenticate("user_" + power, "password")
+            pow_to_game_map[power] = yield channel.join_game(game_id=game_id, power_name=power)
+        soa_bot1 = SmartOrderAccepterBot("FRANCE", pow_to_game_map["FRANCE"], test_mode=False)
+
+        soa_bot2 = SmartOrderAccepterBot("RUSSIA", pow_to_game_map["RUSSIA"], test_mode=False)
+
         game_play = GamePlayAsync(
-            game,
+            pow_to_game_map["FRANCE"],
             [
-                RandomProposerBot_AsyncBot("AUSTRIA", game, test_mode=True),
-                RandomProposerBot_AsyncBot("ENGLAND", game, test_mode=True),
+                RandomProposerBot_AsyncBot("AUSTRIA", pow_to_game_map["AUSTRIA"], test_mode=False),
+                RandomProposerBot_AsyncBot("ENGLAND", pow_to_game_map["ENGLAND"], test_mode=False),
                 soa_bot1,
                 soa_bot2,
-                RandomProposerBot_AsyncBot("GERMANY", game, test_mode=True),
-                RandomProposerBot_AsyncBot("ITALY", game, test_mode=True),
-                RandomProposerBot_AsyncBot("TURKEY", game, test_mode=True),
+                RandomProposerBot_AsyncBot("GERMANY", pow_to_game_map["GERMANY"], test_mode=False),
+                RandomProposerBot_AsyncBot("ITALY", pow_to_game_map["ITALY"], test_mode=False),
+                RandomProposerBot_AsyncBot("TURKEY", pow_to_game_map["TURKEY"], test_mode=False),
             ],
             3,
             True,
