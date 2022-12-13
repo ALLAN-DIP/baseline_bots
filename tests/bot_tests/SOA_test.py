@@ -33,9 +33,9 @@ from baseline_bots.utils import (
 class TestSOABot(AsyncTestCase):
     @testing.gen_test
     def test_play(self):
-        hostname = 'shade.tacc.utexas.edu'
+        hostname = "shade.tacc.utexas.edu"
         port = 8432
-        game_id = 'usc_soa_test_' + str(random.randint(0,10000))
+        game_id = "usc_soa_test_" + str(random.randint(0, 10000))
 
         connection = yield connect(hostname, port)
         channel = yield connection.authenticate("userX", "password")
@@ -44,9 +44,9 @@ class TestSOABot(AsyncTestCase):
             game_id=game_id,
             rules=None,
             deadline=30,
-            n_controls = 7,
-            registration_password='',
-            daide_port=None
+            n_controls=7,
+            registration_password="",
+            daide_port=None,
         )
 
         # Waiting for the game, then joining it
@@ -54,24 +54,48 @@ class TestSOABot(AsyncTestCase):
             yield asyncio.sleep(1.0)
 
         pow_to_game_map = {}
-        for power in ['FRANCE', 'RUSSIA', 'AUSTRIA', 'ENGLAND', 'GERMANY', 'ITALY', 'TURKEY']:
+        for power in [
+            "FRANCE",
+            "RUSSIA",
+            "AUSTRIA",
+            "ENGLAND",
+            "GERMANY",
+            "ITALY",
+            "TURKEY",
+        ]:
             connection = yield connect(hostname, port)
             channel = yield connection.authenticate("user_" + power, "password")
-            pow_to_game_map[power] = yield channel.join_game(game_id=game_id, power_name=power)
-        soa_bot1 = SmartOrderAccepterBot("FRANCE", pow_to_game_map["FRANCE"], test_mode=False)
+            pow_to_game_map[power] = yield channel.join_game(
+                game_id=game_id, power_name=power
+            )
+        soa_bot1 = SmartOrderAccepterBot(
+            "FRANCE", pow_to_game_map["FRANCE"], test_mode=False
+        )
 
-        soa_bot2 = SmartOrderAccepterBot("RUSSIA", pow_to_game_map["RUSSIA"], test_mode=False)
+        soa_bot2 = SmartOrderAccepterBot(
+            "RUSSIA", pow_to_game_map["RUSSIA"], test_mode=False
+        )
 
         game_play = GamePlayAsync(
             pow_to_game_map["FRANCE"],
             [
-                RandomProposerBot_AsyncBot("AUSTRIA", pow_to_game_map["AUSTRIA"], test_mode=False),
-                RandomProposerBot_AsyncBot("ENGLAND", pow_to_game_map["ENGLAND"], test_mode=False),
+                RandomProposerBot_AsyncBot(
+                    "AUSTRIA", pow_to_game_map["AUSTRIA"], test_mode=False
+                ),
+                RandomProposerBot_AsyncBot(
+                    "ENGLAND", pow_to_game_map["ENGLAND"], test_mode=False
+                ),
                 soa_bot1,
                 soa_bot2,
-                RandomProposerBot_AsyncBot("GERMANY", pow_to_game_map["GERMANY"], test_mode=False),
-                RandomProposerBot_AsyncBot("ITALY", pow_to_game_map["ITALY"], test_mode=False),
-                RandomProposerBot_AsyncBot("TURKEY", pow_to_game_map["TURKEY"], test_mode=False),
+                RandomProposerBot_AsyncBot(
+                    "GERMANY", pow_to_game_map["GERMANY"], test_mode=False
+                ),
+                RandomProposerBot_AsyncBot(
+                    "ITALY", pow_to_game_map["ITALY"], test_mode=False
+                ),
+                RandomProposerBot_AsyncBot(
+                    "TURKEY", pow_to_game_map["TURKEY"], test_mode=False
+                ),
             ],
             3,
             True,
