@@ -74,7 +74,7 @@ class GamePlayAsync(GamePlay):
                     recipient=msg["recipient"],
                     message=msg["message"],
                     phase=self.game.get_current_phase(),
-                    time_sent=common.timestamp_microseconds()
+                    time_sent=common.timestamp_microseconds(),
                 )
                 self.game.add_message(message=msg_obj)
 
