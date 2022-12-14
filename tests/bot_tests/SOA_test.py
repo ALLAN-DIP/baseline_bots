@@ -69,12 +69,12 @@ class TestSOABot(AsyncTestCase):
         channel = yield connection.authenticate("userX", "password")
 
         game_created = False
-        while not(game_created):
+        while not (game_created):
             game_id = "usc_soa_test_" + str(random.randint(0, 10000))
             try:
                 game = yield channel.create_game(
                     game_id=game_id,
-                    rules={'REAL_TIME', 'NO_DEADLINE', 'POWER_CHOICE'},
+                    rules={"REAL_TIME", "NO_DEADLINE", "POWER_CHOICE"},
                     deadline=30,
                     n_controls=1,
                     registration_password="",
@@ -90,19 +90,20 @@ class TestSOABot(AsyncTestCase):
             yield asyncio.sleep(1.0)
 
         channel = yield connection.authenticate("userX", "password")
-        game = yield channel.join_game(
-            game_id=game_id, power_name="FRANCE"
-        )
+        game = yield channel.join_game(game_id=game_id, power_name="FRANCE")
 
-        soa_bot1 = SmartOrderAccepterBot(
-            "FRANCE", game, test_mode=False
-        )
+        soa_bot1 = SmartOrderAccepterBot("FRANCE", game, test_mode=False)
 
         game_play = GamePlayAsync(
             game,
             [
                 soa_bot1,
-                None, None, None, None, None, None, 
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ],
             3,
             True,
@@ -115,9 +116,11 @@ class TestSOABot(AsyncTestCase):
             test_rounds_count -= 1
 
             # Check any other country (randomly chosen RUSSIA here for this purpose) for messages received. SOA bot by design sends ALY message to all other bots
-            rcvd_messages = list(game_play.game.filter_messages(
-                messages=game_play.game.messages, game_role="RUSSIA"
-            ).values())
+            rcvd_messages = list(
+                game_play.game.filter_messages(
+                    messages=game_play.game.messages, game_role="RUSSIA"
+                ).values()
+            )
             print([msg.message for msg in rcvd_messages])
             # message count should be non-zero
             assert len(rcvd_messages) != 0
