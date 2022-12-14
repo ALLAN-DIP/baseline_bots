@@ -1,13 +1,14 @@
 """unit tests for smart order accepter bot"""
+import asyncio
+import random
+
 import tornado
 from diplomacy import Game, Message
-from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from diplomacy.client.connection import connect
+from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from gameplay_framework_async import GamePlayAsync
 from tornado import gen, testing
 from tornado.testing import AsyncTestCase
-import asyncio
-import random
 
 from baseline_bots.bots.baseline_bot import BaselineBot, BaselineMsgRoundBot
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
@@ -124,6 +125,9 @@ class TestSOABot(AsyncTestCase):
             print([msg.message for msg in rcvd_messages])
             # message count should be non-zero
             assert len(rcvd_messages) != 0
+
+            # Note this is a valid test case since we know ALY is sent by SOA bot to all other powers in the beginning and this is the only bot amongst 7 powers
+            assert any(["ALY" in msg.message for msg in rcvd_messages])
         print("finish test_send_message")
 
     @testing.gen_test

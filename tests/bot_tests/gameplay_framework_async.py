@@ -5,8 +5,8 @@ import sys
 from typing import List
 
 from diplomacy import Game, Message, connect
-from diplomacy.utils.export import to_saved_game_format
 from diplomacy.utils import common
+from diplomacy.utils.export import to_saved_game_format
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from tornado import gen
 
