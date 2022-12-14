@@ -33,80 +33,95 @@ from baseline_bots.utils import (
 class TestSOABot(AsyncTestCase):
     @testing.gen_test
     def test_play(self):
-        hostname = "shade.tacc.utexas.edu"
-        port = 8432
-        game_id = "usc_soa_test_" + str(random.randint(0, 10000))
+        game = Game()
+        soa_bot1 = SmartOrderAccepterBot("FRANCE", game, test_mode=True)
 
-        connection = yield connect(hostname, port)
-        channel = yield connection.authenticate("userX", "password")
-
-        game = yield channel.create_game(
-            game_id=game_id,
-            rules=None,
-            deadline=30,
-            n_controls=7,
-            registration_password="",
-            daide_port=None,
-        )
-
-        # Waiting for the game, then joining it
-        while not (yield channel.list_games(game_id=game_id)):
-            yield asyncio.sleep(1.0)
-
-        pow_to_game_map = {}
-        for power in [
-            "FRANCE",
-            "RUSSIA",
-            "AUSTRIA",
-            "ENGLAND",
-            "GERMANY",
-            "ITALY",
-            "TURKEY",
-        ]:
-            connection = yield connect(hostname, port)
-            channel = yield connection.authenticate("user_" + power, "password")
-            pow_to_game_map[power] = yield channel.join_game(
-                game_id=game_id, power_name=power
-            )
-        soa_bot1 = SmartOrderAccepterBot(
-            "FRANCE", pow_to_game_map["FRANCE"], test_mode=False
-        )
-
-        soa_bot2 = SmartOrderAccepterBot(
-            "RUSSIA", pow_to_game_map["RUSSIA"], test_mode=False
-        )
-
+        soa_bot2 = SmartOrderAccepterBot("RUSSIA", game, test_mode=True)
         game_play = GamePlayAsync(
-            pow_to_game_map["FRANCE"],
+            game,
             [
-                RandomProposerBot_AsyncBot(
-                    "AUSTRIA", pow_to_game_map["AUSTRIA"], test_mode=False
-                ),
-                RandomProposerBot_AsyncBot(
-                    "ENGLAND", pow_to_game_map["ENGLAND"], test_mode=False
-                ),
+                RandomProposerBot_AsyncBot("AUSTRIA", game, test_mode=True),
+                RandomProposerBot_AsyncBot("ENGLAND", game, test_mode=True),
                 soa_bot1,
                 soa_bot2,
-                RandomProposerBot_AsyncBot(
-                    "GERMANY", pow_to_game_map["GERMANY"], test_mode=False
-                ),
-                RandomProposerBot_AsyncBot(
-                    "ITALY", pow_to_game_map["ITALY"], test_mode=False
-                ),
-                RandomProposerBot_AsyncBot(
-                    "TURKEY", pow_to_game_map["TURKEY"], test_mode=False
-                ),
+                RandomProposerBot_AsyncBot("GERMANY", game, test_mode=True),
+                RandomProposerBot_AsyncBot("ITALY", game, test_mode=True),
+                RandomProposerBot_AsyncBot("TURKEY", game, test_mode=True),
             ],
             3,
             True,
         )
 
-        # test 2 rounds
+        # test 1 round
         test_rounds_count = 1
         while test_rounds_count:
             msgs, done = yield game_play.step()
             test_rounds_count -= 1
         print("finish test_play")
+
+    @testing.gen_test
+    def test_send_message(self):
+        hostname = "shade.tacc.utexas.edu"
+        port = 8432
+        game_id = None
+
+        connection = yield connect(hostname, port)
+        channel = yield connection.authenticate("userX", "password")
+
+        game_created = False
+        while not(game_created):
+            game_id = "usc_soa_test_" + str(random.randint(0, 10000))
+            try:
+                game = yield channel.create_game(
+                    game_id=game_id,
+                    rules={'REAL_TIME', 'NO_DEADLINE', 'POWER_CHOICE'},
+                    deadline=30,
+                    n_controls=1,
+                    registration_password="",
+                    daide_port=None,
+                )
+                game_created = True
+            except:
+                # game not created because of same game id
+                pass
+
+        # Waiting for the game, then joining it
+        while not (yield channel.list_games(game_id=game_id)):
+            yield asyncio.sleep(1.0)
+
+        channel = yield connection.authenticate("userX", "password")
+        game = yield channel.join_game(
+            game_id=game_id, power_name="FRANCE"
+        )
+
+        soa_bot1 = SmartOrderAccepterBot(
+            "FRANCE", game, test_mode=False
+        )
+
+        game_play = GamePlayAsync(
+            game,
+            [
+                soa_bot1,
+                None, None, None, None, None, None, 
+            ],
+            3,
+            True,
+        )
+
+        # test 1 round
+        test_rounds_count = 1
+        while test_rounds_count:
+            msgs, done = yield game_play.step()
+            test_rounds_count -= 1
+
+            # Check any other country (randomly chosen RUSSIA here for this purpose) for messages received. SOA bot by design sends ALY message to all other bots
+            rcvd_messages = list(game_play.game.filter_messages(
+                messages=game_play.game.messages, game_role="RUSSIA"
+            ).values())
+            print([msg.message for msg in rcvd_messages])
+            # message count should be non-zero
+            assert len(rcvd_messages) != 0
+        print("finish test_send_message")
 
     @testing.gen_test
     def test_respond_to_invalid_orders(self):
