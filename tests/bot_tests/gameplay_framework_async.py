@@ -5,6 +5,7 @@ import sys
 from typing import List
 
 from diplomacy import Game, Message, connect
+from diplomacy.utils import common
 from diplomacy.utils.export import to_saved_game_format
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from tornado import gen
@@ -46,6 +47,8 @@ class GamePlayAsync(GamePlay):
         round_msgs = self.game.messages
         msgs_to_send = {}
         for bot in self.bots:
+            if bot is None:
+                continue
             # retrieve messages sent to bot
             rcvd_messages = self.game.filter_messages(
                 messages=round_msgs, game_role=bot.power_name
@@ -71,11 +74,14 @@ class GamePlayAsync(GamePlay):
                     recipient=msg["recipient"],
                     message=msg["message"],
                     phase=self.game.get_current_phase(),
+                    time_sent=common.timestamp_microseconds(),
                 )
                 self.game.add_message(message=msg_obj)
 
         # get/set orders
         for bot in self.bots:
+            if bot is None:
+                continue
             if hasattr(bot, "orders"):
                 orders = ret_dict["orders"]
                 if orders is not None:

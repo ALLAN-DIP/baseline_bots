@@ -80,6 +80,10 @@ class RandomProposerBot(BaselineBot):
 class RandomProposerBot_AsyncBot(RandomProposerBot):
     """Wrapper to RandomProposerBot with tornado decorators for async calls"""
 
+    def __init__(self, power_name, game, test_mode=False) -> None:
+        super().__init__(power_name, game)
+        self.test_mode = test_mode
+
     @gen.coroutine
     def gen_messages(self, rcvd_messages):
         return super().gen_messages(rcvd_messages)
@@ -103,7 +107,8 @@ class RandomProposerBot_AsyncBot(RandomProposerBot):
                     message=msg["message"],
                     phase=self.game.get_current_phase(),
                 )
-                yield self.game.send_game_message(message=msg_obj)
+                if not (self.test_mode):
+                    yield self.game.send_game_message(message=msg_obj)
         orders = yield self.gen_orders()
         # maintain current orders
         self.orders = orders

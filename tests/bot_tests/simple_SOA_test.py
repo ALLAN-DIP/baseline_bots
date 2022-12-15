@@ -25,10 +25,10 @@ from baseline_bots.utils import (
 )
 
 
-class TestSOABot(AsyncTestCase):
+class TestSimpleSOABot(AsyncTestCase):
     @testing.gen_test
     def test_play(self):
         game = Game()
-        soa_bot = SmartOrderAccepterBot("FRANCE", game)
+        soa_bot = SmartOrderAccepterBot("FRANCE", game, test_mode=True)
         messages = MessagesData().add_message("FRANCE", "A PAR - BUR")
         soa_bot.send_message("FRANCE", messages)

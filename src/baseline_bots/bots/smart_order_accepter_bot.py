@@ -47,13 +47,26 @@ class SmartOrderAccepterBot(DipnetBot):
     If the order is rejected, a negative response will be sent to the proposer.
     """
 
-    def __init__(self, power_name, game, discount_factor=0.5) -> None:
+    def __init__(
+        self, power_name, game, discount_factor=0.5, test_mode=False, stance_type="A"
+    ) -> None:
+        """
+        :param power_name: The name of the power
+        :param game: Game object
+        :param discount_factor: discount factor for ActionBasedStance
+        :param test_mode: indicates if this bot is to be executed in test mode or not. In test_mode, async function `send_message` will not be used.
+        :param stance_type: indicates if this bot should use ActionBasedStance (A) or ScoreBasedStance (S)
+        """
         super().__init__(power_name, game)
         self.alliance_props_sent = False
         self.discount_factor = discount_factor
-        self.stance = ActionBasedStance(
-            power_name, game, discount_factor=self.discount_factor
-        )
+        self.stance_type = stance_type
+        if self.stance_type == "A":
+            self.stance = ActionBasedStance(
+                power_name, game, discount_factor=self.discount_factor
+            )
+        elif self.stance_type == "S":
+            self.stance = ScoreBasedStance(power_name, game)
         self.alliances = defaultdict(list)
         self.rollout_length = 5
         self.rollout_n_order = 5
@@ -65,6 +78,7 @@ class SmartOrderAccepterBot(DipnetBot):
         self.allies = []
         self.foes = []
         self.neutral = []
+        self.test_mode = test_mode
 
     async def send_message(self, recipient: str, message: MessagesData) -> None:
         """
@@ -104,7 +118,8 @@ class SmartOrderAccepterBot(DipnetBot):
                 for pow in self.allies:
                     if pow != self.power_name:
                         msgs_data.add_message(pow, str(orders_decided))
-                        await self.send_message(pow, str(orders_decided))
+                        if not (self.test_mode):
+                            await self.send_message(pow, str(orders_decided))
 
     async def gen_messages(
         self, orders_list: List[str], msgs_data: MessagesData
@@ -161,7 +176,8 @@ class SmartOrderAccepterBot(DipnetBot):
                         )
                     )
                 messages.add_message(proposer, str(msg))
-                await self.send_message(proposer, str(msg))
+                if not (self.test_mode):
+                    await self.send_message(proposer, str(msg))
         return messages
 
     async def respond_to_invalid_orders(
@@ -195,7 +211,8 @@ class SmartOrderAccepterBot(DipnetBot):
                 )
             )
             messages_data.add_message(sender, str(message))
-            await self.send_message(sender, str(message))
+            if not (self.test_mode):
+                await self.send_message(sender, str(message))
 
     async def respond_to_alliance_messages(self, messages_data: MessagesData) -> None:
         """
@@ -210,7 +227,8 @@ class SmartOrderAccepterBot(DipnetBot):
             if sender == self.power_name:
                 continue
             messages_data.add_message(sender, str(YES(message)))
-            await self.send_message(sender, str(YES(message)))
+            if not (self.test_mode):
+                await self.send_message(sender, str(YES(message)))
 
         if self.alliances:
             print("Alliances accepted")
@@ -427,7 +445,8 @@ class SmartOrderAccepterBot(DipnetBot):
                 )
                 final_messages[recipient] = str(suggested_proposals)
                 comms_obj.add_message(recipient, str(suggested_proposals))
-                await self.send_message(recipient, str(suggested_proposals))
+                if not (self.test_mode):
+                    await self.send_message(recipient, str(suggested_proposals))
 
         return final_messages
 
@@ -557,8 +576,10 @@ class SmartOrderAccepterBot(DipnetBot):
         # compute pos/neg stance on other bots using Tony's stance vector
 
         # avoid get_stance in the first phase of game
-        if self.game.get_current_phase() != "S1901M":
+        if self.game.get_current_phase() != "S1901M" and self.stance_type == "A":
             self.stance.get_stance(self.game)
+        elif self.stance_type == "S":
+            self.stance.get_stance()
         print(f"Stance vector for {self.power_name}")
         print(self.stance.stance[self.power_name])
 
@@ -612,7 +633,8 @@ class SmartOrderAccepterBot(DipnetBot):
                 msg_allies, msg_foes, msg_neutral = ','.join(self.allies), ','.join(self.foes), ','.join(self.neutral)
                 msgs_data.add_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
                                 {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
-                yield self.send_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
+                if not(self.test_mode):
+                    yield self.send_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
                                 {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
             # fmt: on
 
@@ -628,7 +650,8 @@ class SmartOrderAccepterBot(DipnetBot):
                     vss = [country for country in list(powers.copy().keys()) if country != pow and country != self.power_name]
                     vss_str = " ".join(vss)
                     msgs_data.add_message(pow, f"ALY ({self.power_name} {pow}) VSS ({vss_str})")
-                    yield self.send_message(pow, f"ALY ({self.power_name} {pow}) VSS ({vss_str})")
+                    if not(self.test_mode):
+                        yield self.send_message(pow, f"ALY ({self.power_name} {pow}) VSS ({vss_str})")
 
             # send ALY requests at the start of the game
             yield self.respond_to_invalid_orders(invalid_proposal_orders, msgs_data)
@@ -654,7 +677,8 @@ class SmartOrderAccepterBot(DipnetBot):
                 print(f">>> {self.power_name} Random Orders to {self.foes}", daide_orders)
                 for foe in self.foes:
                     msgs_data.add_message(foe, daide_orders)
-                    yield self.send_message(foe, daide_orders)
+                    if not(self.test_mode):
+                        yield self.send_message(foe, daide_orders)
             except Exception as e:
                 print("Raised Excpetion in order randomization code block")
                 print(e)
