@@ -20,10 +20,6 @@ RUN chmod -R 777 /model/src/model_server/bot_neurips2019-sl_model
 RUN git clone https://github.com/SHADE-AI/diplomacy.git
 RUN git clone https://github.com/SHADE-AI/research.git
 
-# copy baseline bots code into the docker image
-RUN mkdir /model/src/model_server/baseline_bots
-COPY . /model/src/model_server/baseline_bots
-
 # Environment variables
 ENV PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp
 ENV PYTHONIOENCODING=utf-8
@@ -55,9 +51,18 @@ RUN sed -i 's/gym>/gym=/g'  requirements.txt
 RUN pip install -r requirements.txt
 
 # Install baseline_bots requirements
+RUN mkdir -p /model/src/model_server/baseline_bots/src
 WORKDIR /model/src/model_server/baseline_bots
+COPY README.md pyproject.toml requirements.txt setup.py /model/src/model_server/baseline_bots/
 RUN pip install -r requirements.txt
 RUN pip install -e .
+
+# copy baseline bots code into the docker image
+COPY containers/ /model/src/model_server/baseline_bots/containers/
+COPY docs/ /model/src/model_server/baseline_bots/docs/
+COPY scripts/ /model/src/model_server/baseline_bots/scripts/
+COPY src/ /model/src/model_server/baseline_bots/src/
+COPY tests/ /model/src/model_server/baseline_bots/tests/
 
 # allow the tf server to be run
 RUN chmod 777 /model/src/model_server/baseline_bots/containers/allan_dip_bot/run_model_server.sh
