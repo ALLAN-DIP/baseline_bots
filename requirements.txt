@@ -7,3 +7,4 @@ black==22.10.0
 isort==5.10.1
 git+https://github.com/ALLAN-DIP/stance_vector.git
 numpy==1.21
+pre-commit==2.21.0
