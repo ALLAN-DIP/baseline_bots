@@ -2,17 +2,19 @@
 
 Containerization code referenced from [SHADE-AI/diplomacy-playground](https://github.com/SHADE-AI/diplomacy-playground)
 
-This is a docker implementation of ALLAN team's bots. The model parameters are embedded and the TF model server is run within the container along with a python script to instantiate the bot and facilitate game play. 
+This is a docker implementation of ALLAN team's bots. The model parameters are embedded and the TF model server is run within the container along with a python script to instantiate the bot and facilitate game play.
 
 Build:
+
 ```shell
 $ wget https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-sl_model.zip
 $ mkdir bot_neurips2019-sl_model
 $ unzip neurips2019-sl_model.zip -d bot_neurips2019-sl_model/
-$ docker build -t allan_dip_bot . 
+$ docker build -t allan_dip_bot .
 ```
 
 Usage:
+
 ```shell
 $ docker run -it allan_dip_bot --help
 --host 		HOST [default localhost]
@@ -24,6 +26,5 @@ $ docker run -it allan_dip_bot --help
 
 #connect to remote game engine
 $ docker run -it allan_dip_bot --game_id test_game --host shade.tacc.utexas.edu --power TURKEY
-$ 
+$
 ```
-

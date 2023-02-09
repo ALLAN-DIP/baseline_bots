@@ -1,5 +1,5 @@
 """
-Some functions that generate randomized orders from 
+Some functions that generate randomized orders from
 an already existing order / list of orders.
 """
 
@@ -20,8 +20,8 @@ ADJACENCY = {'ADR': ['ALB', 'APU', 'ION', 'TRI', 'VEN'], 'AEG': ['BUL/SC', 'CON'
 TYPES = {'ADR': 'WATER', 'AEG': 'WATER', 'ALB': 'COAST', 'ANK': 'COAST', 'APU': 'COAST', 'ARM': 'COAST', 'BAL': 'WATER', 'BAR': 'WATER', 'BEL': 'COAST', 'BER': 'COAST', 'BLA': 'WATER', 'BOH': 'LAND', 'BOT': 'WATER', 'BRE': 'COAST', 'BUD': 'LAND', 'BUL/EC': 'COAST', 'BUL/SC': 'COAST', 'bul': 'COAST', 'BUR': 'LAND', 'CLY': 'COAST', 'CON': 'COAST', 'DEN': 'COAST', 'EAS': 'WATER', 'EDI': 'COAST', 'ENG': 'WATER', 'FIN': 'COAST', 'GAL': 'LAND', 'GAS': 'COAST', 'GRE': 'COAST', 'HEL': 'WATER', 'HOL': 'COAST', 'ION': 'WATER', 'IRI': 'WATER', 'KIE': 'COAST', 'LON': 'COAST', 'LVN': 'COAST', 'LVP': 'COAST', 'LYO': 'WATER', 'MAO': 'WATER', 'MAR': 'COAST', 'MOS': 'LAND', 'MUN': 'LAND', 'NAF': 'COAST', 'NAO': 'WATER', 'NAP': 'COAST', 'NWY': 'COAST', 'NTH': 'WATER', 'NWG': 'WATER', 'PAR': 'LAND', 'PIC': 'COAST', 'PIE': 'COAST', 'POR': 'COAST', 'PRU': 'COAST', 'ROM': 'COAST', 'RUH': 'LAND', 'RUM': 'COAST', 'SER': 'LAND', 'SEV': 'COAST', 'SIL': 'LAND', 'SKA': 'WATER', 'SMY': 'COAST', 'SPA/NC': 'COAST', 'SPA/SC': 'COAST', 'spa': 'COAST', 'STP/NC': 'COAST', 'STP/SC': 'COAST', 'stp': 'COAST', 'SWE': 'COAST', 'SYR': 'COAST', 'TRI': 'COAST', 'TUN': 'COAST', 'TUS': 'COAST', 'TYR': 'LAND', 'TYS': 'WATER', 'UKR': 'LAND', 'VEN': 'COAST', 'VIE': 'LAND', 'WAL': 'COAST', 'WAR': 'LAND', 'WES': 'WATER', 'YOR': 'COAST', 'SWI': 'SHUT'}
 
 # This nested dict represents the areas that certain types of units can support others into. The format is
-# as follows: COMBOS[ SUPPORTING_UNIT_TYPE ] [ SUPPORTED_UNIT_TYPE ] = {SET OF ALL PROVINCE TYPES THAT SUPPORT CAN OCCUR INTO} 
-COMBOS = { 
+# as follows: COMBOS[ SUPPORTING_UNIT_TYPE ] [ SUPPORTED_UNIT_TYPE ] = {SET OF ALL PROVINCE TYPES THAT SUPPORT CAN OCCUR INTO}
+COMBOS = {
     "FLT" : {"FLT": {"WATER", "COAST"}, "AMY": {"COAST"}},
     "AMY" : {"FLT": {"COAST"}, "AMY": {"LAND", "COAST"}}
 }
@@ -219,7 +219,7 @@ def random_convoy(order: Tuple) -> Tuple:
     assert (amy_type == "AMY" and flt_type == "FLT"), "The unit type is neither army nor fleet so it is invalid."
     # It is necessary to check whether a possible alternate "convoy-to" location is adjacent to the unit being convoyed
     # since convoying to a province adjacent to you would be less believable
-    adj = [loc for loc in ADJACENCY[flt_loc] if TYPES[loc] == "COAST" and loc not in ADJACENCY[amy_loc] and loc != province] 
+    adj = [loc for loc in ADJACENCY[flt_loc] if TYPES[loc] == "COAST" and loc not in ADJACENCY[amy_loc] and loc != province]
     # fmt: on
     if adj:  # if valid adjacencies exist
         return (order[0], tag, order[2], "CTO", random.choice(adj))
@@ -270,7 +270,7 @@ def random_support(order: Tuple) -> Tuple:
     else:  # if it is supporting to move
         # fmt: off
         ((sup_country, sup_type, sup_loc), _, (rec_country, rec_type, rec_loc), _, province) = order
-        sup_adjacent, rec_adjacent = ADJACENCY[sup_loc], ADJACENCY[rec_loc] 
+        sup_adjacent, rec_adjacent = ADJACENCY[sup_loc], ADJACENCY[rec_loc]
         # COMBOS and TYPES must be used to determine the possible locations a unit can support into/from based on the unit type and province type
         dest_choices = COMBOS[sup_type][rec_type]
         adj_to_both = [adjacency for adjacency in sup_adjacent if adjacency in rec_adjacent and adjacency != province and TYPES[adjacency]]

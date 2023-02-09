@@ -46,7 +46,6 @@ class Agent(object):
         epsilon_decay=200,
         use_cuda=True,
     ):
-
         self.env = env
         self.state_dim = state_dim
         self.action_dim = action_dim

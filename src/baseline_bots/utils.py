@@ -384,7 +384,6 @@ def get_state_value(bot, game, power_name, option="default"):
     dipnet_comparison = {power: 0 for power in game.map.powers}
     support_count = {power: 0 for power in game.map.powers}
     for i in range(bot.rollout_length):
-
         for power in game.map.powers:
             if option == "samplingbeam":
                 list_order, prob_order = yield bot.brain.get_beam_orders(game, power)
@@ -457,7 +456,6 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
 
     # get state value for each proposal
     for proposer, unit_orders in proposal_order.items():
-
         # if there is a proposal from this power
         if unit_orders:
             proposed = True
@@ -475,7 +473,6 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
 
             # consider shared orders in a simulated game
             for other_power in simulated_game.powers:
-
                 # if they are not sharing any info about their orders then assume that they are DipNet-based
                 if other_power in shared_order:
                     power_orders = shared_order[other_power]

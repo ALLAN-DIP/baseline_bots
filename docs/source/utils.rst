@@ -2,5 +2,5 @@ Utilities
 ==============
 
 .. automodule:: baseline_bots.utils
-   :members: 
+   :members:
    :undoc-members:

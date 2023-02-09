@@ -155,7 +155,6 @@ async def play(
     # Playing game
     print("Started playing")
     while not game.is_game_done:
-
         current_phase = game.get_current_phase()
         if sleep_delay:
             await asyncio.sleep(

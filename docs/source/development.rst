@@ -53,7 +53,7 @@ To connect your account, first, generate a Personal Access Token in Developer Se
 .. code-block:: bash
 
     cd ~/research
-    pip install -r requirements.txt 
+    pip install -r requirements.txt
 
 Done! In the baseline_bots directory, you should now be able to run:
 
@@ -104,7 +104,7 @@ Then, run:
 
 Running Tests
 **********************************************************************************************************************************************
-The following runs all tests in the tests directory. Look up pytest documentation to see 
+The following runs all tests in the tests directory. Look up pytest documentation to see
 how to run tests individually.
 
 .. code-block:: bash
@@ -139,4 +139,4 @@ General Tips
 
 .. code-block:: bash
 
-    unset PROMPT_COMMAND 
+    unset PROMPT_COMMAND

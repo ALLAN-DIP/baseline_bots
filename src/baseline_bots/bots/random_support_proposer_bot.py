@@ -22,7 +22,6 @@ class RandomSupportProposerBot(BaselineBot):
         self.orders_obj = None
 
     def gen_messages(self):
-
         # Return data initialization
         messages_obj, self.orders_obj = MessagesData(), OrdersData()
 

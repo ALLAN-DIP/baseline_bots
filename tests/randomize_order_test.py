@@ -13,7 +13,6 @@ from baseline_bots.randomize_order import (
 
 class TestRandomizeDipnet:
     def test(self):
-
         # The following three tests check that build, disband and remove commands do not get changed when input into the order randomizer.
 
         ord = [(("FRA", "AMY", "PAR"), "BLD")]

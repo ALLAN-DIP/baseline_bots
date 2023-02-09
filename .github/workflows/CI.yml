@@ -1,9 +1,9 @@
 name: CI test
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main]
   push:
-    branches: [ main, test_CI ]
+    branches: [main, test_CI]
 
 # TODO: create a game
 jobs:
@@ -16,8 +16,8 @@ jobs:
       - name: "Setup Python"
         uses: actions/setup-python@v2
         with:
-          python-version: '3.7'
-      
+          python-version: "3.7"
+
       - name: "Build Docker Container"
         run: |
           docker build --no-cache -t ci_image .

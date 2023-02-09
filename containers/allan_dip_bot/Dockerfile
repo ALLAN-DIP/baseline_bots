@@ -11,7 +11,7 @@ RUN apt-get -y install lsof
 
 # Copy SL model
 RUN mkdir /model/src/model_server/bot_neurips2019-sl_model
-COPY bot_neurips2019-sl_model /model/src/model_server/bot_neurips2019-sl_model 
+COPY bot_neurips2019-sl_model /model/src/model_server/bot_neurips2019-sl_model
 COPY run_model_server.sh /model/src/model_server/run_model_server.sh
 RUN chmod 777 /model/src/model_server/run_model_server.sh
 RUN chmod -R 777 /model/src/model_server/bot_neurips2019-sl_model
@@ -30,7 +30,7 @@ ENV LANG=en_CA.UTF-8
 ENV PYTHONUNBUFFERED=1
 ENV PATH=/data/env3.7/bin:$PATH
 
-# Default batching parameters, can override with docker run -e 
+# Default batching parameters, can override with docker run -e
 ENV MAX_BATCH_SIZE=128
 ENV BATCH_TIMEOUT_MICROS=250000
 ENV MAX_ENQUEUED_BATCHES=1024
@@ -64,4 +64,3 @@ COPY run.sh /model/src/model_server/baseline_bots/run.sh
 RUN chmod 777 /model/src/model_server/baseline_bots/run_bot.py
 RUN chmod 777 /model/src/model_server/baseline_bots/run.sh
 ENTRYPOINT ["/model/src/model_server/baseline_bots/run.sh"]
-

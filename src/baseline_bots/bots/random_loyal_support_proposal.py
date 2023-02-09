@@ -351,7 +351,6 @@ class RandomLSPBot(BaselineMsgRoundBot):
         return comms_obj
 
     def gen_orders(self):
-
         if self.game.get_current_phase()[-1] == "M":
             # Fill out orders randomly if not decided already
             filled_out_orders = [
