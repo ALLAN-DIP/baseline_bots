@@ -20,9 +20,8 @@ jobs:
 
       - name: "Build Docker Container"
         run: |
-          docker build --target dev --no-cache -t ci_image .
+          docker build --target test_ci --no-cache -t ci_image .
 
       - name: "Run Tests"
         run: |
-          docker run --rm ci_image /bin/bash -c "/model/src/model_server/baseline_bots/containers/allan_dip_bot/run_model_server.sh & \
-          pytest"
+          docker run --rm ci_image

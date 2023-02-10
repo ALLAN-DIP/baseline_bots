@@ -72,6 +72,10 @@ RUN chmod 777 /model/src/model_server/baseline_bots/containers/allan_dip_bot/run
 # add diplomacy research to python path
 ENV PYTHONPATH=/model/src/model_server/research:$PYTHONPATH
 
+FROM dev as test_ci
+
+CMD /bin/bash -c '/model/src/model_server/baseline_bots/containers/allan_dip_bot/run_model_server.sh & pytest'
+
 FROM base AS allan_dip_bot
 
 # Copy specialized files
