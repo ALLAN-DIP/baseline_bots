@@ -1,5 +1,7 @@
 FROM pcpaquette/tensorflow-serving:20190226
 
+WORKDIR /model/src/model_server
+
 # install needed packages
 RUN apt-get -y update
 RUN apt-get -y install git
@@ -7,8 +9,6 @@ RUN apt-get -y install vim
 RUN apt-get -y install curl
 RUN apt-get -y install htop
 RUN apt-get -y install lsof
-
-WORKDIR /model/src/model_server
 
 # Copy SL model
 RUN wget https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-sl_model.zip
@@ -40,7 +40,6 @@ ENV ASYNC_TEST_TIMEOUT=180
 # Avoid git issues
 RUN git config --global --add safe.directory /model/src/model_server/diplomacy
 RUN git config --global --add safe.directory /model/src/model_server/research
-RUN git config --global --add safe.directory /model/src/model_server/baseline_bots
 
 # Avoid pip issues
 RUN pip install --upgrade pip
@@ -58,10 +57,12 @@ RUN pip install -r requirements.txt
 RUN pip install -e .
 
 # copy baseline bots code into the docker image
+COPY src/ /model/src/model_server/baseline_bots/src/
+
+# Copy specialized files
 COPY containers/ /model/src/model_server/baseline_bots/containers/
 COPY docs/ /model/src/model_server/baseline_bots/docs/
 COPY scripts/ /model/src/model_server/baseline_bots/scripts/
-COPY src/ /model/src/model_server/baseline_bots/src/
 COPY tests/ /model/src/model_server/baseline_bots/tests/
 
 # allow the tf server to be run
