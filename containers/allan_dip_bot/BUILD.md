@@ -7,7 +7,7 @@ This is a docker implementation of ALLAN team's bots. The model parameters are e
 Build:
 
 ```shell
-$ docker build -t allan_dip_bot .
+$ docker build --target allan_dip_bot -t allan_dip_bot .
 ```
 
 Usage:

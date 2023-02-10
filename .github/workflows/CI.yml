@@ -20,7 +20,7 @@ jobs:
 
       - name: "Build Docker Container"
         run: |
-          docker build --no-cache -t ci_image .
+          docker build --target dev --no-cache -t ci_image .
 
       - name: "Run Tests"
         run: |
