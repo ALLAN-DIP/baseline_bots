@@ -7,9 +7,6 @@ This is a docker implementation of ALLAN team's bots. The model parameters are e
 Build:
 
 ```shell
-$ wget https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-sl_model.zip
-$ mkdir bot_neurips2019-sl_model
-$ unzip neurips2019-sl_model.zip -d bot_neurips2019-sl_model/
 $ docker build -t allan_dip_bot .
 ```
 
