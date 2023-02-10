@@ -1,4 +1,4 @@
-FROM pcpaquette/tensorflow-serving:20190226
+FROM pcpaquette/tensorflow-serving:20190226 AS base
 
 WORKDIR /model/src/model_server
 
@@ -59,6 +59,8 @@ RUN pip install -e .
 # copy baseline bots code into the docker image
 COPY src/ /model/src/model_server/baseline_bots/src/
 
+FROM base AS dev
+
 # Copy specialized files
 COPY containers/ /model/src/model_server/baseline_bots/containers/
 COPY docs/ /model/src/model_server/baseline_bots/docs/
@@ -69,3 +71,12 @@ COPY tests/ /model/src/model_server/baseline_bots/tests/
 RUN chmod 777 /model/src/model_server/baseline_bots/containers/allan_dip_bot/run_model_server.sh
 # add diplomacy research to python path
 ENV PYTHONPATH=/model/src/model_server/research:$PYTHONPATH
+
+FROM base AS allan_dip_bot
+
+# Copy specialized files
+COPY containers/allan_dip_bot/ /model/src/model_server/baseline_bots/containers/allan_dip_bot/
+RUN chmod -R 777 /model/src/model_server/baseline_bots/containers/allan_dip_bot/
+
+# Script executors
+ENTRYPOINT ["/model/src/model_server/baseline_bots/containers/allan_dip_bot/run.sh"]
