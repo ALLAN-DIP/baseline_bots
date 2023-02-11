@@ -36,12 +36,12 @@ class DiplomacyEnv(gym.Env):
         }
         self.power_type_mapping = {"self": 0, "neutral": 1, "ally": 2, "enemy": 3}
         """
-    stance vector of [power1][power2],  
+    stance vector of [power1][power2],
     send? 0/1
     orders:
-            ['self', 'ally', 'neutral', 'enemy'] of unit's power, one hot 
+            ['self', 'ally', 'neutral', 'enemy'] of unit's power, one hot
             type of order, one hot 5 [move, hold, support, attack, convoy]
-            ['self', 'ally', 'neutral', 'enemy'] of unit's power = attack whom/move to whose territory one hot 
+            ['self', 'ally', 'neutral', 'enemy'] of unit's power = attack whom/move to whose territory one hot
     cur_obs for each agent and action for each agent
     """
         self.observation_space = gym.spaces.Box(

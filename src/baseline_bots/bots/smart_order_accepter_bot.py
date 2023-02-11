@@ -598,7 +598,6 @@ class SmartOrderAccepterBot(DipnetBot):
 
         # only in movement phase, we send PRP/ALY/FCT and consider get_best_proposer
         if self.game.get_current_phase()[-1] == "M":
-
             # parse the proposal messages received by the bot
             parsed_messages_dict = parse_proposal_messages(
                 rcvd_messages, self.game, self.power_name
@@ -622,9 +621,9 @@ class SmartOrderAccepterBot(DipnetBot):
             self.neutral = [pow for pow in powers if (pow != self.power_name and powers[pow] > self.enemy_threshold and powers[pow] <= self.ally_threshold)]
 
             best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
-            
+
             # add orders
-            
+
             orders_data.add_orders(best_orders, overwrite=True)
             self.orders = orders_data
 

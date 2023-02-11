@@ -116,7 +116,6 @@ def bot_loop():
     dict_support_count = {power: 0 for power in game.powers}
     dict_support_count["total"] = 0
     while not game.is_game_done:
-
         print(game.get_current_phase())
         for bot in bots:
             # if not game.powers[bot.power_name].is_eliminated():

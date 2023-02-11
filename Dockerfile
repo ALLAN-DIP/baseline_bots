@@ -13,16 +13,12 @@ WORKDIR /model/src/model_server
 # Copy SL model
 RUN wget https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-sl_model.zip
 RUN mkdir /model/src/model_server/bot_neurips2019-sl_model
-RUN unzip neurips2019-sl_model.zip -d /model/src/model_server/bot_neurips2019-sl_model 
+RUN unzip neurips2019-sl_model.zip -d /model/src/model_server/bot_neurips2019-sl_model
 RUN chmod -R 777 /model/src/model_server/bot_neurips2019-sl_model
 
 # Clone repos
 RUN git clone https://github.com/SHADE-AI/diplomacy.git
 RUN git clone https://github.com/SHADE-AI/research.git
-
-# copy baseline bots code into the docker image
-RUN mkdir /model/src/model_server/baseline_bots
-COPY . /model/src/model_server/baseline_bots
 
 # Environment variables
 ENV PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp
@@ -31,7 +27,7 @@ ENV LANG=en_CA.UTF-8
 ENV PYTHONUNBUFFERED=1
 ENV PATH=/data/env3.7/bin:$PATH
 
-# Default batching parameters, can override with docker run -e 
+# Default batching parameters, can override with docker run -e
 ENV MAX_BATCH_SIZE=128
 ENV BATCH_TIMEOUT_MICROS=250000
 ENV MAX_ENQUEUED_BATCHES=1024
@@ -55,9 +51,18 @@ RUN sed -i 's/gym>/gym=/g'  requirements.txt
 RUN pip install -r requirements.txt
 
 # Install baseline_bots requirements
+RUN mkdir -p /model/src/model_server/baseline_bots/src
 WORKDIR /model/src/model_server/baseline_bots
+COPY README.md pyproject.toml requirements.txt setup.py /model/src/model_server/baseline_bots/
 RUN pip install -r requirements.txt
 RUN pip install -e .
+
+# copy baseline bots code into the docker image
+COPY containers/ /model/src/model_server/baseline_bots/containers/
+COPY docs/ /model/src/model_server/baseline_bots/docs/
+COPY scripts/ /model/src/model_server/baseline_bots/scripts/
+COPY src/ /model/src/model_server/baseline_bots/src/
+COPY tests/ /model/src/model_server/baseline_bots/tests/
 
 # allow the tf server to be run
 RUN chmod 777 /model/src/model_server/baseline_bots/containers/allan_dip_bot/run_model_server.sh

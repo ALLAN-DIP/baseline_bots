@@ -645,7 +645,6 @@ class LSP_DipBot(DipnetBot):
 
     @gen.coroutine
     def gen_orders(self):
-
         if self.game.get_current_phase()[-1] != "M":
             # Fetch list of orders from DipNet
             orders = yield from self.brain.get_orders(self.game, self.power_name)

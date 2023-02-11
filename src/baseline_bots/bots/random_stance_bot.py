@@ -147,7 +147,6 @@ if __name__ == "__main__":
         bots.append(temp)
 
     while not game.is_game_done:
-
         for bot in bots:
             bot_state = bot.act()
             messages, orders = bot_state.messages, bot_state.orders

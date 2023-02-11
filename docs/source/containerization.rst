@@ -1,9 +1,9 @@
-Containerization 
+Containerization
 ================
 
 Containerization code referenced from SHADE-AI/diplomacy-playground
 
-This is a docker implementation of ALLAN team's bots. 
+This is a docker implementation of ALLAN team's bots.
 The model parameters are embedded and the TF model server is run within the container along with a python script to instantiate the bot and facilitate game play.
 
 Building the container

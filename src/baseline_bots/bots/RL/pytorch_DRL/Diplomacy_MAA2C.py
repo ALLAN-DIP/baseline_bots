@@ -227,7 +227,6 @@ class DiplomacyMAA2C(Agent):
 
     # train on a roll out batch
     def train(self):
-
         if self.n_episodes <= self.episodes_before_train:
             pass
 
