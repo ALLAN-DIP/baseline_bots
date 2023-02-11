@@ -100,7 +100,7 @@ async def launch(
         sleep_delay,
         outdir,
         discount_factor,
-        aggressiveness=aggressiveness
+        aggressiveness=aggressiveness,
     )
 
 
@@ -143,7 +143,9 @@ async def play(
     elif bot_type == "RandomProposerBot_AsyncBot":
         bot = RandomProposerBot_AsyncBot(power_name, game)
     elif bot_type == "SmartOrderAccepterBot":
-        bot = SmartOrderAccepterBot(power_name, game, discount_factor, aggressiveness=aggressiveness)
+        bot = SmartOrderAccepterBot(
+            power_name, game, discount_factor, aggressiveness=aggressiveness
+        )
 
     # Wait while game is still being formed
     print("Waiting for game to start", end=" ")
@@ -266,7 +268,9 @@ if __name__ == "__main__":
         "--outdir", type=str, help="output directory for game json to be stored"
     )
     parser.add_argument(
-        "--aggressiveness", type=str, help="aggressiveness of the bot (\"A\" - Aggressive, \"M\" - Moderate, \"F\" - Friendly)"
+        "--aggressiveness",
+        type=str,
+        help='aggressiveness of the bot ("A" - Aggressive, "M" - Moderate, "F" - Friendly)',
     )
     args = parser.parse_args()
     host = args.host
@@ -280,7 +284,6 @@ if __name__ == "__main__":
     aggressiveness = args.aggressiveness
     if aggressiveness == None:
         aggressiveness = "M"
-
 
     if game_id == None:
         print("Game ID required")
