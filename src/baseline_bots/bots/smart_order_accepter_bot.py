@@ -48,7 +48,7 @@ class SmartOrderAccepterBot(DipnetBot):
     """
 
     def __init__(
-        self, power_name, game, discount_factor=0.5, test_mode=False, stance_type="A", agressiveness="M"
+        self, power_name, game, discount_factor=0.5, test_mode=False, stance_type="A", aggressiveness="M"
     ) -> None:
         """
         :param power_name: The name of the power
@@ -56,25 +56,25 @@ class SmartOrderAccepterBot(DipnetBot):
         :param discount_factor: discount factor for ActionBasedStance
         :param test_mode: indicates if this bot is to be executed in test mode or not. In test_mode, async function `send_message` will not be used.
         :param stance_type: indicates if this bot should use ActionBasedStance (A) or ScoreBasedStance (S)
-        :param agressiveness: indicates if this bot should be aggressive (A), moderate (M) or friendly (F). Valid only if stance type is action-based
+        :param aggressiveness: indicates if this bot should be aggressive (A), moderate (M) or friendly (F). Valid only if stance type is action-based
         """
         super().__init__(power_name, game)
         self.alliance_props_sent = False
         self.discount_factor = discount_factor
         self.stance_type = stance_type
-        self.agressiveness = agressiveness
+        self.aggressiveness = aggressiveness
         if self.stance_type == "A":
-            if self.agressiveness == "A":
+            if self.aggressiveness == "A":
                 self.stance = ActionBasedStance(
                     power_name, game, invasion_coef = 2.0, conflict_coef = 1.0, invasive_support_coef = 2.0, 
                     conflict_support_coef = 1.0, friendly_coef = 1.0, unrealized_coef = 1.0, discount_factor=self.discount_factor
                 )
-            elif self.agressiveness == "M":
+            elif self.aggressiveness == "M":
                 self.stance = ActionBasedStance(
                     power_name, game, invasion_coef = 1.0, conflict_coef = 0.5, invasive_support_coef = 1.0, 
                     conflict_support_coef = 0.5, friendly_coef = 1.0, unrealized_coef = 1.0, discount_factor=self.discount_factor
                 )
-            elif self.agressiveness == "F":
+            elif self.aggressiveness == "F":
                 self.stance = ActionBasedStance(
                     power_name, game, invasion_coef = 0.5, conflict_coef = 0.25, invasive_support_coef = 0.5, 
                     conflict_support_coef = 0.25, friendly_coef = 0.5, unrealized_coef = 1.0, discount_factor=self.discount_factor

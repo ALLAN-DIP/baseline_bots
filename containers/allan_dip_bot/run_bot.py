@@ -68,6 +68,7 @@ async def launch(
     sleep_delay: bool,
     outdir: str,
     discount_factor: float,
+    aggressiveness: str = "M",
 ) -> None:
     """
     Waits for dipnet model to load and then starts the bot execution
@@ -99,6 +100,7 @@ async def launch(
         sleep_delay,
         outdir,
         discount_factor,
+        aggressiveness=aggressiveness
     )
 
 
@@ -111,6 +113,7 @@ async def play(
     sleep_delay: bool,
     outdir: str,
     discount_factor: float,
+    aggressiveness: str = "M",
 ) -> None:
     """
     Launches the bot for game play
@@ -140,7 +143,7 @@ async def play(
     elif bot_type == "RandomProposerBot_AsyncBot":
         bot = RandomProposerBot_AsyncBot(power_name, game)
     elif bot_type == "SmartOrderAccepterBot":
-        bot = SmartOrderAccepterBot(power_name, game, discount_factor)
+        bot = SmartOrderAccepterBot(power_name, game, discount_factor, aggressiveness=aggressiveness)
 
     # Wait while game is still being formed
     print("Waiting for game to start", end=" ")
@@ -259,6 +262,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--outdir", type=str, help="output directory for game json to be stored"
     )
+    parser.add_argument(
+        "--outdir", type=str, help="output directory for game json to be stored"
+    )
+    parser.add_argument(
+        "--aggressiveness", type=str, help="aggressiveness of the bot (\"A\" - Aggressive, \"M\" - Moderate, \"F\" - Friendly)"
+    )
     args = parser.parse_args()
     host = args.host
     port = args.port
@@ -268,6 +277,10 @@ if __name__ == "__main__":
     discount_factor = args.discount_factor
     outdir = args.outdir
     power = args.power
+    aggressiveness = args.aggressiveness
+    if aggressiveness == None:
+        aggressiveness = "M"
+
 
     if game_id == None:
         print("Game ID required")
@@ -283,5 +296,6 @@ if __name__ == "__main__":
             sleep_delay=sleep_delay,
             outdir=outdir,
             discount_factor=discount_factor,
+            aggressiveness=aggressiveness,
         )
     )
