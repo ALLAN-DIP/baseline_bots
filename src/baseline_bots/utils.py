@@ -1,6 +1,6 @@
 """
 Some quickly built utils mostly for DAIDE stuff
-It would be preferrable to use a real DAIDE parser in prod
+It would be preferable to use a real DAIDE parser in prod
 """
 
 __author__ = "Sander Schulhoff"
@@ -123,7 +123,7 @@ def parse_FCT(msg) -> str:
     try:
         return msg[msg.find("(") + 1 : -1]
     except Exception:
-        raise Exception(f"Cant parse FCT msg {msg}")
+        raise Exception(f"Can't parse FCT msg {msg}")
 
 
 def parse_PRP(msg) -> str:
@@ -133,7 +133,7 @@ def parse_PRP(msg) -> str:
     try:
         return msg[msg.find("(") + 1 : -1]
     except Exception:
-        raise Exception(f"Cant parse PRP msg {msg}")
+        raise Exception(f"Can't parse PRP msg {msg}")
 
 
 def parse_arrangement(msg: str, xdo_only=True) -> List[str]:
@@ -215,7 +215,7 @@ def parse_arrangement(msg: str, xdo_only=True) -> List[str]:
         return ans
 
     except Exception as e:
-        raise ParseError("Cant parse ORR msg")
+        raise ParseError("Can't parse ORR msg")
 
 
 def parse_alliance_proposal(msg: str, recipient: str) -> List[str]:
@@ -254,7 +254,7 @@ def parse_alliance_proposal(msg: str, recipient: str) -> List[str]:
 
 def is_order_aggressive(order: str, sender: str, game: Game) -> bool:
     """
-    Checks if this is an agressive order
+    Checks if this is an aggressive order
     :param order: A string order, e.g. "A BUD S F TRI"
     NOTE: Adapted directly from Joy's code
     """

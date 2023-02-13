@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # launch model server
-/model/src/model_server/run_model_server.sh &
+/model/src/model_server/baseline_bots/containers/allan_dip_bot/run_model_server.sh &
 
 # ASCII art
 printf "Running ALLAN bot\n"
@@ -15,4 +15,4 @@ printf "\n"
 export PYTHONPATH=$PYTHONPATH:/model/src/model_server/research/
 
 # launch bot script
-python /model/src/model_server/baseline_bots/run_bot.py $@
+python /model/src/model_server/baseline_bots/containers/allan_dip_bot/run_bot.py $@

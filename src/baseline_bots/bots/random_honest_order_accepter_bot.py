@@ -50,7 +50,7 @@ class RandomHonestOrderAccepterBot(BaselineMsgRoundBot):
         proposed_orders = []
         proposed_orders_by_country = {}
         for message in rcvd_messages:
-            # parse_arrangement could fail if the message type isnt right
+            # parse_arrangement could fail if the message type isn't right
             try:
                 parsed = parse_arrangement(message.message)
                 proposed_orders += parsed
