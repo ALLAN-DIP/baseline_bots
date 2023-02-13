@@ -33,7 +33,7 @@ $ python run_a2c.py
 
 ## Results
 
-It's extremely difficult to reproduce results for Reinforcement Learning algorithms. Due to different settings, e.g., random seed and hyper parameters etc, you might get different results compared with the followings.
+It's extremely difficult to reproduce results for Reinforcement Learning algorithms. Due to different settings, e.g., random seed and hyper parameters etc, you might get different results compared with the following.
 
 ### A2C
 

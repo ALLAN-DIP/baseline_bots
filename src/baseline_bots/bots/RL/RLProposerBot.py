@@ -23,7 +23,7 @@ from utils import MessagesData, OrdersData
 
 
 class RLProposerBot(RLOrderBot):
-    """Abstract Base Class for RL derivitive bots"""
+    """Abstract Base Class for RL derivative bots"""
 
     def __init__(
         self, power_name: str, game: Game, env: DiplomacyEnv, total_msg_rounds=3

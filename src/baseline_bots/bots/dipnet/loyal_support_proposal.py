@@ -74,7 +74,7 @@ class LSP_DipBot(DipnetBot):
             * alliance_proposer: If alliance message received, set to sender power's name, else None
             * allies_proposed: If alliance message received, set to alliance powers list, else []
             * alliance_msg: If alliance message received, set to alliance message, else None
-            * yes_allies_proposed: If alliance acceptance message receieved, set to alliance powers list, else []
+            * yes_allies_proposed: If alliance acceptance message received, set to alliance powers list, else []
             * orders_proposed: If suggested orders received, set to this list of orders, else []
         """
         alliance_msgs = [
@@ -590,7 +590,7 @@ class LSP_DipBot(DipnetBot):
         # print(f"Selected orders for {self.power_name}: {self.orders.get_list_of_orders()}")
         comms_obj = MessagesData()
 
-        # Parse comms receieved
+        # Parse comms received
         comms_rcvd = self.interpret_orders(rcvd_messages)
 
         # If no alliance formed
@@ -600,7 +600,7 @@ class LSP_DipBot(DipnetBot):
                 if not self.alliance_props_sent:
                     raise "Received ALY YES without sending ALY"
                 self.allies = comms_rcvd["yes_allies_proposed"]
-            # if alliance proposal receieved
+            # if alliance proposal received
             elif comms_rcvd["allies_proposed"]:
                 self.allies = comms_rcvd["allies_proposed"]
                 self.my_leader = comms_rcvd["alliance_proposer"]

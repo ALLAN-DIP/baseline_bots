@@ -144,7 +144,7 @@ def orders_correspondence(orders: List) -> List:
 
 def randomize(order: Tuple) -> Tuple:
     """
-    Takes in an order and returns a randomly deviant verson of it.
+    Takes in an order and returns a randomly deviant version of it.
 
     :param order: A DAIDE order
     :type order: Tuple
