@@ -29,7 +29,7 @@ from baseline_bots.utils import (
 class RealPolitik(DipnetBot):
     """
     select a set of orders that return maximum next state value
-    where the next state is simulated by proposed orders and shared orders (recieved via in-game messages)
+    where the next state is simulated by proposed orders and shared orders (received via in-game messages)
     """
 
     def __init__(self, power_name: str, game: Game, total_msg_rounds=3) -> None:

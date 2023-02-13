@@ -1,4 +1,6 @@
-FROM pcpaquette/tensorflow-serving:20190226
+FROM pcpaquette/tensorflow-serving:20190226 AS base
+
+WORKDIR /model/src/model_server
 
 # install needed packages
 RUN apt-get -y update
@@ -7,8 +9,6 @@ RUN apt-get -y install vim
 RUN apt-get -y install curl
 RUN apt-get -y install htop
 RUN apt-get -y install lsof
-
-WORKDIR /model/src/model_server
 
 # Copy SL model
 RUN wget https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-sl_model.zip
@@ -40,7 +40,6 @@ ENV ASYNC_TEST_TIMEOUT=180
 # Avoid git issues
 RUN git config --global --add safe.directory /model/src/model_server/diplomacy
 RUN git config --global --add safe.directory /model/src/model_server/research
-RUN git config --global --add safe.directory /model/src/model_server/baseline_bots
 
 # Avoid pip issues
 RUN pip install --upgrade pip
@@ -58,13 +57,32 @@ RUN pip install -r requirements.txt
 RUN pip install -e .
 
 # copy baseline bots code into the docker image
+COPY src/ /model/src/model_server/baseline_bots/src/
+
+FROM base AS dev
+
+# Copy specialized files
 COPY containers/ /model/src/model_server/baseline_bots/containers/
 COPY docs/ /model/src/model_server/baseline_bots/docs/
 COPY scripts/ /model/src/model_server/baseline_bots/scripts/
-COPY src/ /model/src/model_server/baseline_bots/src/
 COPY tests/ /model/src/model_server/baseline_bots/tests/
 
 # allow the tf server to be run
 RUN chmod 777 /model/src/model_server/baseline_bots/containers/allan_dip_bot/run_model_server.sh
 # add diplomacy research to python path
 ENV PYTHONPATH=/model/src/model_server/research:$PYTHONPATH
+
+FROM dev as test_ci
+
+CMD /bin/bash -c '/model/src/model_server/baseline_bots/containers/allan_dip_bot/run_model_server.sh & pytest'
+
+FROM base AS allan_dip_bot
+
+# Copy specialized files
+COPY containers/allan_dip_bot/ /model/src/model_server/baseline_bots/containers/allan_dip_bot/
+RUN chmod -R 777 /model/src/model_server/baseline_bots/containers/allan_dip_bot/
+
+ENV WORKING_DIR=/model/src/model_server/research/WORKING_DIR
+
+# Script executors
+ENTRYPOINT ["/model/src/model_server/baseline_bots/containers/allan_dip_bot/run.sh"]

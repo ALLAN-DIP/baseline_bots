@@ -16,7 +16,7 @@ from baseline_bots.utils import MessagesData, OrdersData, get_order_tokens
 
 
 class DipnetBot(BaselineMsgRoundBot, ABC):
-    """Abstract Base Class for dipnet derivitive bots"""
+    """Abstract Base Class for dipnet derivative bots"""
 
     def __init__(
         self, power_name: str, game: Game, total_msg_rounds=3, dipnet_type="slp"

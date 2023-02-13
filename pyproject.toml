@@ -8,3 +8,9 @@ target-version = ["py37"]
 [tool.isort]
 py_version = "37"
 profile = "black"
+
+[tool.codespell]
+ignore-regex = "\\[nt]" # Do not count escaped newlines or tabs as part of a word
+ignore-words-list = "ans,hel,opps,ser,vie"  # "HEL", "SER", and "VIE" are from DAIDE
+check-filenames = ""
+check-hidden = ""

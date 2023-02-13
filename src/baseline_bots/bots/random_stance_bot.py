@@ -52,7 +52,7 @@ class RandomStanceBot(BaselineBot):
         proposed_orders_by_country = {}
         for key in messages:
             message = messages[key]
-            # parse_arrangement could fail if the message type isnt right
+            # parse_arrangement could fail if the message type isn't right
             try:
                 parsed = parse_arrangement(message.message)
                 if self.stance[message.sender] > 0:

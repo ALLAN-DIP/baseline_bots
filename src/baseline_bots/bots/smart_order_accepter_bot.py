@@ -279,7 +279,7 @@ class SmartOrderAccepterBot(DipnetBot):
         """
         Determine if selected support order for neighbour corresponds to a self order selected
 
-        :param support_order: the support order to be determined for correspondance with self orders
+        :param support_order: the support order to be determined for correspondence with self orders
         :return: boolean indicating the above mentioned detail
         """
         order_tokens = get_order_tokens(support_order)
@@ -289,7 +289,7 @@ class SmartOrderAccepterBot(DipnetBot):
             self.orders.orders[order_tokens[2].split()[1]]
         )
 
-        # Check if the support order is in correspondance with the order we have selected for our province
+        # Check if the support order is in correspondence with the order we have selected for our province
         if (
             len(order_tokens[2:]) == len(selected_order)
             and order_tokens[2:] == selected_order
@@ -720,7 +720,7 @@ class SmartOrderAccepterBot(DipnetBot):
                     if not(self.test_mode):
                         yield self.send_message(foe, daide_orders)
             except Exception as e:
-                print("Raised Excpetion in order randomization code block")
+                print("Raised Exception in order randomization code block")
                 print(e)
                 print("Catching the error and resuming operations")
 
