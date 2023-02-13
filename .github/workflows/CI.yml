@@ -3,25 +3,18 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, test_CI]
+    branches: [main, test-ci]
 
 # TODO: create a game
 jobs:
   testbuild:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v2
-
-      - name: "Setup Python"
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.7"
-
+        uses: actions/checkout@v3
       - name: "Build Docker Container"
         run: |
-          docker build --target test_ci --no-cache -t ci_image .
-
+          docker build --target test_ci --no-cache --tag ci_image .
       - name: "Run Tests"
         run: |
           docker run --rm ci_image

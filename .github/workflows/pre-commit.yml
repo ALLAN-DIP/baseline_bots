@@ -4,16 +4,16 @@ name: pre-commit
 on:
   pull_request:
   push:
-    branches: [master]
+    branches: [main, test-ci]
 permissions:
   contents: read # to fetch code (actions/checkout)
 jobs:
   pre-commit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-      - run: pip install pre-commit
-      - run: pre-commit --version
-      - run: pre-commit install
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.7"
+      - run: pip install pre-commit==2.21.0
       - run: pre-commit run --all-files
