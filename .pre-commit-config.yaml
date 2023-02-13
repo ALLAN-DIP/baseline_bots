@@ -48,3 +48,9 @@ repos:
         additional_dependencies:
           - prettier@2.8.4
         exclude: src/baseline_bots/bots/RL/RLProposerBot\.json
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.2
+    hooks:
+      - id: codespell
+        additional_dependencies:
+          - tomli==2.0.1

@@ -25,7 +25,7 @@ class TestRandomizeDipnet:
         assert ord == random_list_orders(ord)
 
         # The following three tests check that when orders that contain movements, holds, convoys and other moves get
-        # input into the order randomizer, they come out differnent.
+        # input into the order randomizer, they come out different.
 
         orders = [
             (("FRA", "FLT", "NTH"), "CVY", ("FRA", "AMY", "HOL"), "CTO", "NWY"),
@@ -87,7 +87,7 @@ class TestRandomizeDipnet:
         assert tup_string and isinstance(tup_string, str)
         assert tup_string == "(FRA AMY BUR) CTO BAR VIA (NTH NEA) "
 
-        # This tests the function randomize_joiner which makes sure that the orders ouput are different than the orders input
+        # This tests the function randomize_joiner which makes sure that the orders output are different than the orders input
         test_string = "AND ((FRA AMY BUR) MTO BEL) ((FRA AMY PIC) CTO FIN VIA (NTH SKA DEN BAL BOT))"
         assert test_string != randomize_order(test_string)
 
