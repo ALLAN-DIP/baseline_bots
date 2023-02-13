@@ -285,6 +285,8 @@ def main() -> None:
     parser.add_argument(
         "--aggressiveness",
         type=str,
+        choices=["A", "M", "F"],
+        default="M"
         help='aggressiveness of the bot ("A" - Aggressive, "M" - Moderate, "F" - Friendly)',
     )
     args = parser.parse_args()
