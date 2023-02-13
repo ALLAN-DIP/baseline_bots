@@ -82,5 +82,7 @@ FROM base AS allan_dip_bot
 COPY containers/allan_dip_bot/ /model/src/model_server/baseline_bots/containers/allan_dip_bot/
 RUN chmod -R 777 /model/src/model_server/baseline_bots/containers/allan_dip_bot/
 
+ENV WORKING_DIR=/model/src/model_server/research/WORKING_DIR
+
 # Script executors
 ENTRYPOINT ["/model/src/model_server/baseline_bots/containers/allan_dip_bot/run.sh"]
