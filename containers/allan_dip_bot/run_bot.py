@@ -1,14 +1,23 @@
 """ALLAN-DIP: Team ALLAN's Diplomacy Agent"""
 
+"""ALLAN-DIP: Team ALLAN's Diplomacy Agent"""
+
 __author__ = "Kartik Shenoy"
 __email__ = "kartik.shenoyy@gmail.com"
 
 import argparse
 import asyncio
 import json as json
+import json as json
 import random
 import sys
+import sys
 import time
+from pathlib import Path
+from typing import Optional
+
+sys.path.append("..")  # Adds higher directory to python modules path.
+
 from pathlib import Path
 from typing import Optional
 
@@ -18,8 +27,12 @@ sys.path.append("..")  # Adds higher directory to python modules path.
 from diplomacy import connect
 from diplomacy.client.network_game import NetworkGame
 from diplomacy.utils.export import to_saved_game_format
+from diplomacy import connect
+from diplomacy.client.network_game import NetworkGame
+from diplomacy.utils.export import to_saved_game_format
 from diplomacy_research.utils.cluster import is_port_opened
 
+from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.bots.dipnet.no_press_bot import NoPressDipBot
 from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
@@ -30,6 +43,12 @@ from baseline_bots.bots.smart_order_accepter_bot import (
 )
 
 POWERS = ["AUSTRIA", "ENGLAND", "FRANCE", "GERMANY", "ITALY", "RUSSIA", "TURKEY"]
+BOTS = [
+    NoPressDipBot.__name__,
+    RandomProposerBot_AsyncBot.__name__,
+    SmartOrderAccepterBot.__name__,
+    TransparentBot.__name__,
+]
 BOTS = [
     NoPressDipBot.__name__,
     RandomProposerBot_AsyncBot.__name__,
@@ -319,6 +338,8 @@ def main() -> None:
             discount_factor=discount_factor,
             outdir=outdir,
             aggressiveness=aggressiveness,
+            aggressiveness=aggressiveness,
+            outdir=outdir,
         )
     )
 
