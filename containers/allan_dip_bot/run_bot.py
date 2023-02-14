@@ -8,9 +8,7 @@ __email__ = "kartik.shenoyy@gmail.com"
 import argparse
 import asyncio
 import json as json
-import json as json
 import random
-import sys
 import sys
 import time
 from pathlib import Path
@@ -27,12 +25,8 @@ sys.path.append("..")  # Adds higher directory to python modules path.
 from diplomacy import connect
 from diplomacy.client.network_game import NetworkGame
 from diplomacy.utils.export import to_saved_game_format
-from diplomacy import connect
-from diplomacy.client.network_game import NetworkGame
-from diplomacy.utils.export import to_saved_game_format
 from diplomacy_research.utils.cluster import is_port_opened
 
-from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.bots.dipnet.no_press_bot import NoPressDipBot
 from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
@@ -337,7 +331,6 @@ def main() -> None:
             sleep_delay=sleep_delay,
             discount_factor=discount_factor,
             outdir=outdir,
-            aggressiveness=aggressiveness,
             aggressiveness=aggressiveness,
             outdir=outdir,
         )
