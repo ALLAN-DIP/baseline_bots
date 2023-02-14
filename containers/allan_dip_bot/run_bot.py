@@ -332,7 +332,6 @@ def main() -> None:
             discount_factor=discount_factor,
             outdir=outdir,
             aggressiveness=aggressiveness,
-            outdir=outdir,
         )
     )
 
