@@ -9,7 +9,6 @@ import json as json
 import random
 import sys
 import time
-from enum import Enum
 from pathlib import Path
 from typing import Optional
 
@@ -25,9 +24,11 @@ from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.bots.dipnet.no_press_bot import NoPressDipBot
 from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
-from baseline_bots.bots.smart_order_accepter_bot import SmartOrderAccepterBot
+from baseline_bots.bots.smart_order_accepter_bot import (
+    Aggressiveness,
+    SmartOrderAccepterBot,
+)
 
-Aggressiveness = Enum("Aggressiveness", ["aggressive", "moderate", "friendly"])
 POWERS = ["AUSTRIA", "ENGLAND", "FRANCE", "GERMANY", "ITALY", "RUSSIA", "TURKEY"]
 BOTS = [
     NoPressDipBot.__name__,
@@ -280,9 +281,6 @@ def main() -> None:
     )
     parser.add_argument(
         "--outdir", type=Path, help="output directory for game json to be stored"
-    )
-    parser.add_argument(
-        "--outdir", type=str, help="output directory for game json to be stored"
     )
     parser.add_argument(
         "--aggressiveness",
