@@ -3,12 +3,12 @@ __email__ = "sanderschulhoff@gmail.com"
 
 import random
 from collections import defaultdict
+from enum import Enum
 from typing import Dict, List, Set, Tuple
 
 import numpy as np
 from DAIDE import FCT, HUH, ORR, PRP, XDO, YES
 from diplomacy import Message
-from enum import Enum
 from stance_vector import ActionBasedStance, ScoreBasedStance
 from tornado import gen
 
@@ -35,6 +35,7 @@ from baseline_bots.utils import (
 )
 
 Aggressiveness = Enum("Aggressiveness", ["aggressive", "moderate", "friendly"])
+
 
 class SmartOrderAccepterBot(DipnetBot):
     """
@@ -108,8 +109,10 @@ class SmartOrderAccepterBot(DipnetBot):
                     unrealized_coef=1.0,
                     discount_factor=self.discount_factor,
                 )
-            else :
-                raise ValueError(f"Aggressiveness should be Aggressiveness.aggressive, Aggressiveness.moderate or Aggressiveness.friendly. {self.aggressiveness!r} is not valid")
+            else:
+                raise ValueError(
+                    f"Aggressiveness should be Aggressiveness.aggressive, Aggressiveness.moderate or Aggressiveness.friendly. {self.aggressiveness!r} is not valid"
+                )
         elif self.stance_type == "S":
             self.stance = ScoreBasedStance(power_name, game)
         self.alliances = defaultdict(list)
