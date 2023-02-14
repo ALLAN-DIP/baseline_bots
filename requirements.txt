@@ -1,5 +1,6 @@
 black==22.10.0
 diplomacy==1.1.2
+enum==3.11.2
 git+https://github.com/ALLAN-DIP/stance_vector.git
 git+https://github.com/trigaten/DAIDE.git
 isort==5.10.1

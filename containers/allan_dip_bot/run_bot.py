@@ -9,6 +9,7 @@ import json as json
 import random
 import sys
 import time
+from enum import Enum
 from pathlib import Path
 from typing import Optional
 
@@ -26,6 +27,7 @@ from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
 from baseline_bots.bots.smart_order_accepter_bot import SmartOrderAccepterBot
 
+Aggressiveness = Enum("Aggressiveness", ["aggressive", "moderate", "friendly"])
 POWERS = ["AUSTRIA", "ENGLAND", "FRANCE", "GERMANY", "ITALY", "RUSSIA", "TURKEY"]
 BOTS = [
     NoPressDipBot.__name__,
@@ -74,7 +76,7 @@ async def launch(
     sleep_delay: bool,
     discount_factor: float,
     outdir: Optional[Path],
-    aggressiveness: str = "M",
+    aggressiveness: Aggressiveness = Aggressiveness.moderate,
 ) -> None:
     """
     Waits for dipnet model to load and then starts the bot execution
@@ -119,7 +121,7 @@ async def play(
     sleep_delay: bool,
     discount_factor: float,
     outdir: Optional[Path],
-    aggressiveness: str = "M",
+    aggressiveness: Aggressiveness = Aggressiveness.moderate,
 ) -> None:
     """
     Launches the bot for game play
@@ -283,7 +285,7 @@ def main() -> None:
         "--aggressiveness",
         type=str,
         choices=["A", "M", "F"],
-        default="M"
+        default="M",
         help='aggressiveness of the bot ("A" - Aggressive, "M" - Moderate, "F" - Friendly)',
     )
     args = parser.parse_args()
@@ -295,9 +297,12 @@ def main() -> None:
     sleep_delay: bool = args.no_sleep_delay
     discount_factor: float = args.discount_factor
     outdir: Optional[Path] = args.outdir
-    aggressiveness = args.aggressiveness
-    if aggressiveness == None:
-        aggressiveness = "M"
+    if args.aggressiveness == "M":
+        aggressiveness = Aggressiveness.moderate
+    elif args.aggressiveness == "A":
+        aggressiveness = Aggressiveness.aggressive
+    elif args.aggressiveness == "F":
+        aggressiveness = Aggressiveness.friendly
 
     if outdir is not None and not outdir.is_dir():
         outdir.mkdir(parents=True, exist_ok=True)

@@ -8,6 +8,7 @@ from typing import Dict, List, Set, Tuple
 import numpy as np
 from DAIDE import FCT, HUH, ORR, PRP, XDO, YES
 from diplomacy import Message
+from enum import Enum
 from stance_vector import ActionBasedStance, ScoreBasedStance
 from tornado import gen
 
@@ -33,6 +34,7 @@ from baseline_bots.utils import (
     smart_select_support_proposals,
 )
 
+Aggressiveness = Enum("Aggressiveness", ["aggressive", "moderate", "friendly"])
 
 class SmartOrderAccepterBot(DipnetBot):
     """
@@ -54,7 +56,7 @@ class SmartOrderAccepterBot(DipnetBot):
         discount_factor=0.5,
         test_mode=False,
         stance_type="A",
-        aggressiveness="M",
+        aggressiveness=Aggressiveness.moderate,
     ) -> None:
         """
         :param power_name: The name of the power
@@ -70,7 +72,7 @@ class SmartOrderAccepterBot(DipnetBot):
         self.stance_type = stance_type
         self.aggressiveness = aggressiveness
         if self.stance_type == "A":
-            if self.aggressiveness == "A":
+            if self.aggressiveness == Aggressiveness.aggressive:
                 self.stance = ActionBasedStance(
                     power_name,
                     game,
@@ -82,7 +84,7 @@ class SmartOrderAccepterBot(DipnetBot):
                     unrealized_coef=1.0,
                     discount_factor=self.discount_factor,
                 )
-            elif self.aggressiveness == "M":
+            elif self.aggressiveness == Aggressiveness.moderate:
                 self.stance = ActionBasedStance(
                     power_name,
                     game,
@@ -94,7 +96,7 @@ class SmartOrderAccepterBot(DipnetBot):
                     unrealized_coef=1.0,
                     discount_factor=self.discount_factor,
                 )
-            elif self.aggressiveness == "F":
+            elif self.aggressiveness == Aggressiveness.friendly:
                 self.stance = ActionBasedStance(
                     power_name,
                     game,
@@ -106,6 +108,8 @@ class SmartOrderAccepterBot(DipnetBot):
                     unrealized_coef=1.0,
                     discount_factor=self.discount_factor,
                 )
+            else :
+                raise ValueError(f"Aggressiveness should be Aggressiveness.aggressive, Aggressiveness.moderate or Aggressiveness.friendly. {self.aggressiveness!r} is not valid")
         elif self.stance_type == "S":
             self.stance = ScoreBasedStance(power_name, game)
         self.alliances = defaultdict(list)
