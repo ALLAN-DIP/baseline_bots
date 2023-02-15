@@ -3,6 +3,7 @@ __email__ = "sanderschulhoff@gmail.com"
 
 import random
 from collections import defaultdict
+from enum import Enum
 from typing import Dict, List, Set, Tuple
 
 import numpy as np
@@ -34,6 +35,16 @@ from baseline_bots.utils import (
 )
 
 
+class Aggressiveness(Enum):
+    """
+    Enum for aggressiveness of the bot
+    """
+
+    aggressive = "aggressive"
+    moderate = "moderate"
+    friendly = "friendly"
+
+
 class SmartOrderAccepterBot(DipnetBot):
     """
     This bot uses dipnet to generate orders.
@@ -48,7 +59,13 @@ class SmartOrderAccepterBot(DipnetBot):
     """
 
     def __init__(
-        self, power_name, game, discount_factor=0.5, test_mode=False, stance_type="A"
+        self,
+        power_name,
+        game,
+        discount_factor=0.5,
+        test_mode=False,
+        stance_type="A",
+        aggressiveness=Aggressiveness.moderate,
     ) -> None:
         """
         :param power_name: The name of the power
@@ -56,15 +73,55 @@ class SmartOrderAccepterBot(DipnetBot):
         :param discount_factor: discount factor for ActionBasedStance
         :param test_mode: indicates if this bot is to be executed in test mode or not. In test_mode, async function `send_message` will not be used.
         :param stance_type: indicates if this bot should use ActionBasedStance (A) or ScoreBasedStance (S)
+        :param aggressiveness: indicates if this bot should be aggressive (A), moderate (M) or friendly (F). Valid only if stance type is action-based
         """
         super().__init__(power_name, game)
         self.alliance_props_sent = False
         self.discount_factor = discount_factor
         self.stance_type = stance_type
+        self.aggressiveness = aggressiveness
         if self.stance_type == "A":
-            self.stance = ActionBasedStance(
-                power_name, game, discount_factor=self.discount_factor
-            )
+            if self.aggressiveness == Aggressiveness.aggressive:
+                self.stance = ActionBasedStance(
+                    power_name,
+                    game,
+                    invasion_coef=2.0,
+                    conflict_coef=1.0,
+                    invasive_support_coef=2.0,
+                    conflict_support_coef=1.0,
+                    friendly_coef=1.0,
+                    unrealized_coef=1.0,
+                    discount_factor=self.discount_factor,
+                )
+            elif self.aggressiveness == Aggressiveness.moderate:
+                # default hyperparameter values for ActionBasedStance module
+                self.stance = ActionBasedStance(
+                    power_name,
+                    game,
+                    invasion_coef=1.0,
+                    conflict_coef=0.5,
+                    invasive_support_coef=1.0,
+                    conflict_support_coef=0.5,
+                    friendly_coef=1.0,
+                    unrealized_coef=1.0,
+                    discount_factor=self.discount_factor,
+                )
+            elif self.aggressiveness == Aggressiveness.friendly:
+                self.stance = ActionBasedStance(
+                    power_name,
+                    game,
+                    invasion_coef=0.5,
+                    conflict_coef=0.25,
+                    invasive_support_coef=0.5,
+                    conflict_support_coef=0.25,
+                    friendly_coef=0.5,
+                    unrealized_coef=1.0,
+                    discount_factor=self.discount_factor,
+                )
+            else:
+                raise ValueError(
+                    f"Aggressiveness should be Aggressiveness.aggressive, Aggressiveness.moderate or Aggressiveness.friendly. {self.aggressiveness!r} is not valid"
+                )
         elif self.stance_type == "S":
             self.stance = ScoreBasedStance(power_name, game)
         self.alliances = defaultdict(list)
