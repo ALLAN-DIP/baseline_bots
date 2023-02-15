@@ -24,7 +24,10 @@ from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.bots.dipnet.no_press_bot import NoPressDipBot
 from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
-from baseline_bots.bots.smart_order_accepter_bot import SmartOrderAccepterBot
+from baseline_bots.bots.smart_order_accepter_bot import (
+    Aggressiveness,
+    SmartOrderAccepterBot,
+)
 
 POWERS = ["AUSTRIA", "ENGLAND", "FRANCE", "GERMANY", "ITALY", "RUSSIA", "TURKEY"]
 BOTS = [
@@ -74,6 +77,7 @@ async def launch(
     sleep_delay: bool,
     discount_factor: float,
     outdir: Optional[Path],
+    aggressiveness: Aggressiveness = Aggressiveness.moderate,
 ) -> None:
     """
     Waits for dipnet model to load and then starts the bot execution
@@ -105,6 +109,7 @@ async def launch(
         sleep_delay,
         discount_factor,
         outdir,
+        aggressiveness,
     )
 
 
@@ -117,6 +122,7 @@ async def play(
     sleep_delay: bool,
     discount_factor: float,
     outdir: Optional[Path],
+    aggressiveness: Aggressiveness = Aggressiveness.moderate,
 ) -> None:
     """
     Launches the bot for game play
@@ -144,7 +150,9 @@ async def play(
     elif bot_type == RandomProposerBot_AsyncBot.__name__:
         bot = RandomProposerBot_AsyncBot(power_name, game)
     elif bot_type == SmartOrderAccepterBot.__name__:
-        bot = SmartOrderAccepterBot(power_name, game, discount_factor)
+        bot = SmartOrderAccepterBot(
+            power_name, game, discount_factor, aggressiveness=aggressiveness
+        )
     else:
         raise ValueError(f"{bot_type!r} is not a valid bot type")
 
@@ -274,6 +282,13 @@ def main() -> None:
     parser.add_argument(
         "--outdir", type=Path, help="output directory for game json to be stored"
     )
+    parser.add_argument(
+        "--aggressiveness",
+        type=str,
+        choices=[str(a.value) for a in Aggressiveness],
+        default=Aggressiveness.moderate.value,
+        help="aggressiveness of the bot (default: %(default)s)",
+    )
     args = parser.parse_args()
     host: str = args.host
     port: int = args.port
@@ -283,6 +298,7 @@ def main() -> None:
     sleep_delay: bool = args.no_sleep_delay
     discount_factor: float = args.discount_factor
     outdir: Optional[Path] = args.outdir
+    aggressiveness: Aggressiveness = Aggressiveness(args.aggressiveness)
 
     if outdir is not None and not outdir.is_dir():
         outdir.mkdir(parents=True, exist_ok=True)
@@ -297,6 +313,7 @@ def main() -> None:
             sleep_delay=sleep_delay,
             discount_factor=discount_factor,
             outdir=outdir,
+            aggressiveness=aggressiveness,
         )
     )
 
