@@ -1,10 +1,12 @@
-black==22.10.0
-diplomacy==1.1.2
-git+https://github.com/ALLAN-DIP/stance_vector.git
-git+https://github.com/trigaten/DAIDE.git
-isort==5.10.1
+DAIDE @ git+https://git@github.com/ALLAN-DIP/DAIDE.git@34766b9bd609d28ea3d0bc4d56f0f798160ed215
+diplomacy @ git+https://git@github.com/SHADE-AI/diplomacy.git@614aa44d826eba3fbe3d96347d277668db45db2e
+gym==0.18.3
 karma_sphinx_theme==0.0.8
 numpy==1.21
 pre-commit==2.21.0
 pytest==7.1.3
 sphinx==5.3.0
+stance_vector @ git+https://git@github.com/ALLAN-DIP/stance_vector.git@21f680a05b083b6ca177817770a198f6356a2c3a
+tornado==6.2
+tqdm==4.64.1
+ujson==5.7.0
