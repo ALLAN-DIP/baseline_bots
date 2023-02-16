@@ -125,8 +125,8 @@ class SmartOrderAccepterBot(DipnetBot):
         elif self.stance_type == "S":
             self.stance = ScoreBasedStance(power_name, game)
         self.alliances = defaultdict(list)
-        self.rollout_length = 5
-        self.rollout_n_order = 5
+        self.rollout_length = 1
+        self.rollout_n_order = 10
         self.allies_influence = set()
         self.orders = None
         self.my_influence = set()
