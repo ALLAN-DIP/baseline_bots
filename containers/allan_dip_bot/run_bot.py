@@ -76,8 +76,14 @@ async def launch(
     bot_type: str,
     sleep_delay: bool,
     discount_factor: float,
+    invasion_coef: float,
+    conflict_coef: float,
+    invasive_support_coef: float,
+    conflict_support_coef: float,
+    friendly_coef: float,
+    unrealized_coef: float,
     outdir: Optional[Path],
-    aggressiveness: Aggressiveness = Aggressiveness.moderate,
+    aggressiveness: Optional[Aggressiveness] = Aggressiveness.moderate,
 ) -> None:
     """
     Waits for dipnet model to load and then starts the bot execution
@@ -108,6 +114,12 @@ async def launch(
         bot_type,
         sleep_delay,
         discount_factor,
+        invasion_coef,
+        conflict_coef,
+        invasive_support_coef,
+        conflict_support_coef,
+        friendly_coef,
+        unrealized_coef,
         outdir,
         aggressiveness,
     )
@@ -121,8 +133,14 @@ async def play(
     bot_type: str,
     sleep_delay: bool,
     discount_factor: float,
+    invasion_coef: float,
+    conflict_coef: float,
+    invasive_support_coef: float,
+    conflict_support_coef: float,
+    friendly_coef: float,
+    unrealized_coef: float,
     outdir: Optional[Path],
-    aggressiveness: Aggressiveness = Aggressiveness.moderate,
+    aggressiveness: Optional[Aggressiveness] = Aggressiveness.moderate,
 ) -> None:
     """
     Launches the bot for game play
@@ -151,7 +169,16 @@ async def play(
         bot = RandomProposerBot_AsyncBot(power_name, game)
     elif bot_type == SmartOrderAccepterBot.__name__:
         bot = SmartOrderAccepterBot(
-            power_name, game, discount_factor, aggressiveness=aggressiveness
+            power_name,
+            game,
+            discount_factor,
+            aggressiveness=aggressiveness,
+            invasion_coef=invasion_coef,
+            conflict_coef=conflict_coef,
+            invasive_support_coef=invasive_support_coef,
+            conflict_support_coef=conflict_support_coef,
+            friendly_coef=friendly_coef,
+            unrealized_coef=unrealized_coef,
         )
     else:
         raise ValueError(f"{bot_type!r} is not a valid bot type")
@@ -280,14 +307,49 @@ def main() -> None:
         help="discount factor for ActionBasedStance (default: %(default)s)",
     )
     parser.add_argument(
+        "--invasion_coef",
+        type=float,
+        default=1.0,
+        help="Stance on nation k -= α1 * count(k’s hostile moves) (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--conflict_coef",
+        type=float,
+        default=0.5,
+        help="Stance on nation k -= α2 * count(k’s conflict moves) (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--invasive_support_coef",
+        type=float,
+        default=1.0,
+        help="Stance on nation k -=β1 * k’s count(hostile supports/convoys) (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--conflict_support_coef",
+        type=float,
+        default=0.5,
+        help="Stance on nation k -= β2 * count(k’s conflict supports/convoys) (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--friendly_coef",
+        type=float,
+        default=1.0,
+        help="Stance on nation k += γ1 * count(k’s friendly supports/convoys) (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--unrealized_coef",
+        type=float,
+        default=1.0,
+        help="Stance on nation k += γ2 * count(k’s unrealized hostile moves) (default: %(default)s)",
+    )
+    parser.add_argument(
         "--outdir", type=Path, help="output directory for game json to be stored"
     )
     parser.add_argument(
         "--aggressiveness",
         type=str,
         choices=[str(a.value) for a in Aggressiveness],
-        default=Aggressiveness.moderate.value,
-        help="aggressiveness of the bot (default: %(default)s)",
+        help="aggressiveness of the bot, overrides individual coefficients (default: %(default)s)",
     )
     args = parser.parse_args()
     host: str = args.host
@@ -297,8 +359,16 @@ def main() -> None:
     bot_type: str = args.bot_type
     sleep_delay: bool = args.no_sleep_delay
     discount_factor: float = args.discount_factor
+    invasion_coef: float = args.invasion_coef
+    conflict_coef: float = args.conflict_coef
+    invasive_support_coef: float = args.invasive_support_coef
+    conflict_support_coef: float = args.conflict_support_coef
+    friendly_coef: float = args.friendly_coef
+    unrealized_coef: float = args.unrealized_coef
     outdir: Optional[Path] = args.outdir
-    aggressiveness: Aggressiveness = Aggressiveness(args.aggressiveness)
+    aggressiveness: Optional[Aggressiveness] = (
+        Aggressiveness(args.aggressiveness) if args.aggressiveness else None
+    )
 
     if outdir is not None and not outdir.is_dir():
         outdir.mkdir(parents=True, exist_ok=True)
@@ -312,6 +382,12 @@ def main() -> None:
             bot_type=bot_type,
             sleep_delay=sleep_delay,
             discount_factor=discount_factor,
+            invasion_coef=invasion_coef,
+            conflict_coef=conflict_coef,
+            invasive_support_coef=invasive_support_coef,
+            conflict_support_coef=conflict_support_coef,
+            friendly_coef=friendly_coef,
+            unrealized_coef=unrealized_coef,
             outdir=outdir,
             aggressiveness=aggressiveness,
         )
