@@ -383,7 +383,10 @@ def get_state_value(bot, game, power_name, option="default"):
     firststep_sc = len(game.get_centers(power_name))
     dipnet_comparison = {power: 0 for power in game.map.powers}
     support_count = {power: 0 for power in game.map.powers}
-    for i in range(bot.rollout_length):
+    movement_phase = 0
+    for i in range(3 * bot.rollout_length):
+        if game.get_current_phase().endswith("M"):
+            movement_phase += 1
         for power in game.map.powers:
             if option == "samplingbeam":
                 list_order, prob_order = yield bot.brain.get_beam_orders(game, power)
@@ -404,7 +407,13 @@ def get_state_value(bot, game, power_name, option="default"):
                 orders=orders[: min(bot.rollout_n_order, len(orders))],
             )
         game.process()
-    return len(game.get_centers(power_name))
+        if movement_phase >= bot.rollout_length:
+            break
+    return (
+        len(game.get_centers(power_name))
+        + 0.5 * len(game.powers[power_name].units)
+        + 0.3 * len(game.get_power(power_name).influence)
+    )
 
 
 @gen.coroutine

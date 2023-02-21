@@ -125,8 +125,8 @@ class SmartOrderAccepterBot(DipnetBot):
         elif self.stance_type == "S":
             self.stance = ScoreBasedStance(power_name, game)
         self.alliances = defaultdict(list)
-        self.rollout_length = 5
-        self.rollout_n_order = 5
+        self.rollout_length = 1
+        self.rollout_n_order = 10
         self.allies_influence = set()
         self.orders = None
         self.my_influence = set()
@@ -596,10 +596,8 @@ class SmartOrderAccepterBot(DipnetBot):
 
         # if none in dipnet beam orders
         for current_order in self.orders.get_list_of_orders():
-            if (
-                current_order != order
-                and not self.is_order_aggressive_to_powers(current_order, powers)
-                and current_order in self.game.get_all_possible_orders()[loc_unit]
+            if current_order != order and not self.is_order_aggressive_to_powers(
+                current_order, powers
             ):
                 return unit + " S " + current_order
 
@@ -695,7 +693,8 @@ class SmartOrderAccepterBot(DipnetBot):
             # fmt: on
 
                 # filter out aggressive orders to allies
-                yield self.replace_aggressive_order_to_allies()
+                if int(self.game.get_current_phase()[1:5]) < 1909:
+                    yield self.replace_aggressive_order_to_allies()
 
             # generate messages for FCT sharing info orders
             opps = list(powers.keys()).copy()
