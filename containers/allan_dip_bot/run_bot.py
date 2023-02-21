@@ -199,6 +199,8 @@ async def play(
             messages=game.messages, game_role=bot.power_name
         )
         rcvd_messages = sorted(rcvd_messages.items())
+        for _, msg in rcvd_messages:
+            print(f"Received message: {msg}")
 
         if not game.powers[bot.power_name].is_eliminated():
             # Send messages to bots and fetch messages from bot

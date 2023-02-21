@@ -177,6 +177,7 @@ class SmartOrderAccepterBot(DipnetBot):
             phase=self.game.get_current_phase(),
         )
         msg_data.add_message(msg_obj.recipient, msg_obj.message)
+        print(f"Sent message: {msg_obj}")
         # Messages should not be sent in local games, only stored
         if isinstance(self.game, NetworkGame):
             await self.game.send_game_message(message=msg_obj)
