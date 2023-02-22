@@ -161,12 +161,15 @@ class SmartOrderAccepterBot(DipnetBot):
         self.neutral = []
         self.test_mode = test_mode
 
-    async def send_message(self, recipient: str, message: MessagesData) -> None:
+    async def send_message(
+        self, recipient: str, message: str, msg_data: MessagesData
+    ) -> None:
         """
         Send message asynchronously to the server while the bot is still processing
 
         :param recipient: The name of the recipient power
-        :param message: MessagesData object containing set of all messages
+        :param message: Message to be sent
+        :param msg_data: MessagesData object containing set of all messages
         """
         msg_obj = Message(
             sender=self.power_name,
@@ -174,7 +177,10 @@ class SmartOrderAccepterBot(DipnetBot):
             message=message,
             phase=self.game.get_current_phase(),
         )
-        await self.game.send_game_message(message=msg_obj)
+        msg_data.add_message(msg_obj.recipient, msg_obj.message)
+        # Messages should not be sent in test mode, only stored
+        if not self.test_mode:
+            await self.game.send_game_message(message=msg_obj)
 
     async def gen_pos_stance_messages(
         self, msgs_data: MessagesData, orders_list: List[str]
@@ -198,9 +204,7 @@ class SmartOrderAccepterBot(DipnetBot):
             if str(orders_decided) != "FCT ()":
                 for pow in self.allies:
                     if pow != self.power_name:
-                        msgs_data.add_message(pow, str(orders_decided))
-                        if not (self.test_mode):
-                            await self.send_message(pow, str(orders_decided))
+                        await self.send_message(pow, str(orders_decided), msgs_data)
 
     async def gen_messages(
         self, orders_list: List[str], msgs_data: MessagesData
@@ -256,9 +260,7 @@ class SmartOrderAccepterBot(DipnetBot):
                             )
                         )
                     )
-                messages.add_message(proposer, str(msg))
-                if not (self.test_mode):
-                    await self.send_message(proposer, str(msg))
+                await self.send_message(proposer, str(msg), messages)
         return messages
 
     async def respond_to_invalid_orders(
@@ -291,9 +293,7 @@ class SmartOrderAccepterBot(DipnetBot):
                     )
                 )
             )
-            messages_data.add_message(sender, str(message))
-            if not (self.test_mode):
-                await self.send_message(sender, str(message))
+            await self.send_message(sender, str(message), messages_data)
 
     async def respond_to_alliance_messages(self, messages_data: MessagesData) -> None:
         """
@@ -307,9 +307,7 @@ class SmartOrderAccepterBot(DipnetBot):
         for sender, message in unique_senders.items():
             if sender == self.power_name:
                 continue
-            messages_data.add_message(sender, str(YES(message)))
-            if not (self.test_mode):
-                await self.send_message(sender, str(YES(message)))
+            await self.send_message(sender, str(YES(message)), messages_data)
 
         if self.alliances:
             print("Alliances accepted")
@@ -525,9 +523,7 @@ class SmartOrderAccepterBot(DipnetBot):
                     )
                 )
                 final_messages[recipient] = str(suggested_proposals)
-                comms_obj.add_message(recipient, str(suggested_proposals))
-                if not (self.test_mode):
-                    await self.send_message(recipient, str(suggested_proposals))
+                await self.send_message(recipient, str(suggested_proposals), comms_obj)
 
         return final_messages
 
@@ -709,11 +705,8 @@ class SmartOrderAccepterBot(DipnetBot):
             # GLOBAL message and filter aggressive moves to allies are disabled in S1901M
             if self.game.get_current_phase()!='S1901M':
                 msg_allies, msg_foes, msg_neutral = ','.join(self.allies), ','.join(self.foes), ','.join(self.neutral)
-                msgs_data.add_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
-                                {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
-                if not(self.test_mode):
-                    yield self.send_message("GLOBAL", str(f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, \
-                                {msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}"))
+                yield self.send_message("GLOBAL", f"{self.power_name}: From my stance vector perspective, I see {msg_allies if msg_allies else 'no one'} as my allies, "
+                                f"{msg_foes if msg_foes else 'no one'} as my foes and I am indifferent towards {msg_neutral if msg_neutral else 'no one'}", msgs_data)
             # fmt: on
 
                 # filter out aggressive orders to allies
@@ -728,9 +721,7 @@ class SmartOrderAccepterBot(DipnetBot):
                 for pow in opps:
                     vss = [country[:3] for country in list(powers.copy().keys()) if country != pow and country != self.power_name]
                     vss_str = " ".join(vss)
-                    msgs_data.add_message(pow, f"PRP (ALY ({self.power_name[:3]} {pow[:3]}) VSS ({vss_str}))")
-                    if not(self.test_mode):
-                        yield self.send_message(pow, f"PRP (ALY ({self.power_name[:3]} {pow[:3]}) VSS ({vss_str}))")
+                    yield self.send_message(pow, f"PRP (ALY ({self.power_name[:3]} {pow[:3]}) VSS ({vss_str}))", msgs_data)
 
             # send ALY requests at the start of the game
             yield self.respond_to_invalid_orders(invalid_proposal_orders, msgs_data)
@@ -755,9 +746,7 @@ class SmartOrderAccepterBot(DipnetBot):
                 print(f">>> {self.power_name} Actual Orders", dipnet_ords)
                 print(f">>> {self.power_name} Random Orders to {self.foes}", daide_orders)
                 for foe in self.foes:
-                    msgs_data.add_message(foe, daide_orders)
-                    if not(self.test_mode):
-                        yield self.send_message(foe, daide_orders)
+                    yield self.send_message(foe, daide_orders, msgs_data)
             except Exception as e:
                 print("Raised Exception in order randomization code block")
                 print(e)
