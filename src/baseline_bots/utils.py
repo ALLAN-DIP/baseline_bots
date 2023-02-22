@@ -7,16 +7,16 @@ __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
 # from diplomacy_research.models.state_space import get_order_tokens
-import re
 from collections import defaultdict
 from copy import deepcopy
+import re
 from typing import Dict, List, Tuple, Union
 
-import numpy as np
 from DAIDE import ALY, FCT, HUH, ORR, PRP, XDO
 from DAIDE.utils.exceptions import ParseError
 from diplomacy import Game, Message
 from diplomacy.utils import strings
+import numpy as np
 from tornado import gen
 
 POWER_NAMES_DICT = {

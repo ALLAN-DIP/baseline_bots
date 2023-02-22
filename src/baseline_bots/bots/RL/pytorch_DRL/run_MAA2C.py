@@ -1,11 +1,11 @@
 import random
 import sys
 
+from MAA2C import MAA2C
+from common.utils import ma_agg_double_list
 import matplotlib.pyplot as plt
 import numpy as np
 import ray
-from common.utils import ma_agg_double_list
-from MAA2C import MAA2C
 from ray.rllib.env.multi_agent_env import MultiAgentEnv, make_multi_agent
 
 # from ray.rllib.examples.env.multi_agent import MultiAgentCartPole

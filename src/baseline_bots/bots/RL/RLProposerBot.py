@@ -11,14 +11,14 @@ sys.path.append("../../../dipnet_press")
 import random
 from typing import List
 
-import ujson as json
-from bots.RL.RLOrderBot import RLOrderBot
 from DAIDE import ORR, XDO
+from DiplomacyEnv import DiplomacyEnv
+from bots.RL.RLOrderBot import RLOrderBot
 from diplomacy import Game, Message
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
-from DiplomacyEnv import DiplomacyEnv
 from pytorch_DRL.common.utils import dict_to_arr
 from tornado import gen
+import ujson as json
 from utils import MessagesData, OrdersData
 
 

@@ -1,8 +1,8 @@
-import numpy as np
-import torch as th
 from common.Memory import ReplayMemory
 from common.Model import ActorNetwork
 from common.utils import to_tensor_var
+import numpy as np
+import torch as th
 from torch import nn
 from torch.optim import Adam, RMSprop
 

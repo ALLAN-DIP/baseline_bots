@@ -1,10 +1,10 @@
 import sys
 
+from A2C import A2C
+from common.utils import agg_double_list
 import gym
 import matplotlib.pyplot as plt
 import numpy as np
-from A2C import A2C
-from common.utils import agg_double_list
 
 MAX_EPISODES = 5000
 EPISODES_BEFORE_TRAIN = 0

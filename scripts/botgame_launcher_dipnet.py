@@ -2,9 +2,9 @@ import argparse
 import sys
 from time import time
 
-import ujson as json
 from diplomacy import Game, Message
 from diplomacy.utils.export import to_saved_game_format
+import ujson as json
 
 sys.path.append("..")
 sys.path.append("../dipnet_press")
@@ -15,10 +15,10 @@ import asyncio
 import os
 
 from bots.baseline_bot import BaselineMsgRoundBot
+from bots.dipnet.RealPolitik import RealPolitik
 from bots.dipnet.dipnet_proposer_bot import ProposerDipBot
 from bots.dipnet.loyal_support_proposal import LSP_DipBot
 from bots.dipnet.no_press_bot import NoPressDipBot
-from bots.dipnet.RealPolitik import RealPolitik
 from bots.dipnet.selectively_transparent_bot import SelectivelyTransparentBot
 from bots.dipnet.transparent_bot import TransparentBot
 from bots.dipnet.transparent_proposer_bot import TransparentProposerDipBot

@@ -1,6 +1,6 @@
 import json
-import time
 from subprocess import PIPE, run
+import time
 
 from tqdm import tqdm
 

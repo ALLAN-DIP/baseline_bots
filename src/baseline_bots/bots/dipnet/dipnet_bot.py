@@ -3,9 +3,9 @@
 __authors__ = ["Sander Schulhoff", "Kartik Shenoy"]
 __email__ = "sanderschulhoff@gmail.com"
 
+from abc import ABC, abstractmethod
 import random
 import sys
-from abc import ABC, abstractmethod
 from typing import List
 
 from diplomacy import Game, Message

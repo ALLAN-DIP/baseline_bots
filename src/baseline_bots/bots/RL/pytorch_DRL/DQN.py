@@ -1,8 +1,8 @@
-import numpy as np
-import torch as th
 from common.Agent import Agent
 from common.Model import ActorNetwork
 from common.utils import identity, to_tensor_var
+import numpy as np
+import torch as th
 from torch import nn
 from torch.optim import Adam, RMSprop
 

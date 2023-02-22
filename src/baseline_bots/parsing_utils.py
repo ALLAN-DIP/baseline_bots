@@ -4,8 +4,8 @@ Some quickly built parsing utils mostly for DAIDE stuff
 
 __author__ = "Kartik Shenoy"
 __email__ = "kartik.shenoyy@gmail.com"
-import re
 from collections import defaultdict
+import re
 from typing import Dict, List, Tuple, Union
 
 from DAIDE.utils.exceptions import ParseError

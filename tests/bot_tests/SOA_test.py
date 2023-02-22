@@ -2,11 +2,11 @@
 import asyncio
 import random
 
-import tornado
 from diplomacy import Game, Message
 from diplomacy.client.connection import connect
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from gameplay_framework_async import GamePlayAsync
+import tornado
 from tornado import gen, testing
 from tornado.testing import AsyncTestCase
 

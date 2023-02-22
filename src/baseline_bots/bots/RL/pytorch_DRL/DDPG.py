@@ -1,10 +1,10 @@
 from copy import deepcopy
 
-import numpy as np
-import torch.nn as nn
 from common.Agent import Agent
 from common.Model import ActorNetwork, CriticNetwork
 from common.utils import to_tensor_var
+import numpy as np
+import torch.nn as nn
 from torch.optim import Adam, RMSprop
 
 
