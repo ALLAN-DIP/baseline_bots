@@ -1,11 +1,10 @@
 import sys
 
+from ACKTR import DisjointACKTR as ACKTR, JointACKTR as ACKTR
+from common.utils import agg_double_list
 import gym
 import matplotlib.pyplot as plt
 import numpy as np
-from ACKTR import DisjointACKTR as ACKTR
-from ACKTR import JointACKTR as ACKTR
-from common.utils import agg_double_list
 
 MAX_EPISODES = 5000
 EPISODES_BEFORE_TRAIN = 0

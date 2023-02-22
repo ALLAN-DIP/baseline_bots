@@ -1,5 +1,5 @@
-import random
 from collections import namedtuple
+import random
 
 Experience = namedtuple(
     "Experience", ("states", "actions", "rewards", "next_states", "dones")

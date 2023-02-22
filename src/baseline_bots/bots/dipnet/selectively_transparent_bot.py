@@ -1,8 +1,8 @@
 __authors__ = ["Sander Schulhoff"]
 __email__ = "sanderschulhoff@gmail.com"
 
-import random
 from collections import defaultdict
+import random
 
 from DAIDE import config
 

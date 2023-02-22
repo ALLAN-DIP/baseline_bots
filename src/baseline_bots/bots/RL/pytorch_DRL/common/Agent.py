@@ -1,7 +1,7 @@
 import numpy as np
-import torch as th
 from pytorch_DRL.common.Memory import ReplayMemory
 from pytorch_DRL.common.utils import identity
+import torch as th
 
 
 class Agent(object):

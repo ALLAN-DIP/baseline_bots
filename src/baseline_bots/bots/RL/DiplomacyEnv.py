@@ -1,8 +1,6 @@
 import copy
 import sys
 
-import gym
-import numpy as np
 from bot_communication import Diplomacy_Press, Diplomacy_Press_Player
 from diplomacy import Game
 from diplomacy.engine.message import Message
@@ -10,8 +8,10 @@ from diplomacy.utils.export import to_saved_game_format
 from diplomacy_research.models.state_space import get_order_tokens
 from diplomacy_research.players.benchmark_player import DipNetRLPlayer, DipNetSLPlayer
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
-from pytorch_DRL.common.utils import ma_agg_double_list
+import gym
+import numpy as np
 from pytorch_DRL.MAA2C import MAA2C
+from pytorch_DRL.common.utils import ma_agg_double_list
 from tornado import gen
 
 # MAA2C: https://github.com/ChenglongChen/pytorch-DRL/

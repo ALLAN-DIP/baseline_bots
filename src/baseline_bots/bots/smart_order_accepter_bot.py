@@ -1,14 +1,14 @@
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
-import random
 from collections import defaultdict
 from enum import Enum
+import random
 from typing import Dict, List, Set, Tuple
 
-import numpy as np
 from DAIDE import FCT, HUH, ORR, PRP, XDO, YES
 from diplomacy import Message
+import numpy as np
 from stance_vector import ActionBasedStance, ScoreBasedStance
 from tornado import gen
 

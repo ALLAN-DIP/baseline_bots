@@ -1,8 +1,8 @@
 __author__ = "Kartik Shenoy"
 __email__ = "kartik.shenoyy@gmail.com"
 
-import random
 from collections import defaultdict
+import random
 from typing import List
 
 from DAIDE import FCT, ORR, XDO

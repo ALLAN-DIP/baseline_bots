@@ -1,10 +1,10 @@
 import sys
 
+from PPO import PPO
+from common.utils import agg_double_list
 import gym
 import matplotlib.pyplot as plt
 import numpy as np
-from common.utils import agg_double_list
-from PPO import PPO
 
 MAX_EPISODES = 5000
 EPISODES_BEFORE_TRAIN = 0

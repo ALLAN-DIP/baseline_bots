@@ -1,7 +1,6 @@
 import os
 
 import numpy as np
-import torch as th
 from pytorch_DRL.common.Agent import Agent
 from pytorch_DRL.common.Model import ActorNetwork, CriticNetwork
 from pytorch_DRL.common.utils import (
@@ -10,6 +9,7 @@ from pytorch_DRL.common.utils import (
     index_to_one_hot,
     to_tensor_var,
 )
+import torch as th
 from torch import nn
 from torch.optim import Adam, RMSprop
 

@@ -6,10 +6,10 @@ __email__ = "kartik.shenoyy@gmail.com"
 import argparse
 import asyncio
 import json as json
+from pathlib import Path
 import random
 import sys
 import time
-from pathlib import Path
 from typing import Optional
 
 sys.path.append("..")  # Adds higher directory to python modules path.

@@ -8,14 +8,14 @@ sys.path.append("../..")
 sys.path.append("../../..")
 sys.path.append("../../../dipnet_press")
 
-import random
 from abc import ABC, abstractmethod
+import random
 from typing import List
 
+from DiplomacyEnv import DiplomacyEnv
 from bots.baseline_bot import BaselineMsgRoundBot
 from diplomacy import Game, Message
 from diplomacy_research.players.benchmark_player import DipNetRLPlayer
-from DiplomacyEnv import DiplomacyEnv
 from pytorch_DRL.MAA2C import MAA2C
 from tornado import gen
 from utils import MessagesData, OrdersData, get_order_tokens

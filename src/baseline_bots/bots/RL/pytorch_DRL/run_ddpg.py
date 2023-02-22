@@ -1,10 +1,10 @@
 import sys
 
+from DDPG import DDPG
+from common.utils import agg_double_list
 import gym
 import matplotlib.pyplot as plt
 import numpy as np
-from common.utils import agg_double_list
-from DDPG import DDPG
 
 MAX_EPISODES = 5000
 EPISODES_BEFORE_TRAIN = 100

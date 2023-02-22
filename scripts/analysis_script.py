@@ -1,8 +1,8 @@
 import argparse
-import json
-import os
 from collections import defaultdict
 from datetime import datetime
+import json
+import os
 from time import time
 
 import pandas as pd

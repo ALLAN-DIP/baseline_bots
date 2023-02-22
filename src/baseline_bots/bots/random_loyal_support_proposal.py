@@ -1,8 +1,8 @@
 __author__ = "Kartik Shenoy"
 __email__ = "kartik.shenoyy@gmail.com"
 
-import random
 from collections import defaultdict
+import random
 
 from DAIDE import ALY, ORR, XDO, YES
 from diplomacy import Message

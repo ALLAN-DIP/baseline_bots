@@ -1,9 +1,9 @@
+from A2C import A2C
+from common.Model import ActorCriticNetwork
+from common.kfac import KFACOptimizer
+from common.utils import entropy, index_to_one_hot, to_tensor_var
 import numpy as np
 import torch as th
-from A2C import A2C
-from common.kfac import KFACOptimizer
-from common.Model import ActorCriticNetwork
-from common.utils import entropy, index_to_one_hot, to_tensor_var
 from torch import nn
 
 
