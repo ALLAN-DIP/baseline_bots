@@ -148,6 +148,9 @@ class SmartOrderAccepterBot(DipnetBot):
                 )
         elif self.stance_type == "S":
             self.stance = ScoreBasedStance(power_name, game)
+        self.opponents = sorted(
+            power for power in game.get_map_power_names() if power != self.power_name
+        )
         self.alliances = defaultdict(list)
         self.rollout_length = 1
         self.rollout_n_order = 10
@@ -424,11 +427,7 @@ class SmartOrderAccepterBot(DipnetBot):
     def cache_allies_influence(self) -> None:
         """Cache allies' influence"""
         self.allies_influence = set()
-        for pow in [
-            pow1
-            for pow1 in self.stance.stance[self.power_name]
-            if pow1 != self.power_name and pow1 in self.allies
-        ]:
+        for pow in [pow1 for pow1 in self.opponents if pow1 in self.allies]:
             self.allies_influence.update(set(self.game.get_power(pow).influence))
 
     def get_allies_orderable_locs(self) -> Set[str]:
@@ -438,11 +437,7 @@ class SmartOrderAccepterBot(DipnetBot):
         :return: set of provinces which are orderable for the allies
         """
         provinces = set()
-        for ally in [
-            pow1
-            for pow1 in self.stance.stance[self.power_name]
-            if pow1 != self.power_name and pow1 in self.allies
-        ]:
+        for ally in [pow1 for pow1 in self.opponents if pow1 in self.allies]:
             new_provs = {loc.upper() for loc in self.game.get_orderable_locations(ally)}
             provinces.update(new_provs)
         return provinces
@@ -690,9 +685,9 @@ class SmartOrderAccepterBot(DipnetBot):
 
             # fmt: off
 
-            self.allies = [pow for pow in powers if (pow != self.power_name and powers[pow] > self.ally_threshold)]
-            self.foes = [pow for pow in powers if (pow != self.power_name and powers[pow] <= self.enemy_threshold)]
-            self.neutral = [pow for pow in powers if (pow != self.power_name and powers[pow] > self.enemy_threshold and powers[pow] <= self.ally_threshold)]
+            self.allies = [pow for pow in self.opponents if (powers[pow] > self.ally_threshold)]
+            self.foes = [pow for pow in self.opponents if (powers[pow] <= self.enemy_threshold)]
+            self.neutral = [pow for pow in self.opponents if (powers[pow] > self.enemy_threshold and powers[pow] <= self.ally_threshold)]
 
             best_proposer, best_orders = yield from get_best_orders(self, valid_proposal_orders, shared_orders)
 
@@ -713,12 +708,10 @@ class SmartOrderAccepterBot(DipnetBot):
                     yield self.replace_aggressive_order_to_allies()
 
             # generate messages for FCT sharing info orders
-            opps = list(powers.keys()).copy()
-            opps.remove(self.power_name) # list of opposing powers
             msgs_data = yield self.gen_messages(orders_data.get_list_of_orders(), msgs_data)
             if self.game.phase == "SPRING 1901 MOVEMENT":
-                for pow in opps:
-                    vss = [country[:3] for country in list(powers.copy().keys()) if country != pow and country != self.power_name]
+                for pow in self.opponents:
+                    vss = [country[:3] for country in self.opponents if country != pow]
                     vss_str = " ".join(vss)
                     yield self.send_message(pow, f"PRP (ALY ({self.power_name[:3]} {pow[:3]}) VSS ({vss_str}))", msgs_data)
 
