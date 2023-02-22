@@ -63,9 +63,15 @@ class SmartOrderAccepterBot(DipnetBot):
         power_name,
         game,
         discount_factor=0.5,
+        invasion_coef=1.0,
+        conflict_coef=0.5,
+        invasive_support_coef=1.0,
+        conflict_support_coef=0.5,
+        friendly_coef=1.0,
+        unrealized_coef=1.0,
         test_mode=False,
         stance_type="A",
-        aggressiveness=Aggressiveness.moderate,
+        aggressiveness=None,
     ) -> None:
         """
         :param power_name: The name of the power
@@ -78,6 +84,12 @@ class SmartOrderAccepterBot(DipnetBot):
         super().__init__(power_name, game)
         self.alliance_props_sent = False
         self.discount_factor = discount_factor
+        self.invasion_coef = invasion_coef
+        self.conflict_coef = conflict_coef
+        self.invasive_support_coef = invasive_support_coef
+        self.conflict_support_coef = conflict_support_coef
+        self.friendly_coef = friendly_coef
+        self.unrealized_coef = unrealized_coef
         self.stance_type = stance_type
         self.aggressiveness = aggressiveness
         if self.stance_type == "A":
@@ -116,6 +128,18 @@ class SmartOrderAccepterBot(DipnetBot):
                     conflict_support_coef=0.25,
                     friendly_coef=0.5,
                     unrealized_coef=1.0,
+                    discount_factor=self.discount_factor,
+                )
+            elif self.aggressiveness is None:
+                self.stance = ActionBasedStance(
+                    power_name,
+                    game,
+                    invasion_coef=self.invasion_coef,
+                    conflict_coef=self.conflict_coef,
+                    invasive_support_coef=self.invasive_support_coef,
+                    conflict_support_coef=self.conflict_support_coef,
+                    friendly_coef=self.friendly_coef,
+                    unrealized_coef=self.unrealized_coef,
                     discount_factor=self.discount_factor,
                 )
             else:
