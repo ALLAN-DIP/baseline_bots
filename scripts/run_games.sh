@@ -87,6 +87,7 @@ if [[ -z $GAME_ID ]]; then
   CUR_ISO_DATE=$(date -u +'%Y_%m_%d_%H_%M_%S')
   GAME_ID=${USER}_$CUR_ISO_DATE
 
+  echo 'Creating game with SHADE account "allanumd" with password "password"'
   python "$CREATE_GAME_SCRIPT" --game_id "$GAME_ID" --deadline 300 --host $HOST
 fi
 
