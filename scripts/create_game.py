@@ -10,6 +10,8 @@ from typing import Optional, Sequence
 from diplomacy.client.connection import connect
 
 DEFAULT_RULES = ("REAL_TIME", "POWER_CHOICE")
+DEFAULT_USER = "allanumd"
+DEFAULT_PASSWORD = "password"
 
 
 async def create_game(
@@ -17,20 +19,22 @@ async def create_game(
     rules: Sequence[str] = DEFAULT_RULES,
     deadline: int = 0,
     n_controls: int = 7,
-    password: Optional[str] = None,
+    user: str = DEFAULT_USER,
+    password: str = DEFAULT_PASSWORD,
+    game_password: Optional[str] = None,
     hostname: str = "localhost",
     port: int = 8432,
 ) -> None:
     """Creates a game on the Diplomacy server"""
     connection = await connect(hostname, port)
-    channel = await connection.authenticate("random_user", "password")
+    channel = await connection.authenticate(user, password)
 
     game = await channel.create_game(
         game_id=game_id,
         rules=rules,
         deadline=deadline,
         n_controls=n_controls,
-        registration_password=password,
+        registration_password=game_password,
     )
 
     game_data = {
@@ -59,7 +63,11 @@ def main() -> None:
         default=7,
         help="Number of controlled powers (default: %(default)s)",
     )
-    parser.add_argument("--password", type=str, help="Game password.")
+    parser.add_argument("--user", type=str, default=DEFAULT_USER, help="SHADE user.")
+    parser.add_argument(
+        "--password", type=str, default=DEFAULT_PASSWORD, help="SHADE password."
+    )
+    parser.add_argument("--game-password", type=str, help="Game password.")
     parser.add_argument(
         "--host", type=str, default="localhost", help="Server hostname."
     )
@@ -79,7 +87,9 @@ def main() -> None:
             rules=args.rules,
             deadline=args.deadline,
             n_controls=args.n_controls,
+            user=args.user,
             password=args.password,
+            game_password=args.game_password,
             hostname=args.host,
             port=args.port,
         )
