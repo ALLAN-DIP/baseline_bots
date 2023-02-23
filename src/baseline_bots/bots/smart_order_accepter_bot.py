@@ -8,6 +8,7 @@ from typing import Dict, List, Set, Tuple
 
 from DAIDE import FCT, HUH, ORR, PRP, XDO, YES
 from diplomacy import Message
+from diplomacy.client.network_game import NetworkGame
 import numpy as np
 from stance_vector import ActionBasedStance, ScoreBasedStance
 from tornado import gen
@@ -69,7 +70,6 @@ class SmartOrderAccepterBot(DipnetBot):
         conflict_support_coef=0.5,
         friendly_coef=1.0,
         unrealized_coef=1.0,
-        test_mode=False,
         stance_type="A",
         aggressiveness=None,
     ) -> None:
@@ -159,7 +159,6 @@ class SmartOrderAccepterBot(DipnetBot):
         self.allies = []
         self.foes = []
         self.neutral = []
-        self.test_mode = test_mode
 
     async def send_message(
         self, recipient: str, message: str, msg_data: MessagesData
@@ -178,8 +177,8 @@ class SmartOrderAccepterBot(DipnetBot):
             phase=self.game.get_current_phase(),
         )
         msg_data.add_message(msg_obj.recipient, msg_obj.message)
-        # Messages should not be sent in test mode, only stored
-        if not self.test_mode:
+        # Messages should not be sent in local games, only stored
+        if isinstance(self.game, NetworkGame):
             await self.game.send_game_message(message=msg_obj)
 
     async def gen_pos_stance_messages(

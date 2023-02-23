@@ -29,6 +29,6 @@ class TestSimpleSOABot(AsyncTestCase):
     @testing.gen_test
     def test_play(self):
         game = Game()
-        soa_bot = SmartOrderAccepterBot("FRANCE", game, test_mode=True)
+        soa_bot = SmartOrderAccepterBot("FRANCE", game)
         msg_data = MessagesData()
         soa_bot.send_message("FRANCE", "A PAR - BUR", msg_data)
