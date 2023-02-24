@@ -415,6 +415,17 @@ class SmartOrderAccepterBot(DipnetBot):
             provinces.update(new_provs)
         return provinces
 
+
+    async def log_stance_change(
+        self, stance_log: Dict
+    ):
+        for pw in list(game.get_map_power_names()):
+                if pw == self.power_name:
+                    continue
+                log_data = self.game.new_log_data(body=stance_log[self.power_name][pw])
+                await self.game.send_log_data(log=log_data)
+
+
     async def generate_support_proposals(
         self, comms_obj: MessagesData
     ) -> Dict[str, str]:
@@ -621,11 +632,7 @@ class SmartOrderAccepterBot(DipnetBot):
         if self.game.get_current_phase() != "S1901M" and self.stance_type == "A":
             # update stance and send logs
             _, stance_log = self.stance.get_stance(self.game, verbose=True)
-            for pw in list(game.get_map_power_names()):
-                if pw == self.power_name:
-                    continue
-                log_data = self.game.new_log_data(body=stance_log[self.power_name][pw])
-                await self.game.send_log_data(log=log_data)
+            yield self.log_stance_change(stance_log)
 
         elif self.stance_type == "S":
             self.stance.get_stance()
