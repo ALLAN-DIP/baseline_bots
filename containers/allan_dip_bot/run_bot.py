@@ -197,8 +197,8 @@ async def play(
     while not game.is_game_done:
         current_phase = game.get_current_phase()
         if sleep_delay:
-            # sleep randomly for 1-3s before retrieving new messages for the power
-            await asyncio.sleep(random.random() * 90)
+            # sleep randomly for 2-5s before retrieving new messages for the power
+            await asyncio.sleep(random.uniform(2, 5))
 
         phase_start_time = time.time()
 
