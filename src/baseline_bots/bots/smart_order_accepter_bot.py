@@ -619,7 +619,14 @@ class SmartOrderAccepterBot(DipnetBot):
 
         # avoid get_stance in the first phase of game
         if self.game.get_current_phase() != "S1901M" and self.stance_type == "A":
-            self.stance.get_stance(self.game)
+            # update stance and send logs
+            _, stance_log = self.stance.get_stance(self.game, verbose=True)
+            for pw in list(game.get_map_power_names()):
+                if pw == self.power_name:
+                    continue
+                log_data = self.game.new_log_data(body=stance_log[self.power_name][pw])
+                await self.game.send_log_data(log=log_data)
+
         elif self.stance_type == "S":
             self.stance.get_stance()
 
