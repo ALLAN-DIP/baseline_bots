@@ -368,7 +368,7 @@ def parse_proposal_messages(
     try:
         # Extract messages containing PRP string
         order_msgs = [msg[1] for msg in rcvd_messages if "PRP" in msg[1].message]
-        print(f"Received {len(order_msgs)} messages")
+        print(f"Received {len(order_msgs)} PRP messages")
         print([(order_msg.sender, order_msg.message) for order_msg in order_msgs])
 
         # Generate a dictionary of sender to list of orders (dipnet-style) for this sender

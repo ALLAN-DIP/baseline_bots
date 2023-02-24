@@ -189,8 +189,9 @@ async def play(
     while not game.is_game_done:
         current_phase = game.get_current_phase()
         if sleep_delay:
-            # sleep randomly for 1-3s before retrieving new messages for the power
-            await asyncio.sleep(random.random() * 90)
+            # sleep randomly for 2-5s before retrieving new messages for the power
+            # The PRNG is seeded with the power name for consistency across runs
+            await asyncio.sleep(random.Random(power_name).uniform(2, 5))
 
         phase_start_time = time.time()
 
@@ -245,7 +246,7 @@ async def play(
             await asyncio.sleep(2)
 
     t2 = time.perf_counter()
-    print(f"TIMING: {t2-t1}:0.4")
+    print(f"TIMING: {t2-t1:0.4}")
     print("-" * 30 + "GAME COMPLETE" + "-" * 30)
 
 

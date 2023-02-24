@@ -74,6 +74,7 @@ class SmartOrderAccepterBot(DipnetBot):
         :param stance_type: indicates if this bot should use ActionBasedStance (A) or ScoreBasedStance (S)
         :param aggressiveness: indicates if this bot should be aggressive (A), moderate (M) or friendly (F). Valid only if stance type is action-based
         """
+        random.seed(power_name)
         super().__init__(power_name, game)
         self.alliance_props_sent = False
         self.discount_factor = discount_factor
@@ -621,12 +622,9 @@ class SmartOrderAccepterBot(DipnetBot):
             self.stance.get_stance(self.game)
         elif self.stance_type == "S":
             self.stance.get_stance()
-        print(f"Stance vector for {self.power_name}")
-        print(self.stance.stance[self.power_name])
 
         powers = self.stance.stance[self.power_name]
-
-        print("current stance: ", powers)
+        print(f"Stance vector for {self.power_name}: {powers}")
 
         # get dipnet order
         orders = yield from self.brain.get_orders(self.game, self.power_name)

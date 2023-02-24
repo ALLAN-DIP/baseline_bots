@@ -6,31 +6,32 @@ It would be preferable to use a real DAIDE parser in prod
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
-# from diplomacy_research.models.state_space import get_order_tokens
 from collections import defaultdict
 from copy import deepcopy
 import re
-from typing import Dict, List, Tuple, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Set, Tuple
 
-from DAIDE import ALY, FCT, HUH, ORR, PRP, XDO
 from DAIDE.utils.exceptions import ParseError
 from diplomacy import Game, Message
 from diplomacy.utils import strings
 import numpy as np
 from tornado import gen
 
+if TYPE_CHECKING:
+    from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
+
 POWER_NAMES_DICT = {
-    "RUS": "RUSSIA",
     "AUS": "AUSTRIA",
-    "ITA": "ITALY",
     "ENG": "ENGLAND",
     "FRA": "FRANCE",
-    "TUR": "TURKEY",
     "GER": "GERMANY",
+    "ITA": "ITALY",
+    "RUS": "RUSSIA",
+    "TUR": "TURKEY",
 }
 
 
-def get_order_tokens(order):
+def get_order_tokens(order: str) -> List[str]:
     """Retrieves the order tokens used in an order
     e.g. 'A PAR - MAR' would return ['A PAR', '-', 'MAR']
     NOTE: Stolen from diplomacy_research
@@ -42,8 +43,8 @@ def get_order_tokens(order):
     buffer, order_tokens = [], []
     for word in order.replace(" R ", " - ").split():
         buffer += [word]
-        if word not in ["A", "F", "-"]:
-            order_tokens += [" ".join(buffer)]
+        if word not in {"A", "F", "-"}:
+            order_tokens.append(" ".join(buffer))
             buffer = []
     return order_tokens
 
@@ -54,9 +55,9 @@ def AND(arrangements: List[str]) -> str:
     """
 
     if len(arrangements) < 2:
-        raise Exception("Need at least 2 items to AND")
+        raise ValueError("Need at least 2 items to AND")
 
-    return "AND" + "".join([f" ({a})" for a in arrangements])
+    return "AND" + "".join(f" ({a})" for a in arrangements)
 
 
 # def ORR(arrangements: List[str]) -> str:
@@ -78,7 +79,7 @@ def AND(arrangements: List[str]) -> str:
 #     return [f"XDO ({order})" for order in orders]
 
 
-def get_other_powers(powers: List[str], game: Game):
+def get_other_powers(powers: List[str], game: Game) -> Set[str]:
     """
     :return: powers in the game other than those listed
     in the powers parameter
@@ -93,15 +94,15 @@ def ALY(powers: List[str], game: Game) -> str:
     :param powers: an array of powers to be allied
     """
     others = get_other_powers(powers, game)
-    return "ALY (" + " ".join(powers) + ") VSS (" + " ".join(others) + ")"
+    return f"ALY ({' '.join(powers)}) VSS ({' '.join(others)})"
 
 
-def YES(string) -> str:
+def YES(string: str) -> str:
     """Forms YES message"""
     return f"YES ({string})"
 
 
-def REJ(string) -> str:
+def REJ(string: str) -> str:
     """Forms REJ message"""
     return f"REJ ({string})"
 
@@ -116,27 +117,27 @@ def REJ(string) -> str:
 #     return f"HUH ({string})"
 
 
-def parse_FCT(msg) -> str:
+def parse_FCT(msg: str) -> str:
     """Detaches FCT from main arrangement"""
     if "FCT" not in msg:
-        raise ParseError("This is not an FCT message")
+        raise ParseError(msg, "FCT")
     try:
         return msg[msg.find("(") + 1 : -1]
-    except Exception:
-        raise Exception(f"Can't parse FCT msg {msg}")
+    except Exception as ex:
+        raise ParseError(msg, "FCT") from ex
 
 
-def parse_PRP(msg) -> str:
+def parse_PRP(msg: str) -> str:
     """Detaches PRP from main arrangement"""
     if "PRP" not in msg:
-        raise ParseError("This is not an PRP message")
+        raise ParseError(msg, "PRP")
     try:
         return msg[msg.find("(") + 1 : -1]
-    except Exception:
-        raise Exception(f"Can't parse PRP msg {msg}")
+    except Exception as ex:
+        raise ParseError(msg, "PRP") from ex
 
 
-def parse_arrangement(msg: str, xdo_only=True) -> List[str]:
+def parse_arrangement(msg: str, xdo_only: bool = True) -> List[str]:
     """
     Attempts to parse arrangements (may or may not have ORR keyword)
 
@@ -174,7 +175,7 @@ def parse_arrangement(msg: str, xdo_only=True) -> List[str]:
                 parts.append((msg[ind : ind + next_ind.start() + 1]).strip())
                 ind = ind + next_ind.end() - 1
 
-        def extract_suborder_indices(part: str) -> str:
+        def extract_suborder_indices(part: str) -> Tuple[int, int, str]:
             """
             Finds the start and end indices of suborder in an XDO message
             For instance,
@@ -200,22 +201,21 @@ def parse_arrangement(msg: str, xdo_only=True) -> List[str]:
 
         ans = []
         for part in parts:
-            if (
-                part[0] == "("
-            ):  # If there is a parenthesis in the beginning, just remove the extra set of parenthesis from both ends
+            # If there is a parenthesis in the beginning,
+            # just remove the extra set of parenthesis from both ends
+            if part[0] == "(":
                 part = part.strip()[1:-1].strip()
             start, end, suborder_type = extract_suborder_indices(part)
             if xdo_only:
                 ans.append(part[start + 1 : end])
+            elif suborder_type == "XDO":
+                ans.append((suborder_type, part[start + 1 : end]))
             else:
-                if suborder_type == "XDO":
-                    ans.append((suborder_type, part[start + 1 : end]))
-                else:
-                    ans.append((suborder_type, part))
+                ans.append((suborder_type, part))
         return ans
 
-    except Exception as e:
-        raise ParseError("Can't parse ORR msg")
+    except Exception as ex:
+        raise ParseError(msg, "ORR") from ex
 
 
 def parse_alliance_proposal(msg: str, recipient: str) -> List[str]:
@@ -260,14 +260,13 @@ def is_order_aggressive(order: str, sender: str, game: Game) -> bool:
     """
     order_token = get_order_tokens(order)
     # print(order_token)
-    if order_token[0][0] == "A" or order_token[0][0] == "F":
+    if order_token[0].startswith("A") or order_token[0].startswith("F"):
         # get location - add order_token[0] ('A' or 'F') at front to check if it collides with other powers' units
         order_unit = order_token[0][0] + order_token[1][1:]
         # check if loc has some units of other powers on
         for power in game.powers:
-            if sender != power:
-                if order_unit in game.powers[power].units:
-                    return True
+            if sender != power and order_unit in game.powers[power].units:
+                return True
     return False
 
 
@@ -278,23 +277,17 @@ def get_non_aggressive_orders(orders: List[str], sender: str, game: Game) -> Lis
     return [order for order in orders if not is_order_aggressive(order, sender, game)]
 
 
-def is_move_order(order):
+def is_move_order(order: str) -> bool:
     order_tokens = get_order_tokens(order)
-    if len(order_tokens) == 2 and order_tokens[1][0] == "-":
-        return True
-    else:
-        return False
+    return len(order_tokens) == 2 and order_tokens[1].startswith("-")
 
 
-def is_support_order(order):
+def is_support_order(order: str) -> bool:
     order_tokens = get_order_tokens(order)
-    if 3 <= len(order_tokens) <= 4 and order_tokens[1] == "S":
-        return True
-    else:
-        return False
+    return 3 <= len(order_tokens) <= 4 and order_tokens[1] == "S"
 
 
-def is_cross_support(order, power, game):
+def is_cross_support(order: str, power: str, game: Game) -> bool:
     if not is_support_order(order):
         return False
     order_tokens = get_order_tokens(order)
@@ -305,15 +298,12 @@ def is_cross_support(order, power, game):
             return False
 
 
-def is_convoyed_order(order):
+def is_convoyed_order(order: str) -> bool:
     order_tokens = get_order_tokens(order)
-    if len(order_tokens) == 3 and order_tokens[-1] == "VIA":
-        return True
-    else:
-        return False
+    return len(order_tokens) == 3 and order_tokens[-1] == "VIA"
 
 
-def get_province_from_order(order):
+def get_province_from_order(order: str) -> str:
     order_tokens = get_order_tokens(order)
     parts = order_tokens[0].split()
     if len(parts) >= 2:
@@ -326,7 +316,7 @@ class MessagesData:
     def __init__(self):
         self.messages = []
 
-    def add_message(self, recipient: str, message: str):
+    def add_message(self, recipient: str, message: str) -> None:
         self.messages.append({"recipient": recipient, "message": message})
 
     def __iter__(self):
@@ -337,7 +327,7 @@ class OrdersData:
     def __init__(self):
         self.orders = defaultdict(str)
 
-    def add_order(self, order, overwrite=True):
+    def add_order(self, order: str, overwrite: bool = True) -> None:
         """
         Adds single order
 
@@ -348,11 +338,10 @@ class OrdersData:
 
         if overwrite:
             self.orders[province] = order
-        else:
-            if province not in self.orders:
-                self.orders[province] = order
+        elif province not in self.orders:
+            self.orders[province] = order
 
-    def add_orders(self, orders, overwrite=True):
+    def add_orders(self, orders: List[str], overwrite: bool = True) -> None:
         """
         Adds multiple orders
 
@@ -361,23 +350,25 @@ class OrdersData:
         for order in orders:
             self.add_order(order, overwrite)
 
-    def get_list_of_orders(self):
+    def get_list_of_orders(self) -> List[str]:
         return list(self.orders.values())
 
     def __iter__(self):
         return iter(self.orders)
 
-    def empty(self):
+    def empty(self) -> bool:
         return len(self.orders) > 0
 
 
-def sort_messages_by_most_recent(messages: List[Message]):
+def sort_messages_by_most_recent(messages: List[Message]) -> List[Message]:
     messages.sort(key=lambda msg: msg.time_sent)
     return messages
 
 
 @gen.coroutine
-def get_state_value(bot, game, power_name, option="default"):
+def get_state_value(
+    bot: "DipnetBot", game: Game, power_name: Optional[str], option: str = "default"
+) -> int:
     # rollout the game --- orders in rollout are from dipnet
     # state value
     firststep_sc = len(game.get_centers(power_name))
@@ -401,6 +392,8 @@ def get_state_value(bot, game, power_name, option="default"):
                     orders = yield bot.brain.get_orders(game, power)
             elif option == "default":
                 orders = yield bot.brain.get_orders(game, power)
+            else:
+                raise ValueError(f"invalid option {option!r}")
 
             game.set_orders(
                 power_name=power,
@@ -417,7 +410,11 @@ def get_state_value(bot, game, power_name, option="default"):
 
 
 @gen.coroutine
-def get_best_orders(bot, proposal_order: dict, shared_order: dict):
+def get_best_orders(
+    bot: "DipnetBot",
+    proposal_order: Dict[str, List[str]],
+    shared_order: Dict[str, List[str]],
+) -> Tuple[str, List[str]]:
     """
     input:
         bot: A bot instance e.g. RealPolitik
@@ -461,7 +458,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
         return result
 
     # initialize state value for each proposal
-    state_value = {power: -10000 for power in bot.game.powers}
+    state_value = {power: float("-inf") for power in bot.game.powers}
 
     # get state value for each proposal
     for proposer, unit_orders in proposal_order.items():
@@ -506,7 +503,7 @@ def get_best_orders(bot, proposal_order: dict, shared_order: dict):
 
 def smart_select_support_proposals(
     possible_support_proposals: Dict[str, List[Tuple[str, str, str]]]
-):
+) -> Dict[str, List[Tuple[str, str, str]]]:
     optimal_possible_support_proposals = defaultdict(list)
     optimal_ordering_units = set()
     order_proposal_mapping = defaultdict(list)
@@ -526,7 +523,3 @@ def smart_select_support_proposals(
             if len(order_list) > 1:
                 optimal_ordering_units.add(ordering_unit)
     return optimal_possible_support_proposals
-
-
-if __name__ == "__main__":
-    pass

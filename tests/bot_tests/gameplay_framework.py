@@ -2,7 +2,7 @@ __authors__ = ["Sander Schulhoff", "Kartik Shenoy"]
 __email__ = "sanderschulhoff@gmail.com"
 
 import sys
-from typing import List
+from typing import List, Optional, Tuple, Type, Union
 
 from diplomacy import Game, Message, connect
 from diplomacy.utils.export import to_saved_game_format
@@ -19,8 +19,12 @@ class GamePlay:
     """
 
     def __init__(
-        self, game: Game, bots: List[BaselineBot], msg_rounds: int, save_json=False
-    ):
+        self,
+        game: Game,
+        bots: List[Union[BaselineBot, Type[BaselineBot]]],
+        msg_rounds: int,
+        save_json: bool = False,
+    ) -> None:
         assert len(bots) <= 7, "too many bots"
         # if no game is passed, assume bots is a list of bot classes to
         # be instantiated.
@@ -43,7 +47,7 @@ class GamePlay:
         self.cur_local_message_round = 0
         self.phase_init_bots()
 
-    def play(self):
+    def play(self) -> None:
         """play a game with the bots"""
 
         while not self.game.is_game_done:
@@ -52,14 +56,14 @@ class GamePlay:
         if self.save_json:
             to_saved_game_format(self.game, output_path="GamePlayFramework.json")
 
-    def phase_init_bots(self):
+    def phase_init_bots(self) -> None:
         self.cur_local_message_round = 0
         # reset bot round info
         for bot in self.bots:
-            if type(bot) == BaselineMsgRoundBot:
+            if isinstance(bot, BaselineMsgRoundBot):
                 bot.phase_init()
 
-    def step(self):
+    def step(self) -> Tuple[Optional[dict], bool]:
         """one step of messaging"""
 
         if self.game.is_game_done:

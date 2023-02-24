@@ -19,7 +19,11 @@ class DipnetBot(BaselineMsgRoundBot, ABC):
     """Abstract Base Class for dipnet derivative bots"""
 
     def __init__(
-        self, power_name: str, game: Game, total_msg_rounds=3, dipnet_type="slp"
+        self,
+        power_name: str,
+        game: Game,
+        total_msg_rounds: int = 3,
+        dipnet_type: str = "slp",
     ) -> None:
         super().__init__(power_name, game, total_msg_rounds)
         if dipnet_type == "slp":

@@ -1,6 +1,8 @@
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
+from typing import List
+
 from DAIDE import ALY, ORR, XDO, YES, ParseError
 from DAIDE.utils.exceptions import ParseError
 from diplomacy import Message
@@ -29,7 +31,7 @@ class LoyalBot(BaselineBot):
         # orders to be provided by allies
         self.orders = OrdersData()
 
-    def gen_messages(self, rcvd_messages):
+    def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
         # Return data initialization
         ret_obj = MessagesData()
 
@@ -66,5 +68,5 @@ class LoyalBot(BaselineBot):
 
         return ret_obj
 
-    def gen_orders(self):
+    def gen_orders(self) -> OrdersData:
         return self.orders

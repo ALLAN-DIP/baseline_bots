@@ -7,8 +7,14 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from diplomacy import Game, Message
+from typing_extensions import TypedDict
 
 from baseline_bots.utils import MessagesData, OrdersData, get_order_tokens
+
+
+class MessagesAndOrders(TypedDict):
+    messages: MessagesData
+    orders: OrdersData
 
 
 class BaselineBot(ABC):
@@ -32,7 +38,7 @@ class BaselineBot(ABC):
         """
         raise NotImplementedError()
 
-    def __call__(self, rcvd_messages: List[Message]) -> dict:
+    def __call__(self, rcvd_messages: List[Message]) -> MessagesAndOrders:
         """
         :return: dict containing messages and orders
         """
@@ -50,7 +56,7 @@ class BaselineMsgRoundBot(BaselineBot, ABC):
     orders
     """
 
-    def __init__(self, power_name: str, game: Game, total_msg_rounds=3) -> None:
+    def __init__(self, power_name: str, game: Game, total_msg_rounds: int = 3) -> None:
         """
         :param num_msg_rounds: the number of communication rounds the bot
         will go through

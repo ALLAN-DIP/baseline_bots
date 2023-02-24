@@ -25,7 +25,7 @@ class TransparentBot(DipnetBot):
     Send out some of them randomly
     """
 
-    def __init__(self, power_name, game, total_msg_rounds=3):
+    def __init__(self, power_name: str, game: Game, total_msg_rounds: int = 3):
         super().__init__(power_name, game, total_msg_rounds)
         self.orders_gossiped = set()
         self.my_orders_informed = False
@@ -96,7 +96,7 @@ class TransparentBot(DipnetBot):
         return self.orders.get_list_of_orders()
 
     @gen.coroutine
-    def __call__(self, rcvd_messages: List[Message]):
+    def __call__(self, rcvd_messages: List[Message]) -> dict:
         messages = yield from self.gen_messages(rcvd_messages)
         orders = yield from self.gen_orders()
         return {"messages": messages, "orders": orders}
