@@ -283,7 +283,7 @@ class SmartOrderAccepterBot(DipnetBot):
     async def log_stance_change(
         self, stance_log
     ) -> None:
-        for pw in list(game.get_map_power_names()):
+        for pw in list(self.game.get_map_power_names()):
             if pw == self.power_name:
                 continue
             log_data = self.game.new_log_data(body=stance_log[self.power_name][pw])
@@ -632,7 +632,7 @@ class SmartOrderAccepterBot(DipnetBot):
 
         elif self.stance_type == "S":
             self.stance.get_stance()
-            
+
         print(f"Stance vector for {self.power_name}")
         print(self.stance.stance[self.power_name])
 
