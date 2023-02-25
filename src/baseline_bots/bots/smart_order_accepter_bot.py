@@ -280,9 +280,7 @@ class SmartOrderAccepterBot(DipnetBot):
             )
             await self.send_message(sender, str(message), messages_data)
 
-    async def log_stance_change(
-        self, stance_log
-    ) -> None:
+    async def log_stance_change(self, stance_log) -> None:
         for pw in list(self.game.get_map_power_names()):
             if pw == self.power_name:
                 continue
