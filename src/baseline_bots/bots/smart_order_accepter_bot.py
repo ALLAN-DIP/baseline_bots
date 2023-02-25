@@ -177,7 +177,11 @@ class SmartOrderAccepterBot(DipnetBot):
             message=message,
             phase=self.game.get_current_phase(),
         )
-        msg_data.add_message(msg_obj.recipient, msg_obj.message)
+        message_already_exists = msg_data.add_message(
+            msg_obj.recipient, msg_obj.message, allow_duplicates=False
+        )
+        if message_already_exists:
+            return
         # Messages should not be sent in local games, only stored
         if isinstance(self.game, NetworkGame):
             await self.game.send_game_message(message=msg_obj)

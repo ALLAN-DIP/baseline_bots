@@ -8,6 +8,7 @@ __email__ = "sanderschulhoff@gmail.com"
 
 # from diplomacy_research.models.state_space import get_order_tokens
 from collections import defaultdict
+import collections.abc
 from copy import deepcopy
 import re
 from typing import Dict, List, Tuple, Union
@@ -322,15 +323,30 @@ def get_province_from_order(order):
         return order_tokens[0]
 
 
-class MessagesData:
+class MessagesData(collections.abc.Collection):
     def __init__(self):
         self.messages = []
 
-    def add_message(self, recipient: str, message: str):
-        self.messages.append({"recipient": recipient, "message": message})
+    def add_message(
+        self, recipient: str, message: str, allow_duplicates: bool = True
+    ) -> bool:
+        pair = {"recipient": recipient, "message": message}
+        message_already_exists = pair in self
+        if allow_duplicates or not message_already_exists:
+            self.messages.append(pair)
+        return message_already_exists
+
+    def __contains__(self, item):
+        return item in self.messages
 
     def __iter__(self):
         return iter(self.messages)
+
+    def __len__(self):
+        return len(self.messages)
+
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}({self.messages})"
 
 
 class OrdersData:
