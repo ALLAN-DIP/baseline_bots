@@ -1,6 +1,7 @@
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
+import asyncio
 from collections import defaultdict
 from enum import Enum
 import random
@@ -645,8 +646,19 @@ class SmartOrderAccepterBot(DipnetBot):
 
         print("debug: Fetched orders", orders)
 
-        # only in movement phase, we send PRP/ALY/FCT and consider get_best_proposer
-        if self.game.get_current_phase().endswith("M"):
+        for _ in range(3):
+            # only in movement phase, we send PRP/ALY/FCT and consider get_best_proposer
+            if not self.game.get_current_phase().endswith("M"):
+                break
+
+            # sleep randomly for 2-5s before retrieving new messages for the power
+            yield asyncio.sleep(random.uniform(2, 5))
+
+            rcvd_messages = self.game.filter_messages(
+                messages=self.game.messages, game_role=self.power_name
+            )
+            rcvd_messages = sorted(rcvd_messages.items())
+
             # parse the proposal messages received by the bot
             parsed_messages_dict = parse_proposal_messages(
                 rcvd_messages, self.game, self.power_name

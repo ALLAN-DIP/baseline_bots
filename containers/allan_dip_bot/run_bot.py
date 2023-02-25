@@ -196,8 +196,9 @@ async def play(
     print("Started playing")
     while not game.is_game_done:
         current_phase = game.get_current_phase()
-        if sleep_delay:
+        if sleep_delay and not isinstance(bot, SmartOrderAccepterBot):
             # sleep randomly for 2-5s before retrieving new messages for the power
+            # SOA bot handles sleeping itself, so it's skipped here
             await asyncio.sleep(random.uniform(2, 5))
 
         phase_start_time = time.time()
