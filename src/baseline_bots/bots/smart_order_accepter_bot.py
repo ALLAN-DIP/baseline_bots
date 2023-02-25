@@ -699,6 +699,8 @@ class SmartOrderAccepterBot(DipnetBot):
                 # filter out aggressive orders to allies
                 if int(self.game.get_current_phase()[1:5]) < 1909:
                     yield self.replace_aggressive_order_to_allies()
+            # Refresh local copy of orders to include replacements
+            orders_data = self.orders
 
             # generate messages for FCT sharing info orders
             msgs_data = yield self.gen_messages(
