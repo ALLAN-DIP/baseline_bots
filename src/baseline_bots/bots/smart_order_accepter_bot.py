@@ -634,21 +634,16 @@ class SmartOrderAccepterBot(DipnetBot):
         elif self.stance_type == "S":
             self.stance.get_stance()
 
-        print(f"Stance vector for {self.power_name}")
-        print(self.stance.stance[self.power_name])
-
         powers = self.stance.stance[self.power_name]
-
-        print("current stance: ", powers)
+        print(f"Stance vector for {self.power_name}: {powers}")
 
         # get dipnet order
         orders = yield from self.brain.get_orders(self.game, self.power_name)
         orders_data = OrdersData()
         orders_data.add_orders(orders)
+        print(f"Fetched orders: {orders}")
 
         msgs_data = MessagesData()
-
-        print("debug: Fetched orders", orders)
 
         for _ in range(3):
             # only in movement phase, we send PRP/ALY/FCT and consider get_best_proposer
