@@ -1,6 +1,7 @@
 __author__ = "Sander Schulhoff"
 __email__ = "sanderschulhoff@gmail.com"
 
+import asyncio
 from collections import defaultdict
 from enum import Enum
 import random
@@ -176,7 +177,11 @@ class SmartOrderAccepterBot(DipnetBot):
             message=message,
             phase=self.game.get_current_phase(),
         )
-        msg_data.add_message(msg_obj.recipient, msg_obj.message)
+        message_already_exists = msg_data.add_message(
+            msg_obj.recipient, msg_obj.message, allow_duplicates=False
+        )
+        if message_already_exists:
+            return
         # Messages should not be sent in local games, only stored
         if isinstance(self.game, NetworkGame):
             await self.game.send_game_message(message=msg_obj)
@@ -629,24 +634,30 @@ class SmartOrderAccepterBot(DipnetBot):
         elif self.stance_type == "S":
             self.stance.get_stance()
 
-        print(f"Stance vector for {self.power_name}")
-        print(self.stance.stance[self.power_name])
-
         powers = self.stance.stance[self.power_name]
-
-        print("current stance: ", powers)
+        print(f"Stance vector for {self.power_name}: {powers}")
 
         # get dipnet order
         orders = yield from self.brain.get_orders(self.game, self.power_name)
         orders_data = OrdersData()
         orders_data.add_orders(orders)
+        print(f"Fetched orders: {orders}")
 
         msgs_data = MessagesData()
 
-        print("debug: Fetched orders", orders)
+        for _ in range(3):
+            # only in movement phase, we send PRP/ALY/FCT and consider get_best_proposer
+            if not self.game.get_current_phase().endswith("M"):
+                break
 
-        # only in movement phase, we send PRP/ALY/FCT and consider get_best_proposer
-        if self.game.get_current_phase().endswith("M"):
+            # sleep randomly for 2-5s before retrieving new messages for the power
+            yield asyncio.sleep(random.uniform(2, 5))
+
+            rcvd_messages = self.game.filter_messages(
+                messages=self.game.messages, game_role=self.power_name
+            )
+            rcvd_messages = sorted(rcvd_messages.items())
+
             # parse the proposal messages received by the bot
             parsed_messages_dict = parse_proposal_messages(
                 rcvd_messages, self.game, self.power_name
@@ -699,6 +710,8 @@ class SmartOrderAccepterBot(DipnetBot):
                 # filter out aggressive orders to allies
                 if int(self.game.get_current_phase()[1:5]) < 1909:
                     yield self.replace_aggressive_order_to_allies()
+            # Refresh local copy of orders to include replacements
+            orders_data = self.orders
 
             # generate messages for FCT sharing info orders
             msgs_data = yield self.gen_messages(

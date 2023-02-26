@@ -97,14 +97,14 @@ async def launch(
     :param outdir: the output directory where game json files should be stored
     """
 
-    print("Waiting for tensorflow server to come online", end=" ")
+    print("Waiting for TensorFlow server to come online", end=" ")
     serving_flag = False
     while not serving_flag:
         serving_flag = is_port_opened(9501)
         print("", end=".")
         await asyncio.sleep(1)
     print()
-    print("Tensorflow server online")
+    print("TensorFlow server online")
 
     await play(
         hostname,
@@ -154,7 +154,7 @@ async def play(
     :param outdir: the output directory where game json files should be stored
     """
     # Connect to the game
-    print("DipNetSL joining game: " + game_id + " as " + power_name)
+    print(f"DipNetSL joining game: {game_id} as {power_name}")
     connection = await connect(hostname, port)
     channel = await connection.authenticate(
         f"allan_{bot_type.lower()}_{power_name}", "password"
@@ -196,9 +196,10 @@ async def play(
     print("Started playing")
     while not game.is_game_done:
         current_phase = game.get_current_phase()
-        if sleep_delay:
-            # sleep randomly for 1-3s before retrieving new messages for the power
-            await asyncio.sleep(random.random() * 90)
+        if sleep_delay and not isinstance(bot, SmartOrderAccepterBot):
+            # sleep randomly for 2-5s before retrieving new messages for the power
+            # SOA bot handles sleeping itself, so it's skipped here
+            await asyncio.sleep(random.uniform(2, 5))
 
         phase_start_time = time.time()
 
@@ -239,12 +240,12 @@ async def play(
                     power_name=power_name, orders=orders_data, wait=False
                 )
 
-            print("Phase: " + current_phase)
-            print("Orders: ")
-            print(orders_data)
+            print(f"Phase: {current_phase}")
+            print(f"Orders: {orders_data}")
+
         phase_end_time = time.time()
         print(
-            f"Time taken for phase {current_phase}: {phase_end_time - phase_start_time}s"
+            f"Time taken for phase {current_phase}: {phase_end_time - phase_start_time:0.4}s"
         )
 
         while current_phase == game.get_current_phase():
@@ -258,7 +259,7 @@ async def play(
                 file.write("\n")
 
     t2 = time.perf_counter()
-    print(f"TIMING: {t2-t1}:0.4")
+    print(f"TIMING: {t2-t1:0.4}")
     print("-" * 30 + "GAME COMPLETE" + "-" * 30)
 
 
