@@ -5,8 +5,6 @@ __email__ = "kartik.shenoyy@gmail.com"
 
 import argparse
 import asyncio
-import json as json
-from pathlib import Path
 import random
 import sys
 import time
@@ -17,7 +15,6 @@ sys.path.append("..")  # Adds higher directory to python modules path.
 
 from diplomacy import connect
 from diplomacy.client.network_game import NetworkGame
-from diplomacy.utils.export import to_saved_game_format
 from diplomacy_research.utils.cluster import is_port_opened
 
 from baseline_bots.bots.baseline_bot import BaselineBot
@@ -82,7 +79,6 @@ async def launch(
     conflict_support_coef: float,
     friendly_coef: float,
     unrealized_coef: float,
-    outdir: Optional[Path],
     aggressiveness: Optional[Aggressiveness] = Aggressiveness.moderate,
 ) -> None:
     """
@@ -94,7 +90,6 @@ async def launch(
     :param power_name: power name of the bot to be launched
     :param bot_type: the type of bot to be launched - NoPressDipBot/TransparentBot/SmartOrderAccepterBot/..
     :param sleep_delay: bool to indicate if bot should sleep randomly for 1-3s before execution
-    :param outdir: the output directory where game json files should be stored
     """
 
     print("Waiting for TensorFlow server to come online", end=" ")
@@ -120,7 +115,6 @@ async def launch(
         conflict_support_coef,
         friendly_coef,
         unrealized_coef,
-        outdir,
         aggressiveness,
     )
 
@@ -139,7 +133,6 @@ async def play(
     conflict_support_coef: float,
     friendly_coef: float,
     unrealized_coef: float,
-    outdir: Optional[Path],
     aggressiveness: Optional[Aggressiveness] = Aggressiveness.moderate,
 ) -> None:
     """
@@ -151,7 +144,6 @@ async def play(
     :param power_name: power name of the bot to be launched
     :param bot_type: the type of bot to be launched - NoPressDipBot/TransparentBot/SmartOrderAccepterBot/..
     :param sleep_delay: bool to indicate if bot should sleep randomly for 1-3s before execution
-    :param outdir: the output directory where game json files should be stored
     """
     # Connect to the game
     print(f"DipNetSL joining game: {game_id} as {power_name}")
@@ -251,13 +243,6 @@ async def play(
         while current_phase == game.get_current_phase():
             await asyncio.sleep(2)
 
-        if outdir:
-            with open(outdir / f"{power_name}_output.json", mode="w") as file:
-                json.dump(
-                    to_saved_game_format(game), file, ensure_ascii=False, indent=2
-                )
-                file.write("\n")
-
     t2 = time.perf_counter()
     print(f"TIMING: {t2-t1:0.4}")
     print("-" * 30 + "GAME COMPLETE" + "-" * 30)
@@ -344,9 +329,6 @@ def main() -> None:
         help="Stance on nation k += γ2 * count(k’s unrealized hostile moves) (default: %(default)s)",
     )
     parser.add_argument(
-        "--outdir", type=Path, help="output directory for game json to be stored"
-    )
-    parser.add_argument(
         "--aggressiveness",
         type=str,
         choices=[str(a.value) for a in Aggressiveness],
@@ -366,13 +348,9 @@ def main() -> None:
     conflict_support_coef: float = args.conflict_support_coef
     friendly_coef: float = args.friendly_coef
     unrealized_coef: float = args.unrealized_coef
-    outdir: Optional[Path] = args.outdir
     aggressiveness: Optional[Aggressiveness] = (
         Aggressiveness(args.aggressiveness) if args.aggressiveness else None
     )
-
-    if outdir is not None and not outdir.is_dir():
-        outdir.mkdir(parents=True, exist_ok=True)
 
     asyncio.run(
         launch(
@@ -389,7 +367,6 @@ def main() -> None:
             conflict_support_coef=conflict_support_coef,
             friendly_coef=friendly_coef,
             unrealized_coef=unrealized_coef,
-            outdir=outdir,
             aggressiveness=aggressiveness,
         )
     )

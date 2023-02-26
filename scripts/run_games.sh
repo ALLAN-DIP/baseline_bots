@@ -87,7 +87,14 @@ if [[ -z $GAME_ID ]]; then
   CUR_ISO_DATE=$(date -u +'%Y_%m_%d_%H_%M_%S')
   GAME_ID=${USER}_$CUR_ISO_DATE
 
+  echo 'Creating game with SHADE account "allanumd" with password "password"'
   python "$CREATE_GAME_SCRIPT" --game_id "$GAME_ID" --deadline 300 --host $HOST
+
+  DOWNLOAD_GAME_SCRIPT="$(dirname "$(readlink --canonicalize "$0")")"/download_game.py
+  if [[ -f $DOWNLOAD_GAME_SCRIPT ]]; then
+    echo 'Your game can be downloaded with the following command:'
+    echo -e "\tpython $DOWNLOAD_GAME_SCRIPT --game_id '$GAME_ID' --host '$HOST'"
+  fi
 fi
 
 LOG_DIR=logs/"$GAME_ID"

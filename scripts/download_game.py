@@ -1,68 +1,47 @@
 # SPDX-FileCopyrightText: 2022, Texas Advanced Computing Center
 # SPDX-License-Identifier: BSD-3-Clause
-"""Create Diplomacy games programmatically."""
+"""Downloads Diplomacy games programmatically."""
 # Based on https://github.com/SHADE-AI/diplomacy-playground/blob/989ec7be748257324a22132e632ac4927b8cb6c2/scripts/create_game.py
 import argparse
 import asyncio
 import json
-from typing import Optional, Sequence
+from pathlib import Path
+from typing import Optional
 
 from diplomacy.client.connection import connect
+from diplomacy.client.network_game import NetworkGame
+from diplomacy.utils.export import to_saved_game_format
 
-DEFAULT_RULES = ("REAL_TIME", "POWER_CHOICE")
 DEFAULT_USER = "allanumd"
 DEFAULT_PASSWORD = "password"
 
 
-async def create_game(
+async def download_game(
     game_id: str,
-    rules: Sequence[str] = DEFAULT_RULES,
-    deadline: int = 0,
-    n_controls: int = 7,
+    output_file: Path,
     user: str = DEFAULT_USER,
     password: str = DEFAULT_PASSWORD,
     game_password: Optional[str] = None,
     hostname: str = "localhost",
     port: int = 8432,
 ) -> None:
-    """Creates a game on the Diplomacy server"""
+    """Downloads a game from the Diplomacy server"""
     connection = await connect(hostname, port)
     channel = await connection.authenticate(user, password)
-
-    game = await channel.create_game(
-        game_id=game_id,
-        rules=rules,
-        deadline=deadline,
-        n_controls=n_controls,
-        registration_password=game_password,
+    game: NetworkGame = await channel.join_game(
+        game_id=game_id, power_name=None, registration_password=game_password
     )
 
-    game_data = {
-        "id": game.game_id,
-        "deadline": game.deadline,
-        "map_name": game.map_name,
-        "registration_password": game.registration_password,
-        "rules": game.rules,
-        "n_controls": n_controls,
-        "status": game.status,
-        "daide_port": game.daide_port,
-    }
-    print(json.dumps(game_data, ensure_ascii=False, indent=4))
+    with open(output_file, mode="w") as file:
+        json.dump(to_saved_game_format(game), file, ensure_ascii=False, indent=2)
+        file.write("\n")
+    print(f"Wrote game log to file {str(output_file)!r}")
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--game_id", type=str, required=True, help="Game ID.")
-    parser.add_argument("--rules", nargs="+", default=DEFAULT_RULES, help="Game rules.")
-    parser.add_argument(
-        "--deadline", type=int, default=0, help="Turn deadline in seconds."
-    )
-    parser.add_argument(
-        "--n_controls",
-        type=int,
-        default=7,
-        help="Number of controlled powers (default: %(default)s)",
-    )
+    parser.add_argument("--output_file", type=Path, help="Output file path.")
     parser.add_argument("--user", type=str, default=DEFAULT_USER, help="SHADE user.")
     parser.add_argument(
         "--password", type=str, default=DEFAULT_PASSWORD, help="SHADE password."
@@ -74,19 +53,18 @@ def main() -> None:
     parser.add_argument("--port", type=int, default=8432, help="Server port.")
     args = parser.parse_args()
 
-    if args.deadline < 0:
-        raise ValueError("--deadline cannot be negative")
-    if args.n_controls < 0:
-        raise ValueError("--n_controls cannot be negative")
-    if args.n_controls > 7:
-        raise ValueError("--n_controls cannot be greater than 7")
+    if args.output_file is None:
+        repository_dir = Path(__file__).resolve().parent.parent
+        output_file = repository_dir / "data" / f"{args.game_id}_log.json"
+    else:
+        output_file = args.output_file
+    if not output_file.parent.is_dir():
+        output_file.parent.mkdir(parents=True, exist_ok=True)
 
     asyncio.run(
-        create_game(
+        download_game(
             game_id=args.game_id,
-            rules=args.rules,
-            deadline=args.deadline,
-            n_controls=args.n_controls,
+            output_file=output_file,
             user=args.user,
             password=args.password,
             game_password=args.game_password,
