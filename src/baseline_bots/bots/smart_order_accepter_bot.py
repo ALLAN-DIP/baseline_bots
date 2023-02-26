@@ -280,6 +280,11 @@ class SmartOrderAccepterBot(DipnetBot):
             )
             await self.send_message(sender, str(message), messages_data)
 
+    async def log_stance_change(self, stance_log) -> None:
+        for pw in self.opponents:
+            log_data = self.game.new_log_data(body=stance_log[self.power_name][pw])
+            await self.game.send_log_data(log=log_data)
+
     async def respond_to_alliance_messages(self, messages_data: MessagesData) -> None:
         """
         Send YES confirmation messages to all alliance proposals
@@ -617,9 +622,13 @@ class SmartOrderAccepterBot(DipnetBot):
 
         # avoid get_stance in the first phase of game
         if self.game.get_current_phase() != "S1901M" and self.stance_type == "A":
-            self.stance.get_stance(self.game)
+            # update stance and send logs
+            _, stance_log = self.stance.get_stance(self.game, verbose=True)
+            yield self.log_stance_change(stance_log)
+
         elif self.stance_type == "S":
             self.stance.get_stance()
+
         print(f"Stance vector for {self.power_name}")
         print(self.stance.stance[self.power_name])
 
