@@ -4,6 +4,7 @@ __email__ = "sanderschulhoff@gmail.com"
 import asyncio
 from collections import defaultdict
 from enum import Enum
+import os
 import random
 from typing import Dict, List, Optional, Set, Tuple
 
@@ -28,6 +29,22 @@ from baseline_bots.utils import (
     get_order_tokens,
     smart_select_support_proposals,
 )
+
+if os.environ.get("DISABLE_ORR") is not None:
+    print("Disabling ORR usage")
+
+    def ORR(value):
+        return value[0]
+
+    def lst_to_daide(orders: List) -> str:
+        """
+        This function should take DAIDE orders as a list of strings and wrap them so: FCT ( ORR ( XDO(ORD1) XDO(ORD2) ) )
+        """
+        daide_ords = "FCT ("
+        if orders:
+            daide_ords += " XDO (" + orders[0] + ")"
+        daide_ords += ")"
+        return daide_ords
 
 
 class Aggressiveness(Enum):
@@ -186,6 +203,17 @@ class SmartOrderAccepterBot(DipnetBot):
         if isinstance(self.game, NetworkGame):
             await self.game.send_game_message(message=msg_obj)
 
+    async def send_intent_log(self, log_msg: str) -> None:
+        # Intent logging should not be sent in local games
+        if not isinstance(self.game, NetworkGame):
+            return
+        log_data = self.game.new_log_data(body=log_msg)
+        await self.game.send_log_data(log=log_data)
+
+    async def log_stance_change(self, stance_log) -> None:
+        for pw in self.opponents:
+            await self.send_intent_log(stance_log[self.power_name][pw])
+
     async def gen_pos_stance_messages(
         self, msgs_data: MessagesData, orders_list: List[str]
     ) -> None:
@@ -207,6 +235,12 @@ class SmartOrderAccepterBot(DipnetBot):
             )
             if str(orders_decided) != "FCT ()":
                 for pow in self.allies:
+                    # Only send one FCT per recipient per phase
+                    if any(
+                        msg["recipient"] == pow and msg["message"].startswith("FCT")
+                        for msg in msgs_data
+                    ):
+                        continue
                     if pow != self.power_name:
                         await self.send_message(pow, str(orders_decided), msgs_data)
 
@@ -284,11 +318,6 @@ class SmartOrderAccepterBot(DipnetBot):
                 )
             )
             await self.send_message(sender, str(message), messages_data)
-
-    async def log_stance_change(self, stance_log) -> None:
-        for pw in self.opponents:
-            log_data = self.game.new_log_data(body=stance_log[self.power_name][pw])
-            await self.game.send_log_data(log=log_data)
 
     async def respond_to_alliance_messages(self, messages_data: MessagesData) -> None:
         """
@@ -695,17 +724,16 @@ class SmartOrderAccepterBot(DipnetBot):
             orders_data.add_orders(best_orders, overwrite=True)
             self.orders = orders_data
 
-            # GLOBAL message and filter aggressive moves to allies are disabled in S1901M
+            # Intent message and filter aggressive moves to allies are disabled in S1901M
             if self.game.get_current_phase() != "S1901M":
                 msg_allies = ",".join(self.allies) if self.allies else "no one"
                 msg_foes = ",".join(self.foes) if self.foes else "no one"
                 msg_neutral = ",".join(self.neutral) if self.neutral else "no one"
-                yield self.send_message(
-                    "GLOBAL",
-                    f"{self.power_name}: From my stance vector perspective, I see {msg_allies} as my allies, "
-                    f"{msg_foes} as my foes and I am indifferent towards {msg_neutral}",
-                    msgs_data,
+                stance_message = (
+                    f"From my stance vector perspective, I see {msg_allies} as my allies, "
+                    f"{msg_foes} as my foes and I am indifferent towards {msg_neutral}"
                 )
+                yield self.send_intent_log(stance_message)
 
                 # filter out aggressive orders to allies
                 if int(self.game.get_current_phase()[1:5]) < 1909:
@@ -750,6 +778,12 @@ class SmartOrderAccepterBot(DipnetBot):
                     f">>> {self.power_name} Random Orders to {self.foes}", daide_orders
                 )
                 for foe in self.foes:
+                    # Only send one FCT per recipient per phase
+                    if any(
+                        msg["recipient"] == foe and msg["message"].startswith("FCT")
+                        for msg in msgs_data
+                    ):
+                        continue
                     yield self.send_message(foe, daide_orders, msgs_data)
             except Exception as e:
                 print("Raised Exception in order randomization code block")
