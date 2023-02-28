@@ -166,7 +166,8 @@ class SmartOrderAccepterBot(DipnetBot):
         self.opponents = sorted(
             power for power in game.get_map_power_names() if power != self.power_name
         )
-        self.alliances = defaultdict(list)
+        self.alliances_prps = defaultdict(list)
+        self.peace_prps = defaultdict(list)
         self.rollout_length = 1
         self.rollout_n_order = 10
         self.allies_influence = set()
@@ -174,6 +175,10 @@ class SmartOrderAccepterBot(DipnetBot):
         self.my_influence = set()
         self.ally_threshold = 1.0
         self.enemy_threshold = -0.5
+        self.accept_alliance_threshold = 5 * self.enemy_threshold
+        self.accept_peace_threshold = 5 * self.enemy_threshold
+        self.alliance_score = 2.5 * self.ally_threshold
+        self.peace_score = 0.5 + self.ally_threshold
         self.allies = []
         self.foes = []
         self.neutral = []
@@ -325,16 +330,83 @@ class SmartOrderAccepterBot(DipnetBot):
         :param messages_data: Message Data object to add messages
         """
         unique_senders = {}
-        for sender_message_tuple in self.alliances.values():
+        for sender_message_tuple in self.alliances_prps.values():
             for sender, message in sender_message_tuple:
                 unique_senders[sender] = message
+
+        power_stance = self.stance.stance[self.power_name]
         for sender, message in unique_senders.items():
             if sender == self.power_name:
                 continue
-            await self.send_message(sender, str(YES(message)), messages_data)
 
-        if self.alliances:
-            print(f"Alliances accepted: {dict(self.alliances)}")
+            # if the stance value is lower than accept_alliance_threshold (-2.5 by default)
+            # we will reject the alliance proposal
+            if power_stance[sender] <= self.accept_alliance_threshold:
+                await self.send_message(sender, str(REJ(message)), messages_data)
+                await self.send_intent_log(
+                    "I reject the alliance proposal from {} because my stance to {} is no greater than {}".format(
+                        sender, sender, self.accept_alliance_threshold
+                    )
+                )
+
+            # otherwise accept the alliance proposal and update stance to alliance_score (+2.5 by default)
+            else:
+                await self.send_intent_log(
+                    "I accept the alliance proposal from {} because my stance to {} is above {}".format(
+                        sender, sender, self.accept_alliance_threshold
+                    )
+                )
+                await self.send_intent_log(
+                    "My stance to {} becomes {} after accepting the alliance proposal.".format(
+                        sender, self.alliance_score
+                    )
+                )
+                self.stance.update_stance(self.power_name, sender, self.alliance_score)
+                await self.send_message(sender, str(YES(message)), messages_data)
+
+        self.update_allies_and_foes()
+
+    async def respond_to_peace_messages(self, messages_data: MessagesData) -> None:
+        """
+        Send YES confirmation messages to all alliance proposals
+        :param messages_data: Message Data object to add messages
+        """
+        unique_senders = {}
+        for sender_message_tuple in self.peace_prps.values():
+            for sender, message in sender_message_tuple:
+                unique_senders[sender] = message
+
+        power_stance = self.stance.stance[self.power_name]
+        for sender, message in unique_senders.items():
+            if sender == self.power_name:
+                continue
+
+            # if the stance value is lower than accept_peace_threshold (-2.5 by default)
+            # we will reject the peace proposal
+            if power_stance[sender] <= self.accept_peace_threshold:
+                await self.send_message(sender, str(REJ(message)), messages_data)
+                await self.send_intent_log(
+                    "I reject the peace proposal from {} because my stance to {} is no greater than {}".format(
+                        sender, sender, self.accept_peace_threshold
+                    )
+                )
+
+            # otherwise accept the peace proposal and update stance to peace_score (+1.5 by default)
+            else:
+                await self.send_intent_log(
+                    "I accept the peace proposal from {} because my stance to {} is above {}".format(
+                        sender, sender, self.accept_peace_threshold
+                    )
+                )
+                await self.send_intent_log(
+                    "My stance to {} becomes {} after accepting the peace proposal.".format(
+                        sender, self.peace_score
+                    )
+                )
+                self.stance.update_stance(self.power_name, sender, self.peace_score)
+                await self.send_message(sender, str(YES(message)), messages_data)
+
+        self.update_allies_and_foes()
 
     def is_support_for_selected_orders(self, support_order: str) -> bool:
         """
@@ -420,6 +492,22 @@ class SmartOrderAccepterBot(DipnetBot):
                 return True
 
         return False
+
+    def update_allies_and_foes(self) -> None:
+        power_stance = self.stance.stance[self.power_name]
+
+        self.allies = [
+            pow for pow in self.opponents if power_stance[pow] > self.ally_threshold
+        ]
+        self.foes = [
+            pow for pow in self.opponents if power_stance[pow] <= self.enemy_threshold
+        ]
+        assert self.enemy_threshold < self.ally_threshold
+        self.neutral = [
+            pow
+            for pow in self.opponents
+            if self.enemy_threshold < power_stance[pow] <= self.ally_threshold
+        ]
 
     def support_move(self, order: str) -> bool:
         """
@@ -663,8 +751,8 @@ class SmartOrderAccepterBot(DipnetBot):
         elif self.stance_type == "S":
             self.stance.get_stance()
 
-        powers = self.stance.stance[self.power_name]
-        print(f"Stance vector for {self.power_name}: {powers}")
+        power_stance = self.stance.stance[self.power_name]
+        print(f"Stance vector for {self.power_name}: {power_stance}")
 
         # get dipnet order
         orders = yield from self.brain.get_orders(self.game, self.power_name)
@@ -695,7 +783,7 @@ class SmartOrderAccepterBot(DipnetBot):
             invalid_proposal_orders = parsed_messages_dict["invalid_proposals"]
             shared_orders = parsed_messages_dict["shared_orders"]
             other_orders = parsed_messages_dict["other_orders"]
-            self.alliances = parsed_messages_dict["alliance_proposals"]
+            self.alliances_prps = parsed_messages_dict["alliance_proposals"]
 
             # include base order to prp_orders.
             # This is to avoid having double calculation for the best list of orders between (self-generated) base orders vs proposal orders
@@ -703,17 +791,7 @@ class SmartOrderAccepterBot(DipnetBot):
             # if there is any better proposal orders that has a state value more than ours, then do it. If not, just follow the base orders.
             valid_proposal_orders[self.power_name] = orders
 
-            self.allies = [
-                pow for pow in self.opponents if powers[pow] > self.ally_threshold
-            ]
-            self.foes = [
-                pow for pow in self.opponents if powers[pow] <= self.enemy_threshold
-            ]
-            self.neutral = [
-                pow
-                for pow in self.opponents
-                if self.enemy_threshold < powers[pow] <= self.ally_threshold
-            ]
+            self.update_allies_and_foes()
 
             best_proposer, best_orders = yield from get_best_orders(
                 self, valid_proposal_orders, shared_orders
@@ -745,6 +823,8 @@ class SmartOrderAccepterBot(DipnetBot):
             msgs_data = yield self.gen_messages(
                 orders_data.get_list_of_orders(), msgs_data
             )
+
+            # send ALY requests at the start of the game
             if self.game.phase == "SPRING 1901 MOVEMENT":
                 for pow in self.opponents:
                     vss = [country[:3] for country in self.opponents if country != pow]
@@ -755,9 +835,14 @@ class SmartOrderAccepterBot(DipnetBot):
                         msgs_data,
                     )
 
-            # send ALY requests at the start of the game
             yield self.respond_to_invalid_orders(invalid_proposal_orders, msgs_data)
+
+            # respond to to alliance message and update stance & allies
             yield self.respond_to_alliance_messages(msgs_data)
+
+            # respond to to peace message and update stance & allies
+            yield self.respond_to_peace_messages(msgs_data)
+
             # generate proposal response YES/NO to allies
             msgs_data = yield self.gen_proposal_reply(
                 best_proposer, valid_proposal_orders, msgs_data
@@ -769,6 +854,7 @@ class SmartOrderAccepterBot(DipnetBot):
             lst_rand = list(
                 map(lambda st: string_to_tuple(f"({st})"), lst_style_orders)
             )
+
             try:
                 randomized_orders = random_list_orders(lst_rand)
                 random_str_orders = list(map(tuple_to_string, randomized_orders))
@@ -785,6 +871,7 @@ class SmartOrderAccepterBot(DipnetBot):
                     ):
                         continue
                     yield self.send_message(foe, daide_orders, msgs_data)
+
             except Exception as e:
                 print("Raised Exception in order randomization code block")
                 print(e)

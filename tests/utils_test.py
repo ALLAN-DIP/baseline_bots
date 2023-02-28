@@ -177,6 +177,7 @@ class TestUtils:
                     "shared_orders": {},
                     "other_orders": {},
                     "alliance_proposals": {},
+                    "peace_proposals": {},
                 },
             ],
             [
@@ -204,6 +205,7 @@ class TestUtils:
                             ("AUSTRIA", "ALY (AUS RUS) VSS (FRA ENG ITA TUR GER)")
                         ],
                     },
+                    "peace_proposals": {},
                 },
             ],
             [
@@ -217,6 +219,7 @@ class TestUtils:
                     "shared_orders": {"RUSSIA": ["A SEV - RUM"]},
                     "other_orders": {"RUSSIA": ["A LVP H"]},
                     "alliance_proposals": {},
+                    "peace_proposals": {},
                 },
             ],
             [
@@ -242,6 +245,7 @@ class TestUtils:
                             ("RUSSIA", "ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)")
                         ],
                     },
+                    "peace_proposals": {},
                 },
             ],
             [
@@ -257,6 +261,7 @@ class TestUtils:
                     "shared_orders": {},
                     "other_orders": {},
                     "alliance_proposals": {},
+                    "peace_proposals": {},
                 },
             ],
         ]
