@@ -260,11 +260,11 @@ def random_support(order: Tuple) -> Tuple:
         # fmt: on
         chance_of_move = 0.5  # the chance of a support hold becoming a move is 50/50
         if adj_to_both and random.random() < chance_of_move:
-            return (order[0], "SUP", order[2], "MTO", random.choice(adj_to_both))
+            return (order[0], "SUP ", order[2], "MTO", random.choice(adj_to_both))
         else:
             return (
                 order[0],
-                tag,
+                tag + " ",
                 order[2],
             )  # returns the same support hold order if there is no value adjacent to both
     else:  # if it is supporting to move
@@ -276,7 +276,7 @@ def random_support(order: Tuple) -> Tuple:
         adj_to_both = [adjacency for adjacency in sup_adjacent if adjacency in rec_adjacent and adjacency != province and TYPES[adjacency]]
         # fmt: on
         if adj_to_both:
-            return (order[0], tag, order[2], "MTO", random.choice(adj_to_both))
+            return (order[0], tag + " ", order[2], "MTO", random.choice(adj_to_both))
         else:
             return order  # returns original order if no "trickier" option is found
 
