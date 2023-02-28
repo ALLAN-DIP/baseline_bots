@@ -6,7 +6,7 @@ from collections import defaultdict
 from enum import Enum
 import os
 import random
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 from DAIDE import FCT, HUH, ORR, PRP, REJ, XDO, YES
 from diplomacy import Game, Message
@@ -209,6 +209,7 @@ class SmartOrderAccepterBot(DipnetBot):
             await self.game.send_game_message(message=msg_obj)
 
     async def send_intent_log(self, log_msg: str) -> None:
+        print(f"Intent log: {log_msg!r}")
         # Intent logging should not be sent in local games
         if not isinstance(self.game, NetworkGame):
             return
@@ -248,6 +249,10 @@ class SmartOrderAccepterBot(DipnetBot):
                         continue
                     if pow != self.power_name:
                         await self.send_message(pow, str(orders_decided), msgs_data)
+                if self.allies:
+                    await self.send_intent_log(
+                        f"Shared information {str(orders_decided)!r} with allies {', '.join(self.allies)}"
+                    )
 
     async def gen_messages(
         self, orders_list: List[str], msgs_data: MessagesData
@@ -287,8 +292,14 @@ class SmartOrderAccepterBot(DipnetBot):
                 )
                 if proposer == best_proposer and proposer in self.allies:
                     msg = YES(prp_msg)
+                    await self.send_intent_log(
+                        f"Accepting proposal {str(prp_msg)!r} from {proposer} because they have the best proposal and are our ally"
+                    )
                 else:
                     msg = REJ(prp_msg)
+                    await self.send_intent_log(
+                        f"Rejecting proposal {str(prp_msg)!r} from {proposer} because they do not have the best proposal or are not our ally"
+                    )
                 await self.send_message(proposer, str(msg), messages)
         return messages
 
@@ -323,6 +334,9 @@ class SmartOrderAccepterBot(DipnetBot):
                 )
             )
             await self.send_message(sender, str(message), messages_data)
+        await self.send_intent_log(
+            f"Notifying {', '.join(sorted(invalid_proposal_orders))} that we cannot understand at least one of their messages"
+        )
 
     async def respond_to_alliance_messages(self, messages_data: MessagesData) -> None:
         """
@@ -616,6 +630,9 @@ class SmartOrderAccepterBot(DipnetBot):
                 )
                 final_messages[recipient] = str(suggested_proposals)
                 await self.send_message(recipient, str(suggested_proposals), comms_obj)
+                await self.send_intent_log(
+                    f"Sent support proposal {str(suggested_proposals)!r} to {recipient}"
+                )
 
         return final_messages
 
@@ -730,6 +747,9 @@ class SmartOrderAccepterBot(DipnetBot):
         for order in self.orders.get_list_of_orders():
             if self.is_order_aggressive_to_powers(order, ally):
                 new_order = yield from self.get_non_aggressive_order(order, ally)
+                yield self.send_intent_log(
+                    f"Replacing order {order!r} with {new_order!r} because we should not be aggressive to allies."
+                )
             else:
                 new_order = order
             final_orders.append(new_order)
@@ -752,13 +772,20 @@ class SmartOrderAccepterBot(DipnetBot):
             self.stance.get_stance()
 
         power_stance = self.stance.stance[self.power_name]
-        print(f"Stance vector for {self.power_name}: {power_stance}")
+        vector_display = (
+            "{"
+            + ", ".join(
+                f"{power}: {float(value):0.2}" for power, value in power_stance.items()
+            )
+            + "}"
+        )
+        print(f"Stance vector for {self.power_name}: {vector_display}")
 
         # get dipnet order
         orders = yield from self.brain.get_orders(self.game, self.power_name)
         orders_data = OrdersData()
         orders_data.add_orders(orders)
-        print(f"Fetched orders: {orders}")
+        yield self.send_intent_log(f"Initial orders (before communication): {orders}")
 
         msgs_data = MessagesData()
 
@@ -804,9 +831,18 @@ class SmartOrderAccepterBot(DipnetBot):
 
             # Intent message and filter aggressive moves to allies are disabled in S1901M
             if self.game.get_current_phase() != "S1901M":
-                msg_allies = ",".join(self.allies) if self.allies else "no one"
-                msg_foes = ",".join(self.foes) if self.foes else "no one"
-                msg_neutral = ",".join(self.neutral) if self.neutral else "no one"
+
+                def gen_relation_msg(powers: Sequence[str]) -> str:
+                    if powers:
+                        return ", ".join(
+                            f"{pow} ({float(power_stance[pow]):0.2})" for pow in powers
+                        )
+                    else:
+                        return "no one"
+
+                msg_allies = gen_relation_msg(self.allies)
+                msg_foes = gen_relation_msg(self.foes)
+                msg_neutral = gen_relation_msg(self.neutral)
                 stance_message = (
                     f"From my stance vector perspective, I see {msg_allies} as my allies, "
                     f"{msg_foes} as my foes and I am indifferent towards {msg_neutral}"
@@ -834,6 +870,9 @@ class SmartOrderAccepterBot(DipnetBot):
                         f"PRP (ALY ({self.power_name[:3]} {pow[:3]}) VSS ({vss_str}))",
                         msgs_data,
                     )
+                yield self.send_intent_log(
+                    f"Proposing alliances with {', '.join(self.opponents)}"
+                )
 
             yield self.respond_to_invalid_orders(invalid_proposal_orders, msgs_data)
 
@@ -854,15 +893,15 @@ class SmartOrderAccepterBot(DipnetBot):
             lst_rand = list(
                 map(lambda st: string_to_tuple(f"({st})"), lst_style_orders)
             )
-
+            yield self.send_intent_log(f"Using orders {dipnet_ords}")
             try:
                 randomized_orders = random_list_orders(lst_rand)
                 random_str_orders = list(map(tuple_to_string, randomized_orders))
                 daide_orders = lst_to_daide(random_str_orders)
-                print(f">>> {self.power_name} Actual Orders", dipnet_ords)
-                print(
-                    f">>> {self.power_name} Random Orders to {self.foes}", daide_orders
-                )
+                if self.foes:
+                    yield self.send_intent_log(
+                        f"Sending untruthful orders to foe(s)/victim(s) {', '.join(self.foes)}: {daide_orders}"
+                    )
                 for foe in self.foes:
                     # Only send one FCT per recipient per phase
                     if any(
