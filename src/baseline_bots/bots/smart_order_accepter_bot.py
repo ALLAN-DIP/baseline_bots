@@ -707,17 +707,16 @@ class SmartOrderAccepterBot(DipnetBot):
             orders_data.add_orders(best_orders, overwrite=True)
             self.orders = orders_data
 
-            # GLOBAL message and filter aggressive moves to allies are disabled in S1901M
+            # Intent message and filter aggressive moves to allies are disabled in S1901M
             if self.game.get_current_phase() != "S1901M":
                 msg_allies = ",".join(self.allies) if self.allies else "no one"
                 msg_foes = ",".join(self.foes) if self.foes else "no one"
                 msg_neutral = ",".join(self.neutral) if self.neutral else "no one"
-                yield self.send_message(
-                    "GLOBAL",
-                    f"{self.power_name}: From my stance vector perspective, I see {msg_allies} as my allies, "
-                    f"{msg_foes} as my foes and I am indifferent towards {msg_neutral}",
-                    msgs_data,
+                stance_message = (
+                    f"From my stance vector perspective, I see {msg_allies} as my allies, "
+                    f"{msg_foes} as my foes and I am indifferent towards {msg_neutral}"
                 )
+                yield self.send_intent_log(stance_message)
 
                 # filter out aggressive orders to allies
                 if int(self.game.get_current_phase()[1:5]) < 1909:
