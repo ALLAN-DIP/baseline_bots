@@ -209,6 +209,7 @@ class SmartOrderAccepterBot(DipnetBot):
             await self.game.send_game_message(message=msg_obj)
 
     async def send_intent_log(self, log_msg: str) -> None:
+        print(f"Intent log: {log_msg!r}")
         # Intent logging should not be sent in local games
         if not isinstance(self.game, NetworkGame):
             return
