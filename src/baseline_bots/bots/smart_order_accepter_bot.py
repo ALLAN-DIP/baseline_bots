@@ -186,6 +186,17 @@ class SmartOrderAccepterBot(DipnetBot):
         if isinstance(self.game, NetworkGame):
             await self.game.send_game_message(message=msg_obj)
 
+    async def send_intent_log(self, log_msg: str) -> None:
+        # Intent logging should not be sent in local games
+        if not isinstance(self.game, NetworkGame):
+            return
+        log_data = self.game.new_log_data(body=log_msg)
+        await self.game.send_log_data(log=log_data)
+
+    async def log_stance_change(self, stance_log) -> None:
+        for pw in self.opponents:
+            await self.send_intent_log(stance_log[self.power_name][pw])
+
     async def gen_pos_stance_messages(
         self, msgs_data: MessagesData, orders_list: List[str]
     ) -> None:
@@ -290,11 +301,6 @@ class SmartOrderAccepterBot(DipnetBot):
                 )
             )
             await self.send_message(sender, str(message), messages_data)
-
-    async def log_stance_change(self, stance_log) -> None:
-        for pw in self.opponents:
-            log_data = self.game.new_log_data(body=stance_log[self.power_name][pw])
-            await self.game.send_log_data(log=log_data)
 
     async def respond_to_alliance_messages(self, messages_data: MessagesData) -> None:
         """
