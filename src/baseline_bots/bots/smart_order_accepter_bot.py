@@ -4,6 +4,7 @@ __email__ = "sanderschulhoff@gmail.com"
 import asyncio
 from collections import defaultdict
 from enum import Enum
+import os
 import random
 from typing import Dict, List, Optional, Set, Tuple
 
@@ -28,6 +29,22 @@ from baseline_bots.utils import (
     get_order_tokens,
     smart_select_support_proposals,
 )
+
+if os.environ.get("DISABLE_ORR") is not None:
+    print("Disabling ORR usage")
+
+    def ORR(value):
+        return value[0]
+
+    def lst_to_daide(orders: List) -> str:
+        """
+        This function should take DAIDE orders as a list of strings and wrap them so: FCT ( ORR ( XDO(ORD1) XDO(ORD2) ) )
+        """
+        daide_ords = "FCT ("
+        if orders:
+            daide_ords += " XDO (" + orders[0] + ")"
+        daide_ords += ")"
+        return daide_ords
 
 
 class Aggressiveness(Enum):
