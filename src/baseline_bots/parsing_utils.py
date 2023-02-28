@@ -364,6 +364,7 @@ def parse_proposal_messages(
         shared orders (orders that the other power said it would execute),
         other orders (orders that the other power shared as gossip),
         alliance proposals
+        peace proposals
     """
     try:
         # Extract messages containing PRP string
@@ -379,6 +380,7 @@ def parse_proposal_messages(
         shared_orders = defaultdict(list)
         other_orders = defaultdict(list)
         alliance_proposals = defaultdict(list)
+        peace_proposals = defaultdict(list)
 
         for order_msg in order_msgs:
             try:
@@ -402,9 +404,14 @@ def parse_proposal_messages(
                         temp_message = daide_to_dipnet_parsing(order)
                         if temp_message:
                             proposals[order_msg.sender].append(temp_message)
+                    # from RY: I think this parsing is problematic though..
+                    # when we YES/REJ a ALY/PCE proposal we should do it as a whole..
                     elif order_type == "ALY":
                         for ally in parse_alliance_proposal(order, power_name):
                             alliance_proposals[ally].append((order_msg.sender, order))
+                    elif order_type == "PCE":
+                        for peace in parse_peace_proposal(order, power_name):
+                            peace_proposals[peace].append((order_msg.sender, order))
                     else:
                         other_orders[order_msg.sender].append(order)
             except Exception as e:
@@ -454,6 +461,7 @@ def parse_proposal_messages(
             "shared_orders": shared_orders,
             "other_orders": other_orders,
             "alliance_proposals": alliance_proposals,
+            "peace_proposals": peace_proposals,
         }
     except Exception as e:
         print(f"ALLAN: main error from parsing_utils.parse_proposal_messages()")
@@ -464,4 +472,5 @@ def parse_proposal_messages(
             "shared_orders": {},
             "other_orders": {},
             "alliance_proposals": {},
+            "peace_proposals": {},
         }

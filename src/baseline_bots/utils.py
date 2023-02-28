@@ -253,6 +253,39 @@ def parse_alliance_proposal(msg: str, recipient: str) -> List[str]:
         raise ParseError("A minimum of 2 powers are needed for an alliance")
 
 
+def parse_peace_proposal(msg: str, recipient: str) -> List[str]:
+    """
+    Parses an peace proposal
+    E.g. (assuming the receiving country is RUSSIA)
+    "PCE (GERMANY RUSSIA)" -> [GERMANY]
+    :param recipient: the power which has received the peace proposal
+    :return: list of allies in the proposal
+    """
+    recipient = recipient[:3]
+    groups = re.findall(r"\(([a-zA-Z\s]*)\)", msg)
+
+    if len(groups) != 1:
+        # raise ParseError("Found more than 1 groups")
+        peaces = []
+
+    # get proposed peaces
+    peaces = groups[0].split(" ")
+
+    if recipient not in peaces:
+        # raise ParseError("Recipient not in peaces")
+        peaces = []
+        return peaces
+
+    peaces.remove(recipient)
+
+    if peaces:
+        return [
+            POWER_NAMES_DICT[pea] if pea in POWER_NAMES_DICT else pea for pea in peaces
+        ]
+    else:
+        raise ParseError("A minimum of 2 powers are needed for PCE")
+
+
 def is_order_aggressive(order: str, sender: str, game: Game) -> bool:
     """
     Checks if this is an aggressive order
