@@ -207,6 +207,12 @@ class SmartOrderAccepterBot(DipnetBot):
             )
             if str(orders_decided) != "FCT ()":
                 for pow in self.allies:
+                    # Only send one FCT per recipient per phase
+                    if any(
+                        msg["recipient"] == pow and msg["message"].startswith("FCT")
+                        for msg in msgs_data
+                    ):
+                        continue
                     if pow != self.power_name:
                         await self.send_message(pow, str(orders_decided), msgs_data)
 
@@ -750,6 +756,12 @@ class SmartOrderAccepterBot(DipnetBot):
                     f">>> {self.power_name} Random Orders to {self.foes}", daide_orders
                 )
                 for foe in self.foes:
+                    # Only send one FCT per recipient per phase
+                    if any(
+                        msg["recipient"] == foe and msg["message"].startswith("FCT")
+                        for msg in msgs_data
+                    ):
+                        continue
                     yield self.send_message(foe, daide_orders, msgs_data)
             except Exception as e:
                 print("Raised Exception in order randomization code block")
