@@ -9,6 +9,7 @@ import random
 from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 from DAIDE import FCT, HUH, ORR, PRP, REJ, XDO, YES
+from daidepp import create_daide_grammar
 from diplomacy import Game, Message
 from diplomacy.client.network_game import NetworkGame
 from stance_vector import ActionBasedStance, ScoreBasedStance
@@ -182,6 +183,9 @@ class SmartOrderAccepterBot(DipnetBot):
         self.allies = []
         self.foes = []
         self.neutral = []
+        self.grammar_checker = create_daide_grammar(
+            level=130, allow_just_arrangement=True
+        )
 
     async def send_message(
         self, recipient: str, message: str, msg_data: MessagesData
@@ -204,6 +208,13 @@ class SmartOrderAccepterBot(DipnetBot):
         )
         if message_already_exists:
             return
+        try:
+            self.grammar_checker.parse(msg_obj.message)
+        except:
+            await self.send_intent_log(
+                "!! Sending a message with invalid DAIDE syntax: " + msg_obj.message
+            )
+
         # Messages should not be sent in local games, only stored
         if isinstance(self.game, NetworkGame):
             await self.game.send_game_message(message=msg_obj)

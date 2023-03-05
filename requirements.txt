@@ -1,4 +1,5 @@
 DAIDE @ git+https://git@github.com/ALLAN-DIP/DAIDE.git@34766b9bd609d28ea3d0bc4d56f0f798160ed215
+daidepp @ git+https://git@github.com/SHADE-AI/daidepp.git@aa27f3e4acae373e8646bdfe5e753cf5f368729f
 diplomacy @ git+https://git@github.com/SHADE-AI/diplomacy.git@614aa44d826eba3fbe3d96347d277668db45db2e
 gym==0.18.3
 karma_sphinx_theme==0.0.8
