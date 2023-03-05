@@ -822,6 +822,7 @@ class SmartOrderAccepterBot(DipnetBot):
             shared_orders = parsed_messages_dict["shared_orders"]
             other_orders = parsed_messages_dict["other_orders"]
             self.alliances_prps = parsed_messages_dict["alliance_proposals"]
+            self.peace_prps = parsed_messages_dict["peace_proposals"]
 
             # include base order to prp_orders.
             # This is to avoid having double calculation for the best list of orders between (self-generated) base orders vs proposal orders
