@@ -186,7 +186,7 @@ def parse_arrangement(msg: str, xdo_only=True) -> List[str]:
             :param part: part of the message representing an arrangement for 1 unit
             :return: the actual order after excluding XDO
             """
-            match_obj = re.search(r"(XDO|ALY|[A-Z]+)", part)
+            match_obj = re.search(r"(XDO|ALY|PCE|[A-Z]+)", part)
             start_in = part.find("(", match_obj.start())
             suborder_type = match_obj.group()
             parenthesis_cnt = 0
