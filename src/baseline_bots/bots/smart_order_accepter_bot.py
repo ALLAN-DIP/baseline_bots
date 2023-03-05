@@ -367,7 +367,7 @@ class SmartOrderAccepterBot(DipnetBot):
             # if the stance value is lower than accept_alliance_threshold (-2.5 by default)
             # we will reject the alliance proposal
             if power_stance[sender] <= self.accept_alliance_threshold:
-                await self.send_message(sender, str(REJ(message)), messages_data)
+                await self.send_message(sender, str(REJ(PRP(message))), messages_data)
                 await self.send_intent_log(
                     "I reject the alliance proposal from {} because my stance to {} is no greater than {}".format(
                         sender, sender, self.accept_alliance_threshold
@@ -387,7 +387,7 @@ class SmartOrderAccepterBot(DipnetBot):
                     )
                 )
                 self.stance.update_stance(self.power_name, sender, self.alliance_score)
-                await self.send_message(sender, str(YES(message)), messages_data)
+                await self.send_message(sender, str(YES(PRP(message))), messages_data)
 
         self.update_allies_and_foes()
 
@@ -409,7 +409,7 @@ class SmartOrderAccepterBot(DipnetBot):
             # if the stance value is lower than accept_peace_threshold (-2.5 by default)
             # we will reject the peace proposal
             if power_stance[sender] <= self.accept_peace_threshold:
-                await self.send_message(sender, str(REJ(message)), messages_data)
+                await self.send_message(sender, str(REJ(PRP(message))), messages_data)
                 await self.send_intent_log(
                     "I reject the peace proposal from {} because my stance to {} is no greater than {}".format(
                         sender, sender, self.accept_peace_threshold
@@ -429,7 +429,7 @@ class SmartOrderAccepterBot(DipnetBot):
                     )
                 )
                 self.stance.update_stance(self.power_name, sender, self.peace_score)
-                await self.send_message(sender, str(YES(message)), messages_data)
+                await self.send_message(sender, str(YES(PRP(message))), messages_data)
 
         self.update_allies_and_foes()
 
