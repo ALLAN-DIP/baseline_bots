@@ -800,13 +800,13 @@ class SmartOrderAccepterBot(DipnetBot):
 
         msgs_data = MessagesData()
 
-        for _ in range(3):
+        for _ in range(4):
             # only in movement phase, we send PRP/ALY/FCT and consider get_best_proposer
             if not self.game.get_current_phase().endswith("M"):
                 break
 
-            # sleep randomly for 2-5s before retrieving new messages for the power
-            yield asyncio.sleep(random.uniform(2, 5))
+            # sleep randomly for 10-15s before retrieving new messages for the power
+            yield asyncio.sleep(random.uniform(10, 15))
 
             rcvd_messages = self.game.filter_messages(
                 messages=self.game.messages, game_role=self.power_name
