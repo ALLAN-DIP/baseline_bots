@@ -1,0 +1,6 @@
+# Python files
+**/*.egg*
+**/__pycache__/
+
+# Project-specific files
+/docs/build/
