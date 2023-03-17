@@ -225,7 +225,7 @@ class TestUtils:
             [
                 "TURKEY",
                 {
-                    "RUSSIA": "PRP(XDO((TUR FLT ANK) MTO BLA) AND XDO((RUS AMY SEV) MTO RUM) AND (XDO((ENG AMY LVP) HLD)) AND (ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)) AND (ABC ((RUS AMY WAR) MTO PRU) ) )"
+                    "RUSSIA": "PRP(XDO((TUR FLT ANK) MTO BLA) AND XDO((RUS AMY SEV) MTO RUM) AND (XDO((ENG AMY LVP) HLD)) AND (ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)) AND (ABC ((RUS AMY WAR) MTO PRU) )  AND (PCE (TUR RUS) ))"
                 },
                 {
                     "valid_proposals": {"RUSSIA": ["F ANK - BLA"]},
@@ -245,7 +245,9 @@ class TestUtils:
                             ("RUSSIA", "ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)")
                         ],
                     },
-                    "peace_proposals": {},
+                    "peace_proposals": {
+                        "RUSSIA": [("RUSSIA", "PCE (TUR RUS)")],
+                    },
                 },
             ],
             [
