@@ -30,6 +30,21 @@ def dipnet_to_daide_parsing(
     :return: DAIDE style order string
     """
 
+    def replace_dipnet_loc(loc: str) -> str:
+        """
+        Replaces dipnet location with DAIDE location
+        E.g. BOT -> GOB
+             ENG -> ECH
+        """
+        if "BOT" in loc:
+            loc = loc.replace("BOT", "GOB")
+        if "ENG" in loc:
+            loc = loc.replace("ENG", "ECH")
+        if "LYO" in loc:
+            loc = loc.replace("LYO", "GOL")
+
+        return loc
+
     def expand_prov_coast(prov: str) -> str:
         """
         If `prov` is a coastal province, expand coastal province from dipnet to DAIDE format
@@ -43,6 +58,8 @@ def dipnet_to_daide_parsing(
             prov = prov.replace("/", " ")
             prov = prov + "S"
             prov = "(" + prov + ")"
+        prov = replace_dipnet_loc(prov)
+
         return prov
 
     def daidefy_suborder(dipnet_suborder: str) -> str:
