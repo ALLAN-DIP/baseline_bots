@@ -66,7 +66,7 @@ class TestUtils:
             ([("A PAR H", "ENG")], ["(ENG AMY PAR) HLD"], True),
             (["A PAR - MAR"], ["(FRA AMY PAR) MTO MAR"], False),
             (["A PAR R MAR"], ["(FRA AMY PAR) MTO MAR"], False),
-            (["F STP/SC - BOT"], ["(RUS FLT (STP SCS)) MTO BOT"], False),
+            (["F STP/SC - BOT"], ["(RUS FLT (STP SCS)) MTO GOB"], False),
             (["A CON - BUL"], ["(TUR AMY CON) MTO BUL"], False),
             (["F BLA - BUL/EC"], ["(TUR FLT BLA) MTO (BUL ECS)"], False),
             (["A BUD S F TRI"], ["(AUS AMY BUD) SUP (AUS FLT TRI)"], False),
@@ -112,9 +112,9 @@ class TestUtils:
                 tc_op,
             )
             comparison_tc_op = (
-                tc_ip[0].replace(" R ", " - ")
+                tc_ip[0].replace(" R ", " - ").replace("BOT", "GOB")
                 if type(tc_ip[0]) == str
-                else tc_ip[0][0].replace(" R ", " - ")
+                else tc_ip[0][0].replace(" R ", " - ").replace("BOT", "GOB")
             )
             assert daide_to_dipnet_parsing(tc_op[0])[0] == comparison_tc_op, (
                 daide_to_dipnet_parsing(tc_op[0]),
