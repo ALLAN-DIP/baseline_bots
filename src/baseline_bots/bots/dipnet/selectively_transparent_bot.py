@@ -1,6 +1,3 @@
-__authors__ = ["Sander Schulhoff"]
-__email__ = "sanderschulhoff@gmail.com"
-
 from collections import defaultdict
 import random
 

@@ -1,7 +1,3 @@
-__authors__ = "Wichayaporn Wongkamjan"
-__email__ = "w.wongkamjan@gmail.com"
-
-
 import random
 from typing import List
 

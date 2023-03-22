@@ -1,7 +1,5 @@
 """Abstract base classes for baseline bots"""
 
-__authors__ = ["Sander Schulhoff", "Kartik Shenoy"]
-__email__ = "sanderschulhoff@gmail.com"
 
 from abc import ABC, abstractmethod
 from typing import List

@@ -1,6 +1,3 @@
-__authors__ = ["Sander Schulhoff", "Kartik Shenoy"]
-__email__ = "sanderschulhoff@gmail.com"
-
 import random
 from typing import List
 
