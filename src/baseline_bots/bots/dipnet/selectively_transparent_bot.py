@@ -55,6 +55,5 @@ class SelectivelyTransparentBot(TransparentBot):
                     orr_arrangement = ORR(xdo_arrangements)
                     fct_arrangement = FCT(orr_arrangement)
                     message["message"] = str(fct_arrangement)
-                    # print(message["message"])
 
         return messages

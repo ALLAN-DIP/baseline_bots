@@ -54,8 +54,6 @@ class PushoverDipnet(DipnetBot):
 
         # parse may fail
         try:
-            # print(last_message.message)
-            # print(parse_arrangement(last_message.message))
             orders = get_non_aggressive_orders(
                 parse_arrangement(last_message.message), self.power_name, self.game
             )

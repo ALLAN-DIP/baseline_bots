@@ -4,7 +4,6 @@ It would be preferable to use a real DAIDE parser in prod
 """
 
 
-# from diplomacy_research.models.state_space import get_order_tokens
 from collections import defaultdict
 import collections.abc
 from copy import deepcopy
@@ -58,25 +57,6 @@ def AND(arrangements: List[str]) -> str:
     return "AND" + "".join([f" ({a})" for a in arrangements])
 
 
-# def ORR(arrangements: List[str]) -> str:
-#     """
-#     ORRs together an array of arrangements
-#     """
-
-#     if len(arrangements) < 2:
-#         return "".join([f"({a})" for a in arrangements])
-#         # raise Exception("Need at least 2 items to ORR")
-
-#     return "ORR" + "".join([f" ({a})" for a in arrangements])
-
-
-# def XDO(orders: List[str]) -> List[str]:
-#     """
-#     Adds XDO to each order in array
-#     """
-#     return [f"XDO ({order})" for order in orders]
-
-
 def get_other_powers(powers: List[str], game: Game):
     """
     :return: powers in the game other than those listed
@@ -103,16 +83,6 @@ def YES(string) -> str:
 def REJ(string) -> str:
     """Forms REJ message"""
     return f"REJ ({string})"
-
-
-# def FCT(string) -> str:
-#     """Forms FCT message"""
-#     return f"FCT ({string})"
-
-
-# def HUH(string) -> str:
-#     """Forms HUH message"""
-#     return f"HUH ({string})"
 
 
 def parse_FCT(msg) -> str:
@@ -157,9 +127,6 @@ def parse_arrangement(msg: str, xdo_only=True) -> List[str]:
             msg = msg[msg.find("(") :]
         elif "AND" in msg:
             msg = msg[msg.find("(") :]
-        # else:
-        #     # remove else since it is a bug to 'XDO (order)'
-        #     msg = msg[1:-1]
 
         # split the message at )( points
         parts = []
@@ -229,14 +196,12 @@ def parse_alliance_proposal(msg: str, recipient: str) -> List[str]:
     groups = re.findall(r"\(([a-zA-Z\s]*)\)", msg)
 
     if len(groups) != 2:
-        # raise ParseError("Found more than 2 groups")
         allies = []
 
     # get proposed allies
     allies = groups[0].split(" ")
 
     if recipient not in allies:
-        # raise ParseError("Recipient not in allies")
         allies = []
         return allies
 
@@ -263,14 +228,12 @@ def parse_peace_proposal(msg: str, recipient: str) -> List[str]:
     groups = re.findall(r"\(([a-zA-Z\s]*)\)", msg)
 
     if len(groups) != 1:
-        # raise ParseError("Found more than 1 groups")
         peaces = []
 
     # get proposed peaces
     peaces = groups[0].split(" ")
 
     if recipient not in peaces:
-        # raise ParseError("Recipient not in peaces")
         peaces = []
         return peaces
 
@@ -291,7 +254,6 @@ def is_order_aggressive(order: str, sender: str, game: Game) -> bool:
     NOTE: Adapted directly from Joy's code
     """
     order_token = get_order_tokens(order)
-    # print(order_token)
     if order_token[0][0] == "A" or order_token[0][0] == "F":
         # get location - add order_token[0] ('A' or 'F') at front to check if it collides with other powers' units
         order_unit = order_token[0][0] + order_token[1][1:]
@@ -308,41 +270,6 @@ def get_non_aggressive_orders(orders: List[str], sender: str, game: Game) -> Lis
     :return: all non aggressive orders in orders
     """
     return [order for order in orders if not is_order_aggressive(order, sender, game)]
-
-
-def is_move_order(order):
-    order_tokens = get_order_tokens(order)
-    if len(order_tokens) == 2 and order_tokens[1][0] == "-":
-        return True
-    else:
-        return False
-
-
-def is_support_order(order):
-    order_tokens = get_order_tokens(order)
-    if 3 <= len(order_tokens) <= 4 and order_tokens[1] == "S":
-        return True
-    else:
-        return False
-
-
-def is_cross_support(order, power, game):
-    if not is_support_order(order):
-        return False
-    order_tokens = get_order_tokens(order)
-    for power2 in game.powers:
-        if power != power2 and order_tokens[2] in game.powers[power2].units:
-            return True
-        else:
-            return False
-
-
-def is_convoyed_order(order):
-    order_tokens = get_order_tokens(order)
-    if len(order_tokens) == 3 and order_tokens[-1] == "VIA":
-        return True
-    else:
-        return False
 
 
 def get_province_from_order(order):

@@ -362,7 +362,6 @@ class TestSOABot(AsyncTestCase):
         )
         valid_proposal_orders = parsed_messages_dict["valid_proposals"]
 
-        # print('parsed_messages_dict ', parsed_messages_dict)
         possible_orders = game_play.game.get_all_possible_orders()
 
         soa_power_units = game_play.game.powers[soa_bot.power_name].units[:]

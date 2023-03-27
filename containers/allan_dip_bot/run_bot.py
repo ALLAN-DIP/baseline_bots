@@ -206,21 +206,6 @@ async def play(
             messages_data = ret_data["messages"]
             orders_data = ret_data["orders"]
 
-            # # If messages are to be sent, send them
-            # to_send_msgs = {}
-            # if messages_data and messages_data.messages:
-            #     to_send_msgs[bot.power_name] = messages_data.messages
-            #
-            # for sender in to_send_msgs:
-            #     for msg in to_send_msgs[sender]:
-            #         msg_obj = Message(
-            #             sender=sender,
-            #             recipient=msg["recipient"],
-            #             message=msg["message"],
-            #             phase=game.get_current_phase(),
-            #         )
-            #         await game.send_game_message(message=msg_obj)
-
             if len(messages_data.messages):
                 print(f"Messages sent: {len(messages_data.messages)}")
 

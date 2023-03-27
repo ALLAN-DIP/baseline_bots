@@ -73,36 +73,6 @@ def random_list_orders(orders: List) -> List:
         orders
     )  # this returns a list of tuples representing correspondences or an empty list
 
-    # if correspondences:
-    #     cor_orders = orders.copy()
-    #     replacements = (
-    #         []
-    #     )  # this represents the orders that the corresponding orders will get replaced with
-    #     for correspondence in correspondences:
-    #         for move in correspondence:
-    #             if move[1] == "CTO" or move[1] == "CVY":
-    #                 cor_orders.remove(move)  # the corresponding are removed
-    #                 replacements.append(
-    #                     random_hold((move[0], "HLD"))
-    #                 )  # the corresponding order is replaced with a HLD or MTO order
-    #             elif move[1] == "SUP":
-    #                 cor_orders.remove(move)  # the corresponding are removed
-    #                 if (move[2], move[3], move[4]) in cor_orders:
-    #                     cor_orders.remove((move[2], move[3], move[4]))
-    #                 if len(move) <= 3:  # if it is supporting a hold
-    #                     replacements.append((move[2], move[1], move[0]))
-    #                 else:  # if it is supporting a move
-    #                     replacements.append(
-    #                         (move[2], move[1], move[0], move[3], move[4])
-    #                     )
-    #                     replacements.append(((move[2], move[3], move[4])))
-
-    #     cor_orders = list(
-    #         map(lambda order: randomize(order), cor_orders)
-    #     )  # all the orders that don't correspond are randomized by themselves
-    #     cor_orders.extend(replacements)  # replacements are added back to the list
-    #     return cor_orders
-    # else:
     cor_orders = list(
         map(lambda order: randomize(order), orders)
     )  # if there are no correspondences, every order is randomized alone

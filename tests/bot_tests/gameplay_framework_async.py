@@ -107,6 +107,4 @@ def game_loop():
 
 
 if __name__ == "__main__":
-    # from utils import OrdersData, MessagesData, get_order_tokens
-
     start_io_loop(game_loop)

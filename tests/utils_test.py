@@ -283,8 +283,6 @@ class TestUtils:
                 )
             ).items()
             parsed_orders_dict = parse_proposal_messages(msgs, game_GTP, power_name)
-            # print(tc_ip)
-            # print(parsed_orders_dict)
 
             assert set(parsed_orders_dict.keys()) == set(tc_op.keys())
             for pod_key in parsed_orders_dict:

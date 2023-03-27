@@ -41,9 +41,7 @@ class PushoverBot(BaselineBot):
         if len(rcvd_messages) == 0:
             self.orders = ret_obj
             return {"orders": ret_obj, "messages": reply_obj}
-        # print(len(rcvd_messages))
         sorted_rcvd_messages = sort_messages_by_most_recent(rcvd_messages)
-        # print(sorted_rcvd_messages)
         last_message = sorted_rcvd_messages[0]
         while "FCT" in last_message.message:
             sorted_rcvd_messages.pop(0)
@@ -57,8 +55,6 @@ class PushoverBot(BaselineBot):
 
         # parse may fail
         try:
-            # print(last_message.message)
-            # print(parse_arrangement(last_message.message))
             orders = get_non_aggressive_orders(
                 parse_arrangement(last_message.message), self.power_name, self.game
             )
