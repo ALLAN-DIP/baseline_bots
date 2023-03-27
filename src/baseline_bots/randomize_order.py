@@ -441,7 +441,7 @@ def string_to_tuple(orders: str) -> Tuple:
     return eval(with_quotes)
 
 
-def lst_to_daide(orders: List) -> str:
+def lst_to_daide(orders: List[str]) -> str:
     """
     This function should take DAIDE orders as a list of strings and wrap them so: FCT ( ORR ( XDO(ORD1) XDO(ORD2) ) )
     """

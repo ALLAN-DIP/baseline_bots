@@ -1,5 +1,8 @@
+from typing import List, Optional
+
 import DAIDE
 from DAIDE import ParseError
+from diplomacy import Game, Message
 from tornado import gen
 
 DAIDE.config.ORDERS_DAIDE = False
@@ -8,6 +11,7 @@ from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.utils import (
     REJ,
     YES,
+    MessagesAndOrders,
     MessagesData,
     OrdersData,
     get_non_aggressive_orders,
@@ -22,18 +26,20 @@ class PushoverBot(BaselineBot):
     NOTE: only executes non-aggressive action
     """
 
-    def __init__(self, power_name, game) -> None:
+    orders: Optional[OrdersData]
+
+    def __init__(self, power_name: str, game: Game) -> None:
         super().__init__(power_name, game)
         self.orders = None
 
-    def gen_messages(self, _):
+    def gen_messages(self, _) -> None:
         # Return data initialization
         return None
 
-    def gen_orders(self):
+    def gen_orders(self) -> List[str]:
         return self.orders.get_list_of_orders()
 
-    def __call__(self, rcvd_messages):
+    def __call__(self, rcvd_messages: List[Message]) -> MessagesAndOrders:
         ret_obj = OrdersData()
         reply_obj = MessagesData()
 
@@ -81,13 +87,13 @@ class PushoverBot_AsyncBot(PushoverBot):
     """Wrapper to PushoverBot with tornado decorators for async calls"""
 
     @gen.coroutine
-    def gen_messages(self, rcvd_messages):
+    def gen_messages(self, rcvd_messages: List[Message]) -> None:
         return super().gen_messages(rcvd_messages)
 
     @gen.coroutine
-    def gen_orders(self):
+    def gen_orders(self) -> List[str]:
         return super().gen_orders()
 
     @gen.coroutine
-    def __call__(self, rcvd_messages):
+    def __call__(self, rcvd_messages: List[Message]) -> MessagesAndOrders:
         return super().__call__(rcvd_messages)

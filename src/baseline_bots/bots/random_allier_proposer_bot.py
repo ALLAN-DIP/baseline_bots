@@ -1,4 +1,7 @@
+from typing import Dict, List
+
 from DAIDE import ALY, PRP
+from diplomacy import Game, Message
 
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
 from baseline_bots.utils import MessagesData, get_other_powers
@@ -11,11 +14,13 @@ class RandomAllierProposerBot(RandomProposerBot):
     other bots.
     """
 
-    def __init__(self, power_name, game) -> None:
+    alliance_props_sent: bool
+
+    def __init__(self, power_name: str, game: Game) -> None:
         super().__init__(power_name, game)
         self.alliance_props_sent = False
 
-    def gen_messages(self, rcvd_messages):
+    def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
         ret_msgs = MessagesData()
         if self.alliance_props_sent:
             # send random action proposals
@@ -36,9 +41,9 @@ class RandomAllierProposerBot(RandomProposerBot):
 
         return ret_msgs
 
-    def gen_orders(self):
+    def gen_orders(self) -> None:
         return None
 
-    def __call__(self, rcvd_messages):
+    def __call__(self, rcvd_messages: List[Message]) -> Dict[str, MessagesData]:
         messages = self.gen_messages(rcvd_messages)
         return {"messages": messages}

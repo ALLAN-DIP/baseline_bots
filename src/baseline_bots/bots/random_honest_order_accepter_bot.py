@@ -1,9 +1,12 @@
 import random
+from typing import List
 
 from DAIDE import ORR, XDO, YES
+from diplomacy import Game, Message
 
 from baseline_bots.bots.baseline_bot import BaselineMsgRoundBot
 from baseline_bots.utils import (
+    MessagesAndOrders,
     MessagesData,
     OrdersData,
     get_non_aggressive_orders,
@@ -20,22 +23,24 @@ class RandomHonestOrderAccepterBot(BaselineMsgRoundBot):
     NOTE: Only selects/sends messages on the last communication round
     """
 
-    def __init__(self, power_name, game) -> None:
+    messages: MessagesData
+
+    def __init__(self, power_name: str, game: Game) -> None:
         super().__init__(power_name, game)
 
-    def phase_init(self):
+    def phase_init(self) -> None:
         super().phase_init()
         self.cur_msg_round = 0
         self.messages = MessagesData()
         self.orders = OrdersData()
 
-    def gen_messages(self, rcvd_messages):
+    def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
         return self.messages
 
-    def gen_orders(self):
+    def gen_orders(self) -> OrdersData:
         return self.orders
 
-    def __call__(self, rcvd_messages):
+    def __call__(self, rcvd_messages: List[Message]) -> MessagesAndOrders:
         self.cur_msg_round += 1
         # only generate messages/orders on final message round
         if self.cur_msg_round == self.total_msg_rounds:

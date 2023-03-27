@@ -1,5 +1,7 @@
+from typing import List
+
 from DAIDE import ParseError
-from diplomacy import Game
+from diplomacy import Game, Message
 from tornado import gen
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
@@ -24,7 +26,7 @@ class PushoverDipnet(DipnetBot):
         super().__init__(power_name, game, total_msg_rounds)
 
     @gen.coroutine
-    def gen_messages(self, rcvd_messages):
+    def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
         self.orders = OrdersData()
         reply_obj = MessagesData()
 
@@ -68,5 +70,5 @@ class PushoverDipnet(DipnetBot):
         return reply_obj
 
     @gen.coroutine
-    def gen_orders(self):
+    def gen_orders(self) -> List[str]:
         return self.orders.get_list_of_orders()

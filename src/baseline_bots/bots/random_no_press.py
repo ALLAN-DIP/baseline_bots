@@ -1,5 +1,7 @@
 import random
+from typing import List
 
+from diplomacy import Game, Message
 from tornado import gen
 
 from baseline_bots.bots.baseline_bot import BaselineBot
@@ -11,14 +13,16 @@ class RandomNoPressBot(BaselineBot):
     Just execute random orders.
     """
 
-    def __init__(self, power_name, game) -> None:
+    orders: OrdersData
+
+    def __init__(self, power_name: str, game: Game) -> None:
         super().__init__(power_name, game)
         self.orders = OrdersData()
 
-    def gen_messages(self, rcvd_messages):
+    def gen_messages(self, rcvd_messages: List[Message]) -> None:
         return None
 
-    def gen_orders(self):
+    def gen_orders(self) -> List[str]:
         self.orders = OrdersData()
         possible_orders = self.game.get_all_possible_orders()
 
@@ -37,9 +41,9 @@ class RandomNoPress_AsyncBot(RandomNoPressBot):
     """Wrapper to RandomNoPressBot with tornado decorators for async calls"""
 
     @gen.coroutine
-    def gen_messages(self, rcvd_messages):
+    def gen_messages(self, rcvd_messages: List[Message]) -> None:
         return super().gen_messages(rcvd_messages)
 
     @gen.coroutine
-    def gen_orders(self):
+    def gen_orders(self) -> List[str]:
         return super().gen_orders()
