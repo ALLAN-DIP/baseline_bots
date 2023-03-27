@@ -1,8 +1,7 @@
 from DAIDE import ALY, PRP
-from diplomacy import Message
 
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
-from baseline_bots.utils import MessagesData, OrdersData, get_other_powers
+from baseline_bots.utils import MessagesData, get_other_powers
 
 
 class RandomAllierProposerBot(RandomProposerBot):

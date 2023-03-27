@@ -1,9 +1,5 @@
-import random
-from typing import List
-
-from DAIDE import FCT, ORR, XDO, ParseError
-from diplomacy import Game, Message
-from diplomacy_research.players.benchmark_player import DipNetRLPlayer
+from DAIDE import ParseError
+from diplomacy import Game
 from tornado import gen
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
@@ -13,10 +9,7 @@ from baseline_bots.utils import (
     MessagesData,
     OrdersData,
     get_non_aggressive_orders,
-    get_order_tokens,
-    get_other_powers,
     parse_arrangement,
-    parse_FCT,
     sort_messages_by_most_recent,
 )
 

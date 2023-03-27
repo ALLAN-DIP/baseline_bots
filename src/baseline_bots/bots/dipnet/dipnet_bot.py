@@ -2,15 +2,13 @@
 
 
 from abc import ABC, abstractmethod
-import random
-import sys
 from typing import List
 
 from diplomacy import Game, Message
 from diplomacy_research.players.benchmark_player import DipNetRLPlayer, DipNetSLPlayer
 
 from baseline_bots.bots.baseline_bot import BaselineMsgRoundBot
-from baseline_bots.utils import MessagesData, OrdersData, get_order_tokens
+from baseline_bots.utils import MessagesData, OrdersData
 
 
 class DipnetBot(BaselineMsgRoundBot, ABC):

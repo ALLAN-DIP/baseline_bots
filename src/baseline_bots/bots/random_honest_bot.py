@@ -1,7 +1,6 @@
 import random
 
 from DAIDE import FCT
-from diplomacy import Message
 
 from baseline_bots.bots.baseline_bot import BaselineMsgRoundBot
 from baseline_bots.utils import MessagesData, OrdersData

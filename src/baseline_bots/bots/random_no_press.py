@@ -1,11 +1,9 @@
 import random
-from time import time
 
-from diplomacy import Message
 from tornado import gen
 
 from baseline_bots.bots.baseline_bot import BaselineBot
-from baseline_bots.utils import OrdersData, get_other_powers
+from baseline_bots.utils import OrdersData
 
 
 class RandomNoPressBot(BaselineBot):

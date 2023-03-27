@@ -1,6 +1,5 @@
 import DAIDE
-from DAIDE import ALY, ORR, XDO, ParseError
-from diplomacy import Message
+from DAIDE import ParseError
 from tornado import gen
 
 DAIDE.config.ORDERS_DAIDE = False

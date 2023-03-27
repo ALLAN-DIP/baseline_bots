@@ -1,6 +1,5 @@
-from DAIDE import ALY, ORR, XDO, YES, ParseError
+from DAIDE import ALY, YES
 from DAIDE.utils.exceptions import ParseError
-from diplomacy import Message
 
 from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.utils import (

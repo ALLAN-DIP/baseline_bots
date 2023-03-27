@@ -8,9 +8,8 @@ from collections import defaultdict
 import collections.abc
 from copy import deepcopy
 import re
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple
 
-from DAIDE import ALY, FCT, HUH, ORR, PRP, XDO
 from DAIDE.utils.exceptions import ParseError
 from diplomacy import Game, Message
 from diplomacy.utils import strings

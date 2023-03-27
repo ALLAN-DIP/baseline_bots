@@ -1,11 +1,10 @@
-import random
 from typing import List
 
-from diplomacy import Game, Message
+from diplomacy import Message
 from tornado import gen
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
-from baseline_bots.utils import MessagesData, OrdersData, get_order_tokens
+from baseline_bots.utils import MessagesData, OrdersData
 
 
 class NoPressDipBot(DipnetBot):

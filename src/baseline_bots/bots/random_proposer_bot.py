@@ -1,15 +1,11 @@
 import random
 
-from DAIDE import FCT, HUH, ORR, PRP, XDO, YES
+from DAIDE import ORR, PRP, XDO
 from diplomacy import Message
 from tornado import gen
 
 from baseline_bots.bots.baseline_bot import BaselineBot
-from baseline_bots.parsing_utils import (
-    daide_to_dipnet_parsing,
-    dipnet_to_daide_parsing,
-    parse_proposal_messages,
-)
+from baseline_bots.parsing_utils import dipnet_to_daide_parsing
 from baseline_bots.utils import MessagesData, OrdersData, get_other_powers
 
 

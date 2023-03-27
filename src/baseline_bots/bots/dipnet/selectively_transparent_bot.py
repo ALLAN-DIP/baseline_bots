@@ -1,16 +1,7 @@
-from collections import defaultdict
-import random
-
 from DAIDE import config
 
 from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
-from baseline_bots.utils import (
-    MessagesData,
-    get_other_powers,
-    is_order_aggressive,
-    parse_arrangement,
-    parse_FCT,
-)
+from baseline_bots.utils import is_order_aggressive
 
 config.ORDERS_DAIDE = False
 from DAIDE import FCT, ORR, XDO, Order, parse

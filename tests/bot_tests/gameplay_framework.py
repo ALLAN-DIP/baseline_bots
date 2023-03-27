@@ -1,9 +1,8 @@
 import sys
 from typing import List
 
-from diplomacy import Game, Message, connect
+from diplomacy import Game, Message
 from diplomacy.utils.export import to_saved_game_format
-from tornado import gen
 
 from baseline_bots.bots.baseline_bot import BaselineBot, BaselineMsgRoundBot
 

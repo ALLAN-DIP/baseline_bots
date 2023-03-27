@@ -6,7 +6,7 @@ from typing import List
 
 from diplomacy import Game, Message
 
-from baseline_bots.utils import MessagesData, OrdersData, get_order_tokens
+from baseline_bots.utils import MessagesData, OrdersData
 
 
 class BaselineBot(ABC):

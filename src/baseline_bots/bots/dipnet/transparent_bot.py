@@ -1,9 +1,7 @@
-from collections import defaultdict
-import random
 from typing import List
 
 from DAIDE import FCT, ORR, XDO
-from diplomacy import Game, Message
+from diplomacy import Message
 from tornado import gen
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
