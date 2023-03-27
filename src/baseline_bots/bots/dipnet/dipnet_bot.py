@@ -37,6 +37,6 @@ class DipnetBot(BaselineMsgRoundBot, ABC):
 
     def gen_orders(self) -> OrdersData:
         """finalizes moves"""
-        self.orders = self.player.get_orders(self.game, self.power_name)
+        self.orders = self.brain.get_orders(self.game, self.power_name)
         print(self.orders)
         return self.orders
