@@ -55,7 +55,7 @@ RUN pip install --no-cache-dir -r research/requirements.txt
 RUN mkdir -p /model/src/model_server/baseline_bots/src
 WORKDIR /model/src/model_server/baseline_bots
 COPY README.md pyproject.toml requirements.txt setup.cfg setup.py /model/src/model_server/baseline_bots/
-RUN pip install --no-cache-dir -r requirements.txt -e .
+RUN pip install --no-cache-dir -e .
 
 # Copy baseline_bots code into the Docker image
 COPY src/ /model/src/model_server/baseline_bots/src/

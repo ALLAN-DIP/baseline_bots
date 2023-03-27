@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=62.6"] # Minimum version required to use `file:` with `install_requires`
 build-backend = "setuptools.build_meta"
 
 [tool.black]
