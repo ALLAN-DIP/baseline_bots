@@ -1,7 +1,5 @@
 """ALLAN-DIP: Team ALLAN's Diplomacy Agent"""
 
-__author__ = "Kartik Shenoy"
-__email__ = "kartik.shenoyy@gmail.com"
 
 import argparse
 import asyncio

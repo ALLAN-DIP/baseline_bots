@@ -1,6 +1,3 @@
-__author__ = "Sander Schulhoff"
-__email__ = "sanderschulhoff@gmail.com"
-
 from DAIDE import ALY, PRP
 from diplomacy import Message
 

@@ -1,6 +1,3 @@
-__author__ = "Sander Schulhoff"
-__email__ = "sanderschulhoff@gmail.com"
-
 import random
 
 from DAIDE import FCT, HUH, ORR, PRP, XDO, YES

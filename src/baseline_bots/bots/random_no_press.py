@@ -1,6 +1,3 @@
-__author__ = "Kartik Shenoy"
-__email__ = "kartik.shenoyy@gmail.com"
-
 import random
 from time import time
 

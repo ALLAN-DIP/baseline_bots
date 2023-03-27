@@ -1,6 +1,3 @@
-__author__ = "Sander Schulhoff"
-__email__ = "sanderschulhoff@gmail.com"
-
 from DAIDE import ALY, ORR, XDO, YES, ParseError
 from DAIDE.utils.exceptions import ParseError
 from diplomacy import Message

@@ -3,8 +3,6 @@ Some functions that generate randomized orders from
 an already existing order / list of orders.
 """
 
-__author__ = "Konstantine Kahadze"
-__email__ = "konstantinekahadze@gmail.com"
 
 import random
 import re

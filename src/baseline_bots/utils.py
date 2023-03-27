@@ -3,8 +3,6 @@ Some quickly built utils mostly for DAIDE stuff
 It would be preferable to use a real DAIDE parser in prod
 """
 
-__author__ = "Sander Schulhoff"
-__email__ = "sanderschulhoff@gmail.com"
 
 # from diplomacy_research.models.state_space import get_order_tokens
 from collections import defaultdict
