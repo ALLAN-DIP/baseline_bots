@@ -1,7 +1,6 @@
 """unit tests for bots"""
 from gameplay_framework import GamePlay
 
-from baseline_bots.bots.dipnet.RealPolitik import RealPolitik
 from baseline_bots.bots.loyal_bot import LoyalBot
 from baseline_bots.bots.pushover_bot import PushoverBot
 from baseline_bots.bots.random_allier_proposer_bot import RandomAllierProposerBot
@@ -18,8 +17,6 @@ class TestRPBot:
         actions, done = game_play.step()
         game_play = GamePlay(None, [LoyalBot, RandomProposerBot], 3)
         game_play.play()
-        # game_play = GamePlay(None, [RealPolitik, RandomProposerBot], 3)
-        # game_play.play()
 
         game_play = GamePlay(None, [PushoverBot, RandomProposerBot], 3)
         game_play.play()
