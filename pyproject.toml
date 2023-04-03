@@ -18,3 +18,9 @@ ignore-words-list = "ans,hel,opps,ser,vie"  # "HEL", "SER", and "VIE" are from D
 quiet-level = 0 # Display all warnings
 check-filenames = ""
 check-hidden = ""
+
+[tool.pytest.ini_options]
+addopts = "--verbosity=2"
+filterwarnings = [
+  "ignore::DeprecationWarning",
+]
