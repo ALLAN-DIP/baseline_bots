@@ -33,13 +33,13 @@ if TYPE_CHECKING:
 
 
 POWER_NAMES_DICT = {
-    "RUS": "RUSSIA",
     "AUS": "AUSTRIA",
-    "ITA": "ITALY",
     "ENG": "ENGLAND",
     "FRA": "FRANCE",
-    "TUR": "TURKEY",
     "GER": "GERMANY",
+    "ITA": "ITALY",
+    "RUS": "RUSSIA",
+    "TUR": "TURKEY",
 }
 
 MAX_DAIDE_LEVEL = get_args(DAIDELevel)[-1]
@@ -118,8 +118,8 @@ def get_order_tokens(order: str) -> List[str]:
     buffer, order_tokens = [], []
     for word in order.replace(" R ", " - ").split():
         buffer += [word]
-        if word not in ["A", "F", "-"]:
-            order_tokens += [" ".join(buffer)]
+        if word not in {"A", "F", "-"}:
+            order_tokens.append(" ".join(buffer))
             buffer = []
     return order_tokens
 
@@ -206,14 +206,13 @@ def is_order_aggressive(order: str, sender: str, game: Game) -> bool:
     NOTE: Adapted directly from Joy's code
     """
     order_token = get_order_tokens(order)
-    if order_token[0][0] == "A" or order_token[0][0] == "F":
+    if order_token[0].startswith("A") or order_token[0].startswith("F"):
         # get location - add order_token[0] ('A' or 'F') at front to check if it collides with other powers' units
         order_unit = order_token[0][0] + order_token[1][1:]
         # check if loc has some units of other powers on
         for power in game.powers:
-            if sender != power:
-                if order_unit in game.powers[power].units:
-                    return True
+            if sender != power and order_unit in game.powers[power].units:
+                return True
     return False
 
 
@@ -274,9 +273,8 @@ class OrdersData:
 
         if overwrite:
             self.orders[province] = order
-        else:
-            if province not in self.orders:
-                self.orders[province] = order
+        elif province not in self.orders:
+            self.orders[province] = order
 
     def add_orders(self, orders: List[str], overwrite: bool = True) -> None:
         """
@@ -324,6 +322,8 @@ def get_state_value(
                     orders = yield bot.brain.get_orders(game, power)
             elif option == "default":
                 orders = yield bot.brain.get_orders(game, power)
+            else:
+                raise ValueError(f"invalid option {option!r}")
 
             game.set_orders(
                 power_name=power,
@@ -388,7 +388,7 @@ def get_best_orders(
         return result
 
     # initialize state value for each proposal
-    state_value = {power: -10000 for power in bot.game.powers}
+    state_value = {power: float("-inf") for power in bot.game.powers}
 
     # get state value for each proposal
     for proposer, unit_orders in proposal_order.items():
