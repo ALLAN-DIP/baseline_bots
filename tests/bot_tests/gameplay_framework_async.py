@@ -14,12 +14,16 @@ from gameplay_framework import GamePlay
 
 
 class GamePlayAsync(GamePlay):
+    max_turns: int = 20
+
     @gen.coroutine
     def play(self):
         """play a game with the bots"""
 
-        while not self.game.is_game_done:
+        turn = 0
+        while not self.game.is_game_done and turn < self.max_turns:
             yield self.step()
+            turn += 1
 
         if self.save_json:
             to_saved_game_format(self.game, output_path="GamePlayFramework.json")
@@ -77,10 +81,11 @@ class GamePlayAsync(GamePlay):
         for bot in self.bots:
             if bot is None:
                 continue
-            if hasattr(bot, "orders"):
+            if hasattr(bot, "orders") and ret_dict["orders"] is not None:
                 orders = ret_dict["orders"]
-                if orders is not None:
-                    self.game.set_orders(power_name=bot.power_name, orders=orders)
+                if hasattr(orders, "get_list_of_orders"):
+                    orders = orders.get_list_of_orders()
+                self.game.set_orders(power_name=bot.power_name, orders=orders)
 
         self.cur_local_message_round += 1
 

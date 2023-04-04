@@ -5,7 +5,7 @@ from diplomacy import Game, Message
 from tornado import gen
 
 from baseline_bots.bots.baseline_bot import BaselineBot
-from baseline_bots.utils import OrdersData
+from baseline_bots.utils import MessagesData, OrdersData
 
 
 class RandomNoPressBot(BaselineBot):
@@ -19,8 +19,8 @@ class RandomNoPressBot(BaselineBot):
         super().__init__(power_name, game)
         self.orders = OrdersData()
 
-    def gen_messages(self, rcvd_messages: List[Message]) -> None:
-        return None
+    def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
+        return MessagesData()
 
     def gen_orders(self) -> List[str]:
         self.orders = OrdersData()

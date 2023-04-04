@@ -72,3 +72,9 @@ class PushoverDipnet(DipnetBot):
     @gen.coroutine
     def gen_orders(self) -> List[str]:
         return self.orders.get_list_of_orders()
+
+    @gen.coroutine
+    def __call__(self, rcvd_messages: List[Message]) -> dict:
+        messages = yield self.gen_messages(rcvd_messages)
+        orders = yield self.gen_orders()
+        return {"messages": messages, "orders": orders}
