@@ -84,6 +84,9 @@ class SmartOrderAccepterBot(DipnetBot):
         unrealized_coef: float = 1.0,
         stance_type: str = "A",
         aggressiveness: Optional[Aggressiveness] = Aggressiveness.moderate,
+        num_message_rounds: int = 4,
+        min_sleep_time: float = 10,
+        max_sleep_time: float = 15,
     ) -> None:
         """
         :param power_name: The name of the power
@@ -164,6 +167,9 @@ class SmartOrderAccepterBot(DipnetBot):
             self.stance = ScoreBasedStance(power_name, game)
         else:
             raise ValueError(f"{self.stance_type!r} is not a valid stance type")
+        self.num_message_rounds = num_message_rounds
+        self.min_sleep_time = min_sleep_time
+        self.max_sleep_time = max_sleep_time
         self.opponents = sorted(
             power for power in game.get_map_power_names() if power != self.power_name
         )
@@ -800,13 +806,15 @@ class SmartOrderAccepterBot(DipnetBot):
 
         msgs_data = MessagesData()
 
-        for _ in range(4):
+        for _ in range(self.num_message_rounds):
             # only in movement phase, we send PRP/ALY/FCT and consider get_best_proposer
             if not self.game.get_current_phase().endswith("M"):
                 break
 
-            # sleep randomly for 10-15s before retrieving new messages for the power
-            yield asyncio.sleep(random.uniform(10, 15))
+            # sleep for a random amount of time before retrieving new messages for the power
+            yield asyncio.sleep(
+                random.uniform(self.min_sleep_time, self.max_sleep_time)
+            )
 
             rcvd_messages = self.game.filter_messages(
                 messages=self.game.messages, game_role=self.power_name

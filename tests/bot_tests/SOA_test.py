@@ -9,6 +9,7 @@ from gameplay_framework_async import GamePlayAsync
 import tornado
 from tornado import gen, testing
 from tornado.testing import AsyncTestCase
+from typing_extensions import Final
 
 from baseline_bots.bots.baseline_bot import BaselineBot, BaselineMsgRoundBot
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
@@ -30,14 +31,20 @@ from baseline_bots.utils import (
     parse_PRP,
 )
 
+SOA_TEST_PARAMS: Final = {
+    "num_message_rounds": 3,
+    "min_sleep_time": 1,
+    "max_sleep_time": 3,
+}
+
 
 class TestSOABot(AsyncTestCase):
     @testing.gen_test
     def test_play(self):
         game = Game()
-        soa_bot1 = SmartOrderAccepterBot("FRANCE", game)
+        soa_bot1 = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
 
-        soa_bot2 = SmartOrderAccepterBot("RUSSIA", game)
+        soa_bot2 = SmartOrderAccepterBot("RUSSIA", game, **SOA_TEST_PARAMS)
         game_play = GamePlayAsync(
             game,
             [
@@ -93,7 +100,7 @@ class TestSOABot(AsyncTestCase):
         channel = yield connection.authenticate("userX", "password")
         game = yield channel.join_game(game_id=game_id, power_name="FRANCE")
 
-        soa_bot1 = SmartOrderAccepterBot("FRANCE", game)
+        soa_bot1 = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
 
         game_play = GamePlayAsync(
             game,
@@ -133,7 +140,7 @@ class TestSOABot(AsyncTestCase):
     @testing.gen_test
     def test_respond_to_invalid_orders(self):
         game = Game()
-        soa_bot = SmartOrderAccepterBot("FRANCE", game)
+        soa_bot = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
         RESPOND_TO_INV_ORDERS_TC = [
             [
                 {
@@ -161,7 +168,7 @@ class TestSOABot(AsyncTestCase):
     @testing.gen_test
     def test_respond_to_alliance_messages(self):
         game = Game()
-        soa_bot = SmartOrderAccepterBot("FRANCE", game)
+        soa_bot = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
         RESPOND_TO_ALLIANCES_TC = [
             [
                 {
@@ -190,7 +197,9 @@ class TestSOABot(AsyncTestCase):
     def test_score_stance(self):
         # score-based
         game = Game()
-        soa_bot = SmartOrderAccepterBot("FRANCE", game, stance_type="S")
+        soa_bot = SmartOrderAccepterBot(
+            "FRANCE", game, stance_type="S", **SOA_TEST_PARAMS
+        )
         bot_instances = [
             RandomProposerBot_AsyncBot("AUSTRIA", game, test_mode=True),
             RandomProposerBot_AsyncBot("ENGLAND", game, test_mode=True),
@@ -218,7 +227,7 @@ class TestSOABot(AsyncTestCase):
     def test_action_stance(self):
         # score-based
         game = Game()
-        soa_bot = SmartOrderAccepterBot("FRANCE", game)
+        soa_bot = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
         bot_instances = [
             RandomProposerBot_AsyncBot("ENGLAND", game, test_mode=True),
             RandomProposerBot_AsyncBot("GERMANY", game, test_mode=True),
@@ -273,7 +282,7 @@ class TestSOABot(AsyncTestCase):
     def test_ally_move_filter(self):
         # assume that stance is correct using score-based
         game = Game()
-        soa_bot = SmartOrderAccepterBot("FRANCE", game)
+        soa_bot = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
         soa_bot.ally_threshold = 1.0
         bot_instances = [
             RandomProposerBot_AsyncBot("ENGLAND", game, test_mode=True),
@@ -311,7 +320,7 @@ class TestSOABot(AsyncTestCase):
         # proposal messages -> proposal dict {power_name: a list of proposal orders}
         # valid moves and power units must belong to SOA
         game = Game()
-        soa_bot = SmartOrderAccepterBot("FRANCE", game)
+        soa_bot = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
         baseline1 = RandomProposerBot_AsyncBot("AUSTRIA", game, test_mode=True)
         baseline2 = RandomProposerBot_AsyncBot("ENGLAND", game, test_mode=True)
         bot_instances = [baseline1, baseline2, soa_bot]
@@ -383,7 +392,9 @@ class TestSOABot(AsyncTestCase):
     def test_gen_pos_stance_messages(self):
         # gen for only allies
         game = Game()
-        soa_bot = SmartOrderAccepterBot("FRANCE", game, stance_type="S")
+        soa_bot = SmartOrderAccepterBot(
+            "FRANCE", game, stance_type="S", **SOA_TEST_PARAMS
+        )
         soa_bot.ally_threshold = 0.5
         bot_instances = [
             RandomProposerBot_AsyncBot("AUSTRIA", game, test_mode=True),
