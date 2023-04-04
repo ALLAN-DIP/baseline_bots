@@ -3,6 +3,7 @@ from typing import List
 
 from DAIDE import ORR, PRP, XDO
 from diplomacy import Game, Message
+from diplomacy.client.network_game import NetworkGame
 from tornado import gen
 
 from baseline_bots.bots.baseline_bot import BaselineBot
@@ -79,9 +80,8 @@ class RandomProposerBot(BaselineBot):
 class RandomProposerBot_AsyncBot(RandomProposerBot):
     """Wrapper to RandomProposerBot with tornado decorators for async calls"""
 
-    def __init__(self, power_name, game, test_mode=False) -> None:
+    def __init__(self, power_name, game) -> None:
         super().__init__(power_name, game)
-        self.test_mode = test_mode
 
     @gen.coroutine
     def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
@@ -106,7 +106,7 @@ class RandomProposerBot_AsyncBot(RandomProposerBot):
                     message=msg["message"],
                     phase=self.game.get_current_phase(),
                 )
-                if not (self.test_mode):
+                if isinstance(self.game, NetworkGame):
                     yield self.game.send_game_message(message=msg_obj)
         orders = yield self.gen_orders()
         # maintain current orders

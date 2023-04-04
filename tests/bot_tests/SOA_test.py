@@ -32,13 +32,13 @@ class TestSOABot(AsyncTestCase):
         game_play = GamePlayAsync(
             game,
             [
-                RandomProposerBot_AsyncBot("AUSTRIA", game, test_mode=True),
-                RandomProposerBot_AsyncBot("ENGLAND", game, test_mode=True),
+                RandomProposerBot_AsyncBot("AUSTRIA", game),
+                RandomProposerBot_AsyncBot("ENGLAND", game),
                 soa_bot1,
                 soa_bot2,
-                RandomProposerBot_AsyncBot("GERMANY", game, test_mode=True),
-                RandomProposerBot_AsyncBot("ITALY", game, test_mode=True),
-                RandomProposerBot_AsyncBot("TURKEY", game, test_mode=True),
+                RandomProposerBot_AsyncBot("GERMANY", game),
+                RandomProposerBot_AsyncBot("ITALY", game),
+                RandomProposerBot_AsyncBot("TURKEY", game),
             ],
             3,
             True,
@@ -185,9 +185,9 @@ class TestSOABot(AsyncTestCase):
             "FRANCE", game, stance_type="S", **SOA_TEST_PARAMS
         )
         bot_instances = [
-            RandomProposerBot_AsyncBot("AUSTRIA", game, test_mode=True),
-            RandomProposerBot_AsyncBot("ENGLAND", game, test_mode=True),
-            RandomProposerBot_AsyncBot("GERMANY", game, test_mode=True),
+            RandomProposerBot_AsyncBot("AUSTRIA", game),
+            RandomProposerBot_AsyncBot("ENGLAND", game),
+            RandomProposerBot_AsyncBot("GERMANY", game),
             soa_bot,
         ]
         game_play = GamePlayAsync(game, bot_instances, 3, True)
@@ -213,8 +213,8 @@ class TestSOABot(AsyncTestCase):
         game = Game()
         soa_bot = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
         bot_instances = [
-            RandomProposerBot_AsyncBot("ENGLAND", game, test_mode=True),
-            RandomProposerBot_AsyncBot("GERMANY", game, test_mode=True),
+            RandomProposerBot_AsyncBot("ENGLAND", game),
+            RandomProposerBot_AsyncBot("GERMANY", game),
             soa_bot,
         ]
         game_play = GamePlayAsync(game, bot_instances, 3, True)
@@ -269,8 +269,8 @@ class TestSOABot(AsyncTestCase):
         soa_bot = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
         soa_bot.ally_threshold = 1.0
         bot_instances = [
-            RandomProposerBot_AsyncBot("ENGLAND", game, test_mode=True),
-            RandomProposerBot_AsyncBot("GERMANY", game, test_mode=True),
+            RandomProposerBot_AsyncBot("ENGLAND", game),
+            RandomProposerBot_AsyncBot("GERMANY", game),
             soa_bot,
         ]
         game_play = GamePlayAsync(game, bot_instances, 3, True)
@@ -305,8 +305,8 @@ class TestSOABot(AsyncTestCase):
         # valid moves and power units must belong to SOA
         game = Game()
         soa_bot = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
-        baseline1 = RandomProposerBot_AsyncBot("AUSTRIA", game, test_mode=True)
-        baseline2 = RandomProposerBot_AsyncBot("ENGLAND", game, test_mode=True)
+        baseline1 = RandomProposerBot_AsyncBot("AUSTRIA", game)
+        baseline2 = RandomProposerBot_AsyncBot("ENGLAND", game)
         bot_instances = [baseline1, baseline2, soa_bot]
         game_play = GamePlayAsync(game, bot_instances, 3, True)
         rcvd_messages = game_play.game.filter_messages(
@@ -380,10 +380,10 @@ class TestSOABot(AsyncTestCase):
         )
         soa_bot.ally_threshold = 0.5
         bot_instances = [
-            RandomProposerBot_AsyncBot("AUSTRIA", game, test_mode=True),
-            RandomProposerBot_AsyncBot("ENGLAND", game, test_mode=True),
-            RandomProposerBot_AsyncBot("GERMANY", game, test_mode=True),
-            RandomProposerBot_AsyncBot("RUSSIA", game, test_mode=True),
+            RandomProposerBot_AsyncBot("AUSTRIA", game),
+            RandomProposerBot_AsyncBot("ENGLAND", game),
+            RandomProposerBot_AsyncBot("GERMANY", game),
+            RandomProposerBot_AsyncBot("RUSSIA", game),
             soa_bot,
         ]
         game_play = GamePlayAsync(game, bot_instances, 3, True)
