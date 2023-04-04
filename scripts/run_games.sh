@@ -74,7 +74,7 @@ else
 fi
 
 HOST=shade-dev.tacc.utexas.edu
-OPTS="--bot_type SmartOrderAccepterBot"
+OPTS=(--bot_type SmartOrderAccepterBot)
 
 if [[ -z $GAME_ID ]]; then
   # Calculate path based on script's expected location
@@ -102,7 +102,7 @@ mkdir -p "$LOG_DIR"
 
 POWERS=(AUSTRIA ENGLAND GERMANY FRANCE ITALY RUSSIA TURKEY)
 for POWER in "${POWERS[@]}"; do
-  $RUN_CMD "$AGENT" --host $HOST --game_id "$GAME_ID" --power "$POWER" "$OPTS" "$@" \
+  $RUN_CMD "$AGENT" --host $HOST --game_id "$GAME_ID" --power "$POWER" "${OPTS[@]}" "$@" \
     &>"$LOG_DIR"/"$POWER".txt &
   sleep 4
 done
