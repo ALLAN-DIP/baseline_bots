@@ -57,6 +57,9 @@ WORKDIR /model/src/model_server/baseline_bots
 COPY LICENSE README.md pyproject.toml requirements.txt setup.cfg setup.py /model/src/model_server/baseline_bots/
 RUN pip install --no-cache-dir -e .
 
+# Add diplomacy research to PYTHONPATH
+ENV PYTHONPATH=/model/src/model_server/research:$PYTHONPATH
+
 # Copy baseline_bots code into the Docker image
 COPY src/ /model/src/model_server/baseline_bots/src/
 
@@ -70,8 +73,6 @@ COPY tests/ /model/src/model_server/baseline_bots/tests/
 
 # Allow the TF server to be run
 RUN chmod 777 /model/src/model_server/baseline_bots/containers/allan_dip_bot/run_model_server.sh
-# Add diplomacy research to PYTHONPATH
-ENV PYTHONPATH=/model/src/model_server/research:$PYTHONPATH
 
 FROM dev as test_ci
 
