@@ -15,6 +15,12 @@ from baseline_bots.utils import (
     parse_PRP,
 )
 
+dipnet2daide_loc = {
+    "BOT": "GOB",
+    "ENG": "ECH",
+    "LYO": "GOL",
+}
+
 
 def dipnet_to_daide_parsing(
     dipnet_style_order_strs: List[Union[str, Tuple[str, str]]],
@@ -38,12 +44,9 @@ def dipnet_to_daide_parsing(
         E.g. BOT -> GOB
              ENG -> ECH
         """
-        if "BOT" in loc:
-            loc = loc.replace("BOT", "GOB")
-        if "ENG" in loc:
-            loc = loc.replace("ENG", "ECH")
-        if "LYO" in loc:
-            loc = loc.replace("LYO", "GOL")
+        for dipnet_loc, daide_loc in dipnet2daide_loc.items():
+            if dipnet_loc in loc:
+                loc = loc.replace(dipnet_loc, daide_loc)
 
         return loc
 
@@ -279,6 +282,18 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
             grouped_order.append(stack)
         return grouped_order
 
+    def replace_daide_loc(loc: str) -> str:
+        """
+        Replaces DAIDE location with dipnet location
+        E.g. GOB -> BOT
+             ECH -> ENG
+        """
+        for dipnet_loc, daide_loc in dipnet2daide_loc.items():
+            if daide_loc in loc:
+                loc = loc.replace(daide_loc, dipnet_loc)
+
+        return loc
+
     def compress_prov_coast(prov: str) -> str:
         """
         If `prov` is a coastal province, compress coastal province from DAIDE to dipnet format
@@ -290,6 +305,7 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
         """
         if len(prov.split()) == 2:
             prov = "/".join(prov.split())[:-1]
+        prov = replace_daide_loc(prov)
         return prov
 
     def dipnetify_suborder(suborder: str) -> str:

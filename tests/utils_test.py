@@ -122,9 +122,9 @@ class TestUtils:
             expected,
         )
         comparison_tc_op = (
-            test_input[0].replace(" R ", " - ").replace("BOT", "GOB")
+            test_input[0].replace(" R ", " - ")
             if type(test_input[0]) == str
-            else test_input[0][0].replace(" R ", " - ").replace("BOT", "GOB")
+            else test_input[0][0].replace(" R ", " - ")
         )
         assert daide_to_dipnet_parsing(expected[0])[0] == comparison_tc_op, (
             daide_to_dipnet_parsing(expected[0]),
