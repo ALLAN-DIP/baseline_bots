@@ -21,7 +21,7 @@ RUN wget --progress=dot:giga https://f002.backblazeb2.com/file/ppaquette-public/
     && chmod -R 777 /model/src/model_server/bot_neurips2019-sl_model
 
 # Clone and prepare research repo
-RUN git config --global --add safe.directory /model/src/model_server/research \
+RUN git config --system --add safe.directory /model/src/model_server/research \
     && git clone https://github.com/SHADE-AI/research.git \
     && git --git-dir research/.git/ checkout 78468505b82f37ec298d234ed406d93445cf8281 \
     && sed -i 's/gym>/gym=/g' research/requirements.txt
