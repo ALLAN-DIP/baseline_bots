@@ -5,7 +5,7 @@ Some quickly built parsing utils mostly for DAIDE stuff
 from collections import defaultdict
 from typing import Dict, List, Mapping, Tuple, Union
 
-from daidepp import CVY, HLD, MTO, SUP, Command, Location, MoveByCVY, Unit
+from daidepp import CVY, HLD, MTO, PRP, SUP, Command, Location, MoveByCVY, Unit
 from diplomacy import Game, Message
 
 from baseline_bots.utils import (
@@ -322,7 +322,9 @@ def parse_proposal_messages(
     """
     try:
         # Extract messages containing PRP string
-        order_msgs = [msg for msg in rcvd_messages if "PRP" in msg.message]
+        order_msgs = [
+            msg for msg in rcvd_messages if isinstance(parse_daide(msg.message), PRP)
+        ]
         print(f"Received {len(order_msgs)} PRP messages:")
         print([(order_msg.sender, order_msg.message) for order_msg in order_msgs])
 

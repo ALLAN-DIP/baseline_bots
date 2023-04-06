@@ -161,8 +161,8 @@ class TestUtils:
             "RUSSIA",
             {
                 "GERMANY": "PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (XDO ((RUS FLT SEV) MTO RUM)) (XDO ((RUS AMY PRU) MTO LVN)))",
-                "AUSTRIA": "PRP (XDO ((RUS AMY MOS) SUP (RUS FLT (STP SCS)) MTO LVN)))",
-                "ENGLAND": "PRP (XDO ((RUS AMY PRU) MTO LVN)))",
+                "AUSTRIA": "PRP (XDO ((RUS AMY MOS) SUP (RUS FLT (STP SCS)) MTO LVN))",
+                "ENGLAND": "PRP (XDO ((RUS AMY PRU) MTO LVN))",
             },
             {
                 "valid_proposals": {
@@ -182,14 +182,14 @@ class TestUtils:
         [
             "RUSSIA",
             {
-                "GERMANY": "PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (ALY (GER RUS ENG ITA) VSS (FRA TUR AUS)) (ABC ((RUS AMY WAR) MTO PRU)))",
+                "GERMANY": "PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (ALY (GER RUS ENG ITA) VSS (FRA TUR AUS)))",
                 "AUSTRIA": "PRP (ALY (AUS RUS) VSS (FRA ENG ITA TUR GER))",
             },
             {
                 "valid_proposals": {"GERMANY": ["A WAR - PRU"]},
                 "invalid_proposals": {},
                 "shared_orders": {},
-                "other_orders": {"GERMANY": ["ABC ((RUS AMY WAR) MTO PRU)"]},
+                "other_orders": {},
                 "alliance_proposals": {
                     "GERMANY": [("GERMANY", "ALY (GER RUS ENG ITA) VSS (FRA TUR AUS)")],
                     "ENGLAND": [("GERMANY", "ALY (GER RUS ENG ITA) VSS (FRA TUR AUS)")],
@@ -202,7 +202,7 @@ class TestUtils:
         [
             "TURKEY",
             {
-                "RUSSIA": "PRP(XDO((TUR FLT ANK) MTO BLA) AND XDO((RUS AMY SEV) MTO RUM) AND (XDO((ENG AMY LVP) HLD)))"
+                "RUSSIA": "PRP(AND (XDO((TUR FLT ANK) MTO BLA)) (XDO((RUS AMY SEV) MTO RUM)) (XDO((ENG AMY LVP) HLD)))"
             },
             {
                 "valid_proposals": {"RUSSIA": ["F ANK - BLA"]},
@@ -216,13 +216,13 @@ class TestUtils:
         [
             "TURKEY",
             {
-                "RUSSIA": "PRP(XDO((TUR FLT ANK) MTO BLA) AND XDO((RUS AMY SEV) MTO RUM) AND (XDO((ENG AMY LVP) HLD)) AND (ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)) AND (ABC ((RUS AMY WAR) MTO PRU) )  AND (PCE (TUR RUS) ))"
+                "RUSSIA": "PRP(AND (XDO((TUR FLT ANK) MTO BLA)) (XDO((RUS AMY SEV) MTO RUM)) (XDO((ENG AMY LVP) HLD)) (ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)) (PCE (TUR RUS) ))"
             },
             {
                 "valid_proposals": {"RUSSIA": ["F ANK - BLA"]},
                 "invalid_proposals": {},
                 "shared_orders": {"RUSSIA": ["A SEV - RUM"]},
-                "other_orders": {"RUSSIA": ["A LVP H", "ABC ((RUS AMY WAR) MTO PRU)"]},
+                "other_orders": {"RUSSIA": ["A LVP H"]},
                 "alliance_proposals": {
                     "RUSSIA": [("RUSSIA", "ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)")],
                     "ENGLAND": [("RUSSIA", "ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)")],
