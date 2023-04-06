@@ -1,9 +1,7 @@
-import random
 from typing import List
 
-from DAIDE import FCT, ORR, XDO, ParseError
+from DAIDE import ParseError
 from diplomacy import Game, Message
-from diplomacy_research.players.benchmark_player import DipNetRLPlayer
 from tornado import gen
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
@@ -13,10 +11,7 @@ from baseline_bots.utils import (
     MessagesData,
     OrdersData,
     get_non_aggressive_orders,
-    get_order_tokens,
-    get_other_powers,
     parse_arrangement,
-    parse_FCT,
     sort_messages_by_most_recent,
 )
 
@@ -31,7 +26,7 @@ class PushoverDipnet(DipnetBot):
         super().__init__(power_name, game, total_msg_rounds)
 
     @gen.coroutine
-    def gen_messages(self, rcvd_messages):
+    def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
         self.orders = OrdersData()
         reply_obj = MessagesData()
 
@@ -54,8 +49,6 @@ class PushoverDipnet(DipnetBot):
 
         # parse may fail
         try:
-            # print(last_message.message)
-            # print(parse_arrangement(last_message.message))
             orders = get_non_aggressive_orders(
                 parse_arrangement(last_message.message), self.power_name, self.game
             )
@@ -77,5 +70,11 @@ class PushoverDipnet(DipnetBot):
         return reply_obj
 
     @gen.coroutine
-    def gen_orders(self):
+    def gen_orders(self) -> List[str]:
         return self.orders.get_list_of_orders()
+
+    @gen.coroutine
+    def __call__(self, rcvd_messages: List[Message]) -> dict:
+        messages = yield self.gen_messages(rcvd_messages)
+        orders = yield self.gen_orders()
+        return {"messages": messages, "orders": orders}

@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -euo pipefail
 
 # launch model server
 /model/src/model_server/baseline_bots/containers/allan_dip_bot/run_model_server.sh &
@@ -15,4 +17,4 @@ printf "\n"
 export PYTHONPATH=$PYTHONPATH:/model/src/model_server/research/
 
 # launch bot script
-python /model/src/model_server/baseline_bots/containers/allan_dip_bot/run_bot.py $@
+python /model/src/model_server/baseline_bots/containers/allan_dip_bot/run_bot.py "$@"

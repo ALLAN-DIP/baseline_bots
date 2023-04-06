@@ -1,9 +1,4 @@
-__author__ = "Kartik Shenoy"
-__email__ = "kartik.shenoyy@gmail.com"
-
-from collections import defaultdict
-import random
-from typing import List
+from typing import List, Set
 
 from DAIDE import FCT, ORR, XDO
 from diplomacy import Game, Message
@@ -25,7 +20,10 @@ class TransparentBot(DipnetBot):
     Send out some of them randomly
     """
 
-    def __init__(self, power_name, game, total_msg_rounds=3):
+    orders_gossiped: Set[str]
+    my_orders_informed: bool
+
+    def __init__(self, power_name: str, game: Game, total_msg_rounds: int = 3):
         super().__init__(power_name, game, total_msg_rounds)
         self.orders_gossiped = set()
         self.my_orders_informed = False
@@ -35,7 +33,7 @@ class TransparentBot(DipnetBot):
         self.orders_gossiped = set()
         self.my_orders_informed = False
 
-    def parse_messages(self, rcvd_messages):
+    def parse_messages(self, rcvd_messages: List[Message]) -> List[str]:
         press_msgs = [msg[1] for msg in rcvd_messages if "FCT" in msg[1].message]
         parsed_orders = []
         for msg in press_msgs:
@@ -43,7 +41,7 @@ class TransparentBot(DipnetBot):
         return parsed_orders
 
     @gen.coroutine
-    def gen_messages(self, rcvd_messages):
+    def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
         # Fetch list of orders from DipNet
         orders = yield from self.brain.get_orders(self.game, self.power_name)
         self.orders.add_orders(orders, overwrite=True)
@@ -86,7 +84,7 @@ class TransparentBot(DipnetBot):
         return comms_obj
 
     @gen.coroutine
-    def gen_orders(self):
+    def gen_orders(self) -> List[str]:
         """query dipnet for orders"""
         if self.game.get_current_phase()[-1] != "M":
             # Fetch list of orders from DipNet
@@ -96,7 +94,7 @@ class TransparentBot(DipnetBot):
         return self.orders.get_list_of_orders()
 
     @gen.coroutine
-    def __call__(self, rcvd_messages: List[Message]):
+    def __call__(self, rcvd_messages: List[Message]) -> dict:
         messages = yield from self.gen_messages(rcvd_messages)
         orders = yield from self.gen_orders()
         return {"messages": messages, "orders": orders}

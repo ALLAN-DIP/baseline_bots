@@ -1,16 +1,10 @@
-from collections import defaultdict
-import random
+from typing import List
 
 from DAIDE import config
+from diplomacy import Game, Message
 
 from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
-from baseline_bots.utils import (
-    MessagesData,
-    get_other_powers,
-    is_order_aggressive,
-    parse_arrangement,
-    parse_FCT,
-)
+from baseline_bots.utils import MessagesData, is_order_aggressive
 
 config.ORDERS_DAIDE = False
 from DAIDE import FCT, ORR, XDO, Order, parse
@@ -23,11 +17,11 @@ class SelectivelyTransparentBot(TransparentBot):
     Sends out non-aggressive actions
     """
 
-    def __init__(self, power_name, game, total_msg_rounds=3):
+    def __init__(self, power_name: str, game: Game, total_msg_rounds: int = 3):
         super().__init__(power_name, game, total_msg_rounds)
 
     @gen.coroutine
-    def gen_messages(self, rcvd_messages):
+    def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
         """send out non-aggressive orders that is bot is taking"""
         # call super then find non-aggressive orders
         messages = yield super().gen_messages(rcvd_messages)
@@ -55,6 +49,5 @@ class SelectivelyTransparentBot(TransparentBot):
                     orr_arrangement = ORR(xdo_arrangements)
                     fct_arrangement = FCT(orr_arrangement)
                     message["message"] = str(fct_arrangement)
-                    # print(message["message"])
 
         return messages

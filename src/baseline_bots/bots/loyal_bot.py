@@ -1,9 +1,8 @@
-__author__ = "Sander Schulhoff"
-__email__ = "sanderschulhoff@gmail.com"
+from typing import List, Optional
 
-from DAIDE import ALY, ORR, XDO, YES, ParseError
+from DAIDE import ALY, YES
 from DAIDE.utils.exceptions import ParseError
-from diplomacy import Message
+from diplomacy import Game, Message
 
 from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.utils import (
@@ -22,14 +21,17 @@ class LoyalBot(BaselineBot):
     NOTE: only executes non-aggressive actions
     """
 
-    def __init__(self, power_name, game) -> None:
+    allies: Optional[List[str]]
+    orders: OrdersData
+
+    def __init__(self, power_name: str, game: Game) -> None:
         super().__init__(power_name, game)
         # will always follow this country's orders
         self.allies = None
         # orders to be provided by allies
         self.orders = OrdersData()
 
-    def gen_messages(self, rcvd_messages):
+    def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
         # Return data initialization
         ret_obj = MessagesData()
 
@@ -66,5 +68,5 @@ class LoyalBot(BaselineBot):
 
         return ret_obj
 
-    def gen_orders(self):
+    def gen_orders(self) -> OrdersData:
         return self.orders

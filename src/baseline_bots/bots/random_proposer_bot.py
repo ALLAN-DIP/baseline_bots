@@ -1,19 +1,19 @@
-__author__ = "Sander Schulhoff"
-__email__ = "sanderschulhoff@gmail.com"
-
 import random
+from typing import List
 
-from DAIDE import FCT, HUH, ORR, PRP, XDO, YES
-from diplomacy import Message
+from DAIDE import ORR, PRP, XDO
+from diplomacy import Game, Message
+from diplomacy.client.network_game import NetworkGame
 from tornado import gen
 
 from baseline_bots.bots.baseline_bot import BaselineBot
-from baseline_bots.parsing_utils import (
-    daide_to_dipnet_parsing,
-    dipnet_to_daide_parsing,
-    parse_proposal_messages,
+from baseline_bots.parsing_utils import dipnet_to_daide_parsing
+from baseline_bots.utils import (
+    MessagesAndOrders,
+    MessagesData,
+    OrdersData,
+    get_other_powers,
 )
-from baseline_bots.utils import MessagesData, OrdersData, get_other_powers
 
 
 class RandomProposerBot(BaselineBot):
@@ -21,7 +21,7 @@ class RandomProposerBot(BaselineBot):
     Just sends random order proposals to other bots.
     """
 
-    def __init__(self, power_name, game) -> None:
+    def __init__(self, power_name: str, game: Game) -> None:
         super().__init__(power_name, game)
 
     def gen_messages(self, _) -> MessagesData:
@@ -59,7 +59,7 @@ class RandomProposerBot(BaselineBot):
 
         return ret_obj
 
-    def gen_orders(self):
+    def gen_orders(self) -> List[str]:
         self.orders = OrdersData()
         possible_orders = self.game.get_all_possible_orders()
 
@@ -73,27 +73,26 @@ class RandomProposerBot(BaselineBot):
 
         return self.orders.get_list_of_orders()
 
-    def __call__(self, rcvd_messages):
+    def __call__(self, rcvd_messages: List[Message]) -> MessagesAndOrders:
         return super().__call__(rcvd_messages)
 
 
 class RandomProposerBot_AsyncBot(RandomProposerBot):
     """Wrapper to RandomProposerBot with tornado decorators for async calls"""
 
-    def __init__(self, power_name, game, test_mode=False) -> None:
+    def __init__(self, power_name, game) -> None:
         super().__init__(power_name, game)
-        self.test_mode = test_mode
 
     @gen.coroutine
-    def gen_messages(self, rcvd_messages):
+    def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
         return super().gen_messages(rcvd_messages)
 
     @gen.coroutine
-    def gen_orders(self):
+    def gen_orders(self) -> List[str]:
         return super().gen_orders()
 
     @gen.coroutine
-    def __call__(self, rcvd_messages):
+    def __call__(self, rcvd_messages: List[Message]) -> MessagesAndOrders:
         """
         :return: dict containing messages and orders
         """
@@ -107,35 +106,9 @@ class RandomProposerBot_AsyncBot(RandomProposerBot):
                     message=msg["message"],
                     phase=self.game.get_current_phase(),
                 )
-                if not (self.test_mode):
+                if isinstance(self.game, NetworkGame):
                     yield self.game.send_game_message(message=msg_obj)
         orders = yield self.gen_orders()
         # maintain current orders
         self.orders = orders
         return {"messages": messages, "orders": orders}
-
-
-if __name__ == "__main__":
-    from diplomacy import Game
-    from diplomacy.utils.export import to_saved_game_format
-
-    # game instance
-    game = Game()
-    # select the first name in the list of powers
-    bot_power = list(game.get_map_power_names())[0]
-    # instantiate random honest bot
-    bot = RandomProposerBot(bot_power, game)
-    while not game.is_game_done:
-        messages = bot.gen_messages(None).messages
-        for msg in messages:
-            msg_obj = Message(
-                sender=bot.power_name,
-                recipient=msg["recipient"],
-                message=msg["message"],
-                phase=game.get_current_phase(),
-            )
-            game.add_message(message=msg_obj)
-
-        game.process()
-
-    to_saved_game_format(game, output_path="RandomProposerBotGame.json")

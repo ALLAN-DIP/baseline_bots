@@ -2,16 +2,18 @@
 Some quickly built parsing utils mostly for DAIDE stuff
 """
 
-__author__ = "Kartik Shenoy"
-__email__ = "kartik.shenoyy@gmail.com"
 from collections import defaultdict
-import re
 from typing import Dict, List, Tuple, Union
 
-from DAIDE.utils.exceptions import ParseError
 from diplomacy import Game, Message
 
-from baseline_bots.utils import *
+from baseline_bots.utils import (
+    get_order_tokens,
+    parse_alliance_proposal,
+    parse_arrangement,
+    parse_peace_proposal,
+    parse_PRP,
+)
 
 
 def dipnet_to_daide_parsing(

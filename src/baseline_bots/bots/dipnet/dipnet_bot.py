@@ -2,22 +2,27 @@
 
 
 from abc import ABC, abstractmethod
-import random
-import sys
 from typing import List
 
 from diplomacy import Game, Message
 from diplomacy_research.players.benchmark_player import DipNetRLPlayer, DipNetSLPlayer
+from diplomacy_research.players.model_based_player import ModelBasedPlayer
 
 from baseline_bots.bots.baseline_bot import BaselineMsgRoundBot
-from baseline_bots.utils import MessagesData, OrdersData, get_order_tokens
+from baseline_bots.utils import MessagesData, OrdersData
 
 
 class DipnetBot(BaselineMsgRoundBot, ABC):
     """Abstract Base Class for dipnet derivative bots"""
 
+    brain: ModelBasedPlayer
+
     def __init__(
-        self, power_name: str, game: Game, total_msg_rounds=3, dipnet_type="slp"
+        self,
+        power_name: str,
+        game: Game,
+        total_msg_rounds: int = 3,
+        dipnet_type: str = "slp",
     ) -> None:
         super().__init__(power_name, game, total_msg_rounds)
         if dipnet_type == "slp":

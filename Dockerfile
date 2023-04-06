@@ -21,7 +21,7 @@ RUN wget --progress=dot:giga https://f002.backblazeb2.com/file/ppaquette-public/
     && chmod -R 777 /model/src/model_server/bot_neurips2019-sl_model
 
 # Clone and prepare research repo
-RUN git config --global --add safe.directory /model/src/model_server/research \
+RUN git config --system --add safe.directory /model/src/model_server/research \
     && git clone https://github.com/SHADE-AI/research.git \
     && git --git-dir research/.git/ checkout 78468505b82f37ec298d234ed406d93445cf8281 \
     && sed -i 's/gym>/gym=/g' research/requirements.txt
@@ -54,8 +54,11 @@ RUN pip install --no-cache-dir -r research/requirements.txt
 # hadolint ignore=DL3059
 RUN mkdir -p /model/src/model_server/baseline_bots/src
 WORKDIR /model/src/model_server/baseline_bots
-COPY README.md pyproject.toml requirements.txt setup.py /model/src/model_server/baseline_bots/
-RUN pip install --no-cache-dir -r requirements.txt -e .
+COPY LICENSE README.md pyproject.toml requirements.txt setup.cfg setup.py /model/src/model_server/baseline_bots/
+RUN pip install --no-cache-dir -e .
+
+# Add diplomacy research to PYTHONPATH
+ENV PYTHONPATH=/model/src/model_server/research:$PYTHONPATH
 
 # Copy baseline_bots code into the Docker image
 COPY src/ /model/src/model_server/baseline_bots/src/
@@ -70,8 +73,6 @@ COPY tests/ /model/src/model_server/baseline_bots/tests/
 
 # Allow the TF server to be run
 RUN chmod 777 /model/src/model_server/baseline_bots/containers/allan_dip_bot/run_model_server.sh
-# Add diplomacy research to PYTHONPATH
-ENV PYTHONPATH=/model/src/model_server/research:$PYTHONPATH
 
 FROM dev as test_ci
 

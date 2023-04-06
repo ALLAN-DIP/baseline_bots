@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=62.6"] # Minimum version required to use `file:` with `install_requires`
 build-backend = "setuptools.build_meta"
 
 [tool.black]
@@ -15,5 +15,12 @@ profile = "black"
 [tool.codespell]
 ignore-regex = "\\[nt]" # Do not count escaped newlines or tabs as part of a word
 ignore-words-list = "ans,hel,opps,ser,vie"  # "HEL", "SER", and "VIE" are from DAIDE
+quiet-level = 0 # Display all warnings
 check-filenames = ""
 check-hidden = ""
+
+[tool.pytest.ini_options]
+addopts = "--verbosity=2"
+filterwarnings = [
+  "ignore::DeprecationWarning",
+]
