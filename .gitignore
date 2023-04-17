@@ -1,6 +1,7 @@
 # Python files
 *.egg*
 /.mypy_cache/
+/.pytest_cache/
 __pycache__/
 
 # IDE files
