@@ -5,6 +5,7 @@ Some quickly built parsing utils mostly for DAIDE stuff
 from collections import defaultdict
 from typing import Dict, List, Tuple, Union
 
+from daidepp import Location
 from diplomacy import Game, Message
 
 from baseline_bots.utils import (
@@ -38,34 +39,26 @@ def dipnet_to_daide_parsing(
     :return: DAIDE style order string
     """
 
-    def replace_dipnet_loc(loc: str) -> str:
-        """
-        Replaces dipnet location with DAIDE location
-        E.g. BOT -> GOB
-             ENG -> ECH
-        """
-        for dipnet_loc, daide_loc in dipnet2daide_loc.items():
-            if dipnet_loc in loc:
-                loc = loc.replace(dipnet_loc, daide_loc)
+    def daidefy_location(prov: str) -> Location:
+        """Converts DipNet-style location to DAIDE-style location
 
-        return loc
-
-    def expand_prov_coast(prov: str) -> str:
-        """
-        If `prov` is a coastal province, expand coastal province from dipnet to DAIDE format
-        Else return original `prov`
         E.g.
-        BUL/EC         --> BUL ECS
-        STP/SC         --> STP SCS
-        PAR            --> PAR
+        BUL/EC --> BUL ECS
+        STP/SC --> STP SCS
+        ENG    --> ECH
+        PAR    --> PAR
+
+        :param prov: DipNet-style province notation
+        :return: DAIDE-style order
         """
         if "/" in prov:
-            prov = prov.replace("/", " ")
-            prov = prov + "S"
-            prov = "(" + prov + ")"
-        prov = replace_dipnet_loc(prov)
-
-        return prov
+            prov, coast = prov.split("/")
+            coast += "S"
+        else:
+            coast = None
+        prov = dipnet2daide_loc.get(prov, prov)
+        loc = Location(province=prov, coast=coast)
+        return loc
 
     def daidefy_suborder(dipnet_suborder: str) -> str:
         """
@@ -90,7 +83,7 @@ def dipnet_to_daide_parsing(
             return None
 
         unit_type = "AMY" if dipnet_suborder[0] == "A" else "FLT"
-        unit = expand_prov_coast(dipnet_suborder.split()[-1])
+        unit = str(daidefy_location(dipnet_suborder.split()[-1]))
 
         return (
             "("
@@ -183,7 +176,7 @@ def dipnet_to_daide_parsing(
                 if len(dipnet_order_tokens) == 4 and dipnet_order_tokens[3] != "H":
                     daide_order.append("MTO")
                     daide_order.append(
-                        expand_prov_coast(dipnet_order_tokens[3].split()[-1])
+                        str(daidefy_location(dipnet_order_tokens[3].split()[-1]))
                     )
                 elif len(dipnet_order_tokens) > 4:
                     print(
@@ -206,13 +199,13 @@ def dipnet_to_daide_parsing(
 
                 daide_order.append("CTO")
                 daide_order.append(
-                    expand_prov_coast(dipnet_order_tokens[3].split()[-1])
+                    str(daidefy_location(dipnet_order_tokens[3].split()[-1]))
                 )
             elif len(dipnet_order_tokens) >= 3 and dipnet_order_tokens[2] == "VIA":
                 # VIA/CTO orders
                 daide_order.append("CTO")
                 daide_order.append(
-                    expand_prov_coast(dipnet_order_tokens[1].split()[-1])
+                    str(daidefy_location(dipnet_order_tokens[1].split()[-1]))
                 )
                 daide_order.append("VIA")
                 if dipnet_order_tokens[0] + dipnet_order_tokens[1] in convoy_map:
@@ -228,7 +221,7 @@ def dipnet_to_daide_parsing(
                 # Move orders
                 daide_order.append("MTO")
                 daide_order.append(
-                    expand_prov_coast(dipnet_order_tokens[1].split()[-1])
+                    str(daidefy_location(dipnet_order_tokens[1].split()[-1]))
                 )
                 if len(dipnet_order_tokens) > 2:
                     print(
