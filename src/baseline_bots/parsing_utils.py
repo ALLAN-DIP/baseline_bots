@@ -5,7 +5,7 @@ Some quickly built parsing utils mostly for DAIDE stuff
 from collections import defaultdict
 from typing import Dict, List, Tuple, Union
 
-from daidepp import Location
+from daidepp import Location, Unit
 from diplomacy import Game, Message
 
 from baseline_bots.utils import (
@@ -60,44 +60,33 @@ def dipnet_to_daide_parsing(
         loc = Location(province=prov, coast=coast)
         return loc
 
-    def daidefy_suborder(dipnet_suborder: str) -> str:
-        """
-        Translates dipnet style units to DAIDE style units
-        E.g. for initial game state
-        A BUD       --> AUS AMY BUD
-        F TRI       --> AUS FLT TRI
-        A PAR       --> FRA AMY PAR
-        A MAR       --> FRA AMY MAR
+    def daidefy_unit(dipnet_unit: str) -> Unit:
+        """Converts DipNet-style unit to DAIDE-style unit
 
-        :param dipnet_suborder: dipnet suborder to be encoded
-        :return: DAIDE-style suborder
+        E.g. (for initial game state)
+        A BUD --> AUS AMY BUD
+        F TRI --> AUS FLT TRI
+        A PAR --> FRA AMY PAR
+        A MAR --> FRA AMY MAR
+
+        :param dipnet_unit: DipNet-style unit notation
+        :return: DAIDE-style unit
         """
-        if dipnet_suborder in unit_game_mapping:
-            power = unit_game_mapping[dipnet_suborder]
-        elif game._unit_owner(dipnet_suborder):
-            power = game._unit_owner(dipnet_suborder)
+        power = unit_game_mapping[dipnet_unit]
+
+        if dipnet_unit.startswith("A"):
+            unit_type = "AMY"
+        elif dipnet_unit.startswith("F"):
+            unit_type = "FLT"
         else:
-            print(
-                f"ALLAN: error from parsing_utils.dipnet_to_daide_parsing: unit {dipnet_suborder} not present in unit_game_mapping"
+            raise ValueError(
+                f"Cannot extract unit type from DipNet-style unit {dipnet_unit!r}"
             )
-            return None
 
-        unit_type = "AMY" if dipnet_suborder[0] == "A" else "FLT"
-        unit = str(daidefy_location(dipnet_suborder.split()[-1]))
+        location = daidefy_location(dipnet_unit.split()[-1])
 
-        return (
-            "("
-            + (
-                " ".join(
-                    [
-                        power,
-                        unit_type,
-                        unit,
-                    ]
-                )
-            )
-            + ")"
-        )
+        unit = Unit(power, unit_type, location)
+        return unit
 
     convoy_map = defaultdict(list)
     dipnet_style_order_strs_tokens = [None for _ in range(len(dipnet_style_order_strs))]
@@ -155,23 +144,12 @@ def dipnet_to_daide_parsing(
                 continue
 
             # Daidefy and add source unit as it is
-            if daidefy_suborder(dipnet_order_tokens[0]):
-                daide_order.append(daidefy_suborder(dipnet_order_tokens[0]))
-            else:
-                print(
-                    f"ALLAN: error from parsing_utils.dipnet_to_daide_parsing() skipping message: {dipnet_order_tokens}"
-                )
-                continue
+            daide_order.append(f"({daidefy_unit(dipnet_order_tokens[0])})")
+
             if dipnet_order_tokens[1] == "S":
                 # Support orders
                 daide_order.append("SUP")
-                if daidefy_suborder(dipnet_order_tokens[2]):
-                    daide_order.append(daidefy_suborder(dipnet_order_tokens[2]))
-                else:
-                    print(
-                        f"ALLAN: error from parsing_utils.dipnet_to_daide_parsing() skipping message: {dipnet_order_tokens}"
-                    )
-                    continue
+                daide_order.append(f"({daidefy_unit(dipnet_order_tokens[2])})")
 
                 if len(dipnet_order_tokens) == 4 and dipnet_order_tokens[3] != "H":
                     daide_order.append("MTO")
@@ -189,13 +167,7 @@ def dipnet_to_daide_parsing(
             elif dipnet_order_tokens[1] == "C":
                 # Convoy orders
                 daide_order.append("CVY")
-                if daidefy_suborder(dipnet_order_tokens[2]):
-                    daide_order.append(daidefy_suborder(dipnet_order_tokens[2]))
-                else:
-                    print(
-                        f"ALLAN: error from parsing_utils.dipnet_to_daide_parsing() skipping message: {dipnet_order_tokens}"
-                    )
-                    continue
+                daide_order.append(f"({daidefy_unit(dipnet_order_tokens[2])})")
 
                 daide_order.append("CTO")
                 daide_order.append(
