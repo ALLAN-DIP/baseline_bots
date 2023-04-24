@@ -11,7 +11,6 @@ from baseline_bots.utils import (
     get_other_powers,
     optional_ORR,
     parse_arrangement,
-    parse_daide,
     parse_FCT,
 )
 
@@ -70,8 +69,8 @@ class TransparentBot(DipnetBot):
 
         for other_power in get_other_powers([self.power_name], self.game):
             if final_orders:
-                raw_orders = dipnet_to_daide_parsing(final_orders, self.game)
-                orders = [XDO(parse_daide(raw_order)) for raw_order in raw_orders]
+                commands = dipnet_to_daide_parsing(final_orders, self.game)
+                orders = [XDO(command) for command in commands]
                 msg = FCT(optional_ORR(orders))
                 comms_obj.add_message(other_power, str(msg))
 

@@ -81,19 +81,22 @@ class TestUtils:
         game_tc = Game()
         game_tc.set_units("TURKEY", ["F BLA"])
 
-        assert (
-            dipnet_to_daide_parsing(
+        assert [
+            str(c)
+            for c in dipnet_to_daide_parsing(
                 test_input,
                 game_tc,
                 unit_power_tuples_included=unit_power_tuples_included,
             )
-            == expected
-        ), (
-            dipnet_to_daide_parsing(
-                test_input,
-                game_tc,
-                unit_power_tuples_included=unit_power_tuples_included,
-            ),
+        ] == expected, (
+            [
+                str(c)
+                for c in dipnet_to_daide_parsing(
+                    test_input,
+                    game_tc,
+                    unit_power_tuples_included=unit_power_tuples_included,
+                )
+            ],
             expected,
         )
         comparison_tc_op = (
@@ -142,8 +145,10 @@ class TestUtils:
         game_tc = Game()
         game_tc.set_units("ITALY", ["A TUN", "F ION", "F EAS", "F AEG"])
 
-        assert dipnet_to_daide_parsing(test_input, game_tc) == expected, (
-            dipnet_to_daide_parsing(test_input, game_tc),
+        assert [
+            str(c) for c in dipnet_to_daide_parsing(test_input, game_tc)
+        ] == expected, (
+            [str(c) for c in dipnet_to_daide_parsing(test_input, game_tc)],
             expected,
         )
         for tc_ip_ord, tc_op_ord in zip(test_input, expected):

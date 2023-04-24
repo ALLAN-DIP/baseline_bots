@@ -5,7 +5,7 @@ Some quickly built parsing utils mostly for DAIDE stuff
 from collections import defaultdict
 from typing import Dict, List, Mapping, Tuple, Union
 
-from daidepp import CVY, HLD, MTO, SUP, Location, MoveByCVY, Unit
+from daidepp import CVY, HLD, MTO, SUP, Command, Location, MoveByCVY, Unit
 from diplomacy import Game, Message
 
 from baseline_bots.utils import (
@@ -79,7 +79,7 @@ def dipnet_to_daide_parsing(
     dipnet_style_order_strs: List[Union[str, Tuple[str, str]]],
     game: Game,
     unit_power_tuples_included: bool = False,
-) -> List[str]:
+) -> List[Command]:
     """Convert set of DipNet-style orders to DAIDE-style orders
 
     Needs game instance to determine the powers owning the units.
@@ -216,7 +216,7 @@ def dipnet_to_daide_parsing(
             )
             print(e)
             continue
-    return [str(order) for order in daide_orders]
+    return daide_orders
 
 
 def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:

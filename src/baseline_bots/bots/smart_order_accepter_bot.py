@@ -194,8 +194,8 @@ class SmartOrderAccepterBot(DipnetBot):
         :param orders_list: set of orders that are going to be executed by the bot
         """
         if orders_list:
-            raw_orders = dipnet_to_daide_parsing(orders_list, self.game)
-            orders = [XDO(parse_daide(raw_order)) for raw_order in raw_orders]
+            commands = dipnet_to_daide_parsing(orders_list, self.game)
+            orders = [XDO(command) for command in commands]
             if not orders:
                 return
             orders_decided = FCT(optional_ORR(orders))
@@ -241,8 +241,8 @@ class SmartOrderAccepterBot(DipnetBot):
         """
         for proposer, orders in prp_orders.items():
             if orders and self.power_name != proposer:
-                raw_orders = dipnet_to_daide_parsing(orders, self.game)
-                orders = [XDO(parse_daide(raw_order)) for raw_order in raw_orders]
+                commands = dipnet_to_daide_parsing(orders, self.game)
+                orders = [XDO(command) for command in commands]
                 prp_msg = FCT(optional_ORR(orders))
                 if proposer == best_proposer and proposer in self.allies:
                     msg = YES(prp_msg)
@@ -273,12 +273,12 @@ class SmartOrderAccepterBot(DipnetBot):
         for sender in invalid_proposal_orders:
             if sender == self.power_name:
                 continue
-            raw_orders = dipnet_to_daide_parsing(
+            commands = dipnet_to_daide_parsing(
                 invalid_proposal_orders[sender],
                 self.game,
                 unit_power_tuples_included=True,
             )
-            orders = [XDO(parse_daide(raw_order)) for raw_order in raw_orders]
+            orders = [XDO(command) for command in commands]
             message = HUH(PRP(optional_ORR(orders)))
             await self.send_message(sender, str(message), messages_data)
         await self.send_intent_log(
@@ -571,12 +571,12 @@ class SmartOrderAccepterBot(DipnetBot):
                 # Construct message for each support proposal
                 if not (final_messages[recipient]):
                     continue
-                raw_orders = dipnet_to_daide_parsing(
+                commands = dipnet_to_daide_parsing(
                     final_messages[recipient],
                     self.game,
                     unit_power_tuples_included=False,
                 )
-                orders = [XDO(parse_daide(raw_order)) for raw_order in raw_orders]
+                orders = [XDO(command) for command in commands]
                 suggested_proposals = PRP(optional_ORR(orders))
                 final_messages[recipient] = str(suggested_proposals)
                 await self.send_message(recipient, str(suggested_proposals), comms_obj)
