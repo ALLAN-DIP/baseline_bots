@@ -1,12 +1,17 @@
 import random
 from typing import List
 
-from DAIDE import ORR, PRP, XDO
+from daidepp import PRP, XDO
 from diplomacy import Game
 
 from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.parsing_utils import dipnet_to_daide_parsing
-from baseline_bots.utils import MessagesData, get_other_powers
+from baseline_bots.utils import (
+    MessagesData,
+    get_other_powers,
+    optional_ORR,
+    parse_daide,
+)
 
 
 class RandomProposerBot(BaselineBot):
@@ -37,16 +42,9 @@ class RandomProposerBot(BaselineBot):
                 filter(lambda x: x != "WAIVE", suggested_random_orders)
             )
             if len(suggested_random_orders) > 0:
-                suggested_random_orders = PRP(
-                    ORR(
-                        [
-                            XDO(order)
-                            for order in dipnet_to_daide_parsing(
-                                suggested_random_orders, self.game
-                            )
-                        ]
-                    )
-                )
+                raw_orders = dipnet_to_daide_parsing(suggested_random_orders, self.game)
+                orders = [XDO(parse_daide(raw_order)) for raw_order in raw_orders]
+                suggested_random_orders = PRP(optional_ORR(orders))
                 # send the other power a message containing the orders
                 ret_obj.add_message(other_power, str(suggested_random_orders))
 

@@ -1,6 +1,6 @@
 from typing import List, Set
 
-from DAIDE import FCT, ORR, XDO
+from daidepp import FCT, XDO
 from diplomacy import Game, Message
 from tornado import gen
 
@@ -9,7 +9,9 @@ from baseline_bots.parsing_utils import daide_to_dipnet_parsing, dipnet_to_daide
 from baseline_bots.utils import (
     MessagesData,
     get_other_powers,
+    optional_ORR,
     parse_arrangement,
+    parse_daide,
     parse_FCT,
 )
 
@@ -68,16 +70,9 @@ class TransparentBot(DipnetBot):
 
         for other_power in get_other_powers([self.power_name], self.game):
             if final_orders:
-                msg = FCT(
-                    ORR(
-                        [
-                            XDO(order)
-                            for order in dipnet_to_daide_parsing(
-                                final_orders, self.game
-                            )
-                        ]
-                    )
-                )
+                raw_orders = dipnet_to_daide_parsing(final_orders, self.game)
+                orders = [XDO(parse_daide(raw_order)) for raw_order in raw_orders]
+                msg = FCT(optional_ORR(orders))
                 comms_obj.add_message(other_power, str(msg))
 
         return comms_obj
