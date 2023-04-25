@@ -365,12 +365,12 @@ def parse_proposal_messages(
                     # from RY: I think this parsing is problematic though..
                     # when we YES/REJ a ALY/PCE proposal we should do it as a whole..
                     elif isinstance(order, ALYVSS):
-                        for ally in parse_alliance_proposal(str(order), power_name):
+                        for ally in parse_alliance_proposal(order, power_name):
                             alliance_proposals[ally].append(
                                 (order_msg.sender, str(order))
                             )
                     elif isinstance(order, PCE):
-                        for peace in parse_peace_proposal(str(order), power_name):
+                        for peace in parse_peace_proposal(order, power_name):
                             peace_proposals[peace].append(
                                 (order_msg.sender, str(order))
                             )

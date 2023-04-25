@@ -178,7 +178,7 @@ def parse_arrangement(msg: str) -> List[str]:
     return [str(o) for o in daide_style_orders]
 
 
-def parse_alliance_proposal(msg: str, recipient: str) -> List[str]:
+def parse_alliance_proposal(msg: ALYVSS, recipient: str) -> List[str]:
     """Parses an alliance proposal
 
     E.g. (assuming the receiving country is RUSSIA)
@@ -187,11 +187,7 @@ def parse_alliance_proposal(msg: str, recipient: str) -> List[str]:
     :param recipient: the power which has received the alliance proposal
     :return: list of allies in the proposal
     """
-    parsed_msg = parse_daide(msg)
-    if not isinstance(parsed_msg, ALYVSS):
-        raise ValueError(f"{msg!r} is not an ALY message")
-
-    allies = list(parsed_msg.aly_powers)
+    allies = list(msg.aly_powers)
 
     recipient = recipient[:3]
     if recipient not in allies:
@@ -203,7 +199,7 @@ def parse_alliance_proposal(msg: str, recipient: str) -> List[str]:
     return sorted(POWER_NAMES_DICT[ally] for ally in allies)
 
 
-def parse_peace_proposal(msg: str, recipient: str) -> List[str]:
+def parse_peace_proposal(msg: PCE, recipient: str) -> List[str]:
     """Parses a peace proposal
 
     E.g. (assuming the receiving country is RUSSIA)
@@ -212,11 +208,7 @@ def parse_peace_proposal(msg: str, recipient: str) -> List[str]:
     :param recipient: the power which has received the peace proposal
     :return: list of allies in the proposal
     """
-    parsed_msg = parse_daide(msg)
-    if not isinstance(parsed_msg, PCE):
-        raise ValueError(f"{msg!r} is not a PCE message")
-
-    peaces = list(parsed_msg.powers)
+    peaces = list(msg.powers)
 
     recipient = recipient[:3]
     if recipient not in peaces:
