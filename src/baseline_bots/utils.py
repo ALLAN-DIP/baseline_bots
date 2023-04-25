@@ -10,7 +10,6 @@ from copy import deepcopy
 import os
 from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Set, Tuple
 
-from DAIDE.utils.exceptions import ParseError
 import daidepp
 from daidepp import (
     ALYVSS,
@@ -141,16 +140,6 @@ def YES(string: str) -> str:
 def REJ(string: str) -> str:
     """Forms REJ message"""
     return f"REJ ({string})"
-
-
-def parse_FCT(msg: str) -> str:
-    """Detaches FCT from main arrangement"""
-    if "FCT" not in msg:
-        raise ParseError("This is not an FCT message")
-    try:
-        return msg[msg.find("(") + 1 : -1]
-    except Exception:
-        raise Exception(f"Can't parse FCT msg {msg}")
 
 
 def parse_arrangement(msg: str) -> List[str]:

@@ -1,6 +1,5 @@
 from typing import List
 
-from DAIDE import ParseError
 from diplomacy import Game, Message
 from tornado import gen
 
@@ -48,25 +47,20 @@ class PushoverDipnet(DipnetBot):
         if "FCT" in last_message.message or len(sorted_rcvd_messages) == 0:
             return reply_obj
 
-        # parse may fail
-        try:
-            orders = get_non_aggressive_orders(
-                parse_arrangement(last_message.message), self.power_name, self.game
-            )
-            # set the orders
-            self.orders.add_orders(orders, overwrite=True)
+        orders = get_non_aggressive_orders(
+            parse_arrangement(last_message.message), self.power_name, self.game
+        )
+        # set the orders
+        self.orders.add_orders(orders, overwrite=True)
 
-            # set message to say YES
-            msg = YES(last_message.message)
-            reply_obj.add_message(last_message.sender, str(msg))
+        # set message to say YES
+        msg = YES(last_message.message)
+        reply_obj.add_message(last_message.sender, str(msg))
 
-            for message in sorted_rcvd_messages[1:]:
-                if "FCT" not in last_message.message:
-                    msg = REJ(message)
-                    reply_obj.add_message(message.sender, str(msg))
-
-        except ParseError as e:
-            pass
+        for message in sorted_rcvd_messages[1:]:
+            if "FCT" not in last_message.message:
+                msg = REJ(message)
+                reply_obj.add_message(message.sender, str(msg))
 
         return reply_obj
 

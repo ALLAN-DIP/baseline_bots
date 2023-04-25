@@ -12,7 +12,6 @@ from baseline_bots.utils import (
     OrdersData,
     get_order_tokens,
     parse_arrangement,
-    parse_FCT,
     smart_select_support_proposals,
 )
 
@@ -307,15 +306,6 @@ class TestUtils:
                     set(parsed_orders_dict[pod_key][key]),
                     set(expected[pod_key][key]),
                 )
-
-    def test_parse_FCT(self):
-        # Tests for orders extraction
-        FCT_TCS = [
-            ["FCT (XDO (F BLK - CON))", "XDO (F BLK - CON)"],
-            ["FCT(XDO (F BLK - CON))", "XDO (F BLK - CON)"],
-        ]
-        for tc_ip, tc_op in FCT_TCS:
-            assert parse_FCT(tc_ip) == tc_op, parse_FCT(tc_ip)
 
     PARSE_ARRANGEMENT_TEST_CASES = [
         ["PRP (XDO ((RUS FLT BLA) MTO CON))", ["XDO ( ( RUS FLT BLA ) MTO CON )"]],

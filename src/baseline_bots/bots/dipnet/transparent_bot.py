@@ -11,7 +11,7 @@ from baseline_bots.utils import (
     get_other_powers,
     optional_ORR,
     parse_arrangement,
-    parse_FCT,
+    parse_daide,
 )
 
 
@@ -37,10 +37,13 @@ class TransparentBot(DipnetBot):
         self.my_orders_informed = False
 
     def parse_messages(self, rcvd_messages: List[Message]) -> List[str]:
-        press_msgs = [msg for msg in rcvd_messages if "FCT" in msg.message]
+        press_msgs = [
+            msg for msg in rcvd_messages if isinstance(parse_daide(msg.message), FCT)
+        ]
         parsed_orders = []
         for msg in press_msgs:
-            parsed_orders += parse_arrangement(parse_FCT(msg.message))
+            parsed_message: FCT = parse_daide(msg.message)
+            parsed_orders += parse_arrangement(str(parsed_message.arrangement_qry_not))
         return parsed_orders
 
     @gen.coroutine
