@@ -8,7 +8,10 @@ import random
 import re
 from typing import List, Tuple
 
+from daidepp import Command
+
 from baseline_bots.parsing_utils import daidefy_location
+from baseline_bots.utils import parse_daide
 
 # The comments below signal the formatter not to expand these dicts to multiple lines
 # fmt: off
@@ -129,7 +132,7 @@ COMBOS = {
 joiners = {"AND", "ORR"}
 
 
-def random_list_orders(orders: List) -> List:
+def random_list_orders(orders: List[Command]) -> List[Command]:
     """
     Generates a randomly deviant orders in the same form.
 
@@ -138,14 +141,14 @@ def random_list_orders(orders: List) -> List:
     :return: The list of deviant orders
     :rtype: List[Tuple]
     """
-    correspondences = orders_correspondence(
-        orders
-    )  # this returns a list of tuples representing correspondences or an empty list
+    # correspondences = orders_correspondence(
+    #     orders
+    # )  # this returns a list of tuples representing correspondences or an empty list
 
-    cor_orders = list(
+    orders = list(
         map(lambda order: randomize(order), orders)
     )  # if there are no correspondences, every order is randomized alone
-    return cor_orders
+    return orders
 
 
 def orders_correspondence(orders: List) -> List:
@@ -179,7 +182,7 @@ def orders_correspondence(orders: List) -> List:
     return correspondences
 
 
-def randomize(order: Tuple) -> Tuple:
+def randomize(order: Command) -> Command:
     """
     Takes in an order and returns a randomly deviant version of it.
 
@@ -188,7 +191,9 @@ def randomize(order: Tuple) -> Tuple:
     :return: A deviant order (with some chance of being the same order).
     :rtype: Tuple
     """
-    tag = order[1]
+    order_tuple = string_to_tuple(f"({order})")
+
+    tag = order_tuple[1]
     tag_to_func = {
         "MTO": random_movement,
         "RTO": random_movement,
@@ -201,8 +206,11 @@ def randomize(order: Tuple) -> Tuple:
         "REM": lambda order: order,
         "DSB": lambda order: order,
     }
+    new_order_tuple = tag_to_func[tag](order_tuple)
 
-    return tag_to_func[tag](order)
+    random_str = tuple_to_string(new_order_tuple)
+    daide_order = parse_daide(random_str)
+    return daide_order
 
 
 def random_convoy_to(order: Tuple) -> Tuple:

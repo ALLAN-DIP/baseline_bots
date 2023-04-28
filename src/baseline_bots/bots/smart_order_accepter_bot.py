@@ -12,11 +12,7 @@ from tornado import gen
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from baseline_bots.parsing_utils import dipnet_to_daide_parsing, parse_proposal_messages
-from baseline_bots.randomize_order import (
-    random_list_orders,
-    string_to_tuple,
-    tuple_to_string,
-)
+from baseline_bots.randomize_order import random_list_orders
 from baseline_bots.utils import (
     MessagesData,
     OrdersData,
@@ -834,19 +830,14 @@ class SmartOrderAccepterBot(DipnetBot):
                 best_proposer, valid_proposal_orders, msgs_data
             )
 
-            # randomize dipnet orders and send random orders to enemies
             dipnet_ords = list(self.orders.orders.values())
-            lst_style_orders = dipnet_to_daide_parsing(dipnet_ords, self.game)
-            lst_rand = list(
-                map(lambda st: string_to_tuple(f"({st})"), lst_style_orders)
-            )
             yield self.send_intent_log(f"Using orders {dipnet_ords}")
+
+            # randomize dipnet orders and send random orders to enemies
             try:
-                randomized_orders = random_list_orders(lst_rand)
-                random_str_orders = list(map(tuple_to_string, randomized_orders))
-                daide_orders = [
-                    XDO(parse_daide(raw_order)) for raw_order in random_str_orders
-                ]
+                daide_style_orders = dipnet_to_daide_parsing(dipnet_ords, self.game)
+                randomized_orders = random_list_orders(daide_style_orders)
+                daide_orders = [XDO(order) for order in randomized_orders]
                 daide_orders = FCT(optional_ORR(daide_orders))
                 if self.foes:
                     yield self.send_intent_log(
