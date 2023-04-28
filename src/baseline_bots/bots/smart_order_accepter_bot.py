@@ -4,14 +4,36 @@ from enum import Enum
 import random
 from typing import Dict, List, Optional, Sequence, Set, Tuple
 
-from daidepp import ALYVSS, FCT, HUH, PRP, REJ, XDO, YES
+from daidepp import (
+    ALYVSS,
+    BLD,
+    CVY,
+    DSB,
+    FCT,
+    HLD,
+    HUH,
+    MTO,
+    PRP,
+    REJ,
+    REM,
+    RTO,
+    SUP,
+    WVE,
+    XDO,
+    YES,
+    MoveByCVY,
+)
 from diplomacy import Game
 from diplomacy.client.network_game import NetworkGame
 from stance_vector import ActionBasedStance, ScoreBasedStance
 from tornado import gen
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
-from baseline_bots.parsing_utils import dipnet_to_daide_parsing, parse_proposal_messages
+from baseline_bots.parsing_utils import (
+    dipnet_to_daide_parsing,
+    dipnetify_location,
+    parse_proposal_messages,
+)
 from baseline_bots.randomize_order import random_list_orders
 from baseline_bots.utils import (
     MessagesData,
@@ -597,47 +619,65 @@ class SmartOrderAccepterBot(DipnetBot):
         :return: Boolean
 
         """
-        order_token = get_order_tokens(order)
-        if order_token[0].startswith("A") or order_token[0].startswith("F"):
-            # for 1 and 2
-            if order_token[1].startswith("-"):
-                # get location - add order_token[0] ('A' or 'F') at front to check if it collides with other powers' units
-                order_unit = order_token[0][0] + order_token[1][1:]
-                for power in powers:
-                    if self.power_name != power:
-                        # if the order is to attack allies' units
-                        if order_unit in self.game.powers[power].units:
-                            return True
-                        # if the order is a move to allies' SC
-                        if order_token[1][2:] in self.game.powers[power].centers:
-                            return True
-            # for 3 and 4
-            if order_token[1].startswith("S"):
-                # if support hold
-                if len(order_token) == 3:  # ['A BUD', 'S', 'A VIE']
-                    return False
-                order_unit = order_token[2][0] + order_token[3][1:]
-                for power in powers:
-                    if self.power_name != power:
-                        # if the order is a support to attack allies' units
-                        if order_unit in self.game.powers[power].units:
-                            return True
-                        # if the order is a support move to allies' SC
-                        if order_token[3][2:] in self.game.powers[power].centers:
-                            return True
-                        # for 3 and 4
+        parsed_order = dipnet_to_daide_parsing([order], self.game)[0]
+        # Check for `Command`, but `isinstance()` doesn't work on `Union`s
+        if not isinstance(
+            parsed_order, (HLD, MTO, SUP, CVY, MoveByCVY, BLD, REM, WVE, RTO, DSB)
+        ):
+            raise ValueError(f"{order!r} is not a valid DAIDE command")
 
-            if order_token[1][0].startswith("C"):
-                # if convoy
-                order_unit = order_token[2][0] + order_token[3][1:]
-                for power in powers:
-                    if self.power_name != power:
-                        # if the order is to convoy attack allies' units
-                        if order_unit in self.game.powers[power].units:
-                            return True
-                        # if the order is a convoy move to allies' SC
-                        if order_token[3][2:] in self.game.powers[power].centers:
-                            return True
+        # for 1 and 2
+        if isinstance(parsed_order, (MTO, RTO, MoveByCVY)):
+            # get location to check if it collides with other powers' units
+            target_loc = parsed_order.location
+            for power in powers:
+                if self.power_name == power:
+                    continue
+                # if the order is to attack allies' units
+                if any(
+                    dipnetify_location(target_loc) in unit
+                    for unit in self.game.powers[power].units
+                ):
+                    return True
+                # if the order is a move to allies' SC
+                if target_loc.province in self.game.powers[power].centers:
+                    return True
+        # for 3 and 4
+        elif isinstance(parsed_order, SUP):
+            # if support hold
+            if parsed_order.province_no_coast_location is None:  # "A BUD S A VIE"
+                return False
+            target_loc = parsed_order.province_no_coast_location
+            for power in powers:
+                if self.power_name == power:
+                    continue
+                # if the order is a support to attack allies' units
+                if any(
+                    dipnetify_location(target_loc) in unit
+                    for unit in self.game.powers[power].units
+                ):
+                    return True
+                # if the order is a support move to allies' SC
+                if target_loc.province in self.game.powers[power].centers:
+                    return True
+                # for 3 and 4
+
+        elif isinstance(parsed_order, CVY):
+            # if convoy
+            target_loc = parsed_order.province
+            for power in powers:
+                if self.power_name == power:
+                    continue
+                # if the order is to convoy attack allies' units
+                if any(
+                    dipnetify_location(target_loc) in unit
+                    for unit in self.game.powers[power].units
+                ):
+                    return True
+                # if the order is a convoy move to allies' SC
+                if target_loc.province in self.game.powers[power].centers:
+                    return True
+
         return False
 
     @gen.coroutine
