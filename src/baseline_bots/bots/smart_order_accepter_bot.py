@@ -604,7 +604,7 @@ class SmartOrderAccepterBot(DipnetBot):
 
         return final_messages
 
-    def is_order_aggressive_to_powers(self, order: str, powers: List[str]):
+    def is_order_aggressive_to_powers(self, order: str, powers: List[str]) -> bool:
         """
         check if the order is aggressive by
         1. to attack ally unit
@@ -626,19 +626,18 @@ class SmartOrderAccepterBot(DipnetBot):
         ):
             raise ValueError(f"{order!r} is not a valid DAIDE command")
 
+        # get target location to check if it collides with other powers' units
         # for 1 and 2
         if isinstance(parsed_order, (MTO, RTO, MoveByCVY)):
-            # get location to check if it collides with other powers' units
             target_loc = parsed_order.location
         # for 3 and 4
         elif isinstance(parsed_order, SUP):
-            # if support hold
-            if parsed_order.province_no_coast_location is None:  # "A BUD S A VIE"
+            # if support hold, e.g., "A BUD S A VIE"
+            if parsed_order.province_no_coast_location is None:
                 return False
             target_loc = parsed_order.province_no_coast_location
         # for 5 and 6
         elif isinstance(parsed_order, CVY):
-            # if convoy
             target_loc = parsed_order.province
         else:
             return False
