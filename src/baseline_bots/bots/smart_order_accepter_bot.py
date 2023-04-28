@@ -630,53 +630,35 @@ class SmartOrderAccepterBot(DipnetBot):
         if isinstance(parsed_order, (MTO, RTO, MoveByCVY)):
             # get location to check if it collides with other powers' units
             target_loc = parsed_order.location
-            for power in powers:
-                if self.power_name == power:
-                    continue
-                # if the order is to attack allies' units
-                if any(
-                    dipnetify_location(target_loc) in unit
-                    for unit in self.game.powers[power].units
-                ):
-                    return True
-                # if the order is a move to allies' SC
-                if target_loc.province in self.game.powers[power].centers:
-                    return True
         # for 3 and 4
         elif isinstance(parsed_order, SUP):
             # if support hold
             if parsed_order.province_no_coast_location is None:  # "A BUD S A VIE"
                 return False
             target_loc = parsed_order.province_no_coast_location
-            for power in powers:
-                if self.power_name == power:
-                    continue
-                # if the order is a support to attack allies' units
-                if any(
-                    dipnetify_location(target_loc) in unit
-                    for unit in self.game.powers[power].units
-                ):
-                    return True
-                # if the order is a support move to allies' SC
-                if target_loc.province in self.game.powers[power].centers:
-                    return True
-                # for 3 and 4
-
+        # for 5 and 6
         elif isinstance(parsed_order, CVY):
             # if convoy
             target_loc = parsed_order.province
-            for power in powers:
-                if self.power_name == power:
-                    continue
-                # if the order is to convoy attack allies' units
-                if any(
-                    dipnetify_location(target_loc) in unit
-                    for unit in self.game.powers[power].units
-                ):
-                    return True
-                # if the order is a convoy move to allies' SC
-                if target_loc.province in self.game.powers[power].centers:
-                    return True
+        else:
+            return False
+
+        for power in powers:
+            if self.power_name == power:
+                continue
+            # if the order is to attack allies' units
+            # if the order is a support to attack allies' units
+            # if the order is to convoy attack allies' units
+            if any(
+                dipnetify_location(target_loc) in unit
+                for unit in self.game.powers[power].units
+            ):
+                return True
+            # if the order is a move to allies' SC
+            # if the order is a support move to allies' SC
+            # if the order is a convoy move to allies' SC
+            if target_loc.province in self.game.powers[power].centers:
+                return True
 
         return False
 
