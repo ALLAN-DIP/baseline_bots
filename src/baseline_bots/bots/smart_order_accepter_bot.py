@@ -6,21 +6,18 @@ from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 from daidepp import (
     ALYVSS,
-    BLD,
     CVY,
-    DSB,
     FCT,
     HLD,
     HUH,
     MTO,
     PRP,
     REJ,
-    REM,
     RTO,
     SUP,
-    WVE,
     XDO,
     YES,
+    Command,
     MoveByCVY,
 )
 from diplomacy import Game
@@ -30,8 +27,10 @@ from tornado import gen
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from baseline_bots.parsing_utils import (
+    daide_to_dipnet_parsing,
     dipnet_to_daide_parsing,
     dipnetify_location,
+    dipnetify_unit,
     parse_proposal_messages,
 )
 from baseline_bots.randomize_order import random_list_orders
@@ -604,7 +603,7 @@ class SmartOrderAccepterBot(DipnetBot):
 
         return final_messages
 
-    def is_order_aggressive_to_powers(self, order: str, powers: List[str]) -> bool:
+    def is_order_aggressive_to_powers(self, order: Command, powers: List[str]) -> bool:
         """
         check if the order is aggressive by
         1. to attack ally unit
@@ -619,26 +618,19 @@ class SmartOrderAccepterBot(DipnetBot):
         :return: Boolean
 
         """
-        parsed_order = dipnet_to_daide_parsing([order], self.game)[0]
-        # Check for `Command`, but `isinstance()` doesn't work on `Union`s
-        if not isinstance(
-            parsed_order, (HLD, MTO, SUP, CVY, MoveByCVY, BLD, REM, WVE, RTO, DSB)
-        ):
-            raise ValueError(f"{order!r} is not a valid DAIDE command")
-
         # get target location to check if it collides with other powers' units
         # for 1 and 2
-        if isinstance(parsed_order, (MTO, RTO, MoveByCVY)):
-            target_loc = parsed_order.location
+        if isinstance(order, (MTO, RTO, MoveByCVY)):
+            target_loc = order.location
         # for 3 and 4
-        elif isinstance(parsed_order, SUP):
+        elif isinstance(order, SUP):
             # if support hold, e.g., "A BUD S A VIE"
-            if parsed_order.province_no_coast_location is None:
+            if order.province_no_coast_location is None:
                 return False
-            target_loc = parsed_order.province_no_coast_location
+            target_loc = order.province_no_coast_location
         # for 5 and 6
-        elif isinstance(parsed_order, CVY):
-            target_loc = parsed_order.province
+        elif isinstance(order, CVY):
+            target_loc = order.province
         else:
             return False
 
@@ -662,7 +654,9 @@ class SmartOrderAccepterBot(DipnetBot):
         return False
 
     @gen.coroutine
-    def get_non_aggressive_order(self, order: str, powers: List[str]):
+    def get_non_aggressive_order(
+        self, order: Command, current_orders: List[Command], powers: List[str]
+    ) -> Command:
         """
         return a non-aggressive order with other options in dipnet beam order, if none left, support its own unit. if none around, support self hold.
 
@@ -671,19 +665,16 @@ class SmartOrderAccepterBot(DipnetBot):
         :return: order
 
         """
-        order_token = get_order_tokens(order)
-        unit = order_token[0]
-        loc_unit = unit[2:]
-        list_order, prob_order = yield self.brain.get_beam_orders(
-            self.game, self.power_name
-        )
+        unit = dipnetify_unit(order.unit)
+        list_order, _ = yield self.brain.get_beam_orders(self.game, self.power_name)
 
         if len(list_order) > 1:
             for i in range(1, len(list_order)):
-                dipnet_order = list_order[i]
-                for candidate_order in dipnet_order:
+                dipnet_orders = list_order[i]
+                daide_orders = dipnet_to_daide_parsing(dipnet_orders, self.game)
+                for candidate_order in daide_orders:
                     if (
-                        unit in candidate_order
+                        unit == candidate_order.unit
                         and not self.is_order_aggressive_to_powers(
                             candidate_order, powers
                         )
@@ -691,35 +682,49 @@ class SmartOrderAccepterBot(DipnetBot):
                         return candidate_order
 
         # if none in dipnet beam orders
-        for current_order in self.orders.get_list_of_orders():
-            if current_order != order and not self.is_order_aggressive_to_powers(
-                current_order, powers
-            ):
-                return f"{unit} S {current_order}"
+        new_order = HLD(order.unit)  # Default value
 
-        return f"{unit} H"
+        for current_order in current_orders:
+            if (
+                current_order != order
+                and isinstance(current_order, (MTO, HLD))
+                and not self.is_order_aggressive_to_powers(order, powers)
+            ):
+                if isinstance(current_order, HLD):
+                    new_order = SUP(order.unit, current_order.unit)
+                else:  # Is `MTO`
+                    new_order = SUP(
+                        order.unit,
+                        current_order.unit,
+                        current_order.location.province,
+                    )
+                break
+
+        return new_order
 
     @gen.coroutine
-    def replace_aggressive_order_to_allies(self):
+    def replace_aggressive_order_to_allies(self) -> None:
         """
         replace aggressive orders with non-aggressive orders (in-place replace self.orders)
 
         :return: nothing
         """
-        ally = self.allies
-
-        if not len(ally):
+        if not self.allies:
             return
+        dipnet_orders = self.orders.get_list_of_orders()
+        daide_orders = dipnet_to_daide_parsing(dipnet_orders, self.game)
         final_orders = []
-        for order in self.orders.get_list_of_orders():
-            if self.is_order_aggressive_to_powers(order, ally):
-                new_order = yield from self.get_non_aggressive_order(order, ally)
+        for order in daide_orders:
+            if self.is_order_aggressive_to_powers(order, self.allies):
+                new_order = yield from self.get_non_aggressive_order(
+                    order, daide_orders, self.allies
+                )
                 yield self.send_intent_log(
-                    f"Replacing order {order!r} with {new_order!r} because we should not be aggressive to allies."
+                    f"Replacing order {daide_to_dipnet_parsing(str(order))[0]!r} with {daide_to_dipnet_parsing(str(new_order))[0]!r} because we should not be aggressive to allies."
                 )
             else:
                 new_order = order
-            final_orders.append(new_order)
+            final_orders.append(daide_to_dipnet_parsing(str(new_order))[0])
 
         orders_data = OrdersData()
         orders_data.add_orders(final_orders)
