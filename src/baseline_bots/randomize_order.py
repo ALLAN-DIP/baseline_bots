@@ -5,7 +5,6 @@ an already existing order / list of orders.
 
 
 import random
-import re
 from typing import List, Tuple, Union
 
 from daidepp import (
@@ -203,8 +202,6 @@ def randomize(order: Command) -> Command:
     :return: A deviant order (with some chance of being the same order).
     :rtype: Tuple
     """
-    order_tuple = string_to_tuple(f"({order})")
-
     if isinstance(order, (MTO, RTO)):
         return random_movement(order)
     elif isinstance(order, HLD):
@@ -219,10 +216,6 @@ def randomize(order: Command) -> Command:
         return order
     else:
         raise NotImplementedError(type(order))
-
-    random_str = tuple_to_string(new_order_tuple)
-    daide_order = parse_daide(random_str)
-    return daide_order
 
 
 def random_convoy_to(order: MoveByCVY) -> MoveByCVY:
@@ -397,46 +390,3 @@ def random_hold(order: HLD, chance_of_move: float = 0.8) -> Union[MTO, HLD]:
         return MTO(order.unit, daidefy_location(move_loc))
     else:
         return order
-
-
-def tuple_to_string(order: Tuple) -> str:
-    """
-    Takes in a tuple representing an order and returns a string
-    representing the same order in DAIDE format
-    Ex. tuple_to_string((('FRA', 'AMY', 'BUR'), 'MTO', 'PAR'))  -> "(FRA AMY BUR) MTO PAR"
-
-    :param order: A Tuple with the format: (('FRA', 'AMY', 'BUR'), 'MTO', 'PAR')
-    :type order: Tuple
-    :return: The same order converted to a string in DAIDE format: (FRA AMY BUR) MTO PAR
-    :rtype: str
-    """
-    # fmt: off
-    for i, sub in enumerate(order):
-        if isinstance(sub, Tuple):  # if a recursive call is necessary to parse a nested tuple
-            if i == 0 or i == 1:  # if a comma must be added before the parenthesis
-                return (" ".join(str(item) for item in order[:i]) + "(" + tuple_to_string(sub) + ") " + tuple_to_string(order[i + 1 :]))
-            else:
-                return (" ".join(str(item) for item in order[:i]) + " (" + tuple_to_string(sub) + ") " + tuple_to_string(order[i + 1 :]))
-
-    # otherwise joins the tuple without recursion
-    # fmt: on
-    return " ".join(str(item) for item in order)
-
-
-def string_to_tuple(orders: str) -> Tuple:
-    """
-    Takes as string representing an order in DAIDE format and
-    returns a tuple representing the same order.
-
-    :param order: A string with the format: "((FRA AMY BUR) MTO PAR)"
-    :type order: str
-    :return: A Tuple that captures the structure of the DAIDE syntax through nesting.
-    :rtype: Tuple
-    """
-    with_commas = re.sub(
-        r"(.*?[^(])\s+?([^)].*?)", r"\1, \2", orders
-    )  # inserts commas in between tuples and strings
-    with_quotes = re.sub(
-        r"([(, ])([A-Z|\/]+)([), ])", r"\1'\2'\3", with_commas
-    )  # inserts quotes around strings
-    return eval(with_quotes)
