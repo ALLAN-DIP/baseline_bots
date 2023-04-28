@@ -221,6 +221,35 @@ def dipnet_to_daide_parsing(
     return daide_orders
 
 
+def dipnetify_location(loc: Location) -> str:
+    """Converts DipNet-style location to DAIDE-style location
+
+    E.g.
+    BUL ECS --> BUL/EC
+    STP SCS --> STP/SC
+    ECH     --> ENG
+    PAR     --> PAR
+
+    :param loc: DAIDE-style location
+    :return: DipNet-style province notation
+    """
+    prov = daide2dipnet_loc.get(loc.province, loc.province)
+    if loc.coast is not None:
+        prov += "/" + loc.coast[:-1]
+    return prov
+
+
+def dipnetify_unit(unit: Unit) -> str:
+    """Converts DAIDE-style unit to DipNet-style unit
+
+    :param unit: DAIDE-style unit
+    :return: DipNet-style unit notation
+    """
+    unit_type = unit.unit_type[0]
+    location = dipnetify_location(unit.location)
+    return f"{unit_type} {location}"
+
+
 def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
     """Convert single DAIDE-style order to DipNet-style order
 
@@ -229,33 +258,6 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
     :param daide_style_order_str: DAIDE-style string to be converted to DipNet style
     :return: DipNet-style order string and unit's power name
     """
-
-    def dipnetify_location(loc: Location) -> str:
-        """Converts DipNet-style location to DAIDE-style location
-
-        E.g.
-        BUL ECS --> BUL/EC
-        STP SCS --> STP/SC
-        ECH     --> ENG
-        PAR     --> PAR
-
-        :param loc: DAIDE-style location
-        :return: DipNet-style province notation
-        """
-        prov = daide2dipnet_loc.get(loc.province, loc.province)
-        if loc.coast is not None:
-            prov += "/" + loc.coast[:-1]
-        return prov
-
-    def dipnetify_unit(unit: Unit) -> str:
-        """Converts DAIDE-style unit to DipNet-style unit
-
-        :param unit: DAIDE-style unit
-        :return: DipNet-style unit notation
-        """
-        unit_type = unit.unit_type[0]
-        location = dipnetify_location(unit.location)
-        return f"{unit_type} {location}"
 
     try:
         parsed_order: Command = parse_daide(daide_style_order_str)
