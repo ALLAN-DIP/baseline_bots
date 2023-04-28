@@ -6,12 +6,24 @@ an already existing order / list of orders.
 
 import random
 import re
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
-from daidepp import Command
+from daidepp import (
+    BLD,
+    CVY,
+    DSB,
+    HLD,
+    MTO,
+    REM,
+    RTO,
+    SUP,
+    WVE,
+    Command,
+    Location,
+    MoveByCVY,
+)
 
-from baseline_bots.parsing_utils import daidefy_location
-from baseline_bots.utils import parse_daide
+from baseline_bots.parsing_utils import daidefy_location, dipnetify_location
 
 # The comments below signal the formatter not to expand these dicts to multiple lines
 # fmt: off
@@ -193,27 +205,27 @@ def randomize(order: Command) -> Command:
     """
     order_tuple = string_to_tuple(f"({order})")
 
-    tag = order_tuple[1]
-    tag_to_func = {
-        "MTO": random_movement,
-        "RTO": random_movement,
-        "HLD": random_hold,
-        "SUP": random_support,
-        "CVY": random_convoy,
-        "CTO": random_convoy_to,
-        "WVE": lambda order: order,
-        "BLD": lambda order: order,
-        "REM": lambda order: order,
-        "DSB": lambda order: order,
-    }
-    new_order_tuple = tag_to_func[tag](order_tuple)
+    if isinstance(order, (MTO, RTO)):
+        return random_movement(order)
+    elif isinstance(order, HLD):
+        return random_hold(order)
+    elif isinstance(order, SUP):
+        return random_support(order)
+    elif isinstance(order, CVY):
+        return random_convoy(order)
+    elif isinstance(order, MoveByCVY):
+        return random_convoy_to(order)
+    elif isinstance(order, (WVE, BLD, REM, DSB)):
+        return order
+    else:
+        raise NotImplementedError(type(order))
 
     random_str = tuple_to_string(new_order_tuple)
     daide_order = parse_daide(random_str)
     return daide_order
 
 
-def random_convoy_to(order: Tuple) -> Tuple:
+def random_convoy_to(order: MoveByCVY) -> MoveByCVY:
     """
     This takes a convoy order and returns the longest alternate convoy.
 
@@ -222,17 +234,16 @@ def random_convoy_to(order: Tuple) -> Tuple:
     :return: A deviant order (with some chance of being the same order).
     :rtype: Tuple
     """
-    (_, _, amy_loc), _, province, _, sea_provinces = order
-    if isinstance(sea_provinces, Tuple):
-        sea_provinces = list(reversed(sea_provinces))
-    else:
-        sea_provinces = [sea_provinces]
+    amy_loc = dipnetify_location(order.unit.location)
+    province = dipnetify_location(order.province)
+    sea_provinces = [dipnetify_location(Location(sea)) for sea in order.province_seas]
+    sea_provinces = list(reversed(sea_provinces))
     for i, sea in enumerate(
         sea_provinces
     ):  # searches through the sea provinces in reversed order to find the longest possible alternate convoy
         # fmt : off
         valid = [
-            str(daidefy_location(loc))
+            loc
             for loc in ADJACENCY[sea]
             if TYPES[loc] == "COAST"
             and loc != [province]
@@ -243,11 +254,12 @@ def random_convoy_to(order: Tuple) -> Tuple:
             route = tuple(
                 (reversed(sea_provinces[i:]))
             )  # the list must be reversed back to the correct order before returning
-            return (order[0], "CTO", random.choice(valid), "VIA", route)
+            route = [daidefy_location(sea).province for sea in route]
+            return MoveByCVY(order.unit, daidefy_location(random.choice(valid)), *route)
     return order
 
 
-def random_convoy(order: Tuple) -> Tuple:
+def random_convoy(order: CVY) -> CVY:
     """
     This takes in the order and produces a convoy to a different destination if it is possible
     and believable. An unbelievable convoy would be one that convoys a unit to a province the
@@ -259,20 +271,26 @@ def random_convoy(order: Tuple) -> Tuple:
     :rtype: Tuple
     """
     # fmt: off
-    tag = order[1]
-    ((flt_country, flt_type, flt_loc), _, (amy_country, amy_type, amy_loc), _, province) = order
-    assert (amy_type == "AMY" and flt_type == "FLT"), "The unit type is neither army nor fleet so it is invalid."
+    # TODO: Add to `daidepp`?
+    assert (order.convoyed_unit.unit_type == "AMY" and order.convoying_unit.unit_type == "FLT"), "The unit type is neither army nor fleet so it is invalid."
     # It is necessary to check whether a possible alternate "convoy-to" location is adjacent to the unit being convoyed
     # since convoying to a province adjacent to you would be less believable
+    flt_loc = dipnetify_location(order.convoying_unit.location)
+    amy_loc = dipnetify_location(order.convoyed_unit.location)
+    province = dipnetify_location(order.province)
     adj = [str(daidefy_location(loc)) for loc in ADJACENCY[flt_loc] if TYPES[loc] == "COAST" and loc not in ADJACENCY[amy_loc] and loc != province]
     # fmt: on
     if adj:  # if valid adjacencies exist
-        return (order[0], tag, order[2], "CTO", random.choice(adj))
+        return CVY(
+            order.convoying_unit,
+            order.convoyed_unit,
+            daidefy_location(random.choice(adj)),
+        )
     else:
         return order
 
 
-def random_support(order: Tuple) -> Tuple:
+def random_support(order: SUP) -> SUP:
     """
     Takes in a support order and returns a believable but randomized version of it.
 
@@ -281,14 +299,12 @@ def random_support(order: Tuple) -> Tuple:
     :return: A deviant order (with some chance of being the same order).
     :rtype: Tuple
     """
-    tag = order[1]
-    if len(order) <= 3:  # if it is supporting to hold
+    if order.province_no_coast is None:  # if it is supporting to hold
         # fmt : off
-        (
-            (_, supporter_type, supporter_loc),
-            _,
-            (_, supported_type, supported_loc),
-        ) = order
+        supporter_type = order.supporting_unit.unit_type
+        supporter_loc = dipnetify_location(order.supporting_unit.location)
+        supported_type = order.supported_unit.unit_type
+        supported_loc = dipnetify_location(order.supported_unit.location)
         supporter_adjacent, supported_adjacent = (
             ADJACENCY[supporter_loc],
             ADJACENCY[supported_loc],
@@ -297,7 +313,7 @@ def random_support(order: Tuple) -> Tuple:
             supported_type
         ]  # Set of possible destinations
         adj_to_both = [
-            str(daidefy_location(adjacency).province)
+            daidefy_location(adjacency).province
             for adjacency in supporter_adjacent  # this finds all provinces adjacent to the supportee and suporter locations
             if adjacency in supported_adjacent
             and (not dest_choices or TYPES[adjacency] in dest_choices)
@@ -305,32 +321,35 @@ def random_support(order: Tuple) -> Tuple:
         # fmt: on
         chance_of_move = 0.5  # the chance of a support hold becoming a move is 50/50
         if adj_to_both and random.random() < chance_of_move:
-            return (order[0], "SUP ", order[2], "MTO", random.choice(adj_to_both))
+            return SUP(
+                order.supporting_unit, order.supported_unit, random.choice(adj_to_both)
+            )
         else:
-            return (
-                order[0],
-                tag + " ",
-                order[2],
-            )  # returns the same support hold order if there is no value adjacent to both
+            # returns the same support hold order if there is no value adjacent to both
+            return order
     else:  # if it is supporting to move
         # fmt: off
-        ((sup_country, sup_type, sup_loc), _, (rec_country, rec_type, rec_loc), _, province) = order
-        if isinstance(sup_loc, tuple):
-            sup_loc = f"{sup_loc[0]}/{sup_loc[1][:2]}"
-        if isinstance(rec_loc, tuple):
-            rec_loc = f"{rec_loc[0]}/{rec_loc[1][:2]}"
+        sup_type = order.supporting_unit.unit_type
+        sup_loc = dipnetify_location(order.supporting_unit.location)
+        rec_type = order.supported_unit.unit_type
+        rec_loc = dipnetify_location(order.supported_unit.location)
+        province = dipnetify_location(Location(order.province_no_coast))
         sup_adjacent, rec_adjacent = ADJACENCY[sup_loc], ADJACENCY[rec_loc]
         # COMBOS and TYPES must be used to determine the possible locations a unit can support into/from based on the unit type and province type
         dest_choices = COMBOS[sup_type][rec_type]
-        adj_to_both = [str(daidefy_location(adjacency).province) for adjacency in sup_adjacent if adjacency in rec_adjacent and adjacency != province and TYPES[adjacency]]
+        adj_to_both = [daidefy_location(adjacency).province for adjacency in sup_adjacent if adjacency in rec_adjacent and adjacency != province and TYPES[adjacency]]
         # fmt: on
         if adj_to_both:
-            return (order[0], tag + " ", order[2], "MTO", random.choice(adj_to_both))
+            return SUP(
+                order.supporting_unit, order.supported_unit, random.choice(adj_to_both)
+            )
         else:
             return order  # returns original order if no "trickier" option is found
 
 
-def random_movement(order: Tuple, chance_of_move=0.5):
+def random_movement(
+    order: Union[MTO, RTO], chance_of_move: float = 0.5
+) -> Union[MTO, RTO, HLD]:
     """
     Takes in a movement order and returns a similar but randomly different version of it.
     This may turn a movement order into a hold order.
@@ -340,26 +359,24 @@ def random_movement(order: Tuple, chance_of_move=0.5):
     :return: A deviant order (with some chance of being the same order).
     :rtype: Tuple
     """
-    (country, unit_type, loc), tag, dest = order
-    if (
-        random.random() < chance_of_move or tag == "RTO"
+    unit = order.unit
+    if random.random() < chance_of_move or isinstance(
+        order, RTO
     ):  # There is a 50/50 chance of switching a move to a hold, 0 for a retreat since that may make one less believable
-        if isinstance(loc, tuple):
-            loc_key = f"{loc[0]}/{loc[1][:2]}"
-        else:
-            loc_key = loc
-        all_adjacent = ADJACENCY[loc_key].copy()
+        loc = dipnetify_location(unit.location)
+        dest = dipnetify_location(order.location)
+        all_adjacent = ADJACENCY[loc].copy()
         if dest in all_adjacent:
             all_adjacent.remove(
                 dest
             )  # removing the already picked choice from the possible destinations
         new_dest = random.choice(all_adjacent)
-        return ((country, unit_type, loc), tag, str(daidefy_location(new_dest)))
+        return type(order)(unit, daidefy_location(new_dest))
     else:
-        return ((country, unit_type, loc), "HLD")
+        return HLD(unit)
 
 
-def random_hold(order: Tuple, chance_of_move=0.8) -> Tuple:
+def random_hold(order: HLD, chance_of_move: float = 0.8) -> Union[MTO, HLD]:
     """
     Takes in a hold order and returns a move from the same location or possibly
     the same hold order.
@@ -373,11 +390,11 @@ def random_hold(order: Tuple, chance_of_move=0.8) -> Tuple:
     if (
         random.random() < chance_of_move
     ):  # The chance of changing the hold to a move is high
-        ((country, unit_type, loc), _) = order
+        loc = dipnetify_location(order.unit.location)
         move_loc = random.choice(
             ADJACENCY[loc]
         )  # randomly chooses an adjacent location
-        return ((country, unit_type, loc), "MTO", str(daidefy_location(move_loc)))
+        return MTO(order.unit, daidefy_location(move_loc))
     else:
         return order
 
