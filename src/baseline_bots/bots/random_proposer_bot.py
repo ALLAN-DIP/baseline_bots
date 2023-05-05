@@ -39,7 +39,10 @@ class RandomProposerBot(BaselineBot):
                 if possible_orders[loc]
             ]
             suggested_random_orders = list(
-                filter(lambda x: x != "WAIVE", suggested_random_orders)
+                filter(
+                    lambda x: x != "WAIVE" and not x.endswith("VIA"),
+                    suggested_random_orders,
+                )
             )
             if len(suggested_random_orders) > 0:
                 raw_orders = dipnet_to_daide_parsing(suggested_random_orders, self.game)
