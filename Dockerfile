@@ -43,8 +43,8 @@ ENV PAD_VARIABLE_LENGTH_INPUTS='true'
 # Test parameter for async tests
 ENV ASYNC_TEST_TIMEOUT=180
 
-# Later versions of setuptools do not work properly
-RUN pip install --no-cache-dir --upgrade pip==23.0.1 setuptools==66.1.1 wheel==0.38.4
+# Later versions of pip and setuptools do not work properly
+RUN pip install --no-cache-dir --upgrade pip==23.0.1 setuptools==66.1.1 wheel==0.40.0
 
 # Install diplomacy research requirements
 # hadolint ignore=DL3059

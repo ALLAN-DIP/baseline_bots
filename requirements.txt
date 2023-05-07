@@ -1,13 +1,13 @@
 DAIDE @ git+https://git@github.com/ALLAN-DIP/DAIDE.git@34766b9bd609d28ea3d0bc4d56f0f798160ed215
-daidepp @ git+https://git@github.com/SHADE-AI/daidepp.git@aa27f3e4acae373e8646bdfe5e753cf5f368729f
-diplomacy @ git+https://git@github.com/SHADE-AI/diplomacy.git@614aa44d826eba3fbe3d96347d277668db45db2e
+daidepp @ git+https://git@github.com/SHADE-AI/daidepp.git@4ca90ec787a9ee9e7153e4f00846b713d6d69167
+diplomacy @ git+https://git@github.com/SHADE-AI/diplomacy.git@cfc663b53858f8ea7a448cd996f6ed0f626b92d6
 gym==0.18.3
 karma_sphinx_theme==0.0.8
-numpy==1.21
+numpy==1.21.6
 pre-commit==2.21.0
-pytest==7.1.3
+pytest==7.3.1
 sphinx==5.3.0
-stance_vector @ git+https://git@github.com/ALLAN-DIP/stance_vector.git@62e3e5d5c5567d1342ea64846e826c4a2139b72a
+stance_vector @ git+https://git@github.com/ALLAN-DIP/stance_vector.git@7d1295a4a28a506d43ee8c44206bcfc6d413abfa
 tornado==6.2
-tqdm==4.64.1
+tqdm==4.65.0
 ujson==5.7.0

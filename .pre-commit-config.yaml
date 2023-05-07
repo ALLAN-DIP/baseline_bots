@@ -30,7 +30,7 @@ repos:
       - id: requirements-txt-fixer
       - id: trailing-whitespace
   - repo: https://github.com/psf/black
-    rev: 23.1.0
+    rev: 23.3.0
     hooks:
       - id: black
   - repo: https://github.com/pycqa/isort
@@ -44,12 +44,12 @@ repos:
     hooks:
       - id: prettier
         # Older LTS version needed to run on CentOS 7 (e.g., Frontera)
-        language_version: 16.19.0
+        language_version: 16.20.0
         # Workaround from https://github.com/pre-commit/mirrors-prettier/issues/29#issuecomment-1332667344
         additional_dependencies:
-          - prettier@2.8.4
+          - prettier@2.8.8
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.2
+    rev: v2.2.4
     hooks:
       - id: codespell
         additional_dependencies:
