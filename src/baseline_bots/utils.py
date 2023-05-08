@@ -7,11 +7,19 @@ It would be preferable to use a real DAIDE parser in prod
 from collections import defaultdict
 import collections.abc
 from copy import deepcopy
+import os
 import re
-from typing import TYPE_CHECKING, Dict, List, Optional, Set, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Set, Tuple
 
 from DAIDE.utils.exceptions import ParseError
-from daidepp import AnyDAIDEToken, create_daide_grammar, daide_visitor
+from daidepp import (
+    AND,
+    ORR,
+    AnyDAIDEToken,
+    Arrangement,
+    create_daide_grammar,
+    daide_visitor,
+)
 from daidepp.grammar.grammar import DAIDELevel
 from diplomacy import Game, Message
 from diplomacy.utils import strings
@@ -62,6 +70,37 @@ def parse_daide(string: str) -> AnyDAIDEToken:
         return daide_visitor.visit(parse_tree)
     except Exception as ex:
         raise ValueError(f"Failed to parse DAIDE string: {string!r}") from ex
+
+
+# Option needed for performers that don't use `ORR`
+DISABLE_ORR = False
+if os.environ.get("DISABLE_ORR") is not None:
+    print("Disabling ORR usage")
+    DISABLE_ORR = True
+
+
+def optional_ORR(arrangements: Sequence[Arrangement]) -> Arrangement:
+    """Wraps a list of arrangements in an `ORR`.
+    If the list has a single element, return that element instead.
+    :param arrangements: List of arrangements.
+    :return: Arrangement object.
+    """
+    if len(arrangements) > 1 and not DISABLE_ORR:
+        return ORR(*arrangements)
+    else:
+        return arrangements[0]
+
+
+def optional_AND(arrangements: Sequence[Arrangement]) -> Arrangement:
+    """Wraps a list of arrangements in an `AND`.
+    If the list has a single element, return that element instead.
+    :param arrangements: List of arrangements.
+    :return: Arrangement object.
+    """
+    if len(arrangements) > 1:
+        return AND(*arrangements)
+    else:
+        return arrangements[0]
 
 
 def get_order_tokens(order: str) -> List[str]:
