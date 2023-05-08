@@ -1,6 +1,6 @@
 """unit tests for smart order accepter bot"""
 import asyncio
-import random
+import datetime
 
 from diplomacy import Game, Message
 from diplomacy.client.connection import connect
@@ -62,7 +62,8 @@ class TestSOABot(AsyncTestCase):
 
         game_created = False
         while not (game_created):
-            game_id = "usc_soa_test_" + str(random.randint(0, 10000))
+            now = datetime.datetime.now(datetime.timezone.utc)
+            game_id = f"usc_soa_test_{now.strftime('%Y_%m_%d_%H_%M_%S_%f')}"
             try:
                 game = yield channel.create_game(
                     game_id=game_id,
