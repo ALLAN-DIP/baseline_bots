@@ -11,7 +11,7 @@ import re
 from typing import TYPE_CHECKING, Dict, List, Optional, Set, Tuple
 
 from DAIDE.utils.exceptions import ParseError
-from daidepp import create_daide_grammar, daide_visitor
+from daidepp import AnyDAIDEToken, create_daide_grammar, daide_visitor
 from daidepp.grammar.grammar import DAIDELevel
 from diplomacy import Game, Message
 from diplomacy.utils import strings
@@ -35,6 +35,7 @@ POWER_NAMES_DICT = {
 
 MAX_DAIDE_LEVEL = get_args(DAIDELevel)[-1]
 MESSAGE_GRAMMAR = create_daide_grammar(level=MAX_DAIDE_LEVEL, string_type="message")
+ALL_GRAMMAR = create_daide_grammar(level=MAX_DAIDE_LEVEL, string_type="all")
 
 
 def is_valid_daide_message(string: str) -> bool:
@@ -48,6 +49,19 @@ def is_valid_daide_message(string: str) -> bool:
     except Exception:
         return False
     return True
+
+
+def parse_daide(string: str) -> AnyDAIDEToken:
+    """Parses a DAIDE string into `daidepp` objects.
+    :param string: String to parse into DAIDE.
+    :return: Parsed DAIDE object.
+    :raises ValueError: If string is invalid DAIDE.
+    """
+    try:
+        parse_tree = ALL_GRAMMAR.parse(string)
+        return daide_visitor.visit(parse_tree)
+    except Exception as ex:
+        raise ValueError(f"Failed to parse DAIDE string: {string!r}") from ex
 
 
 def get_order_tokens(order: str) -> List[str]:
