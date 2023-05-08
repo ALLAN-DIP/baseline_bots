@@ -5,7 +5,7 @@ import datetime
 from diplomacy import Game, Message
 from diplomacy.client.connection import connect
 from diplomacy_research.utils.cluster import stop_io_loop
-from gameplay_framework_async import GamePlayAsync
+from gameplay_framework import GamePlay
 from tornado import testing
 from tornado.testing import AsyncTestCase
 from typing_extensions import Final
@@ -29,7 +29,7 @@ class TestSOABot(AsyncTestCase):
         soa_bot1 = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
 
         soa_bot2 = SmartOrderAccepterBot("RUSSIA", game, **SOA_TEST_PARAMS)
-        game_play = GamePlayAsync(
+        game_play = GamePlay(
             game,
             [
                 RandomProposerBot("AUSTRIA", game),
@@ -87,7 +87,7 @@ class TestSOABot(AsyncTestCase):
 
         soa_bot1 = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
 
-        game_play = GamePlayAsync(
+        game_play = GamePlay(
             game,
             [
                 soa_bot1,
@@ -191,7 +191,7 @@ class TestSOABot(AsyncTestCase):
             RandomProposerBot("GERMANY", game),
             soa_bot,
         ]
-        game_play = GamePlayAsync(game, bot_instances, 3, True)
+        game_play = GamePlay(game, bot_instances, 3, True)
         game_play.game.set_centers("AUSTRIA", ["VIE", "TRI", "BUD"], reset=True)
         game_play.game.set_centers("ENGLAND", ["LON"], reset=True)
         game_play.game.set_centers("GERMANY", ["MUN", "KIE", "BER", "BEL"])
@@ -218,7 +218,7 @@ class TestSOABot(AsyncTestCase):
             RandomProposerBot("GERMANY", game),
             soa_bot,
         ]
-        game_play = GamePlayAsync(game, bot_instances, 3, True)
+        game_play = GamePlay(game, bot_instances, 3, True)
         game_play.game.set_orders("FRANCE", ["A MAR H", "A PAR H", "F BRE - PIC"])
         game_play.game.set_orders(
             "ENGLAND", ["A LVP - WAL", "F EDI - NTH", "F LON - ENG"]
@@ -274,7 +274,7 @@ class TestSOABot(AsyncTestCase):
             RandomProposerBot("GERMANY", game),
             soa_bot,
         ]
-        game_play = GamePlayAsync(game, bot_instances, 3, True)
+        game_play = GamePlay(game, bot_instances, 3, True)
         game_play.game.set_centers("ENGLAND", ["LON"], reset=True)
         game_play.game.set_centers("GERMANY", ["MUN", "KIE", "BER", "BEL"])
         game_play.game.set_centers(soa_bot.power_name, ["PAR", "BRE", "MAR"])
@@ -309,7 +309,7 @@ class TestSOABot(AsyncTestCase):
         baseline1 = RandomProposerBot("AUSTRIA", game)
         baseline2 = RandomProposerBot("ENGLAND", game)
         bot_instances = [baseline1, baseline2, soa_bot]
-        game_play = GamePlayAsync(game, bot_instances, 3, True)
+        game_play = GamePlay(game, bot_instances, 3, True)
         rcvd_messages = game_play.game.filter_messages(
             messages=game_play.game.messages, game_role="AUSTRIA"
         )
@@ -387,7 +387,7 @@ class TestSOABot(AsyncTestCase):
             RandomProposerBot("RUSSIA", game),
             soa_bot,
         ]
-        game_play = GamePlayAsync(game, bot_instances, 3, True)
+        game_play = GamePlay(game, bot_instances, 3, True)
 
         # skip 1 game phase for the test to work correctly
         game_play.game.process()

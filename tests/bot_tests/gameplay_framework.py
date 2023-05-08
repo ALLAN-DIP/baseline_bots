@@ -2,7 +2,9 @@ import sys
 from typing import List, Optional, Tuple, Type, Union
 
 from diplomacy import Game, Message
+from diplomacy.utils import common
 from diplomacy.utils.export import to_saved_game_format
+from tornado import gen
 
 from baseline_bots.bots.baseline_bot import BaselineBot, BaselineMsgRoundBot
 
@@ -13,6 +15,8 @@ class GamePlay:
     """
     A simple framework to test multiple bots together
     """
+
+    max_turns: int = 20
 
     def __init__(
         self,
@@ -43,11 +47,14 @@ class GamePlay:
         self.cur_local_message_round = 0
         self.phase_init_bots()
 
+    @gen.coroutine
     def play(self) -> None:
         """play a game with the bots"""
 
-        while not self.game.is_game_done:
-            self.step()
+        turn = 0
+        while not self.game.is_game_done and turn < self.max_turns:
+            yield self.step()
+            turn += 1
 
         if self.save_json:
             to_saved_game_format(self.game, output_path="GamePlayFramework.json")
@@ -59,6 +66,7 @@ class GamePlay:
             if isinstance(bot, BaselineMsgRoundBot):
                 bot.phase_init()
 
+    @gen.coroutine
     def step(self) -> Tuple[Optional[dict], bool]:
         """one step of messaging"""
 
@@ -76,6 +84,8 @@ class GamePlay:
         round_msgs = self.game.messages
         msgs_to_send = {}
         for bot in self.bots:
+            if bot is None:
+                continue
             # retrieve messages sent to bot
             rcvd_messages = self.game.filter_messages(
                 messages=round_msgs, game_role=bot.power_name
@@ -85,7 +95,7 @@ class GamePlay:
             rcvd_messages = list(rcvd_messages.items())
 
             # get messages to be sent from bot
-            ret_dict = bot(rcvd_messages)
+            ret_dict = yield bot(rcvd_messages)
 
             if "messages" in ret_dict:
                 bot_messages = ret_dict["messages"]  # bot.gen_messages(rcvd_messages)
@@ -101,11 +111,14 @@ class GamePlay:
                     recipient=msg["recipient"],
                     message=msg["message"],
                     phase=self.game.get_current_phase(),
+                    time_sent=common.timestamp_microseconds(),
                 )
                 self.game.add_message(message=msg_obj)
 
         # get/set orders
         for bot in self.bots:
+            if bot is None:
+                continue
             if hasattr(bot, "orders") and ret_dict["orders"] is not None:
                 orders = ret_dict["orders"]
                 if hasattr(orders, "get_list_of_orders"):
