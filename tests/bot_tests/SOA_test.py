@@ -10,7 +10,7 @@ from tornado import testing
 from tornado.testing import AsyncTestCase
 from typing_extensions import Final
 
-from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
+from baseline_bots.bots.random_proposer_bot import RandomProposerBot
 from baseline_bots.bots.smart_order_accepter_bot import SmartOrderAccepterBot
 from baseline_bots.parsing_utils import parse_proposal_messages
 from baseline_bots.utils import MessagesData, OrdersData, get_order_tokens
@@ -32,13 +32,13 @@ class TestSOABot(AsyncTestCase):
         game_play = GamePlayAsync(
             game,
             [
-                RandomProposerBot_AsyncBot("AUSTRIA", game),
-                RandomProposerBot_AsyncBot("ENGLAND", game),
+                RandomProposerBot("AUSTRIA", game),
+                RandomProposerBot("ENGLAND", game),
                 soa_bot1,
                 soa_bot2,
-                RandomProposerBot_AsyncBot("GERMANY", game),
-                RandomProposerBot_AsyncBot("ITALY", game),
-                RandomProposerBot_AsyncBot("TURKEY", game),
+                RandomProposerBot("GERMANY", game),
+                RandomProposerBot("ITALY", game),
+                RandomProposerBot("TURKEY", game),
             ],
             3,
             True,
@@ -186,9 +186,9 @@ class TestSOABot(AsyncTestCase):
             "FRANCE", game, stance_type="S", **SOA_TEST_PARAMS
         )
         bot_instances = [
-            RandomProposerBot_AsyncBot("AUSTRIA", game),
-            RandomProposerBot_AsyncBot("ENGLAND", game),
-            RandomProposerBot_AsyncBot("GERMANY", game),
+            RandomProposerBot("AUSTRIA", game),
+            RandomProposerBot("ENGLAND", game),
+            RandomProposerBot("GERMANY", game),
             soa_bot,
         ]
         game_play = GamePlayAsync(game, bot_instances, 3, True)
@@ -214,8 +214,8 @@ class TestSOABot(AsyncTestCase):
         game = Game()
         soa_bot = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
         bot_instances = [
-            RandomProposerBot_AsyncBot("ENGLAND", game),
-            RandomProposerBot_AsyncBot("GERMANY", game),
+            RandomProposerBot("ENGLAND", game),
+            RandomProposerBot("GERMANY", game),
             soa_bot,
         ]
         game_play = GamePlayAsync(game, bot_instances, 3, True)
@@ -270,8 +270,8 @@ class TestSOABot(AsyncTestCase):
         soa_bot = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
         soa_bot.ally_threshold = 1.0
         bot_instances = [
-            RandomProposerBot_AsyncBot("ENGLAND", game),
-            RandomProposerBot_AsyncBot("GERMANY", game),
+            RandomProposerBot("ENGLAND", game),
+            RandomProposerBot("GERMANY", game),
             soa_bot,
         ]
         game_play = GamePlayAsync(game, bot_instances, 3, True)
@@ -306,8 +306,8 @@ class TestSOABot(AsyncTestCase):
         # valid moves and power units must belong to SOA
         game = Game()
         soa_bot = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
-        baseline1 = RandomProposerBot_AsyncBot("AUSTRIA", game)
-        baseline2 = RandomProposerBot_AsyncBot("ENGLAND", game)
+        baseline1 = RandomProposerBot("AUSTRIA", game)
+        baseline2 = RandomProposerBot("ENGLAND", game)
         bot_instances = [baseline1, baseline2, soa_bot]
         game_play = GamePlayAsync(game, bot_instances, 3, True)
         rcvd_messages = game_play.game.filter_messages(
@@ -381,10 +381,10 @@ class TestSOABot(AsyncTestCase):
         )
         soa_bot.ally_threshold = 0.5
         bot_instances = [
-            RandomProposerBot_AsyncBot("AUSTRIA", game),
-            RandomProposerBot_AsyncBot("ENGLAND", game),
-            RandomProposerBot_AsyncBot("GERMANY", game),
-            RandomProposerBot_AsyncBot("RUSSIA", game),
+            RandomProposerBot("AUSTRIA", game),
+            RandomProposerBot("ENGLAND", game),
+            RandomProposerBot("GERMANY", game),
+            RandomProposerBot("RUSSIA", game),
             soa_bot,
         ]
         game_play = GamePlayAsync(game, bot_instances, 3, True)

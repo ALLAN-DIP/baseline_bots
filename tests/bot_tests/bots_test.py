@@ -1,5 +1,4 @@
 """unit tests for bots"""
-from gameplay_framework import GamePlay
 from gameplay_framework_async import GamePlayAsync
 import pytest
 from tornado.testing import AsyncTestCase, gen_test
@@ -10,10 +9,7 @@ from baseline_bots.bots.dipnet.selectively_transparent_bot import (
     SelectivelyTransparentBot,
 )
 from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
-from baseline_bots.bots.random_proposer_bot import (
-    RandomProposerBot,
-    RandomProposerBot_AsyncBot,
-)
+from baseline_bots.bots.random_proposer_bot import RandomProposerBot
 
 
 class TestOtherBots(AsyncTestCase):
@@ -24,16 +20,12 @@ class TestOtherBots(AsyncTestCase):
 
     @gen_test
     def test_pushover_dip_vs_random_proposer(self):
-        game_play = GamePlayAsync(
-            None, [PushoverDipnet, RandomProposerBot_AsyncBot], 3, True
-        )
+        game_play = GamePlayAsync(None, [PushoverDipnet, RandomProposerBot], 3, True)
         yield game_play.play()
 
     @gen_test
     def test_transparent_vs_random_proposer(self):
-        game_play = GamePlayAsync(
-            None, [TransparentBot, RandomProposerBot_AsyncBot], 3, True
-        )
+        game_play = GamePlayAsync(None, [TransparentBot, RandomProposerBot], 3, True)
         yield game_play.play()
 
     @pytest.mark.xfail(
@@ -43,10 +35,11 @@ class TestOtherBots(AsyncTestCase):
     @gen_test
     def test_selectively_transparent_vs_random_proposer(self):
         game_play = GamePlayAsync(
-            None, [SelectivelyTransparentBot, RandomProposerBot_AsyncBot], 3, True
+            None, [SelectivelyTransparentBot, RandomProposerBot], 3, True
         )
         yield game_play.play()
 
+    @gen_test
     def test_random_proposer_vs_random_proposer(self):
-        game_play = GamePlay(None, [RandomProposerBot, RandomProposerBot], 3, True)
-        game_play.play()
+        game_play = GamePlayAsync(None, [RandomProposerBot, RandomProposerBot], 3, True)
+        yield game_play.play()

@@ -18,7 +18,7 @@ from diplomacy_research.utils.cluster import is_port_opened
 from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.bots.dipnet.no_press_bot import NoPressDipBot
 from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
-from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
+from baseline_bots.bots.random_proposer_bot import RandomProposerBot
 from baseline_bots.bots.smart_order_accepter_bot import (
     Aggressiveness,
     SmartOrderAccepterBot,
@@ -27,7 +27,7 @@ from baseline_bots.bots.smart_order_accepter_bot import (
 POWERS = ["AUSTRIA", "ENGLAND", "FRANCE", "GERMANY", "ITALY", "RUSSIA", "TURKEY"]
 BOTS = [
     NoPressDipBot.__name__,
-    RandomProposerBot_AsyncBot.__name__,
+    RandomProposerBot.__name__,
     SmartOrderAccepterBot.__name__,
     TransparentBot.__name__,
 ]
@@ -125,8 +125,8 @@ async def play(
         bot: BaselineBot = NoPressDipBot(power_name, game)
     elif bot_type == TransparentBot.__name__:
         bot = TransparentBot(power_name, game)
-    elif bot_type == RandomProposerBot_AsyncBot.__name__:
-        bot = RandomProposerBot_AsyncBot(power_name, game)
+    elif bot_type == RandomProposerBot.__name__:
+        bot = RandomProposerBot(power_name, game)
     elif bot_type == SmartOrderAccepterBot.__name__:
         bot = SmartOrderAccepterBot(
             power_name,

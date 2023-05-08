@@ -6,7 +6,7 @@ from diplomacy.utils.export import to_saved_game_format
 from diplomacy_research.utils.cluster import start_io_loop, stop_io_loop
 from tornado import gen
 
-from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
+from baseline_bots.bots.random_proposer_bot import RandomProposerBot
 
 sys.path.append("../../../dipnet_press")
 
@@ -98,9 +98,9 @@ def game_loop():
     game_play_obj = GamePlayAsync(
         None,
         [
-            RandomProposerBot_AsyncBot,
-            RandomProposerBot_AsyncBot,
-            RandomProposerBot_AsyncBot,
+            RandomProposerBot,
+            RandomProposerBot,
+            RandomProposerBot,
         ],
         3,
         True,
