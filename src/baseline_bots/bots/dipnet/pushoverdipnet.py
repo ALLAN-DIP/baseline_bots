@@ -59,7 +59,7 @@ class PushoverDipnet(DipnetBot):
         reply_obj.add_message(last_message.sender, str(msg))
 
         for message in sorted_rcvd_messages[1:]:
-            if "FCT" not in last_message.message:
+            if "FCT" not in message.message:
                 parsed_message = parse_daide(message.message)
                 msg = REJ(parsed_message)
                 reply_obj.add_message(message.sender, str(msg))
