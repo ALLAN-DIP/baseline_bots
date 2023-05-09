@@ -773,7 +773,7 @@ class SmartOrderAccepterBot(DipnetBot):
         self.orders = orders_data
 
     @gen.coroutine
-    def __call__(self, rcvd_messages: List[Tuple[int, Message]]):
+    def __call__(self):
         # compute pos/neg stance on other bots using Tony's stance vector
 
         # avoid get_stance in the first phase of game
@@ -813,10 +813,7 @@ class SmartOrderAccepterBot(DipnetBot):
                 random.uniform(self.min_sleep_time, self.max_sleep_time)
             )
 
-            rcvd_messages = self.game.filter_messages(
-                messages=self.game.messages, game_role=self.power_name
-            )
-            rcvd_messages = sorted(rcvd_messages.items())
+            rcvd_messages = self.read_messages()
 
             # parse the proposal messages received by the bot
             parsed_messages_dict = parse_proposal_messages(

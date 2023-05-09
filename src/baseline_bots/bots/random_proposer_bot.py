@@ -72,7 +72,7 @@ class RandomProposerBot(BaselineBot):
 
         return self.orders.get_list_of_orders()
 
-    async def __call__(self, rcvd_messages: List[Message]) -> MessagesAndOrders:
+    async def __call__(self) -> MessagesAndOrders:
         """
         :return: dict containing messages and orders
         """

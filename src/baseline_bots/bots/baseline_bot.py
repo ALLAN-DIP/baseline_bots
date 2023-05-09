@@ -19,8 +19,20 @@ class BaselineBot(ABC):
         self.power_name = power_name
         self.game = game
 
+    def read_messages(self) -> List[Message]:
+        """Retrieves all messages for the current phase sent to the bot.
+        :return: List of messages.
+        """
+        messages = self.game.filter_messages(
+            messages=self.game.messages, game_role=self.power_name
+        )
+        received_messages = sorted(
+            msg for msg in messages.values() if msg.sender != self.power_name
+        )
+        return received_messages
+
     @abstractmethod
-    def __call__(self, rcvd_messages: List[Message]) -> MessagesAndOrders:
+    def __call__(self) -> MessagesAndOrders:
         """
         :return: dict containing messages and orders
         """

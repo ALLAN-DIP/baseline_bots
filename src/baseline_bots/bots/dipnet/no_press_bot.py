@@ -1,6 +1,5 @@
 from typing import List
 
-from diplomacy import Message
 from tornado import gen
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
@@ -18,7 +17,7 @@ class NoPressDipBot(DipnetBot):
         return self.orders.get_list_of_orders()
 
     @gen.coroutine
-    def __call__(self, rcvd_messages: List[Message]) -> dict:
+    def __call__(self) -> dict:
         messages = []
         orders = yield self.gen_orders()
         return {"messages": messages, "orders": orders}

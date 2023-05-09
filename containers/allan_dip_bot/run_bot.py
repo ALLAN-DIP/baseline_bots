@@ -163,16 +163,10 @@ async def play(
 
         phase_start_time = time.time()
 
-        # Retrieve messages
-        rcvd_messages = game.filter_messages(
-            messages=game.messages, game_role=bot.power_name
-        )
-        rcvd_messages = sorted(rcvd_messages.items())
-
         if not game.powers[bot.power_name].is_eliminated():
             # Send messages to bots and fetch messages from bot
             # Fetch orders from bot
-            ret_data = await bot(rcvd_messages)
+            ret_data = await bot()
             messages_data = ret_data["messages"]
             orders_data = ret_data["orders"]
 

@@ -15,7 +15,6 @@ from baseline_bots.utils import (
     parse_FCT,
     parse_PRP,
     smart_select_support_proposals,
-    sort_messages_by_most_recent,
 )
 
 
@@ -36,30 +35,6 @@ class TestUtils:
 
         orders_data.add_order(EXAMPLE_ORDER_2, overwrite=True)
         assert orders_data.get_list_of_orders() == ["A VIE H"]
-
-    def test_sort_messages_by_most_recent(self):
-        # test sort_messages_by_most_recent
-        game = Game()
-        powers = list(game.powers)
-        power_0 = powers[0]
-        power_1 = powers[1]
-        msg_obj1 = Message(
-            sender=power_0,
-            recipient=power_1,
-            message="HELLO",
-            phase=game.get_current_phase(),
-        )
-        game.add_message(message=msg_obj1)
-        msg_obj2 = Message(
-            sender=power_1,
-            recipient=power_0,
-            message="GOODBYE",
-            phase=game.get_current_phase(),
-        )
-        game.add_message(message=msg_obj2)
-        msgs = [msg_obj2, msg_obj1]
-
-        assert sort_messages_by_most_recent(msgs)[0].message == "HELLO"
 
     DIPNET_TO_DAIDE_PARSING_TEST_CASES = [
         (["A PAR H"], ["(FRA AMY PAR) HLD"], False),
@@ -284,7 +259,7 @@ class TestUtils:
             game_GTP.add_message(message=msg_obj)
         msgs = game_GTP.filter_messages(
             messages=game_GTP.messages, game_role=power_name
-        ).items()
+        ).values()
         parsed_orders_dict = parse_proposal_messages(msgs, game_GTP, power_name)
 
         assert set(parsed_orders_dict.keys()) == set(expected.keys())

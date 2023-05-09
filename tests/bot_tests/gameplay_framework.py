@@ -81,21 +81,13 @@ class GamePlay:
             if self.game.is_game_done:
                 return None, True
 
-        round_msgs = self.game.messages
         msgs_to_send = {}
         for bot in self.bots:
             if bot is None:
                 continue
-            # retrieve messages sent to bot
-            rcvd_messages = self.game.filter_messages(
-                messages=round_msgs, game_role=bot.power_name
-            )
-
-            # an array of Message objects
-            rcvd_messages = list(rcvd_messages.items())
 
             # get messages to be sent from bot
-            ret_dict = yield bot(rcvd_messages)
+            ret_dict = yield bot()
 
             if "messages" in ret_dict:
                 bot_messages = ret_dict["messages"]  # bot.gen_messages(rcvd_messages)

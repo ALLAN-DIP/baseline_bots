@@ -12,7 +12,6 @@ from baseline_bots.utils import (
     OrdersData,
     get_non_aggressive_orders,
     parse_arrangement,
-    sort_messages_by_most_recent,
 )
 
 
@@ -36,7 +35,7 @@ class PushoverDipnet(DipnetBot):
         if len(rcvd_messages) == 0:
             return reply_obj
 
-        sorted_rcvd_messages = sort_messages_by_most_recent(rcvd_messages)
+        sorted_rcvd_messages = rcvd_messages
         last_message = sorted_rcvd_messages[0]
         while "FCT" in last_message.message:
             sorted_rcvd_messages.pop(0)
@@ -74,7 +73,8 @@ class PushoverDipnet(DipnetBot):
         return self.orders.get_list_of_orders()
 
     @gen.coroutine
-    def __call__(self, rcvd_messages: List[Message]) -> dict:
+    def __call__(self) -> dict:
+        rcvd_messages = self.read_messages()
         messages = yield self.gen_messages(rcvd_messages)
         orders = yield self.gen_orders()
         return {"messages": messages, "orders": orders}

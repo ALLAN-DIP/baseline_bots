@@ -333,11 +333,6 @@ class MessagesAndOrders(TypedDict):
     orders: OrdersData
 
 
-def sort_messages_by_most_recent(messages: List[Message]) -> List[Message]:
-    messages.sort(key=lambda msg: msg.time_sent)
-    return messages
-
-
 @gen.coroutine
 def get_state_value(
     bot: "DipnetBot", game: Game, power_name: Optional[str], option: str = "default"

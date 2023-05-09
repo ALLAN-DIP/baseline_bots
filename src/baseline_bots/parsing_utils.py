@@ -385,7 +385,7 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
 
 
 def parse_proposal_messages(
-    rcvd_messages: List[Tuple[int, Message]], game: Game, power_name: str
+    rcvd_messages: List[Message], game: Game, power_name: str
 ) -> Dict[str, Dict[str, List[str]]]:
     """
     From received messages, extract the proposals (categorize as valid and invalid), shared orders and other orders. Use specified game state and power_name to check for validity of moves
@@ -403,7 +403,7 @@ def parse_proposal_messages(
     """
     try:
         # Extract messages containing PRP string
-        order_msgs = [msg[1] for msg in rcvd_messages if "PRP" in msg[1].message]
+        order_msgs = [msg for msg in rcvd_messages if "PRP" in msg.message]
         print(f"Received {len(order_msgs)} PRP messages:")
         print([(order_msg.sender, order_msg.message) for order_msg in order_msgs])
 
