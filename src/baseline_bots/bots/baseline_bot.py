@@ -6,7 +6,7 @@ from typing import List
 
 from diplomacy import Game, Message
 
-from baseline_bots.utils import MessagesAndOrders, OrdersData
+from baseline_bots.utils import MessagesAndOrders, OrdersData, is_valid_daide_message
 
 
 class BaselineBot(ABC):
@@ -20,7 +20,7 @@ class BaselineBot(ABC):
         self.game = game
 
     def read_messages(self) -> List[Message]:
-        """Retrieves all messages for the current phase sent to the bot.
+        """Retrieves all valid messages for the current phase sent to the bot.
         :return: List of messages.
         """
         messages = self.game.filter_messages(
@@ -29,7 +29,13 @@ class BaselineBot(ABC):
         received_messages = sorted(
             msg for msg in messages.values() if msg.sender != self.power_name
         )
-        return received_messages
+        valid_messages = []
+        for msg in received_messages:
+            if is_valid_daide_message(msg.message):
+                valid_messages.append(msg)
+            else:
+                print(f"!! Received a message with invalid DAIDE syntax: {msg.message}")
+        return valid_messages
 
     @abstractmethod
     def __call__(self) -> MessagesAndOrders:

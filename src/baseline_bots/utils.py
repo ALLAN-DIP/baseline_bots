@@ -11,11 +11,13 @@ import re
 from typing import TYPE_CHECKING, Dict, List, Optional, Set, Tuple
 
 from DAIDE.utils.exceptions import ParseError
+from daidepp import create_daide_grammar, daide_visitor
+from daidepp.grammar.grammar import DAIDELevel
 from diplomacy import Game, Message
 from diplomacy.utils import strings
 import numpy as np
 from tornado import gen
-from typing_extensions import TypedDict
+from typing_extensions import TypedDict, get_args
 
 if TYPE_CHECKING:
     from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
@@ -30,6 +32,22 @@ POWER_NAMES_DICT = {
     "TUR": "TURKEY",
     "GER": "GERMANY",
 }
+
+MAX_DAIDE_LEVEL = get_args(DAIDELevel)[-1]
+MESSAGE_GRAMMAR = create_daide_grammar(level=MAX_DAIDE_LEVEL, string_type="message")
+
+
+def is_valid_daide_message(string: str) -> bool:
+    """Determines whether a string is a valid DAIDE message.
+    :param string: String to check for valid DAIDE.
+    :return: Whether the string is valid DAIDE or not.
+    """
+    try:
+        parse_tree = MESSAGE_GRAMMAR.parse(string)
+        daide_visitor.visit(parse_tree)
+    except Exception:
+        return False
+    return True
 
 
 def get_order_tokens(order: str) -> List[str]:
