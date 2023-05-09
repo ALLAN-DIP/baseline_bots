@@ -119,5 +119,6 @@ class GamePlay:
 
         self.cur_local_message_round += 1
 
-        self.game.process()
+        if self.cur_local_message_round == self.msg_rounds:
+            self.game.process()
         return {"messages": msgs_to_send}, self.game.is_game_done
