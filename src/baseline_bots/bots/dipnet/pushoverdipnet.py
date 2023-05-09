@@ -1,16 +1,16 @@
 from typing import List
 
+from daidepp import REJ, YES
 from diplomacy import Game, Message
 from tornado import gen
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from baseline_bots.utils import (
-    REJ,
-    YES,
     MessagesData,
     OrdersData,
     get_non_aggressive_orders,
     parse_arrangement,
+    parse_daide,
 )
 
 
@@ -54,12 +54,14 @@ class PushoverDipnet(DipnetBot):
         self.orders.add_orders(orders, overwrite=True)
 
         # set message to say YES
-        msg = YES(last_message.message)
+        parsed_message = parse_daide(last_message.message)
+        msg = YES(parsed_message)
         reply_obj.add_message(last_message.sender, str(msg))
 
         for message in sorted_rcvd_messages[1:]:
             if "FCT" not in last_message.message:
-                msg = REJ(message)
+                parsed_message = parse_daide(message.message)
+                msg = REJ(parsed_message)
                 reply_obj.add_message(message.sender, str(msg))
 
         return reply_obj

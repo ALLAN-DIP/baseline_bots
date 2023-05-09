@@ -132,16 +132,6 @@ def get_other_powers(powers: List[str], game: Game) -> Set[str]:
     return set(game.get_map_power_names()) - set(powers)
 
 
-def YES(string: str) -> str:
-    """Forms YES message"""
-    return f"YES ({string})"
-
-
-def REJ(string: str) -> str:
-    """Forms REJ message"""
-    return f"REJ ({string})"
-
-
 def parse_arrangement(msg: str) -> List[str]:
     """
     Attempts to parse arrangements (may or may not have ORR keyword)
