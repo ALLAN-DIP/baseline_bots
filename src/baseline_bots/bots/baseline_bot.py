@@ -20,6 +20,11 @@ class BaselineBot(ABC):
         self.power_name = power_name
         self.game = game
 
+    @property
+    def display_name(self) -> str:
+        """Display name consisting of power name and bot type."""
+        return f"{self.power_name} ({self.__class__.__name__})"
+
     def read_messages(self) -> List[Message]:
         """Retrieves all valid messages for the current phase sent to the bot.
         :return: List of messages.
@@ -30,12 +35,16 @@ class BaselineBot(ABC):
         received_messages = sorted(
             msg for msg in messages.values() if msg.sender != self.power_name
         )
+        for msg_obj in received_messages:
+            print(f"{self.display_name} received message: {msg_obj}")
         valid_messages = []
         for msg in received_messages:
             if is_valid_daide_message(msg.message):
                 valid_messages.append(msg)
             else:
-                print(f"!! Received a message with invalid DAIDE syntax: {msg.message}")
+                print(
+                    f"!! {self.display_name} received a message with invalid DAIDE syntax: {msg.message!r}"
+                )
         return valid_messages
 
     async def send_message(
@@ -49,7 +58,7 @@ class BaselineBot(ABC):
         """
         if not is_valid_daide_message(message):
             print(
-                f"!! Attempted to send a message with invalid DAIDE syntax: {message}"
+                f"!! {self.display_name} attempted to send a message with invalid DAIDE syntax: {message!r}"
             )
             return
 
@@ -64,6 +73,8 @@ class BaselineBot(ABC):
         )
         if message_already_exists:
             return
+
+        print(f"{self.display_name} sent message: {msg_obj}")
 
         # Messages should not be sent in local games, only stored
         if isinstance(self.game, NetworkGame):
