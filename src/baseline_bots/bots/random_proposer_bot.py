@@ -2,17 +2,11 @@ import random
 from typing import List
 
 from DAIDE import ORR, PRP, XDO
-from diplomacy import Game, Message
-from diplomacy.client.network_game import NetworkGame
+from diplomacy import Game
 
 from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.parsing_utils import dipnet_to_daide_parsing
-from baseline_bots.utils import (
-    MessagesAndOrders,
-    MessagesData,
-    OrdersData,
-    get_other_powers,
-)
+from baseline_bots.utils import MessagesData, OrdersData, get_other_powers
 
 
 class RandomProposerBot(BaselineBot):
@@ -72,23 +66,13 @@ class RandomProposerBot(BaselineBot):
 
         return self.orders.get_list_of_orders()
 
-    async def __call__(self) -> MessagesAndOrders:
+    async def __call__(self) -> OrdersData:
         """
         :return: dict containing messages and orders
         """
         messages = await self.gen_messages()
-
-        if messages and messages.messages:
-            for msg in messages.messages:
-                msg_obj = Message(
-                    sender=self.power_name,
-                    recipient=msg["recipient"],
-                    message=msg["message"],
-                    phase=self.game.get_current_phase(),
-                )
-                if isinstance(self.game, NetworkGame):
-                    await self.game.send_game_message(message=msg_obj)
+        await self.send_messages(messages)
         orders = await self.gen_orders()
         # maintain current orders
         self.orders = orders
-        return {"messages": messages, "orders": orders}
+        return orders

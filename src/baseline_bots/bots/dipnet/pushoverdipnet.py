@@ -76,5 +76,6 @@ class PushoverDipnet(DipnetBot):
     def __call__(self) -> dict:
         rcvd_messages = self.read_messages()
         messages = yield self.gen_messages(rcvd_messages)
+        yield self.send_messages(messages)
         orders = yield self.gen_orders()
-        return {"messages": messages, "orders": orders}
+        return orders

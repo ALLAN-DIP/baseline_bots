@@ -1,8 +1,7 @@
 import sys
 from typing import List, Optional, Tuple, Type, Union
 
-from diplomacy import Game, Message
-from diplomacy.utils import common
+from diplomacy import Game
 from diplomacy.utils.export import to_saved_game_format
 from tornado import gen
 
@@ -86,36 +85,16 @@ class GamePlay:
             if bot is None:
                 continue
 
-            # get messages to be sent from bot
-            ret_dict = yield bot()
-
-            if "messages" in ret_dict:
-                bot_messages = ret_dict["messages"]  # bot.gen_messages(rcvd_messages)
-
-                msgs_to_send[bot.power_name] = bot_messages
-
-        # Send all messages after all bots decide
-        for power_name in msgs_to_send:
-            msgs = msgs_to_send[power_name]
-            for msg in msgs:
-                msg_obj = Message(
-                    sender=power_name,
-                    recipient=msg["recipient"],
-                    message=msg["message"],
-                    phase=self.game.get_current_phase(),
-                    time_sent=common.timestamp_microseconds(),
-                )
-                self.game.add_message(message=msg_obj)
+            # get orders to be sent from bot
+            orders = yield bot()
 
         # get/set orders
         for bot in self.bots:
             if bot is None:
                 continue
-            if hasattr(bot, "orders") and ret_dict["orders"] is not None:
-                orders = ret_dict["orders"]
-                if hasattr(orders, "get_list_of_orders"):
-                    orders = orders.get_list_of_orders()
-                self.game.set_orders(power_name=bot.power_name, orders=orders)
+            if orders is not None and hasattr(orders, "get_list_of_orders"):
+                orders = orders.get_list_of_orders()
+            self.game.set_orders(power_name=bot.power_name, orders=orders)
 
         self.cur_local_message_round += 1
 

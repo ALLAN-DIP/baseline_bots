@@ -164,14 +164,8 @@ async def play(
         phase_start_time = time.time()
 
         if not game.powers[bot.power_name].is_eliminated():
-            # Send messages to bots and fetch messages from bot
             # Fetch orders from bot
-            ret_data = await bot()
-            messages_data = ret_data["messages"]
-            orders_data = ret_data["orders"]
-
-            if len(messages_data.messages):
-                print(f"Messages sent: {len(messages_data.messages)}")
+            orders_data = await bot()
 
             # If orders are present, send them
             if orders_data is not None:

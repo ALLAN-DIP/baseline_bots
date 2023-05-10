@@ -395,10 +395,15 @@ class TestSOABot(AsyncTestCase):
         print(game_play.game.get_centers())
         print("expected stance ENGLAND: 1, RUSSIA: 1, GERMANY: -1, AUTRIA:0")
         print("soa stance", soa_bot_stance)
-        print(
-            "recipients of messages:",
-            [msg["recipient"] for msg in ret_data["messages"]],
+        messages = game_play.game.filter_messages(
+            messages=game_play.game.messages, game_role=soa_bot.power_name
         )
+        message_recipients = sorted(
+            msg.recipient
+            for msg in messages.values()
+            if msg.sender == soa_bot.power_name
+        )
+        print("recipients of messages:", message_recipients)
 
         assert (
             "ENGLAND" in soa_bot.allies and "RUSSIA" in soa_bot.allies

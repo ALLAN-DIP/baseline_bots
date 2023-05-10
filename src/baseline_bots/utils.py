@@ -17,7 +17,7 @@ from diplomacy import Game, Message
 from diplomacy.utils import strings
 import numpy as np
 from tornado import gen
-from typing_extensions import TypedDict, get_args
+from typing_extensions import get_args
 
 if TYPE_CHECKING:
     from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
@@ -344,11 +344,6 @@ class OrdersData:
 
     def empty(self) -> bool:
         return len(self.orders) > 0
-
-
-class MessagesAndOrders(TypedDict):
-    messages: MessagesData
-    orders: OrdersData
 
 
 @gen.coroutine

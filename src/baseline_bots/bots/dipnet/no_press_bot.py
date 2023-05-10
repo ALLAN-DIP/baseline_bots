@@ -17,7 +17,6 @@ class NoPressDipBot(DipnetBot):
         return self.orders.get_list_of_orders()
 
     @gen.coroutine
-    def __call__(self) -> dict:
-        messages = []
+    def __call__(self) -> OrdersData:
         orders = yield self.gen_orders()
-        return {"messages": messages, "orders": orders}
+        return orders

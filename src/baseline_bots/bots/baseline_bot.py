@@ -5,8 +5,9 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from diplomacy import Game, Message
+from diplomacy.client.network_game import NetworkGame
 
-from baseline_bots.utils import MessagesAndOrders, OrdersData, is_valid_daide_message
+from baseline_bots.utils import MessagesData, OrdersData, is_valid_daide_message
 
 
 class BaselineBot(ABC):
@@ -37,8 +38,51 @@ class BaselineBot(ABC):
                 print(f"!! Received a message with invalid DAIDE syntax: {msg.message}")
         return valid_messages
 
+    async def send_message(
+        self, recipient: str, message: str, msg_data: MessagesData
+    ) -> None:
+        """Send message asynchronously to the server
+
+        :param recipient: The name of the recipient power
+        :param message: Message to be sent
+        :param msg_data: MessagesData object containing set of all sent messages
+        """
+        if not is_valid_daide_message(message):
+            print(
+                f"!! Attempted to send a message with invalid DAIDE syntax: {message}"
+            )
+            return
+
+        msg_obj = Message(
+            sender=self.power_name,
+            recipient=recipient,
+            message=message,
+            phase=self.game.get_current_phase(),
+        )
+        message_already_exists = msg_data.add_message(
+            msg_obj.recipient, msg_obj.message, allow_duplicates=False
+        )
+        if message_already_exists:
+            return
+
+        # Messages should not be sent in local games, only stored
+        if isinstance(self.game, NetworkGame):
+            await self.game.send_game_message(message=msg_obj)
+        else:
+            self.game.add_message(message=msg_obj)
+
+    async def send_messages(self, msg_data: MessagesData) -> None:
+        """Send messages asynchronously to the server
+
+        :param msg_data: MessagesData object containing messages to send
+        """
+        for msg in msg_data.messages:
+            # A new `MessagesData` instance is used because we don't want
+            # to add duplicate messages to the passed-in instance
+            await self.send_message(msg["recipient"], msg["message"], MessagesData())
+
     @abstractmethod
-    def __call__(self) -> MessagesAndOrders:
+    def __call__(self) -> OrdersData:
         """
         :return: dict containing messages and orders
         """
