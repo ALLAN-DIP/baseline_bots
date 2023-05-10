@@ -23,7 +23,7 @@ class RandomProposerBot(BaselineBot):
     def __init__(self, power_name: str, game: Game) -> None:
         super().__init__(power_name, game)
 
-    async def gen_messages(self, _) -> MessagesData:
+    async def gen_messages(self) -> MessagesData:
         # Return data initialization
         ret_obj = MessagesData()
 
@@ -76,7 +76,7 @@ class RandomProposerBot(BaselineBot):
         """
         :return: dict containing messages and orders
         """
-        messages = await self.gen_messages(rcvd_messages)
+        messages = await self.gen_messages()
 
         if messages and messages.messages:
             for msg in messages.messages:

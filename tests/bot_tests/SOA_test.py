@@ -310,14 +310,8 @@ class TestSOABot(AsyncTestCase):
         baseline2 = RandomProposerBot("ENGLAND", game)
         bot_instances = [baseline1, baseline2, soa_bot]
         game_play = GamePlay(game, bot_instances, 3, True)
-        rcvd_messages = game_play.game.filter_messages(
-            messages=game_play.game.messages, game_role="AUSTRIA"
-        )
-        bl1_msg = yield baseline1.gen_messages(rcvd_messages)
-        rcvd_messages = game_play.game.filter_messages(
-            messages=game_play.game.messages, game_role="ENGLAND"
-        )
-        bl2_msg = yield baseline2.gen_messages(rcvd_messages)
+        bl1_msg = yield baseline1.gen_messages()
+        bl2_msg = yield baseline2.gen_messages()
 
         for msg in bl1_msg:
             msg_obj1 = Message(

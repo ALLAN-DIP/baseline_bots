@@ -1,15 +1,14 @@
 """Abstract base classes for baseline bots"""
 
 
-from abc import ABC, abstractmethod
-from typing import List
+from abc import ABC
 
-from diplomacy import Game, Message
+from diplomacy import Game
 from diplomacy_research.players.benchmark_player import DipNetRLPlayer, DipNetSLPlayer
 from diplomacy_research.players.model_based_player import ModelBasedPlayer
 
 from baseline_bots.bots.baseline_bot import BaselineMsgRoundBot
-from baseline_bots.utils import MessagesData, OrdersData
+from baseline_bots.utils import OrdersData
 
 
 class DipnetBot(BaselineMsgRoundBot, ABC):
@@ -29,11 +28,6 @@ class DipnetBot(BaselineMsgRoundBot, ABC):
             self.brain = DipNetSLPlayer()
         else:
             self.brain = DipNetRLPlayer()
-
-    @abstractmethod
-    def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
-        """sets messages to be sent"""
-        raise NotImplementedError()
 
     def gen_orders(self) -> OrdersData:
         """finalizes moves"""
