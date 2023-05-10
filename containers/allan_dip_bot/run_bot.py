@@ -33,36 +33,6 @@ BOTS = [
 ]
 
 
-async def test(hostname: str = "localhost", port: int = 8432) -> None:
-    """
-    Tests the game connection
-
-    :param hostname: name of host on which games are hosted
-    :param port: port to which the bot should connect on the host
-    """
-    connection = await connect(hostname, port)
-    channel = await connection.authenticate("random_user", "password")
-    games = await channel.list_games()
-    for game in games:
-        game_info = {
-            "game_id": game.game_id,
-            "phase": game.phase,
-            "timestamp": game.timestamp,
-            "timestamp_created": game.timestamp_created,
-            "map_name": game.map_name,
-            "observer_level": game.observer_level,
-            "controlled_powers": game.controlled_powers,
-            "rules": game.rules,
-            "status": game.status,
-            "n_players": game.n_players,
-            "n_controls": game.n_controls,
-            "deadline": game.deadline,
-            "registration_password": game.registration_password,
-        }
-        print(game_info)
-    print(games)
-
-
 async def launch(
     hostname: str,
     port: int,

@@ -129,38 +129,6 @@ COMBOS = {
 joiners = {"AND", "ORR"}
 
 
-def randomize_order(order: str) -> str:
-    """
-    This function only takes in non-nested ANDs or ORRs (joiners) and returns a randomized version
-    of those orders.
-
-    :param order: A string that contains an joiner followed by orders: "AND ((FRA AMY BUR) MTO PAR) ((FRA AMY PIC) HLD)"
-    :type order: str
-    :return: A string in the same format as the input with deviant orders.
-    :rtype: str
-    """
-    with_joiner = re.sub(r"[\s+]?(AND|ORR)", r"\1", order)
-    joiner = with_joiner[0:3]  # extracts the "AND" or "ORR" string
-    just_moves = with_joiner[
-        3:
-    ]  # removes the "AND" or "ORR" with all preceding whitespace
-    with_inner_commas = re.sub(
-        r"(.*?[^(])\s+?([^)].*?)", r"\1, \2", just_moves
-    )  # adds commas within tuples
-    with_outer_commas = re.sub(
-        r"(\(\(.+\)\)|\(.+?WVE\)) ", r"\1,", with_inner_commas
-    )  # adds commas between strings and tuples
-    with_quotes = re.sub(
-        r"([(, ])([A-Z]+)([), ])", r"\1'\2'\3", with_outer_commas
-    )  # adds quotes around strings
-    order_list = eval("[" + with_quotes + "]")  # turns string into list of tuples
-    rand = random_list_orders(order_list)  # randomizing orders
-    str_orders = joiner + " "
-    for ord in rand:
-        str_orders += "(" + (tuple_to_string(ord)) + ") "
-    return str_orders
-
-
 def random_list_orders(orders: List) -> List:
     """
     Generates a randomly deviant orders in the same form.

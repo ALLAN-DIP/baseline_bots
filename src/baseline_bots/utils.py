@@ -50,33 +50,12 @@ def get_order_tokens(order: str) -> List[str]:
     return order_tokens
 
 
-def AND(arrangements: List[str]) -> str:
-    """
-    ANDs together an array of arrangements
-    """
-
-    if len(arrangements) < 2:
-        raise Exception("Need at least 2 items to AND")
-
-    return "AND" + "".join([f" ({a})" for a in arrangements])
-
-
 def get_other_powers(powers: List[str], game: Game) -> Set[str]:
     """
     :return: powers in the game other than those listed
     in the powers parameter
     """
     return set(game.get_map_power_names()) - set(powers)
-
-
-def ALY(powers: List[str], game: Game) -> str:
-    """
-    Forms an alliance proposal string
-
-    :param powers: an array of powers to be allied
-    """
-    others = get_other_powers(powers, game)
-    return "ALY (" + " ".join(powers) + ") VSS (" + " ".join(others) + ")"
 
 
 def YES(string: str) -> str:

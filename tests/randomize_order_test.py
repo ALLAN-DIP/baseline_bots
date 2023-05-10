@@ -4,7 +4,6 @@ from typing import Tuple
 from baseline_bots.randomize_order import (
     ADJACENCY,
     random_list_orders,
-    randomize_order,
     string_to_tuple,
     tuple_to_string,
 )
@@ -85,10 +84,6 @@ class TestRandomizeDipnet:
         )
         assert tup_string and isinstance(tup_string, str)
         assert tup_string == "(FRA AMY BUR) CTO BAR VIA (NTH NEA) "
-
-        # This tests the function randomize_joiner which makes sure that the orders output are different than the orders input
-        test_string = "AND ((FRA AMY BUR) MTO BEL) ((FRA AMY PIC) CTO FIN VIA (NTH SKA DEN BAL BOT))"
-        assert test_string != randomize_order(test_string)
 
         # These following tests test the validity of orders that the randomizer can generate
         assert valid_MTO((("FRA", "AMY", "HOL"), "MTO", "BEL"))
