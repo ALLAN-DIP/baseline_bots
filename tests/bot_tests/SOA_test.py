@@ -1,16 +1,16 @@
 """unit tests for smart order accepter bot"""
 import asyncio
-import random
+import datetime
 
 from diplomacy import Game, Message
 from diplomacy.client.connection import connect
 from diplomacy_research.utils.cluster import stop_io_loop
-from gameplay_framework_async import GamePlayAsync
+from gameplay_framework import GamePlay
 from tornado import testing
 from tornado.testing import AsyncTestCase
 from typing_extensions import Final
 
-from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
+from baseline_bots.bots.random_proposer_bot import RandomProposerBot
 from baseline_bots.bots.smart_order_accepter_bot import SmartOrderAccepterBot
 from baseline_bots.parsing_utils import parse_proposal_messages
 from baseline_bots.utils import MessagesData, OrdersData, get_order_tokens
@@ -29,16 +29,16 @@ class TestSOABot(AsyncTestCase):
         soa_bot1 = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
 
         soa_bot2 = SmartOrderAccepterBot("RUSSIA", game, **SOA_TEST_PARAMS)
-        game_play = GamePlayAsync(
+        game_play = GamePlay(
             game,
             [
-                RandomProposerBot_AsyncBot("AUSTRIA", game),
-                RandomProposerBot_AsyncBot("ENGLAND", game),
+                RandomProposerBot("AUSTRIA", game),
+                RandomProposerBot("ENGLAND", game),
                 soa_bot1,
                 soa_bot2,
-                RandomProposerBot_AsyncBot("GERMANY", game),
-                RandomProposerBot_AsyncBot("ITALY", game),
-                RandomProposerBot_AsyncBot("TURKEY", game),
+                RandomProposerBot("GERMANY", game),
+                RandomProposerBot("ITALY", game),
+                RandomProposerBot("TURKEY", game),
             ],
             3,
             True,
@@ -53,7 +53,7 @@ class TestSOABot(AsyncTestCase):
 
     @testing.gen_test
     def test_send_message(self):
-        hostname = "shade-dev.tacc.utexas.edu"
+        hostname = "shade.tacc.utexas.edu"
         port = 8432
         game_id = None
 
@@ -62,7 +62,8 @@ class TestSOABot(AsyncTestCase):
 
         game_created = False
         while not (game_created):
-            game_id = "usc_soa_test_" + str(random.randint(0, 10000))
+            now = datetime.datetime.now(datetime.timezone.utc)
+            game_id = f"usc_soa_test_{now.strftime('%Y_%m_%d_%H_%M_%S_%f')}"
             try:
                 game = yield channel.create_game(
                     game_id=game_id,
@@ -86,7 +87,7 @@ class TestSOABot(AsyncTestCase):
 
         soa_bot1 = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
 
-        game_play = GamePlayAsync(
+        game_play = GamePlay(
             game,
             [
                 soa_bot1,
@@ -185,12 +186,12 @@ class TestSOABot(AsyncTestCase):
             "FRANCE", game, stance_type="S", **SOA_TEST_PARAMS
         )
         bot_instances = [
-            RandomProposerBot_AsyncBot("AUSTRIA", game),
-            RandomProposerBot_AsyncBot("ENGLAND", game),
-            RandomProposerBot_AsyncBot("GERMANY", game),
+            RandomProposerBot("AUSTRIA", game),
+            RandomProposerBot("ENGLAND", game),
+            RandomProposerBot("GERMANY", game),
             soa_bot,
         ]
-        game_play = GamePlayAsync(game, bot_instances, 3, True)
+        game_play = GamePlay(game, bot_instances, 3, True)
         game_play.game.set_centers("AUSTRIA", ["VIE", "TRI", "BUD"], reset=True)
         game_play.game.set_centers("ENGLAND", ["LON"], reset=True)
         game_play.game.set_centers("GERMANY", ["MUN", "KIE", "BER", "BEL"])
@@ -213,11 +214,11 @@ class TestSOABot(AsyncTestCase):
         game = Game()
         soa_bot = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
         bot_instances = [
-            RandomProposerBot_AsyncBot("ENGLAND", game),
-            RandomProposerBot_AsyncBot("GERMANY", game),
+            RandomProposerBot("ENGLAND", game),
+            RandomProposerBot("GERMANY", game),
             soa_bot,
         ]
-        game_play = GamePlayAsync(game, bot_instances, 3, True)
+        game_play = GamePlay(game, bot_instances, 3, True)
         game_play.game.set_orders("FRANCE", ["A MAR H", "A PAR H", "F BRE - PIC"])
         game_play.game.set_orders(
             "ENGLAND", ["A LVP - WAL", "F EDI - NTH", "F LON - ENG"]
@@ -269,11 +270,11 @@ class TestSOABot(AsyncTestCase):
         soa_bot = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
         soa_bot.ally_threshold = 1.0
         bot_instances = [
-            RandomProposerBot_AsyncBot("ENGLAND", game),
-            RandomProposerBot_AsyncBot("GERMANY", game),
+            RandomProposerBot("ENGLAND", game),
+            RandomProposerBot("GERMANY", game),
             soa_bot,
         ]
-        game_play = GamePlayAsync(game, bot_instances, 3, True)
+        game_play = GamePlay(game, bot_instances, 3, True)
         game_play.game.set_centers("ENGLAND", ["LON"], reset=True)
         game_play.game.set_centers("GERMANY", ["MUN", "KIE", "BER", "BEL"])
         game_play.game.set_centers(soa_bot.power_name, ["PAR", "BRE", "MAR"])
@@ -305,18 +306,12 @@ class TestSOABot(AsyncTestCase):
         # valid moves and power units must belong to SOA
         game = Game()
         soa_bot = SmartOrderAccepterBot("FRANCE", game, **SOA_TEST_PARAMS)
-        baseline1 = RandomProposerBot_AsyncBot("AUSTRIA", game)
-        baseline2 = RandomProposerBot_AsyncBot("ENGLAND", game)
+        baseline1 = RandomProposerBot("AUSTRIA", game)
+        baseline2 = RandomProposerBot("ENGLAND", game)
         bot_instances = [baseline1, baseline2, soa_bot]
-        game_play = GamePlayAsync(game, bot_instances, 3, True)
-        rcvd_messages = game_play.game.filter_messages(
-            messages=game_play.game.messages, game_role="AUSTRIA"
-        )
-        bl1_msg = yield baseline1.gen_messages(rcvd_messages)
-        rcvd_messages = game_play.game.filter_messages(
-            messages=game_play.game.messages, game_role="ENGLAND"
-        )
-        bl2_msg = yield baseline2.gen_messages(rcvd_messages)
+        game_play = GamePlay(game, bot_instances, 3, True)
+        bl1_msg = yield baseline1.gen_messages()
+        bl2_msg = yield baseline2.gen_messages()
 
         for msg in bl1_msg:
             msg_obj1 = Message(
@@ -380,13 +375,13 @@ class TestSOABot(AsyncTestCase):
         )
         soa_bot.ally_threshold = 0.5
         bot_instances = [
-            RandomProposerBot_AsyncBot("AUSTRIA", game),
-            RandomProposerBot_AsyncBot("ENGLAND", game),
-            RandomProposerBot_AsyncBot("GERMANY", game),
-            RandomProposerBot_AsyncBot("RUSSIA", game),
+            RandomProposerBot("AUSTRIA", game),
+            RandomProposerBot("ENGLAND", game),
+            RandomProposerBot("GERMANY", game),
+            RandomProposerBot("RUSSIA", game),
             soa_bot,
         ]
-        game_play = GamePlayAsync(game, bot_instances, 3, True)
+        game_play = GamePlay(game, bot_instances, 3, True)
 
         # skip 1 game phase for the test to work correctly
         game_play.game.process()
@@ -395,20 +390,20 @@ class TestSOABot(AsyncTestCase):
         game_play.game.set_centers("RUSSIA", ["MOS"], reset=True)
         game_play.game.set_centers("GERMANY", ["MUN", "KIE", "BER", "BEL"])
         game_play.game.set_centers(soa_bot.power_name, ["PAR", "BRE", "MAR"])
-        rcvd_messages = game.filter_messages(
-            messages=game_play.game.messages, game_role=soa_bot.power_name
-        )
-        rcvd_messages = list(rcvd_messages.items())
-        rcvd_messages.sort()
-        ret_data = yield soa_bot(rcvd_messages)
+        ret_data = yield soa_bot()
         soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
         print(game_play.game.get_centers())
         print("expected stance ENGLAND: 1, RUSSIA: 1, GERMANY: -1, AUTRIA:0")
         print("soa stance", soa_bot_stance)
-        print(
-            "recipients of messages:",
-            [msg["recipient"] for msg in ret_data["messages"]],
+        messages = game_play.game.filter_messages(
+            messages=game_play.game.messages, game_role=soa_bot.power_name
         )
+        message_recipients = sorted(
+            msg.recipient
+            for msg in messages.values()
+            if msg.sender == soa_bot.power_name
+        )
+        print("recipients of messages:", message_recipients)
 
         assert (
             "ENGLAND" in soa_bot.allies and "RUSSIA" in soa_bot.allies

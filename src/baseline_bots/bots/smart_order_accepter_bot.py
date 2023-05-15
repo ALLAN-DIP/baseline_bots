@@ -6,8 +6,7 @@ import random
 from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 from DAIDE import FCT, HUH, ORR, PRP, REJ, XDO, YES
-from daidepp import create_daide_grammar
-from diplomacy import Game, Message
+from diplomacy import Game
 from diplomacy.client.network_game import NetworkGame
 from stance_vector import ActionBasedStance, ScoreBasedStance
 from tornado import gen
@@ -25,6 +24,7 @@ from baseline_bots.utils import (
     OrdersData,
     get_best_orders,
     get_order_tokens,
+    is_valid_daide_message,
     smart_select_support_proposals,
 )
 
@@ -186,41 +186,6 @@ class SmartOrderAccepterBot(DipnetBot):
         self.allies = []
         self.foes = []
         self.neutral = []
-        self.grammar_checker = create_daide_grammar(
-            level=130, allow_just_arrangement=True
-        )
-
-    async def send_message(
-        self, recipient: str, message: str, msg_data: MessagesData
-    ) -> None:
-        """
-        Send message asynchronously to the server while the bot is still processing
-
-        :param recipient: The name of the recipient power
-        :param message: Message to be sent
-        :param msg_data: MessagesData object containing set of all messages
-        """
-        msg_obj = Message(
-            sender=self.power_name,
-            recipient=recipient,
-            message=message,
-            phase=self.game.get_current_phase(),
-        )
-        message_already_exists = msg_data.add_message(
-            msg_obj.recipient, msg_obj.message, allow_duplicates=False
-        )
-        if message_already_exists:
-            return
-        try:
-            self.grammar_checker.parse(msg_obj.message)
-        except:
-            await self.send_intent_log(
-                "!! Sending a message with invalid DAIDE syntax: " + msg_obj.message
-            )
-
-        # Messages should not be sent in local games, only stored
-        if isinstance(self.game, NetworkGame):
-            await self.game.send_game_message(message=msg_obj)
 
     async def send_intent_log(self, log_msg: str) -> None:
         print(f"Intent log: {log_msg!r}")
@@ -773,7 +738,7 @@ class SmartOrderAccepterBot(DipnetBot):
         self.orders = orders_data
 
     @gen.coroutine
-    def __call__(self, rcvd_messages: List[Tuple[int, Message]]):
+    def __call__(self):
         # compute pos/neg stance on other bots using Tony's stance vector
 
         # avoid get_stance in the first phase of game
@@ -813,10 +778,7 @@ class SmartOrderAccepterBot(DipnetBot):
                 random.uniform(self.min_sleep_time, self.max_sleep_time)
             )
 
-            rcvd_messages = self.game.filter_messages(
-                messages=self.game.messages, game_role=self.power_name
-            )
-            rcvd_messages = sorted(rcvd_messages.items())
+            rcvd_messages = self.read_messages()
 
             # parse the proposal messages received by the bot
             parsed_messages_dict = parse_proposal_messages(
@@ -936,4 +898,4 @@ class SmartOrderAccepterBot(DipnetBot):
             # generate support proposals to allies
             yield self.generate_support_proposals(msgs_data)
 
-        return {"messages": msgs_data, "orders": orders_data.get_list_of_orders()}
+        return orders_data.get_list_of_orders()

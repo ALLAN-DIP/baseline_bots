@@ -23,6 +23,6 @@ $ docker run -it allan_dip_bot --help
 --outdir    OUT_DIR
 
 #connect to remote game engine
-$ docker run -it allan_dip_bot --game_id test_game --host shade-dev.tacc.utexas.edu --power TURKEY
+$ docker run -it allan_dip_bot --game_id test_game --host shade.tacc.utexas.edu --power TURKEY
 $
 ```

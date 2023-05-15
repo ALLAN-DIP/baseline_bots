@@ -8,6 +8,7 @@ from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
 from baseline_bots.parsing_utils import daide_to_dipnet_parsing, dipnet_to_daide_parsing
 from baseline_bots.utils import (
     MessagesData,
+    OrdersData,
     get_other_powers,
     parse_arrangement,
     parse_FCT,
@@ -34,7 +35,7 @@ class TransparentBot(DipnetBot):
         self.my_orders_informed = False
 
     def parse_messages(self, rcvd_messages: List[Message]) -> List[str]:
-        press_msgs = [msg[1] for msg in rcvd_messages if "FCT" in msg[1].message]
+        press_msgs = [msg for msg in rcvd_messages if "FCT" in msg.message]
         parsed_orders = []
         for msg in press_msgs:
             parsed_orders += parse_arrangement(parse_FCT(msg.message))
@@ -94,7 +95,9 @@ class TransparentBot(DipnetBot):
         return self.orders.get_list_of_orders()
 
     @gen.coroutine
-    def __call__(self, rcvd_messages: List[Message]) -> dict:
+    def __call__(self) -> OrdersData:
+        rcvd_messages = self.read_messages()
         messages = yield from self.gen_messages(rcvd_messages)
+        yield self.send_messages(messages)
         orders = yield from self.gen_orders()
-        return {"messages": messages, "orders": orders}
+        return orders

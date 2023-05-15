@@ -18,7 +18,7 @@ from diplomacy_research.utils.cluster import is_port_opened
 from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.bots.dipnet.no_press_bot import NoPressDipBot
 from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
-from baseline_bots.bots.random_proposer_bot import RandomProposerBot_AsyncBot
+from baseline_bots.bots.random_proposer_bot import RandomProposerBot
 from baseline_bots.bots.smart_order_accepter_bot import (
     Aggressiveness,
     SmartOrderAccepterBot,
@@ -27,40 +27,10 @@ from baseline_bots.bots.smart_order_accepter_bot import (
 POWERS = ["AUSTRIA", "ENGLAND", "FRANCE", "GERMANY", "ITALY", "RUSSIA", "TURKEY"]
 BOTS = [
     NoPressDipBot.__name__,
-    RandomProposerBot_AsyncBot.__name__,
+    RandomProposerBot.__name__,
     SmartOrderAccepterBot.__name__,
     TransparentBot.__name__,
 ]
-
-
-async def test(hostname: str = "localhost", port: int = 8432) -> None:
-    """
-    Tests the game connection
-
-    :param hostname: name of host on which games are hosted
-    :param port: port to which the bot should connect on the host
-    """
-    connection = await connect(hostname, port)
-    channel = await connection.authenticate("random_user", "password")
-    games = await channel.list_games()
-    for game in games:
-        game_info = {
-            "game_id": game.game_id,
-            "phase": game.phase,
-            "timestamp": game.timestamp,
-            "timestamp_created": game.timestamp_created,
-            "map_name": game.map_name,
-            "observer_level": game.observer_level,
-            "controlled_powers": game.controlled_powers,
-            "rules": game.rules,
-            "status": game.status,
-            "n_players": game.n_players,
-            "n_controls": game.n_controls,
-            "deadline": game.deadline,
-            "registration_password": game.registration_password,
-        }
-        print(game_info)
-    print(games)
 
 
 async def launch(
@@ -155,8 +125,8 @@ async def play(
         bot: BaselineBot = NoPressDipBot(power_name, game)
     elif bot_type == TransparentBot.__name__:
         bot = TransparentBot(power_name, game)
-    elif bot_type == RandomProposerBot_AsyncBot.__name__:
-        bot = RandomProposerBot_AsyncBot(power_name, game)
+    elif bot_type == RandomProposerBot.__name__:
+        bot = RandomProposerBot(power_name, game)
     elif bot_type == SmartOrderAccepterBot.__name__:
         bot = SmartOrderAccepterBot(
             power_name,
@@ -193,21 +163,9 @@ async def play(
 
         phase_start_time = time.time()
 
-        # Retrieve messages
-        rcvd_messages = game.filter_messages(
-            messages=game.messages, game_role=bot.power_name
-        )
-        rcvd_messages = sorted(rcvd_messages.items())
-
         if not game.powers[bot.power_name].is_eliminated():
-            # Send messages to bots and fetch messages from bot
             # Fetch orders from bot
-            ret_data = await bot(rcvd_messages)
-            messages_data = ret_data["messages"]
-            orders_data = ret_data["orders"]
-
-            if len(messages_data.messages):
-                print(f"Messages sent: {len(messages_data.messages)}")
+            orders_data = await bot()
 
             # If orders are present, send them
             if orders_data is not None:

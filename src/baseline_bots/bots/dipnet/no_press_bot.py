@@ -1,19 +1,13 @@
 from typing import List
 
-from diplomacy import Message
 from tornado import gen
 
 from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
-from baseline_bots.utils import MessagesData, OrdersData
+from baseline_bots.utils import OrdersData
 
 
 class NoPressDipBot(DipnetBot):
     """just execute orders computed by dipnet"""
-
-    @gen.coroutine
-    def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
-        """query dipnet for orders"""
-        return MessagesData()
 
     @gen.coroutine
     def gen_orders(self) -> List[str]:
@@ -23,7 +17,6 @@ class NoPressDipBot(DipnetBot):
         return self.orders.get_list_of_orders()
 
     @gen.coroutine
-    def __call__(self, rcvd_messages: List[Message]) -> dict:
-        messages = yield self.gen_messages(rcvd_messages)
+    def __call__(self) -> OrdersData:
         orders = yield self.gen_orders()
-        return {"messages": messages, "orders": orders}
+        return orders

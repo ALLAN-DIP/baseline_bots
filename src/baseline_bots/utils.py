@@ -7,15 +7,25 @@ It would be preferable to use a real DAIDE parser in prod
 from collections import defaultdict
 import collections.abc
 from copy import deepcopy
+import os
 import re
-from typing import TYPE_CHECKING, Dict, List, Optional, Set, Tuple
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Set, Tuple
 
 from DAIDE.utils.exceptions import ParseError
+from daidepp import (
+    AND,
+    ORR,
+    AnyDAIDEToken,
+    Arrangement,
+    create_daide_grammar,
+    daide_visitor,
+)
+from daidepp.grammar.grammar import DAIDELevel
 from diplomacy import Game, Message
 from diplomacy.utils import strings
 import numpy as np
 from tornado import gen
-from typing_extensions import TypedDict
+from typing_extensions import get_args
 
 if TYPE_CHECKING:
     from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
@@ -30,6 +40,67 @@ POWER_NAMES_DICT = {
     "TUR": "TURKEY",
     "GER": "GERMANY",
 }
+
+MAX_DAIDE_LEVEL = get_args(DAIDELevel)[-1]
+MESSAGE_GRAMMAR = create_daide_grammar(level=MAX_DAIDE_LEVEL, string_type="message")
+ALL_GRAMMAR = create_daide_grammar(level=MAX_DAIDE_LEVEL, string_type="all")
+
+
+def is_valid_daide_message(string: str) -> bool:
+    """Determines whether a string is a valid DAIDE message.
+    :param string: String to check for valid DAIDE.
+    :return: Whether the string is valid DAIDE or not.
+    """
+    try:
+        parse_tree = MESSAGE_GRAMMAR.parse(string)
+        daide_visitor.visit(parse_tree)
+    except Exception:
+        return False
+    return True
+
+
+def parse_daide(string: str) -> AnyDAIDEToken:
+    """Parses a DAIDE string into `daidepp` objects.
+    :param string: String to parse into DAIDE.
+    :return: Parsed DAIDE object.
+    :raises ValueError: If string is invalid DAIDE.
+    """
+    try:
+        parse_tree = ALL_GRAMMAR.parse(string)
+        return daide_visitor.visit(parse_tree)
+    except Exception as ex:
+        raise ValueError(f"Failed to parse DAIDE string: {string!r}") from ex
+
+
+# Option needed for performers that don't use `ORR`
+DISABLE_ORR = False
+if os.environ.get("DISABLE_ORR") is not None:
+    print("Disabling ORR usage")
+    DISABLE_ORR = True
+
+
+def optional_ORR(arrangements: Sequence[Arrangement]) -> Arrangement:
+    """Wraps a list of arrangements in an `ORR`.
+    If the list has a single element, return that element instead.
+    :param arrangements: List of arrangements.
+    :return: Arrangement object.
+    """
+    if len(arrangements) > 1 and not DISABLE_ORR:
+        return ORR(*arrangements)
+    else:
+        return arrangements[0]
+
+
+def optional_AND(arrangements: Sequence[Arrangement]) -> Arrangement:
+    """Wraps a list of arrangements in an `AND`.
+    If the list has a single element, return that element instead.
+    :param arrangements: List of arrangements.
+    :return: Arrangement object.
+    """
+    if len(arrangements) > 1:
+        return AND(*arrangements)
+    else:
+        return arrangements[0]
 
 
 def get_order_tokens(order: str) -> List[str]:
@@ -50,33 +121,12 @@ def get_order_tokens(order: str) -> List[str]:
     return order_tokens
 
 
-def AND(arrangements: List[str]) -> str:
-    """
-    ANDs together an array of arrangements
-    """
-
-    if len(arrangements) < 2:
-        raise Exception("Need at least 2 items to AND")
-
-    return "AND" + "".join([f" ({a})" for a in arrangements])
-
-
 def get_other_powers(powers: List[str], game: Game) -> Set[str]:
     """
     :return: powers in the game other than those listed
     in the powers parameter
     """
     return set(game.get_map_power_names()) - set(powers)
-
-
-def ALY(powers: List[str], game: Game) -> str:
-    """
-    Forms an alliance proposal string
-
-    :param powers: an array of powers to be allied
-    """
-    others = get_other_powers(powers, game)
-    return "ALY (" + " ".join(powers) + ") VSS (" + " ".join(others) + ")"
 
 
 def YES(string: str) -> str:
@@ -347,16 +397,6 @@ class OrdersData:
 
     def empty(self) -> bool:
         return len(self.orders) > 0
-
-
-class MessagesAndOrders(TypedDict):
-    messages: MessagesData
-    orders: OrdersData
-
-
-def sort_messages_by_most_recent(messages: List[Message]) -> List[Message]:
-    messages.sort(key=lambda msg: msg.time_sent)
-    return messages
 
 
 @gen.coroutine
