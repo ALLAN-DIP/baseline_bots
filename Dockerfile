@@ -20,11 +20,18 @@ RUN wget --progress=dot:giga https://f002.backblazeb2.com/file/ppaquette-public/
     && rm neurips2019-sl_model.zip \
     && chmod -R 777 /model/src/model_server/bot_neurips2019-sl_model
 
+
 # Clone and prepare research repo
 RUN git config --system --add safe.directory /model/src/model_server/research \
-    && git clone https://github.com/SHADE-AI/research.git \
-    && git --git-dir research/.git/ checkout 78468505b82f37ec298d234ed406d93445cf8281 \
+    && git clone --single-branch -b niruth_allaince_bots https://github.com/ALLAN-DIP/research.git\
+    # && git --git-dir research/.git/ \
     && sed -i 's/gym>/gym=/g' research/requirements.txt
+
+# # Clone and prepare research repo
+# RUN git config --system --add safe.directory /model/src/model_server/research \
+#     && git clone https://github.com/SHADE-AI/research.git \
+#     && git --git-dir research/.git/ checkout 78468505b82f37ec298d234ed406d93445cf8281 \
+#     && sed -i 's/gym>/gym=/g' research/requirements.txt
 
 # Environment variables
 ENV PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=cpp
@@ -88,3 +95,5 @@ ENV WORKING_DIR=/model/src/model_server/research/WORKING_DIR
 
 # Script executors
 ENTRYPOINT ["/model/src/model_server/baseline_bots/containers/allan_dip_bot/run.sh"]
+
+

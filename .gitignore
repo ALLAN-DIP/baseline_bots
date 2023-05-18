@@ -20,3 +20,6 @@ batch.txt
 bot_neurips2019-sl_model
 myjob.*
 neurips2019-sl_model.zip
+
+# ENVs
+dip_bots/

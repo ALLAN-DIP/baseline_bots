@@ -766,6 +766,19 @@ class SmartOrderAccepterBot(DipnetBot):
         orders_data.add_orders(orders)
         yield self.send_intent_log(f"Initial orders (before communication): {orders}")
 
+
+        # get dipnet order -> alliance bots 
+
+        orders_alliance ,orders_data_a = {}, {}
+        for i,bot in enumerate(self.alliance_brains.values()):
+            orders_alliance['al'+str(i+1)]= yield from bot.get_orders(self.game, self.power_name)
+            orders_data_a['al'+str(i+1)] = OrdersData()
+            orders_data_a['al'+str(i+1)].add_orders(orders_alliance['al'+str(i+1)])
+
+        for i,v in enumerate(orders_alliance):
+            yield self.send_intent_log(f"Initial orders (before communication): {orders_alliance['al'+str(i+1)]}")
+
+
         msgs_data = MessagesData()
 
         for _ in range(self.num_message_rounds):
@@ -858,7 +871,7 @@ class SmartOrderAccepterBot(DipnetBot):
             # respond to to alliance message and update stance & allies
             yield self.respond_to_alliance_messages(msgs_data)
 
-            # respond to to peace message and update stance & allies
+            # respond to to peace message and update stance & aintent_logllies
             yield self.respond_to_peace_messages(msgs_data)
 
             # generate proposal response YES/NO to allies

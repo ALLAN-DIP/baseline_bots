@@ -16,6 +16,9 @@ class DipnetBot(BaselineMsgRoundBot, ABC):
 
     brain: ModelBasedPlayer
 
+    
+
+
     def __init__(
         self,
         power_name: str,
@@ -25,7 +28,14 @@ class DipnetBot(BaselineMsgRoundBot, ABC):
     ) -> None:
         super().__init__(power_name, game, total_msg_rounds)
         if dipnet_type == "slp":
-            self.brain = DipNetSLPlayer()
+            self.brain = DipNetSLPlayer(model_name='player',name='main_bot')
+            self.alliance_brains = {'al1':DipNetSLPlayer(model_name='alliance_player1',name='al1'),
+                                    'al2':DipNetSLPlayer(model_name='alliance_player1',name='al2'),
+                                    'al3':DipNetSLPlayer(model_name='alliance_player1',name='al3'),
+                                    'al4':DipNetSLPlayer(model_name='alliance_player1',name='al4'),
+                                    'al5':DipNetSLPlayer(model_name='alliance_player1',name='al5'),
+                                    'al6':DipNetSLPlayer(model_name='alliance_player1',name='al6')
+                                    }
         else:
             self.brain = DipNetRLPlayer()
 

@@ -11,11 +11,31 @@ batch_file="batch.txt"
   printf "pad_variable_length_inputs: %s\n" "$PAD_VARIABLE_LENGTH_INPUTS"
 } >$batch_file
 
+# conf_file="models.conf"
+
 tensorflow_model_server \
   --port=9501 \
-  --model_name="player" \
+  --model_config_file='/model/src/model_server/baseline_bots/containers/allan_dip_bot/models.config' \
   --enable_batching=true \
   --batching_parameters_file=$batch_file \
-  --model_base_path=/model/src/model_server/bot_neurips2019-sl_model/ \
-  --tensorflow_session_parallelism=8 \
-  --file_system_poll_wait_seconds=3
+  --tensorflow_session_parallelism=8 
+
+
+
+# tensorflow_model_server \
+#   --port=9501 \
+#   --model_name="alliance_player1" \
+#   --enable_batching=true \
+#   --batching_parameters_file=$batch_file \
+#   --model_base_path=/model/src/model_server/bot_alliance1-sl_model/ \
+#   --tensorflow_session_parallelism=8 \
+#   --file_system_poll_wait_seconds=3
+
+# tensorflow_model_server \
+#   --port=9501 \
+#   --model_name="player" \
+#   --enable_batching=true \
+#   --batching_parameters_file=$batch_file \
+#   --model_base_path=/model/src/model_server/bot_neurips2019-sl_model/ \
+#   --tensorflow_session_parallelism=8 \
+#   --file_system_poll_wait_seconds=3
