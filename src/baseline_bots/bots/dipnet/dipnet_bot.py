@@ -2,13 +2,13 @@
 
 
 from abc import ABC
+from typing import List
 
 from diplomacy import Game
 from diplomacy_research.players.benchmark_player import DipNetRLPlayer, DipNetSLPlayer
 from diplomacy_research.players.model_based_player import ModelBasedPlayer
 
 from baseline_bots.bots.baseline_bot import BaselineMsgRoundBot
-from baseline_bots.utils import OrdersData
 
 
 class DipnetBot(BaselineMsgRoundBot, ABC):
@@ -29,8 +29,6 @@ class DipnetBot(BaselineMsgRoundBot, ABC):
         else:
             self.brain = DipNetRLPlayer()
 
-    def gen_orders(self) -> OrdersData:
+    async def gen_orders(self) -> List[str]:
         """finalizes moves"""
-        self.orders = self.brain.get_orders(self.game, self.power_name)
-        print(self.orders)
-        return self.orders
+        return await self.brain.get_orders(self.game, self.power_name)

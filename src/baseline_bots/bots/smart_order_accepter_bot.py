@@ -738,7 +738,7 @@ class SmartOrderAccepterBot(DipnetBot):
         self.orders = orders_data
 
     @gen.coroutine
-    def __call__(self):
+    def __call__(self) -> List[str]:
         # compute pos/neg stance on other bots using Tony's stance vector
 
         # avoid get_stance in the first phase of game

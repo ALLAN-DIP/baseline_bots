@@ -21,6 +21,8 @@ class PushoverDipnet(DipnetBot):
     NOTE: only executes non-aggressive action
     """
 
+    orders: OrdersData
+
     def __init__(self, power_name: str, game: Game, total_msg_rounds=3) -> None:
         super().__init__(power_name, game, total_msg_rounds)
 
@@ -69,13 +71,9 @@ class PushoverDipnet(DipnetBot):
         return reply_obj
 
     @gen.coroutine
-    def gen_orders(self) -> List[str]:
-        return self.orders.get_list_of_orders()
-
-    @gen.coroutine
-    def __call__(self) -> dict:
+    def __call__(self) -> List[str]:
         rcvd_messages = self.read_messages()
         messages = yield self.gen_messages(rcvd_messages)
         yield self.send_messages(messages)
-        orders = yield self.gen_orders()
+        orders = self.orders.get_list_of_orders()
         return orders

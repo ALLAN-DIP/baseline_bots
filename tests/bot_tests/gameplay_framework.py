@@ -92,8 +92,6 @@ class GamePlay:
         for bot in self.bots:
             if bot is None:
                 continue
-            if orders is not None and hasattr(orders, "get_list_of_orders"):
-                orders = orders.get_list_of_orders()
             self.game.set_orders(power_name=bot.power_name, orders=orders)
 
         self.cur_local_message_round += 1

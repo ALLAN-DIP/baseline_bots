@@ -6,7 +6,7 @@ from diplomacy import Game
 
 from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.parsing_utils import dipnet_to_daide_parsing
-from baseline_bots.utils import MessagesData, OrdersData, get_other_powers
+from baseline_bots.utils import MessagesData, get_other_powers
 
 
 class RandomProposerBot(BaselineBot):
@@ -53,26 +53,19 @@ class RandomProposerBot(BaselineBot):
         return ret_obj
 
     async def gen_orders(self) -> List[str]:
-        self.orders = OrdersData()
         possible_orders = self.game.get_all_possible_orders()
-
         orders = [
             random.choice([ord for ord in possible_orders[loc]])
             for loc in self.game.get_orderable_locations(self.power_name)
             if possible_orders[loc]
         ]
+        return orders
 
-        self.orders.add_orders(orders)
-
-        return self.orders.get_list_of_orders()
-
-    async def __call__(self) -> OrdersData:
+    async def __call__(self) -> List[str]:
         """
         :return: dict containing messages and orders
         """
         messages = await self.gen_messages()
         await self.send_messages(messages)
         orders = await self.gen_orders()
-        # maintain current orders
-        self.orders = orders
         return orders
