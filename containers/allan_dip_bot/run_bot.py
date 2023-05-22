@@ -120,7 +120,7 @@ async def play(
         f"allan_{bot_type.lower()}_{power_name}", "password"
     )
     game: NetworkGame = await channel.join_game(game_id=game_id, power_name=power_name)
-
+# need to add a list of alliance bots
     if bot_type == NoPressDipBot.__name__:
         bot: BaselineBot = NoPressDipBot(power_name, game)
     elif bot_type == TransparentBot.__name__:

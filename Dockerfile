@@ -20,6 +20,13 @@ RUN wget --progress=dot:giga https://f002.backblazeb2.com/file/ppaquette-public/
     && rm neurips2019-sl_model.zip \
     && chmod -R 777 /model/src/model_server/bot_neurips2019-sl_model
 
+# Copy allaince model
+RUN wget --progress=dot:giga https://f005.backblazeb2.com/file/dip-base-03/russ_tuk_e4_dipnet.zip \
+    && mkdir /model/src/model_server/bot_alliance1-sl_model \
+    && unzip russ_tuk_e4_dipnet.zip -d /model/src/model_server/bot_alliance1-sl_model \
+    && rm russ_tuk_e4_dipnet.zip \
+    && chmod -R 777 /model/src/model_server/bot_alliance1-sl_model
+
 
 # Clone and prepare research repo
 RUN git config --system --add safe.directory /model/src/model_server/research \
@@ -27,6 +34,7 @@ RUN git config --system --add safe.directory /model/src/model_server/research \
     # && git --git-dir research/.git/ \
     && sed -i 's/gym>/gym=/g' research/requirements.txt
 
+# FROM base AS allan_alliance_dip_bot
 # # Clone and prepare research repo
 # RUN git config --system --add safe.directory /model/src/model_server/research \
 #     && git clone https://github.com/SHADE-AI/research.git \
@@ -85,7 +93,7 @@ FROM dev as test_ci
 
 CMD ["/bin/bash", "-c", "/model/src/model_server/baseline_bots/containers/allan_dip_bot/run_model_server.sh & pytest"]
 
-FROM base AS allan_dip_bot
+FROM base AS allan_alliance_dip_bot
 
 # Copy specialized files
 COPY containers/allan_dip_bot/ /model/src/model_server/baseline_bots/containers/allan_dip_bot/

@@ -72,6 +72,8 @@ class SmartOrderAccepterBot(DipnetBot):
         self,
         power_name: str,
         game: Game,
+        alliance_bots: list,
+        # alliance_bots: list = ['RUSSIA_TURKEY','RUSSIA_FRANCE'],
         discount_factor: float = 0.5,
         invasion_coef: float = 1.0,
         conflict_coef: float = 0.5,
@@ -93,7 +95,7 @@ class SmartOrderAccepterBot(DipnetBot):
         :param stance_type: indicates if this bot should use ActionBasedStance (A) or ScoreBasedStance (S)
         :param aggressiveness: indicates if this bot should be aggressive (A), moderate (M) or friendly (F). Valid only if stance type is action-based
         """
-        super().__init__(power_name, game)
+        super().__init__(power_name, game,alliance_bots)
         self.alliance_props_sent = False
         self.discount_factor = discount_factor
         self.invasion_coef = invasion_coef
@@ -768,15 +770,23 @@ class SmartOrderAccepterBot(DipnetBot):
 
 
         # get dipnet order -> alliance bots 
+        if self.alliance_brains:
+            orders_alliance ,orders_data_a = {}, {}
+            for key, bot in self.alliance_brains.items():
+                orders_alliance[key] = yield from bot.get_orders(self.game, self.power_name)
+                orders_data_a[key] = OrdersData()
+                orders_data_a[key].add_orders(orders_alliance[key])
 
-        orders_alliance ,orders_data_a = {}, {}
-        for i,bot in enumerate(self.alliance_brains.values()):
-            orders_alliance['al'+str(i+1)]= yield from bot.get_orders(self.game, self.power_name)
-            orders_data_a['al'+str(i+1)] = OrdersData()
-            orders_data_a['al'+str(i+1)].add_orders(orders_alliance['al'+str(i+1)])
+            for key,bot in orders_alliance.items():
+                yield self.send_intent_log(f"Initial orders alliance brains (before communication ): {'al:' + key} {orders_alliance[key]}")
 
-        for i,v in enumerate(orders_alliance):
-            yield self.send_intent_log(f"Initial orders (before communication): {orders_alliance['al'+str(i+1)]}")
+
+        # for i,bot in enumerate(self.alliance_brains.values()):
+        #     orders_alliance['al'+str(i+1)]= yield from bot.get_orders(self.game, self.power_name)
+        #     orders_data_a['al'+str(i+1)] = OrdersData()
+        #     orders_data_a['al'+str(i+1)].add_orders(orders_alliance['al'+str(i+1)])
+        # for i,v in enumerate(orders_alliance):
+        #     yield self.send_intent_log(f"Initial orders allaince brains (before communication ): {'al' + str(i+1)} {orders_alliance['al'+str(i+1)]}")
 
 
         msgs_data = MessagesData()

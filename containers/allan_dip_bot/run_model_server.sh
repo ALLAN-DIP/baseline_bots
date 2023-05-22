@@ -21,7 +21,6 @@ tensorflow_model_server \
   --tensorflow_session_parallelism=8 
 
 
-
 # tensorflow_model_server \
 #   --port=9501 \
 #   --model_name="alliance_player1" \

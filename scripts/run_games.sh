@@ -74,7 +74,7 @@ else
         sort | tail -1
     )
   else
-    AGENT=allan_dip_bot
+    AGENT=allan_alliance_dip_bot
   fi
 fi
 
@@ -108,6 +108,7 @@ fi
 LOG_DIR=logs/"$GAME_ID"
 mkdir -p "$LOG_DIR"
 
+# add loop to create an alliace_bot list base on each power and pass into OPTS
 POWERS=(AUSTRIA ENGLAND GERMANY FRANCE ITALY RUSSIA TURKEY)
 for POWER in "${POWERS[@]}"; do
   $RUN_CMD "$AGENT" --host $HOST --game_id "$GAME_ID" --power "$POWER" "${OPTS[@]}" "$@" \
