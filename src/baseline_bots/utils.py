@@ -85,6 +85,7 @@ def optional_ORR(arrangements: Sequence[Arrangement]) -> Arrangement:
     :param arrangements: List of arrangements.
     :return: Arrangement object.
     """
+    arrangements = sorted(set(arrangements), key=str)
     if len(arrangements) > 1 and not DISABLE_ORR:
         return ORR(*arrangements)
     else:
@@ -97,6 +98,7 @@ def optional_AND(arrangements: Sequence[Arrangement]) -> Arrangement:
     :param arrangements: List of arrangements.
     :return: Arrangement object.
     """
+    arrangements = sorted(set(arrangements), key=str)
     if len(arrangements) > 1:
         return AND(*arrangements)
     else:
