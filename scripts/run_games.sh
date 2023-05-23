@@ -110,6 +110,22 @@ mkdir -p "$LOG_DIR"
 
 # add loop to create an alliace_bot list base on each power and pass into OPTS
 POWERS=(AUSTRIA ENGLAND GERMANY FRANCE ITALY RUSSIA TURKEY)
+
+# run SOA with alliance_brains 
+
+# for ((i=0; i<${#POWERS[@]}; i++)); do
+# Pairs=()
+#   for ((j=0; j<${#POWERS[@]}; j++)); do
+#     if [ ${POWERS[i]} != ${POWERS[j]} ]; then
+#     Pairs+="${POWERS[i]}_${POWERS[j]} , "
+#     fi
+#   done
+#   OPTS+=(--alliance_bots $Pairs)
+#   $RUN_CMD "$AGENT" --host $HOST --game_id "$GAME_ID" --power "$POWER" "${OPTS[@]}" "$@" \
+#    &>"$LOG_DIR"/"$POWER".txt &
+#   sleep 4
+# done
+
 for POWER in "${POWERS[@]}"; do
   $RUN_CMD "$AGENT" --host $HOST --game_id "$GAME_ID" --power "$POWER" "${OPTS[@]}" "$@" \
     &>"$LOG_DIR"/"$POWER".txt &
