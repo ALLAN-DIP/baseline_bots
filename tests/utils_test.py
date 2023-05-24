@@ -37,33 +37,33 @@ class TestUtils:
         assert orders_data.get_list_of_orders() == ["A VIE H"]
 
     DIPNET_TO_DAIDE_PARSING_TEST_CASES = [
-        (["A PAR H"], ["(FRA AMY PAR) HLD"], False),
-        (["F STP/SC H"], ["(RUS FLT (STP SCS)) HLD"], False),
-        ([("A PAR H", "ENG")], ["(ENG AMY PAR) HLD"], True),
-        (["A PAR - MAR"], ["(FRA AMY PAR) MTO MAR"], False),
-        (["A PAR R MAR"], ["(FRA AMY PAR) MTO MAR"], False),
-        (["F STP/SC - BOT"], ["(RUS FLT (STP SCS)) MTO GOB"], False),
-        (["A CON - BUL"], ["(TUR AMY CON) MTO BUL"], False),
-        (["F BLA - BUL/EC"], ["(TUR FLT BLA) MTO (BUL ECS)"], False),
-        (["A BUD S F TRI"], ["(AUS AMY BUD) SUP (AUS FLT TRI)"], False),
+        (["A PAR H"], ["( FRA AMY PAR ) HLD"], False),
+        (["F STP/SC H"], ["( RUS FLT (STP SCS) ) HLD"], False),
+        ([("A PAR H", "ENG")], ["( ENG AMY PAR ) HLD"], True),
+        (["A PAR - MAR"], ["( FRA AMY PAR ) MTO MAR"], False),
+        (["A PAR R MAR"], ["( FRA AMY PAR ) MTO MAR"], False),
+        (["F STP/SC - BOT"], ["( RUS FLT (STP SCS) ) MTO GOB"], False),
+        (["A CON - BUL"], ["( TUR AMY CON ) MTO BUL"], False),
+        (["F BLA - BUL/EC"], ["( TUR FLT BLA ) MTO (BUL ECS)"], False),
+        (["A BUD S F TRI"], ["( AUS AMY BUD ) SUP ( AUS FLT TRI )"], False),
         (
             ["A PAR S A MAR - BUR"],
-            ["(FRA AMY PAR) SUP (FRA AMY MAR) MTO BUR"],
+            ["( FRA AMY PAR ) SUP ( FRA AMY MAR ) MTO BUR"],
             False,
         ),
         (
             ["A MOS S F STP/SC - LVN"],
-            ["(RUS AMY MOS) SUP (RUS FLT (STP SCS)) MTO LVN"],
+            ["( RUS AMY MOS ) SUP ( RUS FLT (STP SCS) ) MTO LVN"],
             False,
         ),
         (
             ["A SMY S A CON - BUL"],
-            ["(TUR AMY SMY) SUP (TUR AMY CON) MTO BUL"],
+            ["( TUR AMY SMY ) SUP ( TUR AMY CON ) MTO BUL"],
             False,
         ),
         (
             ["A CON S F BLA - BUL/EC"],
-            ["(TUR AMY CON) SUP (TUR FLT BLA) MTO (BUL ECS)"],
+            ["( TUR AMY CON ) SUP ( TUR FLT BLA ) MTO BUL"],
             False,
         ),
     ]
@@ -101,6 +101,14 @@ class TestUtils:
             if type(test_input[0]) == str
             else test_input[0][0].replace(" R ", " - ")
         )
+        # Remove coast for target destination in support orders
+        if " S " in comparison_tc_op and comparison_tc_op[-3:] in {
+            "/NC",
+            "/SC",
+            "/EC",
+            "/WC",
+        }:
+            comparison_tc_op = comparison_tc_op.rsplit("/", maxsplit=1)[0]
         assert daide_to_dipnet_parsing(expected[0])[0] == comparison_tc_op, (
             daide_to_dipnet_parsing(expected[0]),
             comparison_tc_op,
@@ -110,17 +118,17 @@ class TestUtils:
         (
             ["A TUN - SYR VIA", "F ION C A TUN - SYR", "F EAS C A TUN - SYR"],
             [
-                "(ITA AMY TUN) CTO SYR VIA (ION EAS)",
-                "(ITA FLT ION) CVY (ITA AMY TUN) CTO SYR",
-                "(ITA FLT EAS) CVY (ITA AMY TUN) CTO SYR",
+                "( ITA AMY TUN ) CTO SYR VIA ( ION EAS )",
+                "( ITA FLT ION ) CVY ( ITA AMY TUN ) CTO SYR",
+                "( ITA FLT EAS ) CVY ( ITA AMY TUN ) CTO SYR",
             ],
         ),
         (
             ["A TUN - BUL VIA", "F ION C A TUN - BUL", "F AEG C A TUN - BUL"],
             [
-                "(ITA AMY TUN) CTO BUL VIA (ION AEG)",
-                "(ITA FLT ION) CVY (ITA AMY TUN) CTO BUL",
-                "(ITA FLT AEG) CVY (ITA AMY TUN) CTO BUL",
+                "( ITA AMY TUN ) CTO BUL VIA ( ION AEG )",
+                "( ITA FLT ION ) CVY ( ITA AMY TUN ) CTO BUL",
+                "( ITA FLT AEG ) CVY ( ITA AMY TUN ) CTO BUL",
             ],
         ),
     ]

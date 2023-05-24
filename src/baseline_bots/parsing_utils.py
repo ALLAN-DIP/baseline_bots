@@ -5,7 +5,7 @@ Some quickly built parsing utils mostly for DAIDE stuff
 from collections import defaultdict
 from typing import Dict, List, Tuple, Union
 
-from daidepp import Location, Unit
+from daidepp import CVY, HLD, MTO, SUP, Location, MoveByCVY, Unit
 from diplomacy import Game, Message
 
 from baseline_bots.utils import (
@@ -132,8 +132,6 @@ def dipnet_to_daide_parsing(
             if unit_power_tuples_included:
                 unit_game_mapping[dipnet_order_tokens[0]] = unit_power
 
-            daide_order = []
-
             if dipnet_order_tokens[0] not in unit_game_mapping:
                 continue
             if (
@@ -144,63 +142,63 @@ def dipnet_to_daide_parsing(
                 continue
 
             # Daidefy and add source unit as it is
-            daide_order.append(f"({daidefy_unit(dipnet_order_tokens[0])})")
+            acting_unit = daidefy_unit(dipnet_order_tokens[0])
 
             if dipnet_order_tokens[1] == "S":
-                # Support orders
-                daide_order.append("SUP")
-                daide_order.append(f"({daidefy_unit(dipnet_order_tokens[2])})")
+                target_unit = daidefy_unit(dipnet_order_tokens[2])
 
                 if len(dipnet_order_tokens) == 4 and dipnet_order_tokens[3] != "H":
-                    daide_order.append("MTO")
-                    daide_order.append(
-                        str(daidefy_location(dipnet_order_tokens[3].split()[-1]))
-                    )
+                    province_no_coast = daidefy_location(
+                        dipnet_order_tokens[3].split()[-1]
+                    ).province
                 elif len(dipnet_order_tokens) > 4:
-                    print(
-                        f"ALLAN: error from parsing_utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
-                    )
-                    continue
-            elif dipnet_order_tokens[1] == "H":
-                # Hold orders
-                daide_order.append("HLD")
-            elif dipnet_order_tokens[1] == "C":
-                # Convoy orders
-                daide_order.append("CVY")
-                daide_order.append(f"({daidefy_unit(dipnet_order_tokens[2])})")
-
-                daide_order.append("CTO")
-                daide_order.append(
-                    str(daidefy_location(dipnet_order_tokens[3].split()[-1]))
-                )
-            elif len(dipnet_order_tokens) >= 3 and dipnet_order_tokens[2] == "VIA":
-                # VIA/CTO orders
-                daide_order.append("CTO")
-                daide_order.append(
-                    str(daidefy_location(dipnet_order_tokens[1].split()[-1]))
-                )
-                daide_order.append("VIA")
-                if dipnet_order_tokens[0] + dipnet_order_tokens[1] in convoy_map:
-                    daide_order.append(
-                        f"({' '.join(convoy_map[dipnet_order_tokens[0] + dipnet_order_tokens[1]])})"
+                    raise NotImplementedError(
+                        f"Cannot process DipNet support order {' '.join(dipnet_order_tokens)!r} "
+                        "because it has more than 4 tokens"
                     )
                 else:
-                    print(
-                        f"ALLAN: error parsing_utils.dipnet_to_daide_parsing. Found unexpected order {dipnet_order_tokens} which doesn't have convoying fleet in its own set of orders"
-                    )
-                    continue
-            else:
-                # Move orders
-                daide_order.append("MTO")
-                daide_order.append(
-                    str(daidefy_location(dipnet_order_tokens[1].split()[-1]))
+                    province_no_coast = None
+
+                support_order = SUP(
+                    supporting_unit=acting_unit,
+                    supported_unit=target_unit,
+                    province_no_coast=province_no_coast,
                 )
-                if len(dipnet_order_tokens) > 2:
-                    print(
-                        f"ALLAN: error from parsing_utils.dipnet_to_daide_parsing: order {dipnet_order_tokens} is UNEXPECTED. Update code to handle this case!!!"
+                daide_order = support_order
+            elif dipnet_order_tokens[1] == "H":
+                hold_order = HLD(acting_unit)
+                daide_order = hold_order
+            elif dipnet_order_tokens[1] == "C":
+                target_unit = daidefy_unit(dipnet_order_tokens[2])
+                target_prov = daidefy_location(dipnet_order_tokens[3].split()[-1])
+                convoy_order = CVY(
+                    convoying_unit=acting_unit,
+                    convoyed_unit=target_unit,
+                    province=target_prov,
+                )
+                daide_order = convoy_order
+            elif len(dipnet_order_tokens) >= 3 and dipnet_order_tokens[2] == "VIA":
+                province = daidefy_location(dipnet_order_tokens[1].split()[-1])
+                if dipnet_order_tokens[0] + dipnet_order_tokens[1] in convoy_map:
+                    seas = convoy_map[dipnet_order_tokens[0] + dipnet_order_tokens[1]]
+                    seas = [daidefy_location(prov).province for prov in seas]
+                else:
+                    raise ValueError(
+                        f"Found unexpected order {' '.join(dipnet_order_tokens)!r} which "
+                        "doesn't have convoying fleet in its own set of orders"
                     )
-                    continue
-            daide_orders.append(" ".join(daide_order))
+                via_cto_order = MoveByCVY(acting_unit, province, *seas)
+                daide_order = via_cto_order
+            else:
+                target_location = daidefy_location(dipnet_order_tokens[1].split()[-1])
+                move_order = MTO(acting_unit, target_location)
+                if len(dipnet_order_tokens) > 2:
+                    raise NotImplementedError(
+                        f"Cannot process DipNet movement order {' '.join(dipnet_order_tokens)!r} "
+                        "because it has more than 2 tokens"
+                    )
+                daide_order = move_order
+            daide_orders.append(str(daide_order))
         except Exception as e:
             print(f"ALLAN: main error from parsing_utils.dipnet_to_daide_parsing()")
             print(e)
