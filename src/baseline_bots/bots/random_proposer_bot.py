@@ -1,12 +1,12 @@
 import random
 from typing import List
 
-from DAIDE import ORR, PRP, XDO
+from daidepp import PRP, XDO
 from diplomacy import Game
 
 from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.parsing_utils import dipnet_to_daide_parsing
-from baseline_bots.utils import MessagesData, OrdersData, get_other_powers
+from baseline_bots.utils import MessagesData, get_other_powers, optional_ORR
 
 
 class RandomProposerBot(BaselineBot):
@@ -34,45 +34,34 @@ class RandomProposerBot(BaselineBot):
                 if possible_orders[loc]
             ]
             suggested_random_orders = list(
-                filter(lambda x: x != "WAIVE", suggested_random_orders)
+                filter(
+                    lambda x: x != "WAIVE" and not x.endswith("VIA"),
+                    suggested_random_orders,
+                )
             )
             if len(suggested_random_orders) > 0:
-                suggested_random_orders = PRP(
-                    ORR(
-                        [
-                            XDO(order)
-                            for order in dipnet_to_daide_parsing(
-                                suggested_random_orders, self.game
-                            )
-                        ]
-                    )
-                )
+                commands = dipnet_to_daide_parsing(suggested_random_orders, self.game)
+                orders = [XDO(command) for command in commands]
+                suggested_random_orders = PRP(optional_ORR(orders))
                 # send the other power a message containing the orders
                 ret_obj.add_message(other_power, str(suggested_random_orders))
 
         return ret_obj
 
     async def gen_orders(self) -> List[str]:
-        self.orders = OrdersData()
         possible_orders = self.game.get_all_possible_orders()
-
         orders = [
             random.choice([ord for ord in possible_orders[loc]])
             for loc in self.game.get_orderable_locations(self.power_name)
             if possible_orders[loc]
         ]
+        return orders
 
-        self.orders.add_orders(orders)
-
-        return self.orders.get_list_of_orders()
-
-    async def __call__(self) -> OrdersData:
+    async def __call__(self) -> List[str]:
         """
         :return: dict containing messages and orders
         """
         messages = await self.gen_messages()
         await self.send_messages(messages)
         orders = await self.gen_orders()
-        # maintain current orders
-        self.orders = orders
         return orders

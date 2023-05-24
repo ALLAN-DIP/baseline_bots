@@ -93,7 +93,7 @@ class BaselineBot(ABC):
             await self.send_message(msg["recipient"], msg["message"], MessagesData())
 
     @abstractmethod
-    def __call__(self) -> OrdersData:
+    def __call__(self) -> List[str]:
         """
         :return: dict containing messages and orders
         """

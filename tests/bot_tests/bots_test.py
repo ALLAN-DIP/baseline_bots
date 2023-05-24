@@ -1,6 +1,5 @@
 """unit tests for bots"""
 from gameplay_framework import GamePlay
-import pytest
 from tornado.testing import AsyncTestCase, gen_test
 
 from baseline_bots.bots.dipnet.no_press_bot import NoPressDipBot
@@ -28,10 +27,6 @@ class TestOtherBots(AsyncTestCase):
         game_play = GamePlay(None, [TransparentBot, RandomProposerBot], 3, True)
         yield game_play.play()
 
-    @pytest.mark.xfail(
-        reason="`DAIDE` library cannot parse a message, even though `daidepp` can",
-        strict=True,
-    )
     @gen_test
     def test_selectively_transparent_vs_random_proposer(self):
         game_play = GamePlay(
