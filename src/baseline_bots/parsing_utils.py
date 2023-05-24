@@ -3,7 +3,7 @@ Some quickly built parsing utils mostly for DAIDE stuff
 """
 
 from collections import defaultdict
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Mapping, Tuple, Union
 
 from daidepp import CVY, HLD, MTO, SUP, Location, MoveByCVY, Unit
 from diplomacy import Game, Message
@@ -21,6 +21,58 @@ dipnet2daide_loc = {
     "ENG": "ECH",
     "LYO": "GOL",
 }
+
+
+def daidefy_location(prov: str) -> Location:
+    """Converts DipNet-style location to DAIDE-style location
+
+    E.g.
+    BUL/EC --> BUL ECS
+    STP/SC --> STP SCS
+    ENG    --> ECH
+    PAR    --> PAR
+
+    :param prov: DipNet-style province notation
+    :return: DAIDE-style order
+    """
+    if "/" in prov:
+        prov, coast = prov.split("/")
+        coast += "S"
+    else:
+        coast = None
+    prov = dipnet2daide_loc.get(prov, prov)
+    loc = Location(province=prov, coast=coast)
+    return loc
+
+
+def daidefy_unit(dipnet_unit: str, unit_game_mapping: Mapping[str, str]) -> Unit:
+    """Converts DipNet-style unit to DAIDE-style unit
+
+    E.g. (for initial game state)
+    A BUD --> AUS AMY BUD
+    F TRI --> AUS FLT TRI
+    A PAR --> FRA AMY PAR
+    A MAR --> FRA AMY MAR
+
+    :param dipnet_unit: DipNet-style unit notation
+    :param unit_game_mapping: Mapping from DipNet-style units to powers
+    :return: DAIDE-style unit
+    """
+    power = unit_game_mapping[dipnet_unit]
+
+    if dipnet_unit.startswith("A"):
+        unit_type = "AMY"
+    elif dipnet_unit.startswith("F"):
+        unit_type = "FLT"
+    else:
+        raise ValueError(
+            f"Cannot extract unit type from DipNet-style unit {dipnet_unit!r}"
+        )
+
+    location = daidefy_location(dipnet_unit.split()[-1])
+
+    unit = Unit(power, unit_type, location)
+    return unit
 
 
 def dipnet_to_daide_parsing(
@@ -41,55 +93,6 @@ def dipnet_to_daide_parsing(
         dipnet_style_order_strs along with the orders like this: ("A SEV - RUM", "RUS")
     :return: List of DAIDE-style orders
     """
-
-    def daidefy_location(prov: str) -> Location:
-        """Converts DipNet-style location to DAIDE-style location
-
-        E.g.
-        BUL/EC --> BUL ECS
-        STP/SC --> STP SCS
-        ENG    --> ECH
-        PAR    --> PAR
-
-        :param prov: DipNet-style province notation
-        :return: DAIDE-style order
-        """
-        if "/" in prov:
-            prov, coast = prov.split("/")
-            coast += "S"
-        else:
-            coast = None
-        prov = dipnet2daide_loc.get(prov, prov)
-        loc = Location(province=prov, coast=coast)
-        return loc
-
-    def daidefy_unit(dipnet_unit: str) -> Unit:
-        """Converts DipNet-style unit to DAIDE-style unit
-
-        E.g. (for initial game state)
-        A BUD --> AUS AMY BUD
-        F TRI --> AUS FLT TRI
-        A PAR --> FRA AMY PAR
-        A MAR --> FRA AMY MAR
-
-        :param dipnet_unit: DipNet-style unit notation
-        :return: DAIDE-style unit
-        """
-        power = unit_game_mapping[dipnet_unit]
-
-        if dipnet_unit.startswith("A"):
-            unit_type = "AMY"
-        elif dipnet_unit.startswith("F"):
-            unit_type = "FLT"
-        else:
-            raise ValueError(
-                f"Cannot extract unit type from DipNet-style unit {dipnet_unit!r}"
-            )
-
-        location = daidefy_location(dipnet_unit.split()[-1])
-
-        unit = Unit(power, unit_type, location)
-        return unit
 
     convoy_map = defaultdict(list)
     dipnet_style_order_strs_tokens = [None for _ in range(len(dipnet_style_order_strs))]
@@ -149,10 +152,10 @@ def dipnet_to_daide_parsing(
                 )
 
             # Daidefy and add source unit as it is
-            acting_unit = daidefy_unit(dipnet_order_tokens[0])
+            acting_unit = daidefy_unit(dipnet_order_tokens[0], unit_game_mapping)
 
             if dipnet_order_tokens[1] == "S":
-                target_unit = daidefy_unit(dipnet_order_tokens[2])
+                target_unit = daidefy_unit(dipnet_order_tokens[2], unit_game_mapping)
 
                 if len(dipnet_order_tokens) == 4 and dipnet_order_tokens[3] != "H":
                     province_no_coast = daidefy_location(
@@ -176,7 +179,7 @@ def dipnet_to_daide_parsing(
                 hold_order = HLD(acting_unit)
                 daide_orders.append(hold_order)
             elif dipnet_order_tokens[1] == "C":
-                target_unit = daidefy_unit(dipnet_order_tokens[2])
+                target_unit = daidefy_unit(dipnet_order_tokens[2], unit_game_mapping)
                 target_prov = daidefy_location(dipnet_order_tokens[3].split()[-1])
                 convoy_order = CVY(
                     convoying_unit=acting_unit,
