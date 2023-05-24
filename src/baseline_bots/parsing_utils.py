@@ -26,17 +26,20 @@ dipnet2daide_loc = {
 def dipnet_to_daide_parsing(
     dipnet_style_order_strs: List[Union[str, Tuple[str, str]]],
     game: Game,
-    unit_power_tuples_included=False,
+    unit_power_tuples_included: bool = False,
 ) -> List[str]:
-    """
-    Convert dipnet style single order to DAIDE style order. Needs game instance to determine the powers owning the units
+    """Convert set of DipNet-style orders to DAIDE-style orders
+
+    Needs game instance to determine the powers owning the units.
 
     More details here: https://docs.google.com/document/d/16RODa6KDX7vNNooBdciI4NqSVN31lToto3MLTNcEHk0/edit?usp=sharing
 
-    :param dipnet_style_order_strs: dipnet style list of orders to be converted to DAIDE. Either in format: {"RUSSIA": ["A SEV - RUM"]} or {"RUSSIA": [("A SEV - RUM", "RUS")]}
+    :param dipnet_style_order_strs: DipNet-style list of orders to be converted to DAIDE.
+        Either in format: {"RUSSIA": ["A SEV - RUM"]} or {"RUSSIA": [("A SEV - RUM", "RUS")]}
     :param game: game instance
-    :param unit_power_tuples_included: this means the unit power will also be included in the input dipnet_style_order_strs along with the orders like this: ("A SEV - RUM", "RUS")
-    :return: DAIDE style order string
+    :param unit_power_tuples_included: Whether the unit power will also be included in
+        dipnet_style_order_strs along with the orders like this: ("A SEV - RUM", "RUS")
+    :return: List of DAIDE-style orders
     """
 
     def daidefy_location(prov: str) -> Location:
@@ -124,8 +127,8 @@ def dipnet_to_daide_parsing(
 
             # Create unit to power mapping for constructing DAIDE tokens
             unit_game_mapping = {}
-            for power in list(game.powers.keys()):
-                for unit in game.get_units(power):
+            for power, units in game.get_units().items():
+                for unit in units:
                     unit_game_mapping[unit] = power[:3]
 
             # If unit powers are also included in the input, then add the unit - unit power mapping for DAIDE construction
@@ -133,13 +136,17 @@ def dipnet_to_daide_parsing(
                 unit_game_mapping[dipnet_order_tokens[0]] = unit_power
 
             if dipnet_order_tokens[0] not in unit_game_mapping:
-                continue
+                raise ValueError(
+                    f"Acting unit {dipnet_order_tokens[0]!r} does not have a corresponding power"
+                )
             if (
                 len(dipnet_order_tokens) >= 3
                 and dipnet_order_tokens[2] != "VIA"
                 and dipnet_order_tokens[2] not in unit_game_mapping
             ):
-                continue
+                raise ValueError(
+                    f"Target unit {dipnet_order_tokens[0]!r} does not have a corresponding power"
+                )
 
             # Daidefy and add source unit as it is
             acting_unit = daidefy_unit(dipnet_order_tokens[0])
@@ -164,10 +171,10 @@ def dipnet_to_daide_parsing(
                     supported_unit=target_unit,
                     province_no_coast=province_no_coast,
                 )
-                daide_order = support_order
+                daide_orders.append(support_order)
             elif dipnet_order_tokens[1] == "H":
                 hold_order = HLD(acting_unit)
-                daide_order = hold_order
+                daide_orders.append(hold_order)
             elif dipnet_order_tokens[1] == "C":
                 target_unit = daidefy_unit(dipnet_order_tokens[2])
                 target_prov = daidefy_location(dipnet_order_tokens[3].split()[-1])
@@ -176,7 +183,7 @@ def dipnet_to_daide_parsing(
                     convoyed_unit=target_unit,
                     province=target_prov,
                 )
-                daide_order = convoy_order
+                daide_orders.append(convoy_order)
             elif len(dipnet_order_tokens) >= 3 and dipnet_order_tokens[2] == "VIA":
                 province = daidefy_location(dipnet_order_tokens[1].split()[-1])
                 if dipnet_order_tokens[0] + dipnet_order_tokens[1] in convoy_map:
@@ -188,7 +195,7 @@ def dipnet_to_daide_parsing(
                         "doesn't have convoying fleet in its own set of orders"
                     )
                 via_cto_order = MoveByCVY(acting_unit, province, *seas)
-                daide_order = via_cto_order
+                daide_orders.append(via_cto_order)
             else:
                 target_location = daidefy_location(dipnet_order_tokens[1].split()[-1])
                 move_order = MTO(acting_unit, target_location)
@@ -197,13 +204,16 @@ def dipnet_to_daide_parsing(
                         f"Cannot process DipNet movement order {' '.join(dipnet_order_tokens)!r} "
                         "because it has more than 2 tokens"
                     )
-                daide_order = move_order
-            daide_orders.append(str(daide_order))
+                daide_orders.append(move_order)
         except Exception as e:
-            print(f"ALLAN: main error from parsing_utils.dipnet_to_daide_parsing()")
+            print(
+                f"ALLAN: error from {__name__}.{dipnet_to_daide_parsing.__name__}()\n"
+                f"\tOrder with error: {' '.join(dipnet_order_tokens)!r}\n"
+                f"\tSet of orders: {dipnet_style_order_strs}"
+            )
             print(e)
             continue
-    return daide_orders
+    return [str(order) for order in daide_orders]
 
 
 def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
