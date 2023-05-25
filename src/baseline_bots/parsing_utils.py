@@ -285,52 +285,45 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
         prov = replace_daide_loc(prov)
         return prov
 
-    def dipnetify_suborder(suborder: str) -> str:
-        """
-        Translates DAIDE style units to dipnet style units
+    def dipnetify_unit(unit: Unit) -> str:
+        """Converts DAIDE-style unit to DipNet-style unit
 
-        :param suborder: DAIDE-style suborder to be encoded
-        :return: dipnet suborder
+        :param unit: DAIDE-style unit
+        :return: DipNet-style unit notation
         """
-        suborder_tokens = split_into_groups(suborder)
-        try:
-            ans = suborder_tokens[1][0] + " " + compress_prov_coast(suborder_tokens[2])
-        except Exception:
-            print(
-                f"ALLAN: error from parsing_utils.daide_to_dipnet_parsing.dipnetify_suborder() Failed for suborder: {suborder_tokens}"
-            )
-            ans = suborder_tokens[1][0] + " " + suborder_tokens[2]
-        return ans, suborder_tokens[0]
+        unit_type = unit.unit_type[0]
+        location = compress_prov_coast(str(unit.location).strip("()"))
+        return f"{unit_type} {location}"
 
     try:
         parsed_order: Command = parse_daide(daide_style_order_str)
 
         # Dipnetify source unit
-        suborder, _ = dipnetify_suborder(str(parsed_order.unit))
+        acting_unit = dipnetify_unit(parsed_order.unit)
         unit_power = parsed_order.unit.power
         if isinstance(parsed_order, SUP):
             # Support order
-            supported_unit = dipnetify_suborder(str(parsed_order.supported_unit))[0]
-            dipnet_order = f"{suborder} S {supported_unit}"
+            supported_unit = dipnetify_unit(parsed_order.supported_unit)
+            dipnet_order = f"{acting_unit} S {supported_unit}"
             if parsed_order.province_no_coast_location is not None:
                 prov = compress_prov_coast(str(parsed_order.province_no_coast_location))
                 dipnet_order += f" - {prov}"
         elif isinstance(parsed_order, HLD):
             # Hold order
-            dipnet_order = f"{suborder} H"
+            dipnet_order = f"{acting_unit} H"
         elif isinstance(parsed_order, MoveByCVY):
             # CTO order
             prov = compress_prov_coast(str(parsed_order.province))
-            dipnet_order = f"{suborder} - {prov} VIA"
+            dipnet_order = f"{acting_unit} - {prov} VIA"
         elif isinstance(parsed_order, CVY):
             # Convoy order
-            convoyed_unit = dipnetify_suborder(str(parsed_order.convoyed_unit))[0]
+            convoyed_unit = dipnetify_unit(parsed_order.convoyed_unit)
             prov = compress_prov_coast(str(parsed_order.province))
-            dipnet_order = f"{suborder} C {convoyed_unit} - {prov}"
+            dipnet_order = f"{acting_unit} C {convoyed_unit} - {prov}"
         elif isinstance(parsed_order, MTO):
             # Move orders
             prov = compress_prov_coast(str(parsed_order.location).strip("()"))
-            dipnet_order = f"{suborder} - {prov}"
+            dipnet_order = f"{acting_unit} - {prov}"
         else:
             raise NotImplementedError(
                 f"Conversion for {type(parsed_order).__name__} commands has not been implemented yet"
