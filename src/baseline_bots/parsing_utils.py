@@ -22,6 +22,7 @@ dipnet2daide_loc = {
     "ENG": "ECH",
     "LYO": "GOL",
 }
+daide2dipnet_loc = {v: k for k, v in dipnet2daide_loc.items()}
 
 
 def daidefy_location(prov: str) -> Location:
@@ -259,30 +260,21 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
             grouped_order.append(stack)
         return grouped_order
 
-    def replace_daide_loc(loc: str) -> str:
-        """
-        Replaces DAIDE location with dipnet location
-        E.g. GOB -> BOT
-             ECH -> ENG
-        """
-        for dipnet_loc, daide_loc in dipnet2daide_loc.items():
-            if daide_loc in loc:
-                loc = loc.replace(daide_loc, dipnet_loc)
+    def dipnetify_location(loc: Location) -> str:
+        """Converts DipNet-style location to DAIDE-style location
 
-        return loc
-
-    def compress_prov_coast(prov: str) -> str:
-        """
-        If `prov` is a coastal province, compress coastal province from DAIDE to dipnet format
-        Else return original `prov`
         E.g.
-        BUL ECS         --> BUL/EC
-        STP SCS         --> STP/SC
-        PAR             --> PAR
+        BUL ECS --> BUL/EC
+        STP SCS --> STP/SC
+        ECH     --> ENG
+        PAR     --> PAR
+
+        :param loc: DAIDE-style location
+        :return: DipNet-style province notation
         """
-        if len(prov.split()) == 2:
-            prov = "/".join(prov.split())[:-1]
-        prov = replace_daide_loc(prov)
+        prov = daide2dipnet_loc.get(loc.province, loc.province)
+        if loc.coast is not None:
+            prov += "/" + loc.coast[:-1]
         return prov
 
     def dipnetify_unit(unit: Unit) -> str:
@@ -292,7 +284,7 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
         :return: DipNet-style unit notation
         """
         unit_type = unit.unit_type[0]
-        location = compress_prov_coast(str(unit.location).strip("()"))
+        location = dipnetify_location(unit.location)
         return f"{unit_type} {location}"
 
     try:
@@ -306,23 +298,23 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
             supported_unit = dipnetify_unit(parsed_order.supported_unit)
             dipnet_order = f"{acting_unit} S {supported_unit}"
             if parsed_order.province_no_coast_location is not None:
-                prov = compress_prov_coast(str(parsed_order.province_no_coast_location))
+                prov = dipnetify_location(parsed_order.province_no_coast_location)
                 dipnet_order += f" - {prov}"
         elif isinstance(parsed_order, HLD):
             # Hold order
             dipnet_order = f"{acting_unit} H"
         elif isinstance(parsed_order, MoveByCVY):
             # CTO order
-            prov = compress_prov_coast(str(parsed_order.province))
+            prov = dipnetify_location(parsed_order.province)
             dipnet_order = f"{acting_unit} - {prov} VIA"
         elif isinstance(parsed_order, CVY):
             # Convoy order
             convoyed_unit = dipnetify_unit(parsed_order.convoyed_unit)
-            prov = compress_prov_coast(str(parsed_order.province))
+            prov = dipnetify_location(parsed_order.province)
             dipnet_order = f"{acting_unit} C {convoyed_unit} - {prov}"
         elif isinstance(parsed_order, MTO):
             # Move orders
-            prov = compress_prov_coast(str(parsed_order.location).strip("()"))
+            prov = dipnetify_location(parsed_order.location)
             dipnet_order = f"{acting_unit} - {prov}"
         else:
             raise NotImplementedError(
