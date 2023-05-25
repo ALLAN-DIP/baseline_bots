@@ -222,43 +222,13 @@ def dipnet_to_daide_parsing(
 
 
 def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
-    """
-    Convert DAIDE style single order to dipnet style order
+    """Convert single DAIDE-style order to DipNet-style order
 
     More details here: https://docs.google.com/document/d/16RODa6KDX7vNNooBdciI4NqSVN31lToto3MLTNcEHk0/edit?usp=sharing
 
-    :param daide_style_order_str: DAIDE style string to be converted to dipnet style
-    :return: dipnet style order string and unit's power name
+    :param daide_style_order_str: DAIDE-style string to be converted to DipNet style
+    :return: DipNet-style order string and unit's power name
     """
-
-    def split_into_groups(daide_style_order_str: str) -> List[str]:
-        """
-        Split the string based on parenthesis or spaces
-        E.g.
-        "(FRA AMY PAR) SUP (FRA AMY MAR) MTO BUR" --> "FRA AMY PAR", "SUP", "FRA AMY MAR", "MTO", "BUR"
-
-        :param daide_style_order_str: DAIDE style string
-        :return: list of strings containing components of the order which makes it easy to convert to dipnet-style order
-        """
-        brack_cnt = 0
-        stack = ""
-        grouped_order = []
-        for char in daide_style_order_str:
-            if char == ")":
-                brack_cnt -= 1
-            if (brack_cnt == 0 and char == " ") or (brack_cnt == 0 and char == ")"):
-                if brack_cnt == 0 and stack:
-                    grouped_order.append(stack)
-                    stack = ""
-            elif char == "(":
-                if brack_cnt > 0:
-                    stack += char
-                brack_cnt += 1
-            else:
-                stack += char
-        if stack:
-            grouped_order.append(stack)
-        return grouped_order
 
     def dipnetify_location(loc: Location) -> str:
         """Converts DipNet-style location to DAIDE-style location
@@ -323,7 +293,10 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
 
         return dipnet_order, unit_power
     except Exception as e:
-        print(f"ALLAN: error from parsing_utils.daide_to_dipnet_parsing")
+        print(
+            f"ALLAN: error from {__name__}.{daide_to_dipnet_parsing.__name__}\n"
+            f"\tCould not convert DAIDE command {daide_style_order_str!r} to DipNet format"
+        )
         print(e)
         return None
 
