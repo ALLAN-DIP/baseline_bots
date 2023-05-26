@@ -320,8 +320,11 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
 def parse_proposal_messages(
     rcvd_messages: List[Message], game: Game, power_name: str
 ) -> Dict[str, Dict[str, List[str]]]:
-    """
-    From received messages, extract the proposals (categorize as valid and invalid), shared orders and other orders. Use specified game state and power_name to check for validity of moves
+    """Extracts proposals and orders from received messages
+
+    From each received messages, extract the proposals (categorize as valid and invalid),
+    shared orders and other orders. Use specified game state and power_name
+    to check for validity of moves
 
     :param rcvd_messages: list of messages received from other players
     :param game: Game state
@@ -342,7 +345,7 @@ def parse_proposal_messages(
         print(f"Received {len(order_msgs)} PRP messages:")
         print([(order_msg.sender, order_msg.message) for order_msg in order_msgs])
 
-        # Generate a dictionary of sender to list of orders (dipnet-style) for this sender
+        # Generate a dictionary of sender to list of DipNet-style orders for this sender
         proposals = defaultdict(list)
 
         invalid_proposals = defaultdict(list)
@@ -378,8 +381,10 @@ def parse_proposal_messages(
                         other_orders[order_msg.sender].append(str(order))
             except Exception as e:
                 print(
-                    f"ALLAN: error from parsing_utils.parse_proposal_messages() Unexpected message format: {order_msg.message}"
+                    f"ALLAN: error from {__name__}.{parse_proposal_messages.__name__}()\n"
+                    f"\tUnexpected proposal message format: {order_msg.message!r}"
                 )
+                print(e)
                 continue
 
         # Generate set of possible orders for the given power
@@ -394,19 +399,19 @@ def parse_proposal_messages(
             ]
         )
 
-        # For the set of proposed moves from each sender, check if the specified orders would be allowed. If not, mark them as invalid.
+        # For the set of proposed moves from each sender,
+        # check if the specified orders would be allowed.
+        # If not, mark them as invalid.
         for sender in proposals:
             for order, unit_power_name in proposals[sender]:
-                if (
-                    unit_power_name == power_name[:3]
-                ):  # These are supposed to be proposal messages to me
+                # These are supposed to be proposal messages to me
+                if unit_power_name == power_name[:3]:
                     if order in possible_orders:  # These would be valid proposals to me
                         valid_proposals[sender].append(order)
                     else:  # These would be invalid proposals
                         invalid_proposals[sender].append((order, unit_power_name))
-                elif (
-                    unit_power_name == sender[:3]
-                ):  # These are supposed to be conditional orders that the sender is going to execute
+                # These are supposed to be conditional orders that the sender is going to execute
+                elif unit_power_name == sender[:3]:
                     shared_orders[sender].append(order)
                 else:
                     other_orders[sender].append(order)
@@ -426,7 +431,10 @@ def parse_proposal_messages(
             "peace_proposals": peace_proposals,
         }
     except Exception as e:
-        print(f"ALLAN: main error from parsing_utils.parse_proposal_messages()")
+        print(
+            f"ALLAN: error from {__name__}.{parse_proposal_messages.__name__}()\n"
+            f"\tReceived messages: {rcvd_messages}"
+        )
         print(e)
         return {
             "valid_proposals": {},
