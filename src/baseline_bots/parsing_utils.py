@@ -12,6 +12,7 @@ from baseline_bots.utils import (
     get_order_tokens,
     parse_alliance_proposal,
     parse_arrangement,
+    parse_daide,
     parse_peace_proposal,
     parse_PRP,
 )
@@ -302,58 +303,40 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
         return ans, suborder_tokens[0]
 
     try:
-        daide_style_order_groups = split_into_groups(daide_style_order_str)
-
-        dipnet_order = []
+        parsed_order: Command = parse_daide(daide_style_order_str)
 
         # Dipnetify source unit
-        suborder, unit_power = dipnetify_suborder(daide_style_order_groups[0])
-        dipnet_order.append(suborder)
-        if daide_style_order_groups[1] == "SUP":
+        suborder, _ = dipnetify_suborder(str(parsed_order.unit))
+        unit_power = parsed_order.unit.power
+        if isinstance(parsed_order, SUP):
             # Support order
-            dipnet_order.append("S")
-            dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2])[0])
-            if (
-                len(daide_style_order_groups) == 5
-                and daide_style_order_groups[3] == "MTO"
-            ):
-                dipnet_order.append("-")
-                dipnet_order.append(compress_prov_coast(daide_style_order_groups[4]))
-            elif len(daide_style_order_groups) > 5:
-                print(
-                    f"ALLAN: error from parsing_utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
-                )
-                return None
-        elif daide_style_order_groups[1] == "HLD":
+            supported_unit = dipnetify_suborder(str(parsed_order.supported_unit))[0]
+            dipnet_order = f"{suborder} S {supported_unit}"
+            if parsed_order.province_no_coast_location is not None:
+                prov = compress_prov_coast(str(parsed_order.province_no_coast_location))
+                dipnet_order += f" - {prov}"
+        elif isinstance(parsed_order, HLD):
             # Hold order
-            dipnet_order.append("H")
-        elif daide_style_order_groups[1] == "CTO":
+            dipnet_order = f"{suborder} H"
+        elif isinstance(parsed_order, MoveByCVY):
             # CTO order
-            dipnet_order.append("-")
-            dipnet_order.append(compress_prov_coast(daide_style_order_groups[2]))
-            dipnet_order.append("VIA")
-        elif daide_style_order_groups[1] == "CVY":
+            prov = compress_prov_coast(str(parsed_order.province))
+            dipnet_order = f"{suborder} - {prov} VIA"
+        elif isinstance(parsed_order, CVY):
             # Convoy order
-            dipnet_order.append("C")
-            dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2])[0])
-            dipnet_order.append("-")
-            dipnet_order.append(compress_prov_coast(daide_style_order_groups[4]))
-        elif daide_style_order_groups[1] == "MTO":
+            convoyed_unit = dipnetify_suborder(str(parsed_order.convoyed_unit))[0]
+            prov = compress_prov_coast(str(parsed_order.province))
+            dipnet_order = f"{suborder} C {convoyed_unit} - {prov}"
+        elif isinstance(parsed_order, MTO):
             # Move orders
-            dipnet_order.append("-")
-            dipnet_order.append(compress_prov_coast(daide_style_order_groups[2]))
-            if len(daide_style_order_groups) > 3:
-                print(
-                    f"ALLAN: error from parsing_utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
-                )
-                return None
+            prov = compress_prov_coast(str(parsed_order.location).strip("()"))
+            dipnet_order = f"{suborder} - {prov}"
         else:
-            print(
-                f"ALLAN: error from parsing_utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
+            raise NotImplementedError(
+                f"Conversion for {type(parsed_order).__name__} commands has not been implemented yet"
             )
-            return None
 
-        return " ".join(dipnet_order), unit_power
+        return dipnet_order, unit_power
     except Exception as e:
         print(f"ALLAN: error from parsing_utils.daide_to_dipnet_parsing")
         print(e)
