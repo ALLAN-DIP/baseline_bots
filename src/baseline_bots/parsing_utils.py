@@ -355,7 +355,9 @@ def parse_proposal_messages(
                     ]
                 for order_type, order in daide_style_orders:
                     if order_type == "XDO":
-                        temp_message = daide_to_dipnet_parsing(order)
+                        # DAIDE's grammar does not allow leading or trailing spaces
+                        # We need to remove them until this function is converted to use `daidepp`
+                        temp_message = daide_to_dipnet_parsing(order.strip())
                         if temp_message:
                             proposals[order_msg.sender].append(temp_message)
                     # from RY: I think this parsing is problematic though..

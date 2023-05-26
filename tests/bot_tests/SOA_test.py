@@ -334,12 +334,13 @@ class TestSOABot(AsyncTestCase):
         rcvd_messages = game.filter_messages(
             messages=game_play.game.messages, game_role=soa_bot.power_name
         )
-        rcvd_messages = list(rcvd_messages.items())
+        rcvd_messages = list(rcvd_messages.values())
         rcvd_messages.sort()
         parsed_messages_dict = parse_proposal_messages(
             rcvd_messages, game_play.game, soa_bot.power_name
         )
         valid_proposal_orders = parsed_messages_dict["valid_proposals"]
+        assert len(valid_proposal_orders) == len(rcvd_messages)
 
         possible_orders = game_play.game.get_all_possible_orders()
 
