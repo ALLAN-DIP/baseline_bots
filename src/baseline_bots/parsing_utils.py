@@ -5,7 +5,22 @@ Some quickly built parsing utils mostly for DAIDE stuff
 from collections import defaultdict
 from typing import Dict, List, Mapping, Tuple, Union
 
-from daidepp import CVY, HLD, MTO, PRP, SUP, Command, Location, MoveByCVY, Unit
+from daidepp import (
+    ALYVSS,
+    AND,
+    CVY,
+    HLD,
+    MTO,
+    ORR,
+    PCE,
+    PRP,
+    SUP,
+    XDO,
+    Command,
+    Location,
+    MoveByCVY,
+    Unit,
+)
 from diplomacy import Game, Message
 
 from baseline_bots.utils import (
@@ -14,7 +29,6 @@ from baseline_bots.utils import (
     parse_arrangement,
     parse_daide,
     parse_peace_proposal,
-    parse_PRP,
 )
 
 dipnet2daide_loc = {
@@ -340,38 +354,28 @@ def parse_proposal_messages(
 
         for order_msg in order_msgs:
             try:
-                if (
-                    "AND" in order_msg.message
-                ):  # works when AND is present in this format: XDO () AND XDO () AND XDO()
-                    daide_style_orders = [
-                        order_1
-                        for order in (parse_PRP(order_msg.message)).split("AND")
-                        for order_1 in parse_arrangement(order.strip(), xdo_only=False)
-                    ]
-                else:  # works for cases where ORR is present in PRP or nothing is present: ORR ( (XDO()) (XDO()))
-                    daide_style_orders = [
-                        order
-                        for order in parse_arrangement(
-                            parse_PRP(order_msg.message), xdo_only=False
-                        )
-                    ]
-                for order_type, order in daide_style_orders:
-                    if order_type == "XDO":
-                        # DAIDE's grammar does not allow leading or trailing spaces
-                        # We need to remove them until this function is converted to use `daidepp`
-                        temp_message = daide_to_dipnet_parsing(order.strip())
+                daide_style_orders = [
+                    parse_daide(order) for order in parse_arrangement(order_msg.message)
+                ]
+                for order in daide_style_orders:
+                    if isinstance(order, XDO):
+                        temp_message = daide_to_dipnet_parsing(str(order.order))
                         if temp_message:
                             proposals[order_msg.sender].append(temp_message)
                     # from RY: I think this parsing is problematic though..
                     # when we YES/REJ a ALY/PCE proposal we should do it as a whole..
-                    elif order_type == "ALY":
-                        for ally in parse_alliance_proposal(order, power_name):
-                            alliance_proposals[ally].append((order_msg.sender, order))
-                    elif order_type == "PCE":
-                        for peace in parse_peace_proposal(order, power_name):
-                            peace_proposals[peace].append((order_msg.sender, order))
+                    elif isinstance(order, ALYVSS):
+                        for ally in parse_alliance_proposal(str(order), power_name):
+                            alliance_proposals[ally].append(
+                                (order_msg.sender, str(order))
+                            )
+                    elif isinstance(order, PCE):
+                        for peace in parse_peace_proposal(str(order), power_name):
+                            peace_proposals[peace].append(
+                                (order_msg.sender, str(order))
+                            )
                     else:
-                        other_orders[order_msg.sender].append(order)
+                        other_orders[order_msg.sender].append(str(order))
             except Exception as e:
                 print(
                     f"ALLAN: error from parsing_utils.parse_proposal_messages() Unexpected message format: {order_msg.message}"

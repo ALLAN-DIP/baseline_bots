@@ -8,10 +8,10 @@ from collections import defaultdict
 import collections.abc
 from copy import deepcopy
 import os
-import re
 from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Set, Tuple
 
 from DAIDE.utils.exceptions import ParseError
+import daidepp
 from daidepp import (
     ALYVSS,
     AND,
@@ -153,17 +153,7 @@ def parse_FCT(msg: str) -> str:
         raise Exception(f"Can't parse FCT msg {msg}")
 
 
-def parse_PRP(msg: str) -> str:
-    """Detaches PRP from main arrangement"""
-    if "PRP" not in msg:
-        raise ParseError("This is not an PRP message")
-    try:
-        return msg[msg.find("(") + 1 : -1]
-    except Exception:
-        raise Exception(f"Can't parse PRP msg {msg}")
-
-
-def parse_arrangement(msg: str, xdo_only: bool = True) -> List[str]:
+def parse_arrangement(msg: str) -> List[str]:
     """
     Attempts to parse arrangements (may or may not have ORR keyword)
 
@@ -180,66 +170,12 @@ def parse_arrangement(msg: str, xdo_only: bool = True) -> List[str]:
     :param xdo_only: flag indicating if subarrangement type should be included in the return structure
     :return: parsed subarrangements
     """
-    try:
-        if "ORR" in msg:
-            msg = msg[msg.find("(") :]
-        elif "AND" in msg:
-            msg = msg[msg.find("(") :]
-
-        # split the message at )( points
-        parts = []
-        ind = 0
-        while ind < len(msg):
-            next_ind = re.search(r"\)\s*\(", msg[ind:])
-            if next_ind is None:
-                parts.append(msg[ind:].strip())
-                break
-            else:
-                parts.append((msg[ind : ind + next_ind.start() + 1]).strip())
-                ind = ind + next_ind.end() - 1
-
-        def extract_suborder_indices(part: str) -> Tuple[int, int, str]:
-            """
-            Finds the start and end indices of suborder in an XDO message
-            For instance,
-            "XDO (F BLK - CON)" returns (4, 16)
-            "XDO(F BLK - CON)" returns (3, 15)
-            "XDO ((RUS AMY WAR) MTO PRU)" returns (4, 26)
-
-            :param part: part of the message representing an arrangement for 1 unit
-            :return: the actual order after excluding XDO
-            """
-            match_obj = re.search(r"(XDO|ALY|PCE|[A-Z]+)", part)
-            start_in = part.find("(", match_obj.start())
-            suborder_type = match_obj.group()
-            parenthesis_cnt = 0
-            for i in range(start_in, len(part)):
-                if part[i] == "(":
-                    parenthesis_cnt += 1
-                elif part[i] == ")":
-                    parenthesis_cnt -= 1
-                if parenthesis_cnt == 0:
-                    return start_in, i, suborder_type
-            return start_in, -1, suborder_type
-
-        ans = []
-        for part in parts:
-            if (
-                part[0] == "("
-            ):  # If there is a parenthesis in the beginning, just remove the extra set of parenthesis from both ends
-                part = part.strip()[1:-1].strip()
-            start, end, suborder_type = extract_suborder_indices(part)
-            if xdo_only:
-                ans.append(part[start + 1 : end])
-            else:
-                if suborder_type == "XDO":
-                    ans.append((suborder_type, part[start + 1 : end]))
-                else:
-                    ans.append((suborder_type, part))
-        return ans
-
-    except Exception as e:
-        raise ParseError("Can't parse ORR msg")
+    parsed_msg = parse_daide(msg)
+    if isinstance(parsed_msg.arrangement, (daidepp.AND, daidepp.ORR)):
+        daide_style_orders = parsed_msg.arrangement.arrangements
+    else:
+        daide_style_orders = [parsed_msg.arrangement]
+    return [str(o) for o in daide_style_orders]
 
 
 def parse_alliance_proposal(msg: str, recipient: str) -> List[str]:
