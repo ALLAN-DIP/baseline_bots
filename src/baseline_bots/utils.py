@@ -13,8 +13,10 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Set, Tuple
 
 from DAIDE.utils.exceptions import ParseError
 from daidepp import (
+    ALYVSS,
     AND,
     ORR,
+    PCE,
     AnyDAIDEToken,
     Arrangement,
     create_daide_grammar,
@@ -241,66 +243,53 @@ def parse_arrangement(msg: str, xdo_only: bool = True) -> List[str]:
 
 
 def parse_alliance_proposal(msg: str, recipient: str) -> List[str]:
-    """
-    Parses an alliance proposal
+    """Parses an alliance proposal
+
     E.g. (assuming the receiving country is RUSSIA)
-    "ALY (GERMANY RUSSIA) VSS (FRANCE ENGLAND ITALY TURKEY AUSTRIA)" -> [GERMANY]
+    "ALY (GER RUS) VSS (AUS ENG FRA ITA TUR)" -> [GERMANY]
+
     :param recipient: the power which has received the alliance proposal
     :return: list of allies in the proposal
     """
+    parsed_msg = parse_daide(msg)
+    if not isinstance(parsed_msg, ALYVSS):
+        raise ValueError(f"{msg!r} is not an ALY message")
+
+    allies = list(parsed_msg.aly_powers)
+
     recipient = recipient[:3]
-    groups = re.findall(r"\(([a-zA-Z\s]*)\)", msg)
-
-    if len(groups) != 2:
-        allies = []
-
-    # get proposed allies
-    allies = groups[0].split(" ")
-
     if recipient not in allies:
         allies = []
         return allies
 
     allies.remove(recipient)
 
-    if allies:
-        return [
-            POWER_NAMES_DICT[ally] if ally in POWER_NAMES_DICT else ally
-            for ally in allies
-        ]
-    else:
-        raise ParseError("A minimum of 2 powers are needed for an alliance")
+    return sorted(POWER_NAMES_DICT[ally] for ally in allies)
 
 
 def parse_peace_proposal(msg: str, recipient: str) -> List[str]:
-    """
-    Parses an peace proposal
+    """Parses a peace proposal
+
     E.g. (assuming the receiving country is RUSSIA)
-    "PCE (GERMANY RUSSIA)" -> [GERMANY]
+    "PCE (GER RUS)" -> [GERMANY]
+
     :param recipient: the power which has received the peace proposal
     :return: list of allies in the proposal
     """
+    parsed_msg = parse_daide(msg)
+    if not isinstance(parsed_msg, PCE):
+        raise ValueError(f"{msg!r} is not a PCE message")
+
+    peaces = list(parsed_msg.powers)
+
     recipient = recipient[:3]
-    groups = re.findall(r"\(([a-zA-Z\s]*)\)", msg)
-
-    if len(groups) != 1:
-        peaces = []
-
-    # get proposed peaces
-    peaces = groups[0].split(" ")
-
     if recipient not in peaces:
         peaces = []
         return peaces
 
     peaces.remove(recipient)
 
-    if peaces:
-        return [
-            POWER_NAMES_DICT[pea] if pea in POWER_NAMES_DICT else pea for pea in peaces
-        ]
-    else:
-        raise ParseError("A minimum of 2 powers are needed for PCE")
+    return sorted(POWER_NAMES_DICT[pea] for pea in peaces)
 
 
 def is_order_aggressive(order: str, sender: str, game: Game) -> bool:
