@@ -8,6 +8,8 @@ import random
 import re
 from typing import List, Tuple
 
+from baseline_bots.parsing_utils import daidefy_location
+
 # The comments below signal the formatter not to expand these dicts to multiple lines
 # fmt: off
 
@@ -31,7 +33,7 @@ ADJACENCY = {
     "BUL/EC": ["BLA", "CON", "RUM"],
     "BUL/SC": ["AEG", "CON", "GRE"],
     "BUL": ["AEG", "BLA", "CON", "GRE", "RUM", "SER"],
-    "BUR": ["BEL", "GAS", "RUH", "MAR", "MUN", "PAR", "PIC", "SWI"],
+    "BUR": ["BEL", "GAS", "RUH", "MAR", "MUN", "PAR", "PIC"],
     "CLY": ["EDI", "LVP", "NAO", "NWG"],
     "CON": ["AEG", "BUL/EC", "BUL/SC", "BLA", "ANK", "SMY"],
     "DEN": ["BAL", "HEL", "KIE", "NTH", "SKA", "SWE"],
@@ -52,9 +54,9 @@ ADJACENCY = {
     "LVP": ["CLY", "EDI", "IRI", "NAO", "WAL", "YOR"],
     "LYO": ["MAR", "PIE", "SPA/SC", "TUS", "TYS", "WES"],
     "MAO": ["BRE", "ENG", "GAS", "IRI", "NAF", "NAO", "POR", "SPA/NC", "SPA/SC", "WES"],
-    "MAR": ["BUR", "GAS", "LYO", "PIE", "SPA/SC", "SWI"],
+    "MAR": ["BUR", "GAS", "LYO", "PIE", "SPA/SC"],
     "MOS": ["LVN", "SEV", "STP", "UKR", "WAR"],
-    "MUN": ["BER", "BOH", "BUR", "KIE", "RUH", "SIL", "TYR", "SWI"],
+    "MUN": ["BER", "BOH", "BUR", "KIE", "RUH", "SIL", "TYR"],
     "NAF": ["MAO", "TUN", "WES"],
     "NAO": ["CLY", "IRI", "LVP", "MAO", "NWG"],
     "NAP": ["APU", "ION", "ROM", "TYS"],
@@ -63,7 +65,7 @@ ADJACENCY = {
     "NWG": ["BAR", "CLY", "EDI", "NAO", "NWY", "NTH"],
     "PAR": ["BUR", "BRE", "GAS", "PIC"],
     "PIC": ["BEL", "BRE", "BUR", "ENG", "PAR"],
-    "PIE": ["LYO", "MAR", "TUS", "TYR", "VEN", "SWI"],
+    "PIE": ["LYO", "MAR", "TUS", "TYR", "VEN"],
     "POR": ["MAO", "SPA/NC", "SPA/SC"],
     "PRU": ["BAL", "BER", "LVN", "SIL", "WAR"],
     "ROM": ["APU", "NAP", "TUS", "TYS", "VEN"],
@@ -85,7 +87,7 @@ ADJACENCY = {
     "TRI": ["ADR", "ALB", "BUD", "SER", "TYR", "VEN", "VIE"],
     "TUN": ["ION", "NAF", "TYS", "WES"],
     "TUS": ["LYO", "PIE", "ROM", "TYS", "VEN"],
-    "TYR": ["BOH", "MUN", "PIE", "TRI", "VEN", "VIE", "SWI"],
+    "TYR": ["BOH", "MUN", "PIE", "TRI", "VEN", "VIE"],
     "TYS": ["ION", "LYO", "ROM", "NAP", "TUN", "TUS", "WES"],
     "UKR": ["GAL", "MOS", "RUM", "SEV", "WAR"],
     "VEN": ["ADR", "APU", "PIE", "ROM", "TRI", "TUS", "TYR"],
@@ -94,10 +96,9 @@ ADJACENCY = {
     "WAR": ["GAL", "LVN", "MOS", "PRU", "SIL", "UKR"],
     "WES": ["MAO", "LYO", "NAF", "SPA/SC", "TUN", "TYS"],
     "YOR": ["EDI", "LON", "LVP", "NTH", "WAL"],
-    "SWI": ["MAR", "BUR", "MUN", "TYR", "PIE"],
 }
 
-# This dict defines the type of every province. Every province is either "COAST", "WATER", "LAND" or "SHUT"
+# This dict defines the type of every province. Every province is either "COAST", "WATER", or "LAND"
 TYPES = {
     "ADR": "WATER", "AEG": "WATER", "ALB": "COAST", "ANK": "COAST", "APU": "COAST", "ARM": "COAST",
     "BAL": "WATER", "BAR": "WATER", "BEL": "COAST", "BER": "COAST", "BLA": "WATER", "BOH": "LAND",
@@ -113,7 +114,6 @@ TYPES = {
     "STP/NC": "COAST", "STP/SC": "COAST", "stp": "COAST", "SWE": "COAST", "SYR": "COAST",
     "TRI": "COAST", "TUN": "COAST", "TUS": "COAST", "TYR": "LAND", "TYS": "WATER", "UKR": "LAND",
     "VEN": "COAST", "VIE": "LAND", "WAL": "COAST", "WAR": "LAND", "WES": "WATER", "YOR": "COAST",
-    "SWI": "SHUT",
 }
 
 # fmt: on
@@ -224,7 +224,7 @@ def random_convoy_to(order: Tuple) -> Tuple:
     ):  # searches through the sea provinces in reversed order to find the longest possible alternate convoy
         # fmt : off
         valid = [
-            loc
+            str(daidefy_location(loc))
             for loc in ADJACENCY[sea]
             if TYPES[loc] == "COAST"
             and loc != [province]
@@ -256,7 +256,7 @@ def random_convoy(order: Tuple) -> Tuple:
     assert (amy_type == "AMY" and flt_type == "FLT"), "The unit type is neither army nor fleet so it is invalid."
     # It is necessary to check whether a possible alternate "convoy-to" location is adjacent to the unit being convoyed
     # since convoying to a province adjacent to you would be less believable
-    adj = [loc for loc in ADJACENCY[flt_loc] if TYPES[loc] == "COAST" and loc not in ADJACENCY[amy_loc] and loc != province]
+    adj = [str(daidefy_location(loc)) for loc in ADJACENCY[flt_loc] if TYPES[loc] == "COAST" and loc not in ADJACENCY[amy_loc] and loc != province]
     # fmt: on
     if adj:  # if valid adjacencies exist
         return (order[0], tag, order[2], "CTO", random.choice(adj))
@@ -289,7 +289,7 @@ def random_support(order: Tuple) -> Tuple:
             supported_type
         ]  # Set of possible destinations
         adj_to_both = [
-            adjacency
+            str(daidefy_location(adjacency).province)
             for adjacency in supporter_adjacent  # this finds all provinces adjacent to the supportee and suporter locations
             if adjacency in supported_adjacent
             and (not dest_choices or TYPES[adjacency] in dest_choices)
@@ -307,10 +307,14 @@ def random_support(order: Tuple) -> Tuple:
     else:  # if it is supporting to move
         # fmt: off
         ((sup_country, sup_type, sup_loc), _, (rec_country, rec_type, rec_loc), _, province) = order
+        if isinstance(sup_loc, tuple):
+            sup_loc = f"{sup_loc[0]}/{sup_loc[1][:2]}"
+        if isinstance(rec_loc, tuple):
+            rec_loc = f"{rec_loc[0]}/{rec_loc[1][:2]}"
         sup_adjacent, rec_adjacent = ADJACENCY[sup_loc], ADJACENCY[rec_loc]
         # COMBOS and TYPES must be used to determine the possible locations a unit can support into/from based on the unit type and province type
         dest_choices = COMBOS[sup_type][rec_type]
-        adj_to_both = [adjacency for adjacency in sup_adjacent if adjacency in rec_adjacent and adjacency != province and TYPES[adjacency]]
+        adj_to_both = [str(daidefy_location(adjacency).province) for adjacency in sup_adjacent if adjacency in rec_adjacent and adjacency != province and TYPES[adjacency]]
         # fmt: on
         if adj_to_both:
             return (order[0], tag + " ", order[2], "MTO", random.choice(adj_to_both))
@@ -332,13 +336,17 @@ def random_movement(order: Tuple, chance_of_move=0.5):
     if (
         random.random() < chance_of_move or tag == "RTO"
     ):  # There is a 50/50 chance of switching a move to a hold, 0 for a retreat since that may make one less believable
-        all_adjacent = ADJACENCY[loc].copy()
+        if isinstance(loc, tuple):
+            loc_key = f"{loc[0]}/{loc[1][:2]}"
+        else:
+            loc_key = loc
+        all_adjacent = ADJACENCY[loc_key].copy()
         if dest in all_adjacent:
             all_adjacent.remove(
                 dest
             )  # removing the already picked choice from the possible destinations
         new_dest = random.choice(all_adjacent)
-        return ((country, unit_type, loc), tag, new_dest)
+        return ((country, unit_type, loc), tag, str(daidefy_location(new_dest)))
     else:
         return ((country, unit_type, loc), "HLD")
 
@@ -361,7 +369,7 @@ def random_hold(order: Tuple, chance_of_move=0.8) -> Tuple:
         move_loc = random.choice(
             ADJACENCY[loc]
         )  # randomly chooses an adjacent location
-        return ((country, unit_type, loc), "MTO", move_loc)
+        return ((country, unit_type, loc), "MTO", str(daidefy_location(move_loc)))
     else:
         return order
 
