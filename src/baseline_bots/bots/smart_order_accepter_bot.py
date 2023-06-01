@@ -759,13 +759,15 @@ class SmartOrderAccepterBot(DipnetBot):
         orders_data.add_orders(orders)
         yield self.send_intent_log(f"Initial orders (before communication): {orders}")
 
+        # Skip communications unless in the movement phase
+        if not self.game.get_current_phase().endswith("M"):
+            return orders_data.get_list_of_orders()
+
+        yield self.wait_for_comm_stage()
+
         msgs_data = MessagesData()
 
         for _ in range(self.num_message_rounds):
-            # only in movement phase, we send PRP/ALY/FCT and consider get_best_proposer
-            if not self.game.get_current_phase().endswith("M"):
-                break
-
             # sleep for a random amount of time before retrieving new messages for the power
             yield asyncio.sleep(
                 random.uniform(self.min_sleep_time, self.max_sleep_time)

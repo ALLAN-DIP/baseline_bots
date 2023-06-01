@@ -2,6 +2,7 @@
 
 
 from abc import ABC, abstractmethod
+import asyncio
 from typing import ClassVar, List
 
 from diplomacy import Game, Message
@@ -26,6 +27,29 @@ class BaselineBot(ABC):
     def display_name(self) -> str:
         """Display name consisting of power name and bot type."""
         return f"{self.power_name} ({self.__class__.__name__})"
+
+    async def wait_for_comm_stage(self) -> None:
+        """Wait for all other press bots to be ready.
+
+        The bot marks itself as ready and then polls the other press bots until they are all ready.
+        Once they all, the bot can start communicating.
+        """
+        # Comm status should not be sent in local games, only set
+        if isinstance(self.game, NetworkGame):
+            await self.game.set_comm_status(
+                power_name=self.power_name, comm_status=strings.READY
+            )
+        else:
+            self.game.set_comm_status(
+                power_name=self.power_name, comm_status=strings.READY
+            )
+
+        while not all(
+            power.comm_status == strings.READY
+            for power in self.game.powers.values()
+            if power.player_type == strings.PRESS_BOT
+        ):
+            await asyncio.sleep(1)
 
     def read_messages(self) -> List[Message]:
         """Retrieves all valid messages for the current phase sent to the bot.
