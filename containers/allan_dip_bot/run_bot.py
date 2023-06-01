@@ -16,13 +16,13 @@ from diplomacy.client.network_game import NetworkGame
 from diplomacy_research.utils.cluster import is_port_opened
 
 from baseline_bots.bots.baseline_bot import BaselineBot
-from baseline_bots.bots.dipnet.no_press_bot import NoPressDipBot
-from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
+from baseline_bots.bots.no_press_bot import NoPressDipBot
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
 from baseline_bots.bots.smart_order_accepter_bot import (
     Aggressiveness,
     SmartOrderAccepterBot,
 )
+from baseline_bots.bots.transparent_bot import TransparentBot
 
 POWERS = ["AUSTRIA", "ENGLAND", "FRANCE", "GERMANY", "ITALY", "RUSSIA", "TURKEY"]
 BOTS = [

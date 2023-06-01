@@ -2,13 +2,11 @@
 from gameplay_framework import GamePlay
 from tornado.testing import AsyncTestCase, gen_test
 
-from baseline_bots.bots.dipnet.no_press_bot import NoPressDipBot
-from baseline_bots.bots.dipnet.pushoverdipnet import PushoverDipnet
-from baseline_bots.bots.dipnet.selectively_transparent_bot import (
-    SelectivelyTransparentBot,
-)
-from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
+from baseline_bots.bots.no_press_bot import NoPressDipBot
+from baseline_bots.bots.pushover_bot import PushoverDipnet
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
+from baseline_bots.bots.selectively_transparent_bot import SelectivelyTransparentBot
+from baseline_bots.bots.transparent_bot import TransparentBot
 
 
 class TestOtherBots(AsyncTestCase):

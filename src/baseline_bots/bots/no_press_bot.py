@@ -2,7 +2,7 @@ from typing import List
 
 from tornado import gen
 
-from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
+from baseline_bots.bots.dipnet_bot import DipnetBot
 
 
 class NoPressDipBot(DipnetBot):

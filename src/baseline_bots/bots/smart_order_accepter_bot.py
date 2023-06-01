@@ -25,7 +25,7 @@ from diplomacy.client.network_game import NetworkGame
 from stance_vector import ActionBasedStance, ScoreBasedStance
 from tornado import gen
 
-from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
+from baseline_bots.bots.dipnet_bot import DipnetBot
 from baseline_bots.parsing_utils import (
     daide_to_dipnet_parsing,
     dipnet_to_daide_parsing,
