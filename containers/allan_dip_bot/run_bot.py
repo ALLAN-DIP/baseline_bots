@@ -6,7 +6,7 @@ import asyncio
 import random
 import sys
 import time
-from typing import Optional
+from typing import Optional, Type
 
 sys.path.append("..")  # Adds higher directory to python modules path.
 
@@ -17,7 +17,9 @@ from diplomacy_research.utils.cluster import is_port_opened
 
 from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.bots.no_press_bot import NoPressDipBot
+from baseline_bots.bots.pushover_bot import PushoverDipnet
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
+from baseline_bots.bots.selectively_transparent_bot import SelectivelyTransparentBot
 from baseline_bots.bots.smart_order_accepter_bot import (
     Aggressiveness,
     SmartOrderAccepterBot,
@@ -26,11 +28,14 @@ from baseline_bots.bots.transparent_bot import TransparentBot
 
 POWERS = ["AUSTRIA", "ENGLAND", "FRANCE", "GERMANY", "ITALY", "RUSSIA", "TURKEY"]
 BOTS = [
-    NoPressDipBot.__name__,
-    RandomProposerBot.__name__,
-    SmartOrderAccepterBot.__name__,
-    TransparentBot.__name__,
+    NoPressDipBot,
+    PushoverDipnet,
+    RandomProposerBot,
+    SelectivelyTransparentBot,
+    SmartOrderAccepterBot,
+    TransparentBot,
 ]
+NAMES_TO_BOTS = {bot.__name__: bot for bot in BOTS}
 
 
 async def launch() -> None:
@@ -53,7 +58,7 @@ async def play(
     port: int,
     game_id: str,
     power_name: str,
-    bot_type: str,
+    bot_class: Type[BaselineBot],
     sleep_delay: bool,
     discount_factor: float,
     invasion_coef: float,
@@ -71,7 +76,7 @@ async def play(
     :param port: port to which the bot should connect on the host
     :param game_id: game id to connect to on host
     :param power_name: power name of the bot to be launched
-    :param bot_type: the type of bot to be launched - NoPressDipBot/TransparentBot/SmartOrderAccepterBot/..
+    :param bot_class: the type of bot to be launched - NoPressDipBot/TransparentBot/SmartOrderAccepterBot/..
     :param sleep_delay: bool to indicate if bot should sleep randomly for 1-3s before execution
     """
     await launch()
@@ -80,17 +85,19 @@ async def play(
     print(f"DipNetSL joining game: {game_id} as {power_name}")
     connection = await connect(hostname, port)
     channel = await connection.authenticate(
-        f"allan_{bot_type.lower()}_{power_name}", "password"
+        f"allan_{bot_class.__name__.lower()}_{power_name}", "password"
     )
     game: NetworkGame = await channel.join_game(game_id=game_id, power_name=power_name)
 
-    if bot_type == NoPressDipBot.__name__:
-        bot: BaselineBot = NoPressDipBot(power_name, game)
-    elif bot_type == TransparentBot.__name__:
-        bot = TransparentBot(power_name, game)
-    elif bot_type == RandomProposerBot.__name__:
-        bot = RandomProposerBot(power_name, game)
-    elif bot_type == SmartOrderAccepterBot.__name__:
+    if bot_class in [
+        NoPressDipBot,
+        PushoverDipnet,
+        RandomProposerBot,
+        SelectivelyTransparentBot,
+        TransparentBot,
+    ]:
+        bot: BaselineBot = bot_class(power_name, game)
+    elif bot_class == SmartOrderAccepterBot:
         bot = SmartOrderAccepterBot(
             power_name,
             game,
@@ -104,7 +111,7 @@ async def play(
             unrealized_coef=unrealized_coef,
         )
     else:
-        raise ValueError(f"{bot_type!r} is not a valid bot type")
+        raise ValueError(f"{bot_class.__name__!r} is not a valid bot type")
 
     # Wait while game is still being formed
     print("Waiting for game to start", end=" ")
@@ -181,8 +188,8 @@ def main() -> None:
     parser.add_argument(
         "--bot_type",
         type=str,
-        choices=BOTS,
-        default=TransparentBot.__name__,
+        choices=list(NAMES_TO_BOTS),
+        default=SmartOrderAccepterBot.__name__,
         help="type of bot to be launched (default: %(default)s)",
     )
     parser.add_argument(
@@ -256,13 +263,15 @@ def main() -> None:
         Aggressiveness(args.aggressiveness) if args.aggressiveness else None
     )
 
+    bot_class: Type[BaselineBot] = NAMES_TO_BOTS[bot_type]
+
     asyncio.run(
         play(
             hostname=host,
             port=port,
             game_id=game_id,
             power_name=power,
-            bot_type=bot_type,
+            bot_class=bot_class,
             sleep_delay=sleep_delay,
             discount_factor=discount_factor,
             invasion_coef=invasion_coef,
