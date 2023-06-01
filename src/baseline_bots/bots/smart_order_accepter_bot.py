@@ -188,14 +188,6 @@ class SmartOrderAccepterBot(DipnetBot):
         self.foes = []
         self.neutral = []
 
-    async def send_intent_log(self, log_msg: str) -> None:
-        print(f"Intent log: {log_msg!r}")
-        # Intent logging should not be sent in local games
-        if not isinstance(self.game, NetworkGame):
-            return
-        log_data = self.game.new_log_data(body=log_msg)
-        await self.game.send_log_data(log=log_data)
-
     async def log_stance_change(self, stance_log) -> None:
         for pw in self.opponents:
             await self.send_intent_log(stance_log[self.power_name][pw])

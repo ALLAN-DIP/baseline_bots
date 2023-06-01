@@ -118,6 +118,18 @@ class BaselineBot(ABC):
             # to add duplicate messages to the passed-in instance
             await self.send_message(msg["recipient"], msg["message"], MessagesData())
 
+    async def send_intent_log(self, log_msg: str) -> None:
+        """Send intent log asynchronously to the server
+
+        :param log_msg: Log message to be sent
+        """
+        print(f"Intent log: {log_msg!r}")
+        # Intent logging should not be sent in local games
+        if not isinstance(self.game, NetworkGame):
+            return
+        log_data = self.game.new_log_data(body=log_msg)
+        await self.game.send_log_data(log=log_data)
+
     @abstractmethod
     def __call__(self) -> List[str]:
         """
