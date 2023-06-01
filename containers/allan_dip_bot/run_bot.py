@@ -87,7 +87,9 @@ async def play(
     channel = await connection.authenticate(
         f"allan_{bot_class.__name__.lower()}_{power_name}", "password"
     )
-    game: NetworkGame = await channel.join_game(game_id=game_id, power_name=power_name)
+    game: NetworkGame = await channel.join_game(
+        game_id=game_id, power_name=power_name, player_type=bot_class.player_type
+    )
 
     if bot_class in [
         NoPressDipBot,

@@ -2,10 +2,11 @@
 
 
 from abc import ABC, abstractmethod
-from typing import List
+from typing import ClassVar, List
 
 from diplomacy import Game, Message
 from diplomacy.client.network_game import NetworkGame
+from diplomacy.utils import strings
 
 from baseline_bots.utils import MessagesData, OrdersData, is_valid_daide_message
 
@@ -13,6 +14,7 @@ from baseline_bots.utils import MessagesData, OrdersData, is_valid_daide_message
 class BaselineBot(ABC):
     """Abstract Base Class for baselines bots"""
 
+    player_type: ClassVar[str] = strings.PRESS_BOT
     power_name: str
     game: Game
 
