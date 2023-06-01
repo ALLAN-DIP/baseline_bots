@@ -78,7 +78,7 @@ else
   fi
 fi
 
-HOST=shade.tacc.utexas.edu
+HOST=shade-dev.tacc.utexas.edu
 OPTS=(--bot_type SmartOrderAccepterBot)
 
 if [[ -z $GAME_ID ]]; then
