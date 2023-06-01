@@ -5,15 +5,30 @@ Some quickly built parsing utils mostly for DAIDE stuff
 from collections import defaultdict
 from typing import Dict, List, Mapping, Tuple, Union
 
-from daidepp import CVY, HLD, MTO, SUP, Command, Location, MoveByCVY, Unit
+from daidepp import (
+    ALYVSS,
+    AND,
+    CVY,
+    HLD,
+    MTO,
+    ORR,
+    PCE,
+    PRP,
+    SUP,
+    XDO,
+    Command,
+    Location,
+    MoveByCVY,
+    Unit,
+)
 from diplomacy import Game, Message
 
 from baseline_bots.utils import (
     get_order_tokens,
     parse_alliance_proposal,
     parse_arrangement,
+    parse_daide,
     parse_peace_proposal,
-    parse_PRP,
 )
 
 dipnet2daide_loc = {
@@ -21,6 +36,7 @@ dipnet2daide_loc = {
     "ENG": "ECH",
     "LYO": "GOL",
 }
+daide2dipnet_loc = {v: k for k, v in dipnet2daide_loc.items()}
 
 
 def daidefy_location(prov: str) -> Location:
@@ -219,143 +235,84 @@ def dipnet_to_daide_parsing(
     return daide_orders
 
 
-def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
+def dipnetify_location(loc: Location) -> str:
+    """Converts DipNet-style location to DAIDE-style location
+
+    E.g.
+    BUL ECS --> BUL/EC
+    STP SCS --> STP/SC
+    ECH     --> ENG
+    PAR     --> PAR
+
+    :param loc: DAIDE-style location
+    :return: DipNet-style province notation
     """
-    Convert DAIDE style single order to dipnet style order
+    prov = daide2dipnet_loc.get(loc.province, loc.province)
+    if loc.coast is not None:
+        prov += "/" + loc.coast[:-1]
+    return prov
+
+
+def dipnetify_unit(unit: Unit) -> str:
+    """Converts DAIDE-style unit to DipNet-style unit
+
+    :param unit: DAIDE-style unit
+    :return: DipNet-style unit notation
+    """
+    unit_type = unit.unit_type[0]
+    location = dipnetify_location(unit.location)
+    return f"{unit_type} {location}"
+
+
+def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
+    """Convert single DAIDE-style order to DipNet-style order
 
     More details here: https://docs.google.com/document/d/16RODa6KDX7vNNooBdciI4NqSVN31lToto3MLTNcEHk0/edit?usp=sharing
 
-    :param daide_style_order_str: DAIDE style string to be converted to dipnet style
-    :return: dipnet style order string and unit's power name
+    :param daide_style_order_str: DAIDE-style string to be converted to DipNet style
+    :return: DipNet-style order string and unit's power name
     """
 
-    def split_into_groups(daide_style_order_str: str) -> List[str]:
-        """
-        Split the string based on parenthesis or spaces
-        E.g.
-        "(FRA AMY PAR) SUP (FRA AMY MAR) MTO BUR" --> "FRA AMY PAR", "SUP", "FRA AMY MAR", "MTO", "BUR"
-
-        :param daide_style_order_str: DAIDE style string
-        :return: list of strings containing components of the order which makes it easy to convert to dipnet-style order
-        """
-        brack_cnt = 0
-        stack = ""
-        grouped_order = []
-        for char in daide_style_order_str:
-            if char == ")":
-                brack_cnt -= 1
-            if (brack_cnt == 0 and char == " ") or (brack_cnt == 0 and char == ")"):
-                if brack_cnt == 0 and stack:
-                    grouped_order.append(stack)
-                    stack = ""
-            elif char == "(":
-                if brack_cnt > 0:
-                    stack += char
-                brack_cnt += 1
-            else:
-                stack += char
-        if stack:
-            grouped_order.append(stack)
-        return grouped_order
-
-    def replace_daide_loc(loc: str) -> str:
-        """
-        Replaces DAIDE location with dipnet location
-        E.g. GOB -> BOT
-             ECH -> ENG
-        """
-        for dipnet_loc, daide_loc in dipnet2daide_loc.items():
-            if daide_loc in loc:
-                loc = loc.replace(daide_loc, dipnet_loc)
-
-        return loc
-
-    def compress_prov_coast(prov: str) -> str:
-        """
-        If `prov` is a coastal province, compress coastal province from DAIDE to dipnet format
-        Else return original `prov`
-        E.g.
-        BUL ECS         --> BUL/EC
-        STP SCS         --> STP/SC
-        PAR             --> PAR
-        """
-        if len(prov.split()) == 2:
-            prov = "/".join(prov.split())[:-1]
-        prov = replace_daide_loc(prov)
-        return prov
-
-    def dipnetify_suborder(suborder: str) -> str:
-        """
-        Translates DAIDE style units to dipnet style units
-
-        :param suborder: DAIDE-style suborder to be encoded
-        :return: dipnet suborder
-        """
-        suborder_tokens = split_into_groups(suborder)
-        try:
-            ans = suborder_tokens[1][0] + " " + compress_prov_coast(suborder_tokens[2])
-        except Exception:
-            print(
-                f"ALLAN: error from parsing_utils.daide_to_dipnet_parsing.dipnetify_suborder() Failed for suborder: {suborder_tokens}"
-            )
-            ans = suborder_tokens[1][0] + " " + suborder_tokens[2]
-        return ans, suborder_tokens[0]
-
     try:
-        daide_style_order_groups = split_into_groups(daide_style_order_str)
-
-        dipnet_order = []
+        parsed_order: Command = parse_daide(daide_style_order_str)
 
         # Dipnetify source unit
-        suborder, unit_power = dipnetify_suborder(daide_style_order_groups[0])
-        dipnet_order.append(suborder)
-        if daide_style_order_groups[1] == "SUP":
+        acting_unit = dipnetify_unit(parsed_order.unit)
+        unit_power = parsed_order.unit.power
+        if isinstance(parsed_order, SUP):
             # Support order
-            dipnet_order.append("S")
-            dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2])[0])
-            if (
-                len(daide_style_order_groups) == 5
-                and daide_style_order_groups[3] == "MTO"
-            ):
-                dipnet_order.append("-")
-                dipnet_order.append(compress_prov_coast(daide_style_order_groups[4]))
-            elif len(daide_style_order_groups) > 5:
-                print(
-                    f"ALLAN: error from parsing_utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
-                )
-                return None
-        elif daide_style_order_groups[1] == "HLD":
+            supported_unit = dipnetify_unit(parsed_order.supported_unit)
+            dipnet_order = f"{acting_unit} S {supported_unit}"
+            if parsed_order.province_no_coast_location is not None:
+                prov = dipnetify_location(parsed_order.province_no_coast_location)
+                dipnet_order += f" - {prov}"
+        elif isinstance(parsed_order, HLD):
             # Hold order
-            dipnet_order.append("H")
-        elif daide_style_order_groups[1] == "CTO":
+            dipnet_order = f"{acting_unit} H"
+        elif isinstance(parsed_order, MoveByCVY):
             # CTO order
-            dipnet_order.append("-")
-            dipnet_order.append(compress_prov_coast(daide_style_order_groups[2]))
-            dipnet_order.append("VIA")
-        elif daide_style_order_groups[1] == "CVY":
+            prov = dipnetify_location(parsed_order.province)
+            dipnet_order = f"{acting_unit} - {prov} VIA"
+        elif isinstance(parsed_order, CVY):
             # Convoy order
-            dipnet_order.append("C")
-            dipnet_order.append(dipnetify_suborder(daide_style_order_groups[2])[0])
-            dipnet_order.append("-")
-            dipnet_order.append(compress_prov_coast(daide_style_order_groups[4]))
-        elif daide_style_order_groups[1] == "MTO":
+            convoyed_unit = dipnetify_unit(parsed_order.convoyed_unit)
+            prov = dipnetify_location(parsed_order.province)
+            dipnet_order = f"{acting_unit} C {convoyed_unit} - {prov}"
+        elif isinstance(parsed_order, MTO):
             # Move orders
-            dipnet_order.append("-")
-            dipnet_order.append(compress_prov_coast(daide_style_order_groups[2]))
-            if len(daide_style_order_groups) > 3:
-                print(
-                    f"ALLAN: error from parsing_utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
-                )
-                return None
+            prov = dipnetify_location(parsed_order.location)
+            dipnet_order = f"{acting_unit} - {prov}"
         else:
-            print(
-                f"ALLAN: error from parsing_utils.daide_to_dipnet_parsing: order {daide_style_order_groups} is UNEXPECTED. Update code to handle this case!!!"
+            raise NotImplementedError(
+                f"Conversion for {type(parsed_order).__name__} commands has not been implemented yet"
             )
-            return None
 
-        return " ".join(dipnet_order), unit_power
+        return dipnet_order, unit_power
     except Exception as e:
-        print(f"ALLAN: error from parsing_utils.daide_to_dipnet_parsing")
+        print(
+            f"ALLAN: error from {__name__}.{daide_to_dipnet_parsing.__name__}\n"
+            f"\tCould not convert DAIDE command {daide_style_order_str!r} to DipNet format"
+        )
         print(e)
         return None
 
@@ -363,8 +320,11 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
 def parse_proposal_messages(
     rcvd_messages: List[Message], game: Game, power_name: str
 ) -> Dict[str, Dict[str, List[str]]]:
-    """
-    From received messages, extract the proposals (categorize as valid and invalid), shared orders and other orders. Use specified game state and power_name to check for validity of moves
+    """Extracts proposals and orders from received messages
+
+    From each received messages, extract the proposals (categorize as valid and invalid),
+    shared orders and other orders. Use specified game state and power_name
+    to check for validity of moves
 
     :param rcvd_messages: list of messages received from other players
     :param game: Game state
@@ -379,11 +339,13 @@ def parse_proposal_messages(
     """
     try:
         # Extract messages containing PRP string
-        order_msgs = [msg for msg in rcvd_messages if "PRP" in msg.message]
+        order_msgs = [
+            msg for msg in rcvd_messages if isinstance(parse_daide(msg.message), PRP)
+        ]
         print(f"Received {len(order_msgs)} PRP messages:")
         print([(order_msg.sender, order_msg.message) for order_msg in order_msgs])
 
-        # Generate a dictionary of sender to list of orders (dipnet-style) for this sender
+        # Generate a dictionary of sender to list of DipNet-style orders for this sender
         proposals = defaultdict(list)
 
         invalid_proposals = defaultdict(list)
@@ -395,40 +357,34 @@ def parse_proposal_messages(
 
         for order_msg in order_msgs:
             try:
-                if (
-                    "AND" in order_msg.message
-                ):  # works when AND is present in this format: XDO () AND XDO () AND XDO()
-                    daide_style_orders = [
-                        order_1
-                        for order in (parse_PRP(order_msg.message)).split("AND")
-                        for order_1 in parse_arrangement(order.strip(), xdo_only=False)
-                    ]
-                else:  # works for cases where ORR is present in PRP or nothing is present: ORR ( (XDO()) (XDO()))
-                    daide_style_orders = [
-                        order
-                        for order in parse_arrangement(
-                            parse_PRP(order_msg.message), xdo_only=False
-                        )
-                    ]
-                for order_type, order in daide_style_orders:
-                    if order_type == "XDO":
-                        temp_message = daide_to_dipnet_parsing(order)
+                daide_style_orders = [
+                    parse_daide(order) for order in parse_arrangement(order_msg.message)
+                ]
+                for order in daide_style_orders:
+                    if isinstance(order, XDO):
+                        temp_message = daide_to_dipnet_parsing(str(order.order))
                         if temp_message:
                             proposals[order_msg.sender].append(temp_message)
                     # from RY: I think this parsing is problematic though..
                     # when we YES/REJ a ALY/PCE proposal we should do it as a whole..
-                    elif order_type == "ALY":
+                    elif isinstance(order, ALYVSS):
                         for ally in parse_alliance_proposal(order, power_name):
-                            alliance_proposals[ally].append((order_msg.sender, order))
-                    elif order_type == "PCE":
+                            alliance_proposals[ally].append(
+                                (order_msg.sender, str(order))
+                            )
+                    elif isinstance(order, PCE):
                         for peace in parse_peace_proposal(order, power_name):
-                            peace_proposals[peace].append((order_msg.sender, order))
+                            peace_proposals[peace].append(
+                                (order_msg.sender, str(order))
+                            )
                     else:
-                        other_orders[order_msg.sender].append(order)
+                        other_orders[order_msg.sender].append(str(order))
             except Exception as e:
                 print(
-                    f"ALLAN: error from parsing_utils.parse_proposal_messages() Unexpected message format: {order_msg.message}"
+                    f"ALLAN: error from {__name__}.{parse_proposal_messages.__name__}()\n"
+                    f"\tUnexpected proposal message format: {order_msg.message!r}"
                 )
+                print(e)
                 continue
 
         # Generate set of possible orders for the given power
@@ -443,19 +399,19 @@ def parse_proposal_messages(
             ]
         )
 
-        # For the set of proposed moves from each sender, check if the specified orders would be allowed. If not, mark them as invalid.
+        # For the set of proposed moves from each sender,
+        # check if the specified orders would be allowed.
+        # If not, mark them as invalid.
         for sender in proposals:
             for order, unit_power_name in proposals[sender]:
-                if (
-                    unit_power_name == power_name[:3]
-                ):  # These are supposed to be proposal messages to me
+                # These are supposed to be proposal messages to me
+                if unit_power_name == power_name[:3]:
                     if order in possible_orders:  # These would be valid proposals to me
                         valid_proposals[sender].append(order)
                     else:  # These would be invalid proposals
                         invalid_proposals[sender].append((order, unit_power_name))
-                elif (
-                    unit_power_name == sender[:3]
-                ):  # These are supposed to be conditional orders that the sender is going to execute
+                # These are supposed to be conditional orders that the sender is going to execute
+                elif unit_power_name == sender[:3]:
                     shared_orders[sender].append(order)
                 else:
                     other_orders[sender].append(order)
@@ -475,7 +431,10 @@ def parse_proposal_messages(
             "peace_proposals": peace_proposals,
         }
     except Exception as e:
-        print(f"ALLAN: main error from parsing_utils.parse_proposal_messages()")
+        print(
+            f"ALLAN: error from {__name__}.{parse_proposal_messages.__name__}()\n"
+            f"\tReceived messages: {rcvd_messages}"
+        )
         print(e)
         return {
             "valid_proposals": {},

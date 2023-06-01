@@ -5,8 +5,24 @@ an already existing order / list of orders.
 
 
 import random
-import re
-from typing import List, Tuple
+from typing import List, Tuple, Union
+
+from daidepp import (
+    BLD,
+    CVY,
+    DSB,
+    HLD,
+    MTO,
+    REM,
+    RTO,
+    SUP,
+    WVE,
+    Command,
+    Location,
+    MoveByCVY,
+)
+
+from baseline_bots.parsing_utils import daidefy_location, dipnetify_location
 
 # The comments below signal the formatter not to expand these dicts to multiple lines
 # fmt: off
@@ -31,7 +47,7 @@ ADJACENCY = {
     "BUL/EC": ["BLA", "CON", "RUM"],
     "BUL/SC": ["AEG", "CON", "GRE"],
     "BUL": ["AEG", "BLA", "CON", "GRE", "RUM", "SER"],
-    "BUR": ["BEL", "GAS", "RUH", "MAR", "MUN", "PAR", "PIC", "SWI"],
+    "BUR": ["BEL", "GAS", "RUH", "MAR", "MUN", "PAR", "PIC"],
     "CLY": ["EDI", "LVP", "NAO", "NWG"],
     "CON": ["AEG", "BUL/EC", "BUL/SC", "BLA", "ANK", "SMY"],
     "DEN": ["BAL", "HEL", "KIE", "NTH", "SKA", "SWE"],
@@ -52,9 +68,9 @@ ADJACENCY = {
     "LVP": ["CLY", "EDI", "IRI", "NAO", "WAL", "YOR"],
     "LYO": ["MAR", "PIE", "SPA/SC", "TUS", "TYS", "WES"],
     "MAO": ["BRE", "ENG", "GAS", "IRI", "NAF", "NAO", "POR", "SPA/NC", "SPA/SC", "WES"],
-    "MAR": ["BUR", "GAS", "LYO", "PIE", "SPA/SC", "SWI"],
+    "MAR": ["BUR", "GAS", "LYO", "PIE", "SPA/SC"],
     "MOS": ["LVN", "SEV", "STP", "UKR", "WAR"],
-    "MUN": ["BER", "BOH", "BUR", "KIE", "RUH", "SIL", "TYR", "SWI"],
+    "MUN": ["BER", "BOH", "BUR", "KIE", "RUH", "SIL", "TYR"],
     "NAF": ["MAO", "TUN", "WES"],
     "NAO": ["CLY", "IRI", "LVP", "MAO", "NWG"],
     "NAP": ["APU", "ION", "ROM", "TYS"],
@@ -63,7 +79,7 @@ ADJACENCY = {
     "NWG": ["BAR", "CLY", "EDI", "NAO", "NWY", "NTH"],
     "PAR": ["BUR", "BRE", "GAS", "PIC"],
     "PIC": ["BEL", "BRE", "BUR", "ENG", "PAR"],
-    "PIE": ["LYO", "MAR", "TUS", "TYR", "VEN", "SWI"],
+    "PIE": ["LYO", "MAR", "TUS", "TYR", "VEN"],
     "POR": ["MAO", "SPA/NC", "SPA/SC"],
     "PRU": ["BAL", "BER", "LVN", "SIL", "WAR"],
     "ROM": ["APU", "NAP", "TUS", "TYS", "VEN"],
@@ -85,7 +101,7 @@ ADJACENCY = {
     "TRI": ["ADR", "ALB", "BUD", "SER", "TYR", "VEN", "VIE"],
     "TUN": ["ION", "NAF", "TYS", "WES"],
     "TUS": ["LYO", "PIE", "ROM", "TYS", "VEN"],
-    "TYR": ["BOH", "MUN", "PIE", "TRI", "VEN", "VIE", "SWI"],
+    "TYR": ["BOH", "MUN", "PIE", "TRI", "VEN", "VIE"],
     "TYS": ["ION", "LYO", "ROM", "NAP", "TUN", "TUS", "WES"],
     "UKR": ["GAL", "MOS", "RUM", "SEV", "WAR"],
     "VEN": ["ADR", "APU", "PIE", "ROM", "TRI", "TUS", "TYR"],
@@ -94,10 +110,9 @@ ADJACENCY = {
     "WAR": ["GAL", "LVN", "MOS", "PRU", "SIL", "UKR"],
     "WES": ["MAO", "LYO", "NAF", "SPA/SC", "TUN", "TYS"],
     "YOR": ["EDI", "LON", "LVP", "NTH", "WAL"],
-    "SWI": ["MAR", "BUR", "MUN", "TYR", "PIE"],
 }
 
-# This dict defines the type of every province. Every province is either "COAST", "WATER", "LAND" or "SHUT"
+# This dict defines the type of every province. Every province is either "COAST", "WATER", or "LAND"
 TYPES = {
     "ADR": "WATER", "AEG": "WATER", "ALB": "COAST", "ANK": "COAST", "APU": "COAST", "ARM": "COAST",
     "BAL": "WATER", "BAR": "WATER", "BEL": "COAST", "BER": "COAST", "BLA": "WATER", "BOH": "LAND",
@@ -113,7 +128,6 @@ TYPES = {
     "STP/NC": "COAST", "STP/SC": "COAST", "stp": "COAST", "SWE": "COAST", "SYR": "COAST",
     "TRI": "COAST", "TUN": "COAST", "TUS": "COAST", "TYR": "LAND", "TYS": "WATER", "UKR": "LAND",
     "VEN": "COAST", "VIE": "LAND", "WAL": "COAST", "WAR": "LAND", "WES": "WATER", "YOR": "COAST",
-    "SWI": "SHUT",
 }
 
 # fmt: on
@@ -129,7 +143,7 @@ COMBOS = {
 joiners = {"AND", "ORR"}
 
 
-def random_list_orders(orders: List) -> List:
+def random_list_orders(orders: List[Command]) -> List[Command]:
     """
     Generates a randomly deviant orders in the same form.
 
@@ -138,14 +152,14 @@ def random_list_orders(orders: List) -> List:
     :return: The list of deviant orders
     :rtype: List[Tuple]
     """
-    correspondences = orders_correspondence(
-        orders
-    )  # this returns a list of tuples representing correspondences or an empty list
+    # correspondences = orders_correspondence(
+    #     orders
+    # )  # this returns a list of tuples representing correspondences or an empty list
 
-    cor_orders = list(
+    orders = list(
         map(lambda order: randomize(order), orders)
     )  # if there are no correspondences, every order is randomized alone
-    return cor_orders
+    return orders
 
 
 def orders_correspondence(orders: List) -> List:
@@ -179,7 +193,7 @@ def orders_correspondence(orders: List) -> List:
     return correspondences
 
 
-def randomize(order: Tuple) -> Tuple:
+def randomize(order: Command) -> Command:
     """
     Takes in an order and returns a randomly deviant version of it.
 
@@ -188,24 +202,23 @@ def randomize(order: Tuple) -> Tuple:
     :return: A deviant order (with some chance of being the same order).
     :rtype: Tuple
     """
-    tag = order[1]
-    tag_to_func = {
-        "MTO": random_movement,
-        "RTO": random_movement,
-        "HLD": random_hold,
-        "SUP": random_support,
-        "CVY": random_convoy,
-        "CTO": random_convoy_to,
-        "WVE": lambda order: order,
-        "BLD": lambda order: order,
-        "REM": lambda order: order,
-        "DSB": lambda order: order,
-    }
+    if isinstance(order, (MTO, RTO)):
+        return random_movement(order)
+    elif isinstance(order, HLD):
+        return random_hold(order)
+    elif isinstance(order, SUP):
+        return random_support(order)
+    elif isinstance(order, CVY):
+        return random_convoy(order)
+    elif isinstance(order, MoveByCVY):
+        return random_convoy_to(order)
+    elif isinstance(order, (WVE, BLD, REM, DSB)):
+        return order
+    else:
+        raise NotImplementedError(type(order))
 
-    return tag_to_func[tag](order)
 
-
-def random_convoy_to(order: Tuple) -> Tuple:
+def random_convoy_to(order: MoveByCVY) -> MoveByCVY:
     """
     This takes a convoy order and returns the longest alternate convoy.
 
@@ -214,11 +227,10 @@ def random_convoy_to(order: Tuple) -> Tuple:
     :return: A deviant order (with some chance of being the same order).
     :rtype: Tuple
     """
-    (_, _, amy_loc), _, province, _, sea_provinces = order
-    if isinstance(sea_provinces, Tuple):
-        sea_provinces = list(reversed(sea_provinces))
-    else:
-        sea_provinces = [sea_provinces]
+    amy_loc = dipnetify_location(order.unit.location)
+    province = dipnetify_location(order.province)
+    sea_provinces = [dipnetify_location(Location(sea)) for sea in order.province_seas]
+    sea_provinces = list(reversed(sea_provinces))
     for i, sea in enumerate(
         sea_provinces
     ):  # searches through the sea provinces in reversed order to find the longest possible alternate convoy
@@ -235,11 +247,12 @@ def random_convoy_to(order: Tuple) -> Tuple:
             route = tuple(
                 (reversed(sea_provinces[i:]))
             )  # the list must be reversed back to the correct order before returning
-            return (order[0], "CTO", random.choice(valid), "VIA", route)
+            route = [daidefy_location(sea).province for sea in route]
+            return MoveByCVY(order.unit, daidefy_location(random.choice(valid)), *route)
     return order
 
 
-def random_convoy(order: Tuple) -> Tuple:
+def random_convoy(order: CVY) -> CVY:
     """
     This takes in the order and produces a convoy to a different destination if it is possible
     and believable. An unbelievable convoy would be one that convoys a unit to a province the
@@ -251,20 +264,26 @@ def random_convoy(order: Tuple) -> Tuple:
     :rtype: Tuple
     """
     # fmt: off
-    tag = order[1]
-    ((flt_country, flt_type, flt_loc), _, (amy_country, amy_type, amy_loc), _, province) = order
-    assert (amy_type == "AMY" and flt_type == "FLT"), "The unit type is neither army nor fleet so it is invalid."
+    # TODO: Add to `daidepp`?
+    assert (order.convoyed_unit.unit_type == "AMY" and order.convoying_unit.unit_type == "FLT"), "The unit type is neither army nor fleet so it is invalid."
     # It is necessary to check whether a possible alternate "convoy-to" location is adjacent to the unit being convoyed
     # since convoying to a province adjacent to you would be less believable
-    adj = [loc for loc in ADJACENCY[flt_loc] if TYPES[loc] == "COAST" and loc not in ADJACENCY[amy_loc] and loc != province]
+    flt_loc = dipnetify_location(order.convoying_unit.location)
+    amy_loc = dipnetify_location(order.convoyed_unit.location)
+    province = dipnetify_location(order.province)
+    adj = [str(daidefy_location(loc)) for loc in ADJACENCY[flt_loc] if TYPES[loc] == "COAST" and loc not in ADJACENCY[amy_loc] and loc != province]
     # fmt: on
     if adj:  # if valid adjacencies exist
-        return (order[0], tag, order[2], "CTO", random.choice(adj))
+        return CVY(
+            order.convoying_unit,
+            order.convoyed_unit,
+            daidefy_location(random.choice(adj)),
+        )
     else:
         return order
 
 
-def random_support(order: Tuple) -> Tuple:
+def random_support(order: SUP) -> SUP:
     """
     Takes in a support order and returns a believable but randomized version of it.
 
@@ -273,14 +292,12 @@ def random_support(order: Tuple) -> Tuple:
     :return: A deviant order (with some chance of being the same order).
     :rtype: Tuple
     """
-    tag = order[1]
-    if len(order) <= 3:  # if it is supporting to hold
+    if order.province_no_coast is None:  # if it is supporting to hold
         # fmt : off
-        (
-            (_, supporter_type, supporter_loc),
-            _,
-            (_, supported_type, supported_loc),
-        ) = order
+        supporter_type = order.supporting_unit.unit_type
+        supporter_loc = dipnetify_location(order.supporting_unit.location)
+        supported_type = order.supported_unit.unit_type
+        supported_loc = dipnetify_location(order.supported_unit.location)
         supporter_adjacent, supported_adjacent = (
             ADJACENCY[supporter_loc],
             ADJACENCY[supported_loc],
@@ -289,7 +306,7 @@ def random_support(order: Tuple) -> Tuple:
             supported_type
         ]  # Set of possible destinations
         adj_to_both = [
-            adjacency
+            daidefy_location(adjacency).province
             for adjacency in supporter_adjacent  # this finds all provinces adjacent to the supportee and suporter locations
             if adjacency in supported_adjacent
             and (not dest_choices or TYPES[adjacency] in dest_choices)
@@ -297,28 +314,35 @@ def random_support(order: Tuple) -> Tuple:
         # fmt: on
         chance_of_move = 0.5  # the chance of a support hold becoming a move is 50/50
         if adj_to_both and random.random() < chance_of_move:
-            return (order[0], "SUP ", order[2], "MTO", random.choice(adj_to_both))
+            return SUP(
+                order.supporting_unit, order.supported_unit, random.choice(adj_to_both)
+            )
         else:
-            return (
-                order[0],
-                tag + " ",
-                order[2],
-            )  # returns the same support hold order if there is no value adjacent to both
+            # returns the same support hold order if there is no value adjacent to both
+            return order
     else:  # if it is supporting to move
         # fmt: off
-        ((sup_country, sup_type, sup_loc), _, (rec_country, rec_type, rec_loc), _, province) = order
+        sup_type = order.supporting_unit.unit_type
+        sup_loc = dipnetify_location(order.supporting_unit.location)
+        rec_type = order.supported_unit.unit_type
+        rec_loc = dipnetify_location(order.supported_unit.location)
+        province = dipnetify_location(Location(order.province_no_coast))
         sup_adjacent, rec_adjacent = ADJACENCY[sup_loc], ADJACENCY[rec_loc]
         # COMBOS and TYPES must be used to determine the possible locations a unit can support into/from based on the unit type and province type
         dest_choices = COMBOS[sup_type][rec_type]
-        adj_to_both = [adjacency for adjacency in sup_adjacent if adjacency in rec_adjacent and adjacency != province and TYPES[adjacency]]
+        adj_to_both = [daidefy_location(adjacency).province for adjacency in sup_adjacent if adjacency in rec_adjacent and adjacency != province and TYPES[adjacency]]
         # fmt: on
         if adj_to_both:
-            return (order[0], tag + " ", order[2], "MTO", random.choice(adj_to_both))
+            return SUP(
+                order.supporting_unit, order.supported_unit, random.choice(adj_to_both)
+            )
         else:
             return order  # returns original order if no "trickier" option is found
 
 
-def random_movement(order: Tuple, chance_of_move=0.5):
+def random_movement(
+    order: Union[MTO, RTO], chance_of_move: float = 0.5
+) -> Union[MTO, RTO, HLD]:
     """
     Takes in a movement order and returns a similar but randomly different version of it.
     This may turn a movement order into a hold order.
@@ -328,22 +352,24 @@ def random_movement(order: Tuple, chance_of_move=0.5):
     :return: A deviant order (with some chance of being the same order).
     :rtype: Tuple
     """
-    (country, unit_type, loc), tag, dest = order
-    if (
-        random.random() < chance_of_move or tag == "RTO"
+    unit = order.unit
+    if random.random() < chance_of_move or isinstance(
+        order, RTO
     ):  # There is a 50/50 chance of switching a move to a hold, 0 for a retreat since that may make one less believable
+        loc = dipnetify_location(unit.location)
+        dest = dipnetify_location(order.location)
         all_adjacent = ADJACENCY[loc].copy()
         if dest in all_adjacent:
             all_adjacent.remove(
                 dest
             )  # removing the already picked choice from the possible destinations
         new_dest = random.choice(all_adjacent)
-        return ((country, unit_type, loc), tag, new_dest)
+        return type(order)(unit, daidefy_location(new_dest))
     else:
-        return ((country, unit_type, loc), "HLD")
+        return HLD(unit)
 
 
-def random_hold(order: Tuple, chance_of_move=0.8) -> Tuple:
+def random_hold(order: HLD, chance_of_move: float = 0.8) -> Union[MTO, HLD]:
     """
     Takes in a hold order and returns a move from the same location or possibly
     the same hold order.
@@ -357,53 +383,10 @@ def random_hold(order: Tuple, chance_of_move=0.8) -> Tuple:
     if (
         random.random() < chance_of_move
     ):  # The chance of changing the hold to a move is high
-        ((country, unit_type, loc), _) = order
+        loc = dipnetify_location(order.unit.location)
         move_loc = random.choice(
             ADJACENCY[loc]
         )  # randomly chooses an adjacent location
-        return ((country, unit_type, loc), "MTO", move_loc)
+        return MTO(order.unit, daidefy_location(move_loc))
     else:
         return order
-
-
-def tuple_to_string(order: Tuple) -> str:
-    """
-    Takes in a tuple representing an order and returns a string
-    representing the same order in DAIDE format
-    Ex. tuple_to_string((('FRA', 'AMY', 'BUR'), 'MTO', 'PAR'))  -> "(FRA AMY BUR) MTO PAR"
-
-    :param order: A Tuple with the format: (('FRA', 'AMY', 'BUR'), 'MTO', 'PAR')
-    :type order: Tuple
-    :return: The same order converted to a string in DAIDE format: (FRA AMY BUR) MTO PAR
-    :rtype: str
-    """
-    # fmt: off
-    for i, sub in enumerate(order):
-        if isinstance(sub, Tuple):  # if a recursive call is necessary to parse a nested tuple
-            if i == 0 or i == 1:  # if a comma must be added before the parenthesis
-                return (" ".join(str(item) for item in order[:i]) + "(" + tuple_to_string(sub) + ") " + tuple_to_string(order[i + 1 :]))
-            else:
-                return (" ".join(str(item) for item in order[:i]) + " (" + tuple_to_string(sub) + ") " + tuple_to_string(order[i + 1 :]))
-
-    # otherwise joins the tuple without recursion
-    # fmt: on
-    return " ".join(str(item) for item in order)
-
-
-def string_to_tuple(orders: str) -> Tuple:
-    """
-    Takes as string representing an order in DAIDE format and
-    returns a tuple representing the same order.
-
-    :param order: A string with the format: "((FRA AMY BUR) MTO PAR)"
-    :type order: str
-    :return: A Tuple that captures the structure of the DAIDE syntax through nesting.
-    :rtype: Tuple
-    """
-    with_commas = re.sub(
-        r"(.*?[^(])\s+?([^)].*?)", r"\1, \2", orders
-    )  # inserts commas in between tuples and strings
-    with_quotes = re.sub(
-        r"([(, ])([A-Z|\/]+)([), ])", r"\1'\2'\3", with_commas
-    )  # inserts quotes around strings
-    return eval(with_quotes)

@@ -12,8 +12,6 @@ from baseline_bots.utils import (
     OrdersData,
     get_order_tokens,
     parse_arrangement,
-    parse_FCT,
-    parse_PRP,
     smart_select_support_proposals,
 )
 
@@ -161,8 +159,8 @@ class TestUtils:
             "RUSSIA",
             {
                 "GERMANY": "PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (XDO ((RUS FLT SEV) MTO RUM)) (XDO ((RUS AMY PRU) MTO LVN)))",
-                "AUSTRIA": "PRP (XDO ((RUS AMY MOS) SUP (RUS FLT STP/SC) MTO LVN)))",
-                "ENGLAND": "PRP (XDO ((RUS AMY PRU) MTO LVN)))",
+                "AUSTRIA": "PRP (XDO ((RUS AMY MOS) SUP (RUS FLT (STP SCS)) MTO LVN))",
+                "ENGLAND": "PRP (XDO ((RUS AMY PRU) MTO LVN))",
             },
             {
                 "valid_proposals": {
@@ -182,19 +180,27 @@ class TestUtils:
         [
             "RUSSIA",
             {
-                "GERMANY": "PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (ALY (GER RUS ENG ITA) VSS (FRA TUR AUS)) (ABC ((RUS AMY WAR) MTO PRU)))",
+                "GERMANY": "PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (ALY (GER RUS ENG ITA) VSS (FRA TUR AUS)))",
                 "AUSTRIA": "PRP (ALY (AUS RUS) VSS (FRA ENG ITA TUR GER))",
             },
             {
                 "valid_proposals": {"GERMANY": ["A WAR - PRU"]},
                 "invalid_proposals": {},
                 "shared_orders": {},
-                "other_orders": {"GERMANY": ["ABC ((RUS AMY WAR) MTO PRU)"]},
+                "other_orders": {},
                 "alliance_proposals": {
-                    "GERMANY": [("GERMANY", "ALY (GER RUS ENG ITA) VSS (FRA TUR AUS)")],
-                    "ENGLAND": [("GERMANY", "ALY (GER RUS ENG ITA) VSS (FRA TUR AUS)")],
-                    "ITALY": [("GERMANY", "ALY (GER RUS ENG ITA) VSS (FRA TUR AUS)")],
-                    "AUSTRIA": [("AUSTRIA", "ALY (AUS RUS) VSS (FRA ENG ITA TUR GER)")],
+                    "GERMANY": [
+                        ("GERMANY", "ALY ( ENG GER ITA RUS ) VSS ( AUS FRA TUR )")
+                    ],
+                    "ENGLAND": [
+                        ("GERMANY", "ALY ( ENG GER ITA RUS ) VSS ( AUS FRA TUR )")
+                    ],
+                    "ITALY": [
+                        ("GERMANY", "ALY ( ENG GER ITA RUS ) VSS ( AUS FRA TUR )")
+                    ],
+                    "AUSTRIA": [
+                        ("AUSTRIA", "ALY ( AUS RUS ) VSS ( ENG FRA GER ITA TUR )")
+                    ],
                 },
                 "peace_proposals": {},
             },
@@ -202,7 +208,7 @@ class TestUtils:
         [
             "TURKEY",
             {
-                "RUSSIA": "PRP(XDO((TUR FLT ANK) MTO BLA) AND XDO((RUS AMY SEV) MTO RUM) AND (XDO((ENG AMY LVP) HLD)))"
+                "RUSSIA": "PRP(AND (XDO((TUR FLT ANK) MTO BLA)) (XDO((RUS AMY SEV) MTO RUM)) (XDO((ENG AMY LVP) HLD)))"
             },
             {
                 "valid_proposals": {"RUSSIA": ["F ANK - BLA"]},
@@ -216,27 +222,33 @@ class TestUtils:
         [
             "TURKEY",
             {
-                "RUSSIA": "PRP(XDO((TUR FLT ANK) MTO BLA) AND XDO((RUS AMY SEV) MTO RUM) AND (XDO((ENG AMY LVP) HLD)) AND (ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)) AND (ABC ((RUS AMY WAR) MTO PRU) )  AND (PCE (TUR RUS) ))"
+                "RUSSIA": "PRP(AND (XDO((TUR FLT ANK) MTO BLA)) (XDO((RUS AMY SEV) MTO RUM)) (XDO((ENG AMY LVP) HLD)) (ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)) (PCE (TUR RUS) ))"
             },
             {
                 "valid_proposals": {"RUSSIA": ["F ANK - BLA"]},
                 "invalid_proposals": {},
                 "shared_orders": {"RUSSIA": ["A SEV - RUM"]},
-                "other_orders": {"RUSSIA": ["A LVP H", "ABC ((RUS AMY WAR) MTO PRU)"]},
+                "other_orders": {"RUSSIA": ["A LVP H"]},
                 "alliance_proposals": {
-                    "RUSSIA": [("RUSSIA", "ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)")],
-                    "ENGLAND": [("RUSSIA", "ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)")],
-                    "ITALY": [("RUSSIA", "ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)")],
+                    "RUSSIA": [
+                        ("RUSSIA", "ALY ( ENG ITA RUS TUR ) VSS ( AUS FRA GER )")
+                    ],
+                    "ENGLAND": [
+                        ("RUSSIA", "ALY ( ENG ITA RUS TUR ) VSS ( AUS FRA GER )")
+                    ],
+                    "ITALY": [
+                        ("RUSSIA", "ALY ( ENG ITA RUS TUR ) VSS ( AUS FRA GER )")
+                    ],
                 },
                 "peace_proposals": {
-                    "RUSSIA": [("RUSSIA", "PCE (TUR RUS)")],
+                    "RUSSIA": [("RUSSIA", "PCE ( RUS TUR )")],
                 },
             },
         ],
         [
             "ENGLAND",
             {
-                "FRANCE": "PRP(AND(XDO((ENG AMY LVP) MTO WAL))(XDO((ENG FLT EDI) MTO NTH))(XDO((ENG FLT LON) MTO ENG)))"
+                "FRANCE": "PRP(AND(XDO((ENG AMY LVP) MTO WAL))(XDO((ENG FLT EDI) MTO NTH))(XDO((ENG FLT LON) MTO ECH)))"
             },
             {
                 "valid_proposals": {
@@ -295,83 +307,39 @@ class TestUtils:
                     set(expected[pod_key][key]),
                 )
 
-    def test_parse_FCT(self):
-        # Tests for orders extraction
-        FCT_TCS = [
-            ["FCT (XDO (F BLK - CON))", "XDO (F BLK - CON)"],
-            ["FCT(XDO (F BLK - CON))", "XDO (F BLK - CON)"],
-        ]
-        for tc_ip, tc_op in FCT_TCS:
-            assert parse_FCT(tc_ip) == tc_op, parse_FCT(tc_ip)
-
-    def test_parse_PRP(self):
-        PRP_TCS = [
-            ["PRP (XDO (F BLK - CON))", "XDO (F BLK - CON)"],
-            ["PRP(XDO (F BLK - CON))", "XDO (F BLK - CON)"],
-        ]
-        for tc_ip, tc_op in PRP_TCS:
-            assert parse_PRP(tc_ip) == tc_op, parse_PRP(tc_ip)
-
     PARSE_ARRANGEMENT_TEST_CASES = [
-        ["XDO (F BLK - CON)", ["F BLK - CON"], True],
-        ["XDO (F BLK - CON)", ["F BLK - CON"], True],
-        ["XDO(F BLK - CON)", ["F BLK - CON"], True],
+        ["PRP (XDO ((RUS FLT BLA) MTO CON))", ["XDO ( ( RUS FLT BLA ) MTO CON )"]],
         [
-            "ORR (XDO(F BLK - CON))(XDO(A RUM - BUD))(XDO(F BLK - BUD))",
-            ["F BLK - CON", "A RUM - BUD", "F BLK - BUD"],
-            True,
-        ],
-        [
-            "ORR (XDO (F BLK - CON)) (XDO (A RUM - BUD))",
-            ["F BLK - CON", "A RUM - BUD"],
-            True,
-        ],
-        ["XDO (F BLA - CON)", [("XDO", "F BLA - CON")], False],
-        ["XDO (F BLA - CON)", [("XDO", "F BLA - CON")], False],
-        ["XDO(F BLA - CON)", [("XDO", "F BLA - CON")], False],
-        [
-            "ALY (GER RUS) VSS (FRA ENG ITA TUR AUS)",
-            [("ALY", "ALY (GER RUS) VSS (FRA ENG ITA TUR AUS)")],
-            False,
-        ],
-        [
-            "ORR (XDO(F BLA - CON))(XDO(A RUM - BUD))(XDO(F BLA - BUD))",
-            [("XDO", "F BLA - CON"), ("XDO", "A RUM - BUD"), ("XDO", "F BLA - BUD")],
-            False,
-        ],
-        [
-            "ORR  (XDO (F BLA - CON)) (XDO (A RUM - BUD))",
-            [("XDO", "F BLA - CON"), ("XDO", "A RUM - BUD")],
-            False,
-        ],
-        [
-            "ORR (XDO (F BLA - CON)) (ALY (GER RUS TUR) VSS (FRA ENG ITA AUS))",
+            "PRP (ORR (XDO(( RUS FLT BLA ) MTO CON))(XDO(( RUS AMY RUM ) MTO BUD))(XDO(( RUS FLT BLA ) MTO BUD)))",
             [
-                ("XDO", "F BLA - CON"),
-                ("ALY", "ALY (GER RUS TUR) VSS (FRA ENG ITA AUS)"),
+                "XDO ( ( RUS AMY RUM ) MTO BUD )",
+                "XDO ( ( RUS FLT BLA ) MTO BUD )",
+                "XDO ( ( RUS FLT BLA ) MTO CON )",
             ],
-            False,
         ],
         [
-            "ORR (XDO ((RUS FLT BLA) MTO CON)) (ALY (GER RUS TUR) VSS (FRA ENG ITA AUS)) (ABC (F BLA - CON))",
+            "PRP (ORR (XDO(( RUS FLT BLA ) MTO CON))(XDO(( RUS AMY RUM ) MTO BUD)))",
+            ["XDO ( ( RUS AMY RUM ) MTO BUD )", "XDO ( ( RUS FLT BLA ) MTO CON )"],
+        ],
+        [
+            "PRP(ALY (GER RUS) VSS (FRA ENG ITA TUR AUS))",
+            ["ALY ( GER RUS ) VSS ( AUS ENG FRA ITA TUR )"],
+        ],
+        [
+            "PRP(ORR (XDO (( RUS FLT BLA ) MTO CON)) (ALY (GER RUS TUR) VSS (FRA ENG ITA AUS)))",
             [
-                ("XDO", "(RUS FLT BLA) MTO CON"),
-                ("ALY", "ALY (GER RUS TUR) VSS (FRA ENG ITA AUS)"),
-                ("ABC", "ABC (F BLA - CON)"),
+                "ALY ( GER RUS TUR ) VSS ( AUS ENG FRA ITA )",
+                "XDO ( ( RUS FLT BLA ) MTO CON )",
             ],
-            False,
         ],
     ]
 
-    @pytest.mark.parametrize(
-        "test_input,expected,xdo_only", PARSE_ARRANGEMENT_TEST_CASES
-    )
-    def test_parse_arrangement(
-        self, test_input: str, expected: List[str], xdo_only: bool
-    ):
-        assert (
-            parse_arrangement(test_input, xdo_only=xdo_only) == expected
-        ), parse_arrangement(test_input, xdo_only=xdo_only)
+    @pytest.mark.parametrize("test_input,expected", PARSE_ARRANGEMENT_TEST_CASES)
+    def test_parse_arrangement(self, test_input: str, expected: List[str]):
+        assert parse_arrangement(test_input) == expected, (
+            parse_arrangement(test_input),
+            expected,
+        )
 
     def test_smart_select_support_proposals(self):
         test_input = {

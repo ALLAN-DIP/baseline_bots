@@ -8,13 +8,14 @@ from collections import defaultdict
 import collections.abc
 from copy import deepcopy
 import os
-import re
 from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Set, Tuple
 
-from DAIDE.utils.exceptions import ParseError
+import daidepp
 from daidepp import (
+    ALYVSS,
     AND,
     ORR,
+    PCE,
     AnyDAIDEToken,
     Arrangement,
     create_daide_grammar,
@@ -32,13 +33,13 @@ if TYPE_CHECKING:
 
 
 POWER_NAMES_DICT = {
-    "RUS": "RUSSIA",
     "AUS": "AUSTRIA",
-    "ITA": "ITALY",
     "ENG": "ENGLAND",
     "FRA": "FRANCE",
-    "TUR": "TURKEY",
     "GER": "GERMANY",
+    "ITA": "ITALY",
+    "RUS": "RUSSIA",
+    "TUR": "TURKEY",
 }
 
 MAX_DAIDE_LEVEL = get_args(DAIDELevel)[-1]
@@ -117,8 +118,8 @@ def get_order_tokens(order: str) -> List[str]:
     buffer, order_tokens = [], []
     for word in order.replace(" R ", " - ").split():
         buffer += [word]
-        if word not in ["A", "F", "-"]:
-            order_tokens += [" ".join(buffer)]
+        if word not in {"A", "F", "-"}:
+            order_tokens.append(" ".join(buffer))
             buffer = []
     return order_tokens
 
@@ -131,37 +132,7 @@ def get_other_powers(powers: List[str], game: Game) -> Set[str]:
     return set(game.get_map_power_names()) - set(powers)
 
 
-def YES(string: str) -> str:
-    """Forms YES message"""
-    return f"YES ({string})"
-
-
-def REJ(string: str) -> str:
-    """Forms REJ message"""
-    return f"REJ ({string})"
-
-
-def parse_FCT(msg: str) -> str:
-    """Detaches FCT from main arrangement"""
-    if "FCT" not in msg:
-        raise ParseError("This is not an FCT message")
-    try:
-        return msg[msg.find("(") + 1 : -1]
-    except Exception:
-        raise Exception(f"Can't parse FCT msg {msg}")
-
-
-def parse_PRP(msg: str) -> str:
-    """Detaches PRP from main arrangement"""
-    if "PRP" not in msg:
-        raise ParseError("This is not an PRP message")
-    try:
-        return msg[msg.find("(") + 1 : -1]
-    except Exception:
-        raise Exception(f"Can't parse PRP msg {msg}")
-
-
-def parse_arrangement(msg: str, xdo_only: bool = True) -> List[str]:
+def parse_arrangement(msg: str) -> List[str]:
     """
     Attempts to parse arrangements (may or may not have ORR keyword)
 
@@ -178,129 +149,54 @@ def parse_arrangement(msg: str, xdo_only: bool = True) -> List[str]:
     :param xdo_only: flag indicating if subarrangement type should be included in the return structure
     :return: parsed subarrangements
     """
-    try:
-        if "ORR" in msg:
-            msg = msg[msg.find("(") :]
-        elif "AND" in msg:
-            msg = msg[msg.find("(") :]
-
-        # split the message at )( points
-        parts = []
-        ind = 0
-        while ind < len(msg):
-            next_ind = re.search(r"\)\s*\(", msg[ind:])
-            if next_ind is None:
-                parts.append(msg[ind:].strip())
-                break
-            else:
-                parts.append((msg[ind : ind + next_ind.start() + 1]).strip())
-                ind = ind + next_ind.end() - 1
-
-        def extract_suborder_indices(part: str) -> Tuple[int, int, str]:
-            """
-            Finds the start and end indices of suborder in an XDO message
-            For instance,
-            "XDO (F BLK - CON)" returns (4, 16)
-            "XDO(F BLK - CON)" returns (3, 15)
-            "XDO ((RUS AMY WAR) MTO PRU)" returns (4, 26)
-
-            :param part: part of the message representing an arrangement for 1 unit
-            :return: the actual order after excluding XDO
-            """
-            match_obj = re.search(r"(XDO|ALY|PCE|[A-Z]+)", part)
-            start_in = part.find("(", match_obj.start())
-            suborder_type = match_obj.group()
-            parenthesis_cnt = 0
-            for i in range(start_in, len(part)):
-                if part[i] == "(":
-                    parenthesis_cnt += 1
-                elif part[i] == ")":
-                    parenthesis_cnt -= 1
-                if parenthesis_cnt == 0:
-                    return start_in, i, suborder_type
-            return start_in, -1, suborder_type
-
-        ans = []
-        for part in parts:
-            if (
-                part[0] == "("
-            ):  # If there is a parenthesis in the beginning, just remove the extra set of parenthesis from both ends
-                part = part.strip()[1:-1].strip()
-            start, end, suborder_type = extract_suborder_indices(part)
-            if xdo_only:
-                ans.append(part[start + 1 : end])
-            else:
-                if suborder_type == "XDO":
-                    ans.append((suborder_type, part[start + 1 : end]))
-                else:
-                    ans.append((suborder_type, part))
-        return ans
-
-    except Exception as e:
-        raise ParseError("Can't parse ORR msg")
+    parsed_msg = parse_daide(msg)
+    if isinstance(parsed_msg.arrangement, (daidepp.AND, daidepp.ORR)):
+        daide_style_orders = parsed_msg.arrangement.arrangements
+    else:
+        daide_style_orders = [parsed_msg.arrangement]
+    return [str(o) for o in daide_style_orders]
 
 
-def parse_alliance_proposal(msg: str, recipient: str) -> List[str]:
-    """
-    Parses an alliance proposal
+def parse_alliance_proposal(msg: ALYVSS, recipient: str) -> List[str]:
+    """Parses an alliance proposal
+
     E.g. (assuming the receiving country is RUSSIA)
-    "ALY (GERMANY RUSSIA) VSS (FRANCE ENGLAND ITALY TURKEY AUSTRIA)" -> [GERMANY]
+    "ALY (GER RUS) VSS (AUS ENG FRA ITA TUR)" -> [GERMANY]
+
     :param recipient: the power which has received the alliance proposal
     :return: list of allies in the proposal
     """
+    allies = list(msg.aly_powers)
+
     recipient = recipient[:3]
-    groups = re.findall(r"\(([a-zA-Z\s]*)\)", msg)
-
-    if len(groups) != 2:
-        allies = []
-
-    # get proposed allies
-    allies = groups[0].split(" ")
-
     if recipient not in allies:
         allies = []
         return allies
 
     allies.remove(recipient)
 
-    if allies:
-        return [
-            POWER_NAMES_DICT[ally] if ally in POWER_NAMES_DICT else ally
-            for ally in allies
-        ]
-    else:
-        raise ParseError("A minimum of 2 powers are needed for an alliance")
+    return sorted(POWER_NAMES_DICT[ally] for ally in allies)
 
 
-def parse_peace_proposal(msg: str, recipient: str) -> List[str]:
-    """
-    Parses an peace proposal
+def parse_peace_proposal(msg: PCE, recipient: str) -> List[str]:
+    """Parses a peace proposal
+
     E.g. (assuming the receiving country is RUSSIA)
-    "PCE (GERMANY RUSSIA)" -> [GERMANY]
+    "PCE (GER RUS)" -> [GERMANY]
+
     :param recipient: the power which has received the peace proposal
     :return: list of allies in the proposal
     """
+    peaces = list(msg.powers)
+
     recipient = recipient[:3]
-    groups = re.findall(r"\(([a-zA-Z\s]*)\)", msg)
-
-    if len(groups) != 1:
-        peaces = []
-
-    # get proposed peaces
-    peaces = groups[0].split(" ")
-
     if recipient not in peaces:
         peaces = []
         return peaces
 
     peaces.remove(recipient)
 
-    if peaces:
-        return [
-            POWER_NAMES_DICT[pea] if pea in POWER_NAMES_DICT else pea for pea in peaces
-        ]
-    else:
-        raise ParseError("A minimum of 2 powers are needed for PCE")
+    return sorted(POWER_NAMES_DICT[pea] for pea in peaces)
 
 
 def is_order_aggressive(order: str, sender: str, game: Game) -> bool:
@@ -310,14 +206,13 @@ def is_order_aggressive(order: str, sender: str, game: Game) -> bool:
     NOTE: Adapted directly from Joy's code
     """
     order_token = get_order_tokens(order)
-    if order_token[0][0] == "A" or order_token[0][0] == "F":
+    if order_token[0].startswith("A") or order_token[0].startswith("F"):
         # get location - add order_token[0] ('A' or 'F') at front to check if it collides with other powers' units
         order_unit = order_token[0][0] + order_token[1][1:]
         # check if loc has some units of other powers on
         for power in game.powers:
-            if sender != power:
-                if order_unit in game.powers[power].units:
-                    return True
+            if sender != power and order_unit in game.powers[power].units:
+                return True
     return False
 
 
@@ -378,9 +273,8 @@ class OrdersData:
 
         if overwrite:
             self.orders[province] = order
-        else:
-            if province not in self.orders:
-                self.orders[province] = order
+        elif province not in self.orders:
+            self.orders[province] = order
 
     def add_orders(self, orders: List[str], overwrite: bool = True) -> None:
         """
@@ -428,6 +322,8 @@ def get_state_value(
                     orders = yield bot.brain.get_orders(game, power)
             elif option == "default":
                 orders = yield bot.brain.get_orders(game, power)
+            else:
+                raise ValueError(f"invalid option {option!r}")
 
             game.set_orders(
                 power_name=power,
@@ -492,7 +388,7 @@ def get_best_orders(
         return result
 
     # initialize state value for each proposal
-    state_value = {power: -10000 for power in bot.game.powers}
+    state_value = {power: float("-inf") for power in bot.game.powers}
 
     # get state value for each proposal
     for proposer, unit_orders in proposal_order.items():
