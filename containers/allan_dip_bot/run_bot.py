@@ -33,31 +33,9 @@ BOTS = [
 ]
 
 
-async def launch(
-    hostname: str,
-    port: int,
-    game_id: str,
-    power_name: str,
-    bot_type: str,
-    sleep_delay: bool,
-    discount_factor: float,
-    invasion_coef: float,
-    conflict_coef: float,
-    invasive_support_coef: float,
-    conflict_support_coef: float,
-    friendly_coef: float,
-    unrealized_coef: float,
-    aggressiveness: Optional[Aggressiveness] = Aggressiveness.moderate,
-) -> None:
+async def launch() -> None:
     """
-    Waits for dipnet model to load and then starts the bot execution
-
-    :param hostname: name of host on which games are hosted
-    :param port: port to which the bot should connect on the host
-    :param game_id: game id to connect to on host
-    :param power_name: power name of the bot to be launched
-    :param bot_type: the type of bot to be launched - NoPressDipBot/TransparentBot/SmartOrderAccepterBot/..
-    :param sleep_delay: bool to indicate if bot should sleep randomly for 1-3s before execution
+    Waits for dipnet model to load
     """
 
     print("Waiting for TensorFlow server to come online", end=" ")
@@ -68,23 +46,6 @@ async def launch(
         await asyncio.sleep(1)
     print()
     print("TensorFlow server online")
-
-    await play(
-        hostname,
-        port,
-        game_id,
-        power_name,
-        bot_type,
-        sleep_delay,
-        discount_factor,
-        invasion_coef,
-        conflict_coef,
-        invasive_support_coef,
-        conflict_support_coef,
-        friendly_coef,
-        unrealized_coef,
-        aggressiveness,
-    )
 
 
 async def play(
@@ -113,6 +74,8 @@ async def play(
     :param bot_type: the type of bot to be launched - NoPressDipBot/TransparentBot/SmartOrderAccepterBot/..
     :param sleep_delay: bool to indicate if bot should sleep randomly for 1-3s before execution
     """
+    await launch()
+
     # Connect to the game
     print(f"DipNetSL joining game: {game_id} as {power_name}")
     connection = await connect(hostname, port)
@@ -294,7 +257,7 @@ def main() -> None:
     )
 
     asyncio.run(
-        launch(
+        play(
             hostname=host,
             port=port,
             game_id=game_id,
