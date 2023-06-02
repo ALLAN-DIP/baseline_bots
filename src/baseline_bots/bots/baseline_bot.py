@@ -3,7 +3,7 @@
 
 from abc import ABC, abstractmethod
 import asyncio
-from typing import ClassVar, List
+from typing import ClassVar, List, Sequence
 
 from diplomacy import Game, Message
 from diplomacy.client.network_game import NetworkGame
@@ -129,6 +129,21 @@ class BaselineBot(ABC):
             return
         log_data = self.game.new_log_data(body=log_msg)
         await self.game.send_log_data(log=log_data)
+
+    async def send_orders(self, orders: Sequence[str], wait: bool = False) -> None:
+        """Send orders asynchronously to the server
+
+        :param orders: Orders to be sent
+        """
+        print(f"Sent orders: {orders}")
+
+        # Orders should not be sent in local games, only stored
+        if isinstance(self.game, NetworkGame):
+            await self.game.set_orders(
+                power_name=self.power_name, orders=orders, wait=wait
+            )
+        else:
+            self.game.set_orders(power_name=self.power_name, orders=orders)
 
     @abstractmethod
     def __call__(self) -> List[str]:

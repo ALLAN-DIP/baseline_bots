@@ -141,9 +141,7 @@ async def play(
 
             # If orders are present, send them
             if orders_data is not None:
-                await game.set_orders(
-                    power_name=power_name, orders=orders_data, wait=False
-                )
+                await bot.send_orders(orders_data)
 
             print(f"Phase: {current_phase}")
             print(f"Orders: {orders_data}")
