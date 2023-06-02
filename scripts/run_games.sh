@@ -14,8 +14,8 @@ if [ "${1:-}" = "--help" ]; then
   echo "usage: bash $SCRIPT_NAME [--runner RUNNER] [--game-id GAME_ID] [--agent AGENT] [bot args]" >&2
   echo >&2
   echo 'Arguments must be provided in this order.' >&2
-  echo 'RUNNER must be either "docker" or "singularity".' >&2
-  echo 'It defaults to "singularity" on TACC but "docker" everywhere else.' >&2
+  echo 'RUNNER must be either "apptainer" or "docker".' >&2
+  echo 'It defaults to "apptainer" on TACC but "docker" everywhere else.' >&2
   echo 'If GAME_ID is not provided, then one will be generated automatically.' >&2
   echo 'If AGENT is not provided, then a default will be chosen depending on the runner and host.' >&2
   echo 'Bot args are passed when running the container.' >&2
@@ -26,24 +26,24 @@ if [ -n "${1:-}" ] && [ "--runner" = "$1" ]; then
   RUNNER=$2
   shift 2
 elif [[ $IS_ON_TACC -eq 0 ]]; then
-  RUNNER=singularity
+  RUNNER=apptainer
 else
   RUNNER=docker
 fi
 
-if [[ $RUNNER == singularity ]]; then
-  if ! command -v singularity 1>/dev/null 2>&1; then
-    echo -n "Singularity is not installed." >&2
+if [[ $RUNNER == apptainer ]]; then
+  if ! command -v apptainer 1>/dev/null 2>&1; then
+    echo -n "Apptainer is not installed." >&2
     if [[ $IS_ON_TACC -eq 0 ]]; then
-      echo -n " Run \`module load tacc-singularity\`." >&2
+      echo -n " Run \`module load tacc-apptainer\`." >&2
     fi
     echo >&2
     exit 2
   fi
   # Flags based on following docs:
-  # - https://docs.sylabs.io/guides/3.7/user-guide/cli/singularity_run.html
+  # - https://apptainer.org/docs/user/1.1/cli/apptainer_run.html
   # - https://apptainer.org/docs/user/1.1/docker_and_oci.html#docker-like-compat-flag
-  RUN_CMD='singularity run --cleanenv --ipc --no-home --no-init --no-umask --pid'
+  RUN_CMD='apptainer run --cleanenv --ipc --no-eval --no-home --no-init --no-umask --pid'
 elif [[ $RUNNER == docker ]]; then
   if ! command -v docker 1>/dev/null 2>&1; then
     echo "Docker is not installed." >&2
@@ -66,7 +66,7 @@ if [ -n "${1:-}" ] && [ "--agent" = "$1" ]; then
   AGENT=$2
   shift 2
 else
-  if [[ $RUNNER == singularity ]] && [[ $IS_ON_TACC -eq 0 ]]; then
+  if [[ $RUNNER == apptainer ]] && [[ $IS_ON_TACC -eq 0 ]]; then
     # Automatically find latest version downloaded on TACC
     AGENT=$(
       find /corral/projects/DARPA-SHADE/Milestone_4/UMD/ \
