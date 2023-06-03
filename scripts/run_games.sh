@@ -43,7 +43,7 @@ if [[ $RUNNER == singularity ]]; then
   # Flags based on following docs:
   # - https://docs.sylabs.io/guides/3.7/user-guide/cli/singularity_run.html
   # - https://apptainer.org/docs/user/1.1/docker_and_oci.html#docker-like-compat-flag
-  RUN_CMD='singularity run --cleanenv --no-home --pid --ipc --no-init --no-umask'
+  RUN_CMD='singularity run --cleanenv --ipc --no-home --no-init --no-umask --pid'
 elif [[ $RUNNER == docker ]]; then
   if ! command -v docker 1>/dev/null 2>&1; then
     echo "Docker is not installed." >&2
@@ -108,7 +108,7 @@ fi
 LOG_DIR=logs/"$GAME_ID"
 mkdir -p "$LOG_DIR"
 
-POWERS=(AUSTRIA ENGLAND GERMANY FRANCE ITALY RUSSIA TURKEY)
+POWERS=(AUSTRIA ENGLAND FRANCE GERMANY ITALY RUSSIA TURKEY)
 for POWER in "${POWERS[@]}"; do
   $RUN_CMD "$AGENT" --host $HOST --game_id "$GAME_ID" --power "$POWER" "${OPTS[@]}" "$@" \
     &>"$LOG_DIR"/"$POWER".txt &
