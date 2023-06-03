@@ -252,7 +252,7 @@ class SmartOrderAccepterBot(DipnetBot):
             if orders and self.power_name != proposer:
                 commands = dipnet_to_daide_parsing(orders, self.game)
                 orders = [XDO(command) for command in commands]
-                prp_msg = FCT(optional_ORR(orders))
+                prp_msg = PRP(optional_ORR(orders))
                 if proposer == best_proposer and proposer in self.allies:
                     msg = YES(prp_msg)
                     await self.send_intent_log(
