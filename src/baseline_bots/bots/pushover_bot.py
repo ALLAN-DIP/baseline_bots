@@ -31,7 +31,7 @@ class PushoverDipnet(DipnetBot):
         reply_obj = MessagesData()
 
         orders = yield self.brain.get_orders(self.game, self.power_name)
-        self.orders.add_orders(orders, overwrite=True)
+        self.orders.add_orders(orders)
 
         if len(rcvd_messages) == 0:
             return reply_obj
@@ -51,7 +51,7 @@ class PushoverDipnet(DipnetBot):
             parse_arrangement(last_message.message), self.power_name, self.game
         )
         # set the orders
-        self.orders.add_orders(orders, overwrite=True)
+        self.orders.add_orders(orders)
 
         # set message to say YES
         parsed_message = parse_daide(last_message.message)

@@ -260,28 +260,25 @@ class OrdersData:
     def __init__(self):
         self.orders = defaultdict(str)
 
-    def add_order(self, order: str, overwrite: bool = True) -> None:
+    def add_order(self, order: str) -> None:
         """
         Adds single order
 
-        :param overwrite: whether or not to overwrite an order
+        :param order: order to add
         """
 
         province = get_province_from_order(order)
 
-        if overwrite:
-            self.orders[province] = order
-        elif province not in self.orders:
-            self.orders[province] = order
+        self.orders[province] = order
 
-    def add_orders(self, orders: List[str], overwrite: bool = True) -> None:
+    def add_orders(self, orders: List[str]) -> None:
         """
         Adds multiple orders
 
-        :param overwrite: whether or not to overwrite orders
+        :param orders: orders to add
         """
         for order in orders:
-            self.add_order(order, overwrite)
+            self.add_order(order)
 
     def get_list_of_orders(self) -> List[str]:
         return list(self.orders.values())

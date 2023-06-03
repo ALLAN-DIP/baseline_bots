@@ -759,7 +759,7 @@ class SmartOrderAccepterBot(DipnetBot):
 
         # add orders
 
-        orders_data.add_orders(best_orders, overwrite=True)
+        orders_data.add_orders(best_orders)
         self.orders = orders_data
 
         # Intent message and filter aggressive moves to allies are disabled in S1901M
