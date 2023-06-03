@@ -4,7 +4,7 @@ from daidepp import FCT, XDO
 from diplomacy import Game, Message
 from tornado import gen
 
-from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
+from baseline_bots.bots.dipnet_bot import DipnetBot
 from baseline_bots.parsing_utils import daide_to_dipnet_parsing, dipnet_to_daide_parsing
 from baseline_bots.utils import (
     MessagesData,

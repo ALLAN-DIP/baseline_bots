@@ -29,7 +29,7 @@ from tornado import gen
 from typing_extensions import get_args
 
 if TYPE_CHECKING:
-    from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
+    from baseline_bots.bots.dipnet_bot import DipnetBot
 
 
 POWER_NAMES_DICT = {

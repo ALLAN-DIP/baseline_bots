@@ -25,7 +25,7 @@ from diplomacy.client.network_game import NetworkGame
 from stance_vector import ActionBasedStance, ScoreBasedStance
 from tornado import gen
 
-from baseline_bots.bots.dipnet.dipnet_bot import DipnetBot
+from baseline_bots.bots.dipnet_bot import DipnetBot
 from baseline_bots.parsing_utils import (
     daide_to_dipnet_parsing,
     dipnet_to_daide_parsing,
@@ -188,14 +188,6 @@ class SmartOrderAccepterBot(DipnetBot):
         self.foes = []
         self.neutral = []
 
-    async def send_intent_log(self, log_msg: str) -> None:
-        print(f"Intent log: {log_msg!r}")
-        # Intent logging should not be sent in local games
-        if not isinstance(self.game, NetworkGame):
-            return
-        log_data = self.game.new_log_data(body=log_msg)
-        await self.game.send_log_data(log=log_data)
-
     async def log_stance_change(self, stance_log) -> None:
         for pw in self.opponents:
             await self.send_intent_log(stance_log[self.power_name][pw])
@@ -260,7 +252,7 @@ class SmartOrderAccepterBot(DipnetBot):
             if orders and self.power_name != proposer:
                 commands = dipnet_to_daide_parsing(orders, self.game)
                 orders = [XDO(command) for command in commands]
-                prp_msg = FCT(optional_ORR(orders))
+                prp_msg = PRP(optional_ORR(orders))
                 if proposer == best_proposer and proposer in self.allies:
                     msg = YES(prp_msg)
                     await self.send_intent_log(
@@ -731,6 +723,131 @@ class SmartOrderAccepterBot(DipnetBot):
         self.orders = orders_data
 
     @gen.coroutine
+    def do_messaging_round(
+        self,
+        orders_data: OrdersData,
+        power_stance: Dict[str, float],
+        msgs_data: MessagesData,
+    ) -> OrdersData:
+        """Run a single round of messaging."""
+        orders = orders_data.get_list_of_orders()
+
+        rcvd_messages = self.read_messages()
+
+        # parse the proposal messages received by the bot
+        parsed_messages_dict = parse_proposal_messages(
+            rcvd_messages, self.game, self.power_name
+        )
+        valid_proposal_orders = parsed_messages_dict["valid_proposals"]
+        invalid_proposal_orders = parsed_messages_dict["invalid_proposals"]
+        shared_orders = parsed_messages_dict["shared_orders"]
+        other_orders = parsed_messages_dict["other_orders"]
+        self.alliances_prps = parsed_messages_dict["alliance_proposals"]
+        self.peace_prps = parsed_messages_dict["peace_proposals"]
+
+        # include base order to prp_orders.
+        # This is to avoid having double calculation for the best list of orders between (self-generated) base orders vs proposal orders
+        # e.g. if we are playing as ENG and the base orders are generated from DipNet, we would want to consider
+        # if there is any better proposal orders that has a state value more than ours, then do it. If not, just follow the base orders.
+        valid_proposal_orders[self.power_name] = orders
+
+        self.update_allies_and_foes()
+
+        best_proposer, best_orders = yield from get_best_orders(
+            self, valid_proposal_orders, shared_orders
+        )
+
+        # add orders
+
+        orders_data.add_orders(best_orders, overwrite=True)
+        self.orders = orders_data
+
+        # Intent message and filter aggressive moves to allies are disabled in S1901M
+        if self.game.get_current_phase() != "S1901M":
+
+            def gen_relation_msg(powers: Sequence[str]) -> str:
+                if powers:
+                    return ", ".join(
+                        f"{pow} ({float(power_stance[pow]):0.2})" for pow in powers
+                    )
+                else:
+                    return "no one"
+
+            msg_allies = gen_relation_msg(self.allies)
+            msg_foes = gen_relation_msg(self.foes)
+            msg_neutral = gen_relation_msg(self.neutral)
+            stance_message = (
+                f"From my stance vector perspective, I see {msg_allies} as my allies, "
+                f"{msg_foes} as my foes and I am indifferent towards {msg_neutral}"
+            )
+            yield self.send_intent_log(stance_message)
+
+            # filter out aggressive orders to allies
+            if int(self.game.get_current_phase()[1:5]) < 1909:
+                yield self.replace_aggressive_order_to_allies()
+        # Refresh local copy of orders to include replacements
+        orders_data = self.orders
+
+        # generate messages for FCT sharing info orders
+        msgs_data = yield self.gen_messages(orders_data.get_list_of_orders(), msgs_data)
+
+        # send ALY requests at the start of the game
+        if self.game.phase == "SPRING 1901 MOVEMENT":
+            for pow in self.opponents:
+                aly = [self.power_name[:3], pow[:3]]
+                vss = [country[:3] for country in self.opponents if country != pow]
+                aly_msg = PRP(ALYVSS(aly_powers=aly, vss_powers=vss))
+                yield self.send_message(pow, str(aly_msg), msgs_data)
+            yield self.send_intent_log(
+                f"Proposing alliances with {', '.join(self.opponents)}"
+            )
+
+        yield self.respond_to_invalid_orders(invalid_proposal_orders, msgs_data)
+
+        # respond to to alliance message and update stance & allies
+        yield self.respond_to_alliance_messages(msgs_data)
+
+        # respond to to peace message and update stance & allies
+        yield self.respond_to_peace_messages(msgs_data)
+
+        # generate proposal response YES/NO to allies
+        msgs_data = yield self.gen_proposal_reply(
+            best_proposer, valid_proposal_orders, msgs_data
+        )
+
+        dipnet_ords = list(self.orders.orders.values())
+        yield self.send_intent_log(f"Using orders {dipnet_ords}")
+
+        # randomize dipnet orders and send random orders to enemies
+        try:
+            daide_style_orders = dipnet_to_daide_parsing(dipnet_ords, self.game)
+            randomized_orders = random_list_orders(daide_style_orders)
+            daide_orders = [XDO(order) for order in randomized_orders]
+            daide_orders = FCT(optional_ORR(daide_orders))
+            if self.foes:
+                yield self.send_intent_log(
+                    f"Sending untruthful orders to foe(s)/victim(s) {', '.join(self.foes)}: {daide_orders}"
+                )
+            for foe in self.foes:
+                # Only send one FCT per recipient per phase
+                if any(
+                    msg["recipient"] == foe and msg["message"].startswith("FCT")
+                    for msg in msgs_data
+                ):
+                    continue
+                yield self.send_message(foe, str(daide_orders), msgs_data)
+
+        except Exception as e:
+            print("Raised Exception in order randomization code block")
+            print(e)
+            print("Catching the error and resuming operations")
+
+        # generate support proposals to allies
+        yield self.generate_support_proposals(msgs_data)
+
+        return orders_data
+
+    @gen.coroutine
     def __call__(self) -> List[str]:
         # compute pos/neg stance on other bots using Tony's stance vector
 
@@ -759,131 +876,22 @@ class SmartOrderAccepterBot(DipnetBot):
         orders_data.add_orders(orders)
         yield self.send_intent_log(f"Initial orders (before communication): {orders}")
 
+        # Skip communications unless in the movement phase
+        if not self.game.get_current_phase().endswith("M"):
+            return orders_data.get_list_of_orders()
+
+        yield self.wait_for_comm_stage()
+
         msgs_data = MessagesData()
 
         for _ in range(self.num_message_rounds):
-            # only in movement phase, we send PRP/ALY/FCT and consider get_best_proposer
-            if not self.game.get_current_phase().endswith("M"):
-                break
-
             # sleep for a random amount of time before retrieving new messages for the power
             yield asyncio.sleep(
                 random.uniform(self.min_sleep_time, self.max_sleep_time)
             )
 
-            rcvd_messages = self.read_messages()
-
-            # parse the proposal messages received by the bot
-            parsed_messages_dict = parse_proposal_messages(
-                rcvd_messages, self.game, self.power_name
+            orders_data = yield from self.do_messaging_round(
+                orders_data, power_stance, msgs_data
             )
-            valid_proposal_orders = parsed_messages_dict["valid_proposals"]
-            invalid_proposal_orders = parsed_messages_dict["invalid_proposals"]
-            shared_orders = parsed_messages_dict["shared_orders"]
-            other_orders = parsed_messages_dict["other_orders"]
-            self.alliances_prps = parsed_messages_dict["alliance_proposals"]
-            self.peace_prps = parsed_messages_dict["peace_proposals"]
-
-            # include base order to prp_orders.
-            # This is to avoid having double calculation for the best list of orders between (self-generated) base orders vs proposal orders
-            # e.g. if we are playing as ENG and the base orders are generated from DipNet, we would want to consider
-            # if there is any better proposal orders that has a state value more than ours, then do it. If not, just follow the base orders.
-            valid_proposal_orders[self.power_name] = orders
-
-            self.update_allies_and_foes()
-
-            best_proposer, best_orders = yield from get_best_orders(
-                self, valid_proposal_orders, shared_orders
-            )
-
-            # add orders
-
-            orders_data.add_orders(best_orders, overwrite=True)
-            self.orders = orders_data
-
-            # Intent message and filter aggressive moves to allies are disabled in S1901M
-            if self.game.get_current_phase() != "S1901M":
-
-                def gen_relation_msg(powers: Sequence[str]) -> str:
-                    if powers:
-                        return ", ".join(
-                            f"{pow} ({float(power_stance[pow]):0.2})" for pow in powers
-                        )
-                    else:
-                        return "no one"
-
-                msg_allies = gen_relation_msg(self.allies)
-                msg_foes = gen_relation_msg(self.foes)
-                msg_neutral = gen_relation_msg(self.neutral)
-                stance_message = (
-                    f"From my stance vector perspective, I see {msg_allies} as my allies, "
-                    f"{msg_foes} as my foes and I am indifferent towards {msg_neutral}"
-                )
-                yield self.send_intent_log(stance_message)
-
-                # filter out aggressive orders to allies
-                if int(self.game.get_current_phase()[1:5]) < 1909:
-                    yield self.replace_aggressive_order_to_allies()
-            # Refresh local copy of orders to include replacements
-            orders_data = self.orders
-
-            # generate messages for FCT sharing info orders
-            msgs_data = yield self.gen_messages(
-                orders_data.get_list_of_orders(), msgs_data
-            )
-
-            # send ALY requests at the start of the game
-            if self.game.phase == "SPRING 1901 MOVEMENT":
-                for pow in self.opponents:
-                    aly = [self.power_name[:3], pow[:3]]
-                    vss = [country[:3] for country in self.opponents if country != pow]
-                    aly_msg = PRP(ALYVSS(aly_powers=aly, vss_powers=vss))
-                    yield self.send_message(pow, str(aly_msg), msgs_data)
-                yield self.send_intent_log(
-                    f"Proposing alliances with {', '.join(self.opponents)}"
-                )
-
-            yield self.respond_to_invalid_orders(invalid_proposal_orders, msgs_data)
-
-            # respond to to alliance message and update stance & allies
-            yield self.respond_to_alliance_messages(msgs_data)
-
-            # respond to to peace message and update stance & allies
-            yield self.respond_to_peace_messages(msgs_data)
-
-            # generate proposal response YES/NO to allies
-            msgs_data = yield self.gen_proposal_reply(
-                best_proposer, valid_proposal_orders, msgs_data
-            )
-
-            dipnet_ords = list(self.orders.orders.values())
-            yield self.send_intent_log(f"Using orders {dipnet_ords}")
-
-            # randomize dipnet orders and send random orders to enemies
-            try:
-                daide_style_orders = dipnet_to_daide_parsing(dipnet_ords, self.game)
-                randomized_orders = random_list_orders(daide_style_orders)
-                daide_orders = [XDO(order) for order in randomized_orders]
-                daide_orders = FCT(optional_ORR(daide_orders))
-                if self.foes:
-                    yield self.send_intent_log(
-                        f"Sending untruthful orders to foe(s)/victim(s) {', '.join(self.foes)}: {daide_orders}"
-                    )
-                for foe in self.foes:
-                    # Only send one FCT per recipient per phase
-                    if any(
-                        msg["recipient"] == foe and msg["message"].startswith("FCT")
-                        for msg in msgs_data
-                    ):
-                        continue
-                    yield self.send_message(foe, str(daide_orders), msgs_data)
-
-            except Exception as e:
-                print("Raised Exception in order randomization code block")
-                print(e)
-                print("Catching the error and resuming operations")
-
-            # generate support proposals to allies
-            yield self.generate_support_proposals(msgs_data)
 
         return orders_data.get_list_of_orders()

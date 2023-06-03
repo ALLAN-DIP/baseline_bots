@@ -4,7 +4,7 @@ from daidepp import FCT, ORR, XDO
 from diplomacy import Game, Message
 from tornado import gen
 
-from baseline_bots.bots.dipnet.transparent_bot import TransparentBot
+from baseline_bots.bots.transparent_bot import TransparentBot
 from baseline_bots.utils import (
     MessagesData,
     is_order_aggressive,

@@ -2,10 +2,12 @@
 
 
 from abc import ABC, abstractmethod
-from typing import List
+import asyncio
+from typing import ClassVar, List, Sequence
 
 from diplomacy import Game, Message
 from diplomacy.client.network_game import NetworkGame
+from diplomacy.utils import strings
 
 from baseline_bots.utils import MessagesData, OrdersData, is_valid_daide_message
 
@@ -13,6 +15,7 @@ from baseline_bots.utils import MessagesData, OrdersData, is_valid_daide_message
 class BaselineBot(ABC):
     """Abstract Base Class for baselines bots"""
 
+    player_type: ClassVar[str] = strings.PRESS_BOT
     power_name: str
     game: Game
 
@@ -24,6 +27,29 @@ class BaselineBot(ABC):
     def display_name(self) -> str:
         """Display name consisting of power name and bot type."""
         return f"{self.power_name} ({self.__class__.__name__})"
+
+    async def wait_for_comm_stage(self) -> None:
+        """Wait for all other press bots to be ready.
+
+        The bot marks itself as ready and then polls the other press bots until they are all ready.
+        Once they all, the bot can start communicating.
+        """
+        # Comm status should not be sent in local games, only set
+        if isinstance(self.game, NetworkGame):
+            await self.game.set_comm_status(
+                power_name=self.power_name, comm_status=strings.READY
+            )
+        else:
+            self.game.set_comm_status(
+                power_name=self.power_name, comm_status=strings.READY
+            )
+
+        while not all(
+            power.comm_status == strings.READY
+            for power in self.game.powers.values()
+            if power.player_type == strings.PRESS_BOT
+        ):
+            await asyncio.sleep(1)
 
     def read_messages(self) -> List[Message]:
         """Retrieves all valid messages for the current phase sent to the bot.
@@ -91,6 +117,33 @@ class BaselineBot(ABC):
             # A new `MessagesData` instance is used because we don't want
             # to add duplicate messages to the passed-in instance
             await self.send_message(msg["recipient"], msg["message"], MessagesData())
+
+    async def send_intent_log(self, log_msg: str) -> None:
+        """Send intent log asynchronously to the server
+
+        :param log_msg: Log message to be sent
+        """
+        print(f"Intent log: {log_msg!r}")
+        # Intent logging should not be sent in local games
+        if not isinstance(self.game, NetworkGame):
+            return
+        log_data = self.game.new_log_data(body=log_msg)
+        await self.game.send_log_data(log=log_data)
+
+    async def send_orders(self, orders: Sequence[str], wait: bool = False) -> None:
+        """Send orders asynchronously to the server
+
+        :param orders: Orders to be sent
+        """
+        print(f"Sent orders: {orders}")
+
+        # Orders should not be sent in local games, only stored
+        if isinstance(self.game, NetworkGame):
+            await self.game.set_orders(
+                power_name=self.power_name, orders=orders, wait=wait
+            )
+        else:
+            self.game.set_orders(power_name=self.power_name, orders=orders)
 
     @abstractmethod
     def __call__(self) -> List[str]:
