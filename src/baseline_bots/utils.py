@@ -8,7 +8,7 @@ from collections import defaultdict
 import collections.abc
 from copy import deepcopy
 import os
-from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Set, Tuple
+from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Sequence, Set, Tuple
 
 import daidepp
 from daidepp import (
@@ -257,8 +257,8 @@ class MessagesData(collections.abc.Collection):
 
 
 class OrdersData:
-    def __init__(self):
-        self.orders = defaultdict(str)
+    def __init__(self) -> None:
+        self.orders: Dict[str, str] = defaultdict(str)
 
     def add_order(self, order: str) -> None:
         """
@@ -266,12 +266,10 @@ class OrdersData:
 
         :param order: order to add
         """
-
         province = get_province_from_order(order)
-
         self.orders[province] = order
 
-    def add_orders(self, orders: List[str]) -> None:
+    def add_orders(self, orders: Sequence[str]) -> None:
         """
         Adds multiple orders
 
@@ -280,11 +278,21 @@ class OrdersData:
         for order in orders:
             self.add_order(order)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         return iter(sorted(self.orders.values()))
 
-    def empty(self) -> bool:
-        return len(self.orders) > 0
+    def __len__(self) -> int:
+        return len(self.orders)
+
+    def __bool__(self) -> bool:
+        return bool(self.orders)
+
+    def __repr__(self) -> str:
+        contents = dict(sorted(self.orders.items()))
+        return f"{self.__class__.__name__}({contents})"
+
+    def __str__(self) -> str:
+        return str(list(self))
 
 
 @gen.coroutine
