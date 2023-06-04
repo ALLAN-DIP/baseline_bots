@@ -164,7 +164,7 @@ def dipnet_to_daide_parsing(
                 and dipnet_order_tokens[2] not in unit_game_mapping
             ):
                 raise ValueError(
-                    f"Target unit {dipnet_order_tokens[0]!r} does not have a corresponding power"
+                    f"Target unit {dipnet_order_tokens[2]!r} does not have a corresponding power"
                 )
 
             # Daidefy and add source unit as it is
