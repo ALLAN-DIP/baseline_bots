@@ -134,6 +134,7 @@ async def play(
             await asyncio.sleep(random.uniform(2, 5))
 
         phase_start_time = time.time()
+        print(f"Starting phase: {current_phase}")
 
         if not game.powers[bot.power_name].is_eliminated():
             # Fetch orders from bot
@@ -141,9 +142,6 @@ async def play(
 
             # Always send orders so engine knows turn is over
             await bot.send_orders(orders_data)
-
-            print(f"Phase: {current_phase}")
-            print(f"Orders: {orders_data}")
 
         phase_end_time = time.time()
         print(
@@ -154,7 +152,7 @@ async def play(
             await asyncio.sleep(2)
 
     t2 = time.perf_counter()
-    print(f"TIMING: {t2-t1:0.4}")
+    print(f"Time taken for game: {t2-t1:0.4}")
     print("-" * 30 + "GAME COMPLETE" + "-" * 30)
 
 
