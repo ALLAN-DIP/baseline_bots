@@ -18,7 +18,9 @@ from daidepp import (
     PCE,
     AnyDAIDEToken,
     Arrangement,
+    DAIDEGrammar,
     create_daide_grammar,
+    create_grammar_from_press_keywords,
     daide_visitor,
 )
 from daidepp.grammar.grammar import MAX_DAIDE_LEVEL
@@ -42,16 +44,23 @@ POWER_NAMES_DICT = {
 }
 
 MESSAGE_GRAMMAR = create_daide_grammar(level=MAX_DAIDE_LEVEL, string_type="message")
+# Grammar for limited DAIDE subset used in communications protocol
+LIMITED_MESSAGE_GRAMMAR = create_grammar_from_press_keywords(
+    ["ALY_VSS", "AND", "DMZ", "HUH", "NAR", "PCE", "PRP", "REJ", "XDO", "YES"]
+)
 ALL_GRAMMAR = create_daide_grammar(level=MAX_DAIDE_LEVEL, string_type="all")
 
 
-def is_valid_daide_message(string: str) -> bool:
+def is_valid_daide_message(string: str, grammar: Optional[DAIDEGrammar] = None) -> bool:
     """Determines whether a string is a valid DAIDE message.
     :param string: String to check for valid DAIDE.
+    :param grammar: DAIDE grammar to use. Defaults to complete message grammar.
     :return: Whether the string is valid DAIDE or not.
     """
+    if grammar is None:
+        grammar = MESSAGE_GRAMMAR
     try:
-        parse_tree = MESSAGE_GRAMMAR.parse(string)
+        parse_tree = grammar.parse(string)
         daide_visitor.visit(parse_tree)
     except Exception:
         return False
