@@ -139,9 +139,8 @@ async def play(
             # Fetch orders from bot
             orders_data = await bot()
 
-            # If orders are present, send them
-            if orders_data is not None:
-                await bot.send_orders(orders_data)
+            # Always send orders so engine knows turn is over
+            await bot.send_orders(orders_data)
 
             print(f"Phase: {current_phase}")
             print(f"Orders: {orders_data}")
