@@ -38,7 +38,7 @@ from baseline_bots.utils import (
     get_best_orders,
     get_order_tokens,
     neighboring_opps,
-    optional_ORR,
+    optional_AND,
     parse_daide,
     smart_select_support_proposals,
 )
@@ -212,7 +212,7 @@ class SmartOrderAccepterBot(DipnetBot):
             orders = [XDO(command) for command in commands]
             if not orders:
                 return
-            orders_decided = FCT(optional_ORR(orders))
+            orders_decided = FCT(optional_AND(orders))
             for pow in self.allies:
                 # Only send one FCT per recipient per phase
                 if any(
@@ -242,7 +242,7 @@ class SmartOrderAccepterBot(DipnetBot):
             if orders and self.power_name != proposer:
                 commands = dipnet_to_daide_parsing(orders, self.game)
                 orders = [XDO(command) for command in commands]
-                prp_msg = PRP(optional_ORR(orders))
+                prp_msg = PRP(optional_AND(orders))
                 if proposer == best_proposer and proposer in self.allies:
                     msg = YES(prp_msg)
                     await self.send_intent_log(
@@ -278,7 +278,7 @@ class SmartOrderAccepterBot(DipnetBot):
                 unit_power_tuples_included=True,
             )
             orders = [XDO(command) for command in commands]
-            message = HUH(PRP(optional_ORR(orders)))
+            message = HUH(PRP(optional_AND(orders)))
             await self.send_message(sender, str(message), messages_data)
         await self.send_intent_log(
             f"Notifying {', '.join(sorted(invalid_proposal_orders))} that we cannot understand at least one of their messages"
@@ -583,7 +583,7 @@ class SmartOrderAccepterBot(DipnetBot):
                     unit_power_tuples_included=False,
                 )
                 orders = [XDO(command) for command in commands]
-                suggested_proposals = PRP(optional_ORR(orders))
+                suggested_proposals = PRP(optional_AND(orders))
                 final_messages[recipient] = str(suggested_proposals)
                 await self.send_message(recipient, str(suggested_proposals), comms_obj)
                 await self.send_intent_log(
@@ -726,7 +726,7 @@ class SmartOrderAccepterBot(DipnetBot):
             daide_style_orders = dipnet_to_daide_parsing(dipnet_ords, self.game)
             randomized_orders = random_list_orders(daide_style_orders)
             daide_orders = [XDO(order) for order in randomized_orders]
-            daide_orders = FCT(optional_ORR(daide_orders))
+            daide_orders = FCT(optional_AND(daide_orders))
             if self.foes:
                 await self.send_intent_log(
                     f"Sending untruthful orders to foe(s)/victim(s) {', '.join(self.foes)}: {daide_orders}"
