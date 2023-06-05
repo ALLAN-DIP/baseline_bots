@@ -21,7 +21,6 @@ from daidepp import (
     MoveByCVY,
 )
 from diplomacy import Game
-from diplomacy.client.network_game import NetworkGame
 from stance_vector import ActionBasedStance, ScoreBasedStance
 
 from baseline_bots.bots.dipnet_bot import DipnetBot
@@ -38,7 +37,6 @@ from baseline_bots.utils import (
     OrdersData,
     get_best_orders,
     get_order_tokens,
-    is_valid_daide_message,
     optional_ORR,
     parse_daide,
     smart_select_support_proposals,

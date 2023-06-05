@@ -8,11 +8,9 @@ from typing import Dict, List, Mapping, Tuple, Union
 
 from daidepp import (
     ALYVSS,
-    AND,
     CVY,
     HLD,
     MTO,
-    ORR,
     PCE,
     PRP,
     SUP,

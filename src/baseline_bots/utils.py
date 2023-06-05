@@ -25,7 +25,7 @@ from daidepp import (
     daide_visitor,
 )
 from daidepp.grammar.grammar import MAX_DAIDE_LEVEL
-from diplomacy import Game, Message
+from diplomacy import Game
 from diplomacy.utils import strings
 import numpy as np
 
