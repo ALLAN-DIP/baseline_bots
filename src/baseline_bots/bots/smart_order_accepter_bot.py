@@ -241,7 +241,7 @@ class SmartOrderAccepterBot(DipnetBot):
         self, best_proposer: str, prp_orders: dict, messages: MessagesData
     ) -> MessagesData:
         """
-        Reply back to allies regarding their proposals whether we follow or not follow
+        Reply to allies regarding their proposals whether we follow or not follow
 
         :param best_proposer: the name of the best proposer as determined by the bot in utils.get_best_orders
         :param prp_orders: dictionary of proposed orders
@@ -391,7 +391,7 @@ class SmartOrderAccepterBot(DipnetBot):
         Determine if selected support order for neighbour corresponds to a self order selected
 
         :param support_order: the support order to be determined for correspondence with self orders
-        :return: boolean indicating the above mentioned detail
+        :return: boolean indicating the detail mentioned above
         """
         order_tokens = get_order_tokens(support_order)
 
@@ -807,7 +807,7 @@ class SmartOrderAccepterBot(DipnetBot):
         # respond to to alliance message and update stance & allies
         yield self.respond_to_alliance_messages(msgs_data)
 
-        # respond to to peace message and update stance & allies
+        # respond to peace message and update stance & allies
         yield self.respond_to_peace_messages(msgs_data)
 
         # generate proposal response YES/NO to allies

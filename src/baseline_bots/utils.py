@@ -216,7 +216,7 @@ def is_order_aggressive(order: str, sender: str, game: Game) -> bool:
 
 def get_non_aggressive_orders(orders: List[str], sender: str, game: Game) -> List[str]:
     """
-    :return: all non aggressive orders in orders
+    :return: all non-aggressive orders in orders
     """
     return [order for order in orders if not is_order_aggressive(order, sender, game)]
 

@@ -174,7 +174,7 @@ def orders_correspondence(orders: List) -> List:
     :return: The list of all sets (as tuples) of corresponding orders.
     :rtype: List[Tuple]
     """
-    correspondences = []  # a list of tuples represing all correspondences
+    correspondences = []  # a list of tuples representing all correspondences
     for i, order in enumerate(orders):
         if order[1] == "SUP":
             if len(order) > 3:  # if it is supporting a move
