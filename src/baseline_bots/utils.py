@@ -27,7 +27,6 @@ from daidepp.grammar.grammar import MAX_DAIDE_LEVEL
 from diplomacy import Game, Message
 from diplomacy.utils import strings
 import numpy as np
-from tornado import gen
 
 if TYPE_CHECKING:
     from baseline_bots.bots.dipnet_bot import DipnetBot
@@ -304,8 +303,7 @@ class OrdersData:
         return str(list(self))
 
 
-@gen.coroutine
-def get_state_value(
+async def get_state_value(
     bot: "DipnetBot", game: Game, power_name: Optional[str], option: str = "default"
 ) -> int:
     # rollout the game --- orders in rollout are from dipnet
@@ -319,7 +317,7 @@ def get_state_value(
             movement_phase += 1
         for power in game.map.powers:
             if option == "samplingbeam":
-                list_order, prob_order = yield bot.brain.get_beam_orders(game, power)
+                list_order, prob_order = await bot.brain.get_beam_orders(game, power)
 
                 if len(list_order) > 0:
                     prob_order = np.array(prob_order)
@@ -328,9 +326,9 @@ def get_state_value(
                     select_index = np.random.choice(orders_index, p=prob_order)
                     orders = list_order[select_index]
                 else:
-                    orders = yield bot.brain.get_orders(game, power)
+                    orders = await bot.brain.get_orders(game, power)
             elif option == "default":
-                orders = yield bot.brain.get_orders(game, power)
+                orders = await bot.brain.get_orders(game, power)
             else:
                 raise ValueError(f"invalid option {option!r}")
 
@@ -348,8 +346,7 @@ def get_state_value(
     )
 
 
-@gen.coroutine
-def get_best_orders(
+async def get_best_orders(
     bot: "DipnetBot",
     proposal_order: Dict[str, List[str]],
     shared_order: Dict[str, List[str]],
@@ -422,7 +419,7 @@ def get_best_orders(
                 if other_power in shared_order:
                     power_orders = shared_order[other_power]
                 else:
-                    power_orders = yield bot.brain.get_orders(
+                    power_orders = await bot.brain.get_orders(
                         simulated_game, other_power
                     )
                 simulated_game.set_orders(power_name=other_power, orders=power_orders)
@@ -431,7 +428,7 @@ def get_best_orders(
             simulated_game.process()
 
             # rollout and get state value
-            state_value[proposer] = yield get_state_value(
+            state_value[proposer] = await get_state_value(
                 bot, simulated_game, bot.power_name
             )
 

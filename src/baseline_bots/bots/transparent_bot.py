@@ -2,7 +2,6 @@ from typing import List, Set
 
 from daidepp import FCT, XDO
 from diplomacy import Game, Message
-from tornado import gen
 
 from baseline_bots.bots.dipnet_bot import DipnetBot
 from baseline_bots.parsing_utils import daide_to_dipnet_parsing, dipnet_to_daide_parsing
@@ -46,7 +45,6 @@ class TransparentBot(DipnetBot):
             parsed_orders += parse_arrangement(str(parsed_message.arrangement_qry_not))
         return parsed_orders
 
-    @gen.coroutine
     def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
         self.my_orders_informed = False
         comms_obj = MessagesData()
@@ -79,10 +77,9 @@ class TransparentBot(DipnetBot):
 
         return comms_obj
 
-    @gen.coroutine
-    def __call__(self) -> List[str]:
-        self.orders = yield self.gen_orders()
+    async def __call__(self) -> List[str]:
+        self.orders = await self.gen_orders()
         rcvd_messages = self.read_messages()
-        messages = yield from self.gen_messages(rcvd_messages)
-        yield self.send_messages(messages)
+        messages = self.gen_messages(rcvd_messages)
+        await self.send_messages(messages)
         return self.orders

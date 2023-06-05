@@ -2,7 +2,6 @@ from typing import List
 
 from daidepp import FCT, ORR, XDO
 from diplomacy import Game, Message
-from tornado import gen
 
 from baseline_bots.bots.transparent_bot import TransparentBot
 from baseline_bots.utils import (
@@ -22,11 +21,10 @@ class SelectivelyTransparentBot(TransparentBot):
     def __init__(self, power_name: str, game: Game, total_msg_rounds: int = 3):
         super().__init__(power_name, game, total_msg_rounds)
 
-    @gen.coroutine
     def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
         """send out non-aggressive orders that is bot is taking"""
         # call super then find non-aggressive orders
-        messages = yield super().gen_messages(rcvd_messages)
+        messages = super().gen_messages(rcvd_messages)
         for message in messages:
             parsed_message = parse_daide(message["message"])
             if isinstance(parsed_message, FCT):
