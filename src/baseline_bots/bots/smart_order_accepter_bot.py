@@ -703,7 +703,7 @@ class SmartOrderAccepterBot(DipnetBot):
         """
         if not self.allies:
             return
-        dipnet_orders = self.orders.get_list_of_orders()
+        dipnet_orders = list(self.orders)
         daide_orders = dipnet_to_daide_parsing(dipnet_orders, self.game)
         final_orders = []
         for order in daide_orders:
@@ -730,7 +730,7 @@ class SmartOrderAccepterBot(DipnetBot):
         msgs_data: MessagesData,
     ) -> OrdersData:
         """Run a single round of messaging."""
-        orders = orders_data.get_list_of_orders()
+        orders = list(orders_data)
 
         rcvd_messages = self.read_messages()
 
@@ -789,7 +789,7 @@ class SmartOrderAccepterBot(DipnetBot):
         orders_data = self.orders
 
         # generate messages for FCT sharing info orders
-        msgs_data = yield self.gen_messages(orders_data.get_list_of_orders(), msgs_data)
+        msgs_data = yield self.gen_messages(list(orders_data), msgs_data)
 
         # send ALY requests at the start of the game
         if self.game.phase == "SPRING 1901 MOVEMENT":
@@ -815,7 +815,7 @@ class SmartOrderAccepterBot(DipnetBot):
             best_proposer, valid_proposal_orders, msgs_data
         )
 
-        dipnet_ords = list(self.orders.orders.values())
+        dipnet_ords = list(self.orders)
         yield self.send_intent_log(f"Using orders {dipnet_ords}")
 
         # randomize dipnet orders and send random orders to enemies
@@ -874,11 +874,13 @@ class SmartOrderAccepterBot(DipnetBot):
         orders = yield from self.brain.get_orders(self.game, self.power_name)
         orders_data = OrdersData()
         orders_data.add_orders(orders)
-        yield self.send_intent_log(f"Initial orders (before communication): {orders}")
+        yield self.send_intent_log(
+            f"Initial orders (before communication): {list(orders_data)}"
+        )
 
         # Skip communications unless in the movement phase
         if not self.game.get_current_phase().endswith("M"):
-            return orders_data.get_list_of_orders()
+            return list(orders_data)
 
         yield self.wait_for_comm_stage()
 
@@ -894,4 +896,4 @@ class SmartOrderAccepterBot(DipnetBot):
                 orders_data, power_stance, msgs_data
             )
 
-        return orders_data.get_list_of_orders()
+        return list(orders_data)

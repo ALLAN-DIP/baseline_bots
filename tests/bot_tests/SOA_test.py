@@ -295,7 +295,7 @@ class TestSOABot(AsyncTestCase):
             {k: v for k, v in soa_bot_stance.items() if v >= soa_bot.ally_threshold},
         )
         yield soa_bot.replace_aggressive_order_to_allies()
-        print("remove non-aggressive", soa_bot.orders.get_list_of_orders())
+        print("remove non-aggressive", list(soa_bot.orders))
 
         print("finish test ally move filter")
         stop_io_loop()

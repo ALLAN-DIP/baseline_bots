@@ -71,5 +71,5 @@ class PushoverDipnet(DipnetBot):
         rcvd_messages = self.read_messages()
         messages = yield self.gen_messages(rcvd_messages)
         yield self.send_messages(messages)
-        orders = self.orders.get_list_of_orders()
+        orders = list(self.orders)
         return orders

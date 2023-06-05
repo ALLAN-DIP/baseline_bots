@@ -280,11 +280,8 @@ class OrdersData:
         for order in orders:
             self.add_order(order)
 
-    def get_list_of_orders(self) -> List[str]:
-        return list(self.orders.values())
-
     def __iter__(self):
-        return iter(self.orders)
+        return iter(sorted(self.orders.values()))
 
     def empty(self) -> bool:
         return len(self.orders) > 0
