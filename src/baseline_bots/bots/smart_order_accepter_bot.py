@@ -732,6 +732,35 @@ class SmartOrderAccepterBot(DipnetBot):
         orders_data.add_orders(final_orders)
         self.orders = orders_data
 
+    async def send_fake_orders_to_foes(
+        self, dipnet_ords: List[str], msgs_data: MessagesData
+    ) -> None:
+        """Sends fake orders to enemies by randomly modifying the actual orders."""
+        # randomize dipnet orders and send random orders to enemies
+        try:
+            daide_style_orders = dipnet_to_daide_parsing(dipnet_ords, self.game)
+            randomized_orders = random_list_orders(daide_style_orders)
+            daide_orders = [XDO(order) for order in randomized_orders]
+            daide_orders = FCT(optional_ORR(daide_orders))
+            if self.foes:
+                await self.send_intent_log(
+                    f"Sending untruthful orders to foe(s)/victim(s) {', '.join(self.foes)}: {daide_orders}"
+                )
+            for foe in self.foes:
+                # Only send one FCT per recipient per phase
+                if any(
+                    msg["recipient"] == foe and msg["message"].startswith("FCT")
+                    for msg in msgs_data
+                ):
+                    continue
+                await self.send_message(foe, str(daide_orders), msgs_data)
+        except asyncio.CancelledError:
+            raise
+        except Exception as e:
+            print(f"Raised {type(e).__name__} in order randomization code block")
+            print(e)
+            print("Catching the error and resuming operations")
+
     async def do_messaging_round(
         self,
         orders_data: OrdersData,
@@ -831,31 +860,7 @@ class SmartOrderAccepterBot(DipnetBot):
         dipnet_ords = list(self.orders)
         await self.send_intent_log(f"Using orders {dipnet_ords}")
 
-        # randomize dipnet orders and send random orders to enemies
-        try:
-            daide_style_orders = dipnet_to_daide_parsing(dipnet_ords, self.game)
-            randomized_orders = random_list_orders(daide_style_orders)
-            daide_orders = [XDO(order) for order in randomized_orders]
-            daide_orders = FCT(optional_ORR(daide_orders))
-            if self.foes:
-                await self.send_intent_log(
-                    f"Sending untruthful orders to foe(s)/victim(s) {', '.join(self.foes)}: {daide_orders}"
-                )
-            for foe in self.foes:
-                # Only send one FCT per recipient per phase
-                if any(
-                    msg["recipient"] == foe and msg["message"].startswith("FCT")
-                    for msg in msgs_data
-                ):
-                    continue
-                await self.send_message(foe, str(daide_orders), msgs_data)
-
-        except asyncio.CancelledError:
-            raise
-        except Exception as e:
-            print(f"Raised {type(e).__name__} in order randomization code block")
-            print(e)
-            print("Catching the error and resuming operations")
+        await self.send_fake_orders_to_foes(dipnet_ords, msgs_data)
 
         # generate support proposals to allies
         await self.generate_support_proposals(msgs_data)
