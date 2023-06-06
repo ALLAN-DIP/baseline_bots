@@ -842,6 +842,18 @@ class SmartOrderAccepterBot(DipnetBot):
         return orders_data
 
     async def __call__(self) -> List[str]:
+        # get dipnet order
+        orders = await self.brain.get_orders(self.game, self.power_name)
+        orders_data = OrdersData()
+        orders_data.add_orders(orders)
+        await self.send_intent_log(
+            f"Initial orders (before communication): {list(orders_data)}"
+        )
+
+        # Skip communications unless in the movement phase
+        if not self.game.get_current_phase().endswith("M"):
+            return list(orders_data)
+
         # compute pos/neg stance on other bots using Tony's stance vector
 
         # avoid get_stance in the first phase of game
@@ -862,18 +874,6 @@ class SmartOrderAccepterBot(DipnetBot):
             + "}"
         )
         print(f"Stance vector for {self.power_name}: {vector_display}")
-
-        # get dipnet order
-        orders = await self.brain.get_orders(self.game, self.power_name)
-        orders_data = OrdersData()
-        orders_data.add_orders(orders)
-        await self.send_intent_log(
-            f"Initial orders (before communication): {list(orders_data)}"
-        )
-
-        # Skip communications unless in the movement phase
-        if not self.game.get_current_phase().endswith("M"):
-            return list(orders_data)
 
         await self.wait_for_comm_stage()
 
