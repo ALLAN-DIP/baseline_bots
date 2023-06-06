@@ -21,12 +21,11 @@ from daidepp import (
     create_daide_grammar,
     daide_visitor,
 )
-from daidepp.grammar.grammar import DAIDELevel
+from daidepp.grammar.grammar import MAX_DAIDE_LEVEL
 from diplomacy import Game, Message
 from diplomacy.utils import strings
 import numpy as np
 from tornado import gen
-from typing_extensions import get_args
 
 if TYPE_CHECKING:
     from baseline_bots.bots.dipnet_bot import DipnetBot
@@ -42,7 +41,6 @@ POWER_NAMES_DICT = {
     "TUR": "TURKEY",
 }
 
-MAX_DAIDE_LEVEL = get_args(DAIDELevel)[-1]
 MESSAGE_GRAMMAR = create_daide_grammar(level=MAX_DAIDE_LEVEL, string_type="message")
 ALL_GRAMMAR = create_daide_grammar(level=MAX_DAIDE_LEVEL, string_type="all")
 
