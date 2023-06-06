@@ -21,9 +21,7 @@ from daidepp import (
     MoveByCVY,
 )
 from diplomacy import Game
-from diplomacy.client.network_game import NetworkGame
 from stance_vector import ActionBasedStance, ScoreBasedStance
-from tornado import gen
 
 from baseline_bots.bots.dipnet_bot import DipnetBot
 from baseline_bots.parsing_utils import (
@@ -39,7 +37,6 @@ from baseline_bots.utils import (
     OrdersData,
     get_best_orders,
     get_order_tokens,
-    is_valid_daide_message,
     optional_ORR,
     parse_daide,
     smart_select_support_proposals,
@@ -82,9 +79,8 @@ class SmartOrderAccepterBot(DipnetBot):
         unrealized_coef: float = 1.0,
         stance_type: str = "A",
         aggressiveness: Optional[Aggressiveness] = Aggressiveness.moderate,
-        num_message_rounds: int = 4,
-        min_sleep_time: float = 10,
-        max_sleep_time: float = 15,
+        num_message_rounds: Optional[int] = None,
+        communication_stage_length: int = 300,  # 5 minutes
     ) -> None:
         """
         :param power_name: The name of the power
@@ -166,8 +162,7 @@ class SmartOrderAccepterBot(DipnetBot):
         else:
             raise ValueError(f"{self.stance_type!r} is not a valid stance type")
         self.num_message_rounds = num_message_rounds
-        self.min_sleep_time = min_sleep_time
-        self.max_sleep_time = max_sleep_time
+        self.communication_stage_length = communication_stage_length
         self.opponents = sorted(
             power for power in game.get_map_power_names() if power != self.power_name
         )
@@ -241,7 +236,7 @@ class SmartOrderAccepterBot(DipnetBot):
         self, best_proposer: str, prp_orders: dict, messages: MessagesData
     ) -> MessagesData:
         """
-        Reply back to allies regarding their proposals whether we follow or not follow
+        Reply to allies regarding their proposals whether we follow or not follow
 
         :param best_proposer: the name of the best proposer as determined by the bot in utils.get_best_orders
         :param prp_orders: dictionary of proposed orders
@@ -391,7 +386,7 @@ class SmartOrderAccepterBot(DipnetBot):
         Determine if selected support order for neighbour corresponds to a self order selected
 
         :param support_order: the support order to be determined for correspondence with self orders
-        :return: boolean indicating the above mentioned detail
+        :return: boolean indicating the detail mentioned above
         """
         order_tokens = get_order_tokens(support_order)
 
@@ -645,8 +640,7 @@ class SmartOrderAccepterBot(DipnetBot):
 
         return False
 
-    @gen.coroutine
-    def get_non_aggressive_order(
+    async def get_non_aggressive_order(
         self, order: Command, current_orders: List[Command], powers: List[str]
     ) -> Command:
         """
@@ -658,7 +652,7 @@ class SmartOrderAccepterBot(DipnetBot):
 
         """
         unit = dipnetify_unit(order.unit)
-        list_order, _ = yield self.brain.get_beam_orders(self.game, self.power_name)
+        list_order, _ = await self.brain.get_beam_orders(self.game, self.power_name)
 
         if len(list_order) > 1:
             for i in range(1, len(list_order)):
@@ -694,8 +688,7 @@ class SmartOrderAccepterBot(DipnetBot):
 
         return new_order
 
-    @gen.coroutine
-    def replace_aggressive_order_to_allies(self) -> None:
+    async def replace_aggressive_order_to_allies(self) -> None:
         """
         replace aggressive orders with non-aggressive orders (in-place replace self.orders)
 
@@ -703,15 +696,15 @@ class SmartOrderAccepterBot(DipnetBot):
         """
         if not self.allies:
             return
-        dipnet_orders = self.orders.get_list_of_orders()
+        dipnet_orders = list(self.orders)
         daide_orders = dipnet_to_daide_parsing(dipnet_orders, self.game)
         final_orders = []
         for order in daide_orders:
             if self.is_order_aggressive_to_powers(order, self.allies):
-                new_order = yield from self.get_non_aggressive_order(
+                new_order = await self.get_non_aggressive_order(
                     order, daide_orders, self.allies
                 )
-                yield self.send_intent_log(
+                await self.send_intent_log(
                     f"Replacing order {daide_to_dipnet_parsing(str(order))[0]!r} with {daide_to_dipnet_parsing(str(new_order))[0]!r} because we should not be aggressive to allies."
                 )
             else:
@@ -722,15 +715,14 @@ class SmartOrderAccepterBot(DipnetBot):
         orders_data.add_orders(final_orders)
         self.orders = orders_data
 
-    @gen.coroutine
-    def do_messaging_round(
+    async def do_messaging_round(
         self,
         orders_data: OrdersData,
         power_stance: Dict[str, float],
         msgs_data: MessagesData,
     ) -> OrdersData:
         """Run a single round of messaging."""
-        orders = orders_data.get_list_of_orders()
+        orders = list(orders_data)
 
         rcvd_messages = self.read_messages()
 
@@ -753,13 +745,13 @@ class SmartOrderAccepterBot(DipnetBot):
 
         self.update_allies_and_foes()
 
-        best_proposer, best_orders = yield from get_best_orders(
+        best_proposer, best_orders = await get_best_orders(
             self, valid_proposal_orders, shared_orders
         )
 
         # add orders
 
-        orders_data.add_orders(best_orders, overwrite=True)
+        orders_data.add_orders(best_orders)
         self.orders = orders_data
 
         # Intent message and filter aggressive moves to allies are disabled in S1901M
@@ -780,16 +772,16 @@ class SmartOrderAccepterBot(DipnetBot):
                 f"From my stance vector perspective, I see {msg_allies} as my allies, "
                 f"{msg_foes} as my foes and I am indifferent towards {msg_neutral}"
             )
-            yield self.send_intent_log(stance_message)
+            await self.send_intent_log(stance_message)
 
             # filter out aggressive orders to allies
             if int(self.game.get_current_phase()[1:5]) < 1909:
-                yield self.replace_aggressive_order_to_allies()
+                await self.replace_aggressive_order_to_allies()
         # Refresh local copy of orders to include replacements
         orders_data = self.orders
 
         # generate messages for FCT sharing info orders
-        msgs_data = yield self.gen_messages(orders_data.get_list_of_orders(), msgs_data)
+        msgs_data = await self.gen_messages(list(orders_data), msgs_data)
 
         # send ALY requests at the start of the game
         if self.game.phase == "SPRING 1901 MOVEMENT":
@@ -797,26 +789,26 @@ class SmartOrderAccepterBot(DipnetBot):
                 aly = [self.power_name[:3], pow[:3]]
                 vss = [country[:3] for country in self.opponents if country != pow]
                 aly_msg = PRP(ALYVSS(aly_powers=aly, vss_powers=vss))
-                yield self.send_message(pow, str(aly_msg), msgs_data)
-            yield self.send_intent_log(
+                await self.send_message(pow, str(aly_msg), msgs_data)
+            await self.send_intent_log(
                 f"Proposing alliances with {', '.join(self.opponents)}"
             )
 
-        yield self.respond_to_invalid_orders(invalid_proposal_orders, msgs_data)
+        await self.respond_to_invalid_orders(invalid_proposal_orders, msgs_data)
 
         # respond to to alliance message and update stance & allies
-        yield self.respond_to_alliance_messages(msgs_data)
+        await self.respond_to_alliance_messages(msgs_data)
 
-        # respond to to peace message and update stance & allies
-        yield self.respond_to_peace_messages(msgs_data)
+        # respond to peace message and update stance & allies
+        await self.respond_to_peace_messages(msgs_data)
 
         # generate proposal response YES/NO to allies
-        msgs_data = yield self.gen_proposal_reply(
+        msgs_data = await self.gen_proposal_reply(
             best_proposer, valid_proposal_orders, msgs_data
         )
 
-        dipnet_ords = list(self.orders.orders.values())
-        yield self.send_intent_log(f"Using orders {dipnet_ords}")
+        dipnet_ords = list(self.orders)
+        await self.send_intent_log(f"Using orders {dipnet_ords}")
 
         # randomize dipnet orders and send random orders to enemies
         try:
@@ -825,7 +817,7 @@ class SmartOrderAccepterBot(DipnetBot):
             daide_orders = [XDO(order) for order in randomized_orders]
             daide_orders = FCT(optional_ORR(daide_orders))
             if self.foes:
-                yield self.send_intent_log(
+                await self.send_intent_log(
                     f"Sending untruthful orders to foe(s)/victim(s) {', '.join(self.foes)}: {daide_orders}"
                 )
             for foe in self.foes:
@@ -835,27 +827,40 @@ class SmartOrderAccepterBot(DipnetBot):
                     for msg in msgs_data
                 ):
                     continue
-                yield self.send_message(foe, str(daide_orders), msgs_data)
+                await self.send_message(foe, str(daide_orders), msgs_data)
 
+        except asyncio.CancelledError:
+            raise
         except Exception as e:
-            print("Raised Exception in order randomization code block")
+            print(f"Raised {type(e).__name__} in order randomization code block")
             print(e)
             print("Catching the error and resuming operations")
 
         # generate support proposals to allies
-        yield self.generate_support_proposals(msgs_data)
+        await self.generate_support_proposals(msgs_data)
 
         return orders_data
 
-    @gen.coroutine
-    def __call__(self) -> List[str]:
+    async def __call__(self) -> List[str]:
+        # get dipnet order
+        orders = await self.brain.get_orders(self.game, self.power_name)
+        orders_data = OrdersData()
+        orders_data.add_orders(orders)
+        await self.send_intent_log(
+            f"Initial orders (before communication): {list(orders_data)}"
+        )
+
+        # Skip communications unless in the movement phase
+        if not self.game.get_current_phase().endswith("M"):
+            return list(orders_data)
+
         # compute pos/neg stance on other bots using Tony's stance vector
 
         # avoid get_stance in the first phase of game
         if self.game.get_current_phase() != "S1901M" and self.stance_type == "A":
             # update stance and send logs
             _, stance_log = self.stance.get_stance(self.game, verbose=True)
-            yield self.log_stance_change(stance_log)
+            await self.log_stance_change(stance_log)
 
         elif self.stance_type == "S":
             self.stance.get_stance()
@@ -870,28 +875,35 @@ class SmartOrderAccepterBot(DipnetBot):
         )
         print(f"Stance vector for {self.power_name}: {vector_display}")
 
-        # get dipnet order
-        orders = yield from self.brain.get_orders(self.game, self.power_name)
-        orders_data = OrdersData()
-        orders_data.add_orders(orders)
-        yield self.send_intent_log(f"Initial orders (before communication): {orders}")
+        await self.wait_for_comm_stage()
 
-        # Skip communications unless in the movement phase
-        if not self.game.get_current_phase().endswith("M"):
-            return orders_data.get_list_of_orders()
+        if self.num_message_rounds:
+            msgs_data = MessagesData()
 
-        yield self.wait_for_comm_stage()
+            for _ in range(self.num_message_rounds):
+                orders_data = await self.do_messaging_round(
+                    orders_data, power_stance, msgs_data
+                )
+        else:
 
-        msgs_data = MessagesData()
+            async def run_messaging_loop() -> None:
+                nonlocal orders_data
 
-        for _ in range(self.num_message_rounds):
-            # sleep for a random amount of time before retrieving new messages for the power
-            yield asyncio.sleep(
-                random.uniform(self.min_sleep_time, self.max_sleep_time)
-            )
+                msgs = MessagesData()
 
-            orders_data = yield from self.do_messaging_round(
-                orders_data, power_stance, msgs_data
-            )
+                while True:
+                    # sleep for a random amount of time before retrieving new messages for the power
+                    await asyncio.sleep(random.uniform(0.5, 1.5))
 
-        return orders_data.get_list_of_orders()
+                    orders_data = await self.do_messaging_round(
+                        orders_data, power_stance, msgs
+                    )
+
+            try:
+                # Set aside 10s for cancellation
+                wait_time = self.communication_stage_length - 10
+                await asyncio.wait_for(run_messaging_loop(), timeout=wait_time)
+            except asyncio.TimeoutError:
+                print("Exiting communication phase because out of time")
+
+        return list(orders_data)

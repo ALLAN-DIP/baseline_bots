@@ -9,7 +9,12 @@ from diplomacy import Game, Message
 from diplomacy.client.network_game import NetworkGame
 from diplomacy.utils import strings
 
-from baseline_bots.utils import MessagesData, OrdersData, is_valid_daide_message
+from baseline_bots.utils import (
+    LIMITED_MESSAGE_GRAMMAR,
+    MessagesData,
+    OrdersData,
+    is_valid_daide_message,
+)
 
 
 class BaselineBot(ABC):
@@ -47,7 +52,7 @@ class BaselineBot(ABC):
         while not all(
             power.comm_status == strings.READY
             for power in self.game.powers.values()
-            if power.player_type == strings.PRESS_BOT
+            if power.player_type == strings.PRESS_BOT and not power.is_eliminated()
         ):
             await asyncio.sleep(1)
 
@@ -87,6 +92,11 @@ class BaselineBot(ABC):
                 f"!! {self.display_name} attempted to send a message with invalid DAIDE syntax: {message!r}"
             )
             return
+
+        if not is_valid_daide_message(message, LIMITED_MESSAGE_GRAMMAR):
+            print(
+                f"!! {self.display_name} sending a message outside of the limited DAIDE syntax: {message!r}"
+            )
 
         msg_obj = Message(
             sender=self.power_name,

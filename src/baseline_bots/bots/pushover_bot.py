@@ -2,7 +2,6 @@ from typing import List
 
 from daidepp import REJ, YES
 from diplomacy import Game, Message
-from tornado import gen
 
 from baseline_bots.bots.dipnet_bot import DipnetBot
 from baseline_bots.utils import (
@@ -25,13 +24,12 @@ class PushoverDipnet(DipnetBot):
     def __init__(self, power_name: str, game: Game, total_msg_rounds=3) -> None:
         super().__init__(power_name, game, total_msg_rounds)
 
-    @gen.coroutine
-    def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
+    async def gen_messages(self, rcvd_messages: List[Message]) -> MessagesData:
         self.orders = OrdersData()
         reply_obj = MessagesData()
 
-        orders = yield self.brain.get_orders(self.game, self.power_name)
-        self.orders.add_orders(orders, overwrite=True)
+        orders = await self.brain.get_orders(self.game, self.power_name)
+        self.orders.add_orders(orders)
 
         if len(rcvd_messages) == 0:
             return reply_obj
@@ -51,7 +49,7 @@ class PushoverDipnet(DipnetBot):
             parse_arrangement(last_message.message), self.power_name, self.game
         )
         # set the orders
-        self.orders.add_orders(orders, overwrite=True)
+        self.orders.add_orders(orders)
 
         # set message to say YES
         parsed_message = parse_daide(last_message.message)
@@ -66,10 +64,9 @@ class PushoverDipnet(DipnetBot):
 
         return reply_obj
 
-    @gen.coroutine
-    def __call__(self) -> List[str]:
+    async def __call__(self) -> List[str]:
         rcvd_messages = self.read_messages()
-        messages = yield self.gen_messages(rcvd_messages)
-        yield self.send_messages(messages)
-        orders = self.orders.get_list_of_orders()
+        messages = await self.gen_messages(rcvd_messages)
+        await self.send_messages(messages)
+        orders = list(self.orders)
         return orders

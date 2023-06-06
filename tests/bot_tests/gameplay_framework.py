@@ -3,7 +3,6 @@ from typing import List, Optional, Tuple, Type, Union
 
 from diplomacy import Game
 from diplomacy.utils.export import to_saved_game_format
-from tornado import gen
 
 from baseline_bots.bots.baseline_bot import BaselineBot, BaselineMsgRoundBot
 
@@ -46,13 +45,12 @@ class GamePlay:
         self.cur_local_message_round = 0
         self.phase_init_bots()
 
-    @gen.coroutine
-    def play(self) -> None:
+    async def play(self) -> None:
         """play a game with the bots"""
 
         turn = 0
         while not self.game.is_game_done and turn < self.max_turns:
-            yield self.step()
+            await self.step()
             turn += 1
 
         if self.save_json:
@@ -65,8 +63,7 @@ class GamePlay:
             if isinstance(bot, BaselineMsgRoundBot):
                 bot.phase_init()
 
-    @gen.coroutine
-    def step(self) -> Tuple[Optional[dict], bool]:
+    async def step(self) -> Tuple[Optional[dict], bool]:
         """one step of messaging"""
 
         if self.game.is_game_done:
@@ -86,7 +83,7 @@ class GamePlay:
                 continue
 
             # get orders to be sent from bot
-            orders = yield bot()
+            orders = await bot()
 
         # get/set orders
         for bot in self.bots:

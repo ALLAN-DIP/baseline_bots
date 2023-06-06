@@ -17,8 +17,6 @@ from baseline_bots.utils import MessagesData, OrdersData, get_order_tokens
 
 SOA_TEST_PARAMS: Final = {
     "num_message_rounds": 3,
-    "min_sleep_time": 1,
-    "max_sleep_time": 3,
 }
 
 
@@ -53,7 +51,7 @@ class TestSOABot(AsyncTestCase):
 
     @testing.gen_test
     def test_send_message(self):
-        hostname = "shade-dev.tacc.utexas.edu"
+        hostname = "shade.tacc.utexas.edu"
         port = 8432
         game_id = None
 
@@ -295,7 +293,7 @@ class TestSOABot(AsyncTestCase):
             {k: v for k, v in soa_bot_stance.items() if v >= soa_bot.ally_threshold},
         )
         yield soa_bot.replace_aggressive_order_to_allies()
-        print("remove non-aggressive", soa_bot.orders.get_list_of_orders())
+        print("remove non-aggressive", list(soa_bot.orders))
 
         print("finish test ally move filter")
         stop_io_loop()

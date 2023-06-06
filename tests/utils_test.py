@@ -23,16 +23,13 @@ class TestUtils:
 
         orders_data = OrdersData()
 
-        # test regular add
+        # test initial add
         orders_data.add_order(EXAMPLE_ORDER)
-        assert orders_data.get_list_of_orders() == ["A VIE S A BUD - GAL"]
+        assert list(orders_data) == ["A VIE S A BUD - GAL"]
 
-        # test guarded add
-        orders_data.add_order(EXAMPLE_ORDER_2, overwrite=False)
-        assert orders_data.get_list_of_orders() == ["A VIE S A BUD - GAL"]
-
-        orders_data.add_order(EXAMPLE_ORDER_2, overwrite=True)
-        assert orders_data.get_list_of_orders() == ["A VIE H"]
+        # test overwrite add
+        orders_data.add_order(EXAMPLE_ORDER_2)
+        assert list(orders_data) == ["A VIE H"]
 
     DIPNET_TO_DAIDE_PARSING_TEST_CASES = [
         (["A PAR H"], ["( FRA AMY PAR ) HLD"], False),

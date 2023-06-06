@@ -60,6 +60,7 @@ async def play(
     power_name: str,
     bot_class: Type[BaselineBot],
     sleep_delay: bool,
+    communication_stage_length: int,
     discount_factor: float,
     invasion_coef: float,
     conflict_coef: float,
@@ -111,6 +112,7 @@ async def play(
             conflict_support_coef=conflict_support_coef,
             friendly_coef=friendly_coef,
             unrealized_coef=unrealized_coef,
+            communication_stage_length=communication_stage_length,
         )
     else:
         raise ValueError(f"{bot_class.__name__!r} is not a valid bot type")
@@ -134,17 +136,14 @@ async def play(
             await asyncio.sleep(random.uniform(2, 5))
 
         phase_start_time = time.time()
+        print(f"Starting phase: {current_phase}")
 
         if not game.powers[bot.power_name].is_eliminated():
             # Fetch orders from bot
             orders_data = await bot()
 
-            # If orders are present, send them
-            if orders_data is not None:
-                await bot.send_orders(orders_data)
-
-            print(f"Phase: {current_phase}")
-            print(f"Orders: {orders_data}")
+            # Always send orders so engine knows turn is over
+            await bot.send_orders(orders_data)
 
         phase_end_time = time.time()
         print(
@@ -155,7 +154,7 @@ async def play(
             await asyncio.sleep(2)
 
     t2 = time.perf_counter()
-    print(f"TIMING: {t2-t1:0.4}")
+    print(f"Time taken for game: {t2-t1:0.4}")
     print("-" * 30 + "GAME COMPLETE" + "-" * 30)
 
 
@@ -196,6 +195,12 @@ def main() -> None:
         "--no_sleep_delay",
         action="store_false",
         help="disable bot sleeping randomly for 1-3s before execution",
+    )
+    parser.add_argument(
+        "--communication_stage_length",
+        type=int,
+        default=300,  # 5 minutes
+        help="Length of communication stage in seconds",
     )
     parser.add_argument(
         "--discount_factor",
@@ -252,6 +257,7 @@ def main() -> None:
     power: str = args.power
     bot_type: str = args.bot_type
     sleep_delay: bool = args.no_sleep_delay
+    communication_stage_length: int = args.communication_stage_length
     discount_factor: float = args.discount_factor
     invasion_coef: float = args.invasion_coef
     conflict_coef: float = args.conflict_coef
@@ -273,6 +279,7 @@ def main() -> None:
             power_name=power,
             bot_class=bot_class,
             sleep_delay=sleep_delay,
+            communication_stage_length=communication_stage_length,
             discount_factor=discount_factor,
             invasion_coef=invasion_coef,
             conflict_coef=conflict_coef,

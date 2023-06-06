@@ -4,11 +4,12 @@ It would be preferable to use a real DAIDE parser in prod
 """
 
 
+import asyncio
 from collections import defaultdict
 import collections.abc
 from copy import deepcopy
 import os
-from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Set, Tuple
+from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Sequence, Set, Tuple
 
 import daidepp
 from daidepp import (
@@ -18,15 +19,15 @@ from daidepp import (
     PCE,
     AnyDAIDEToken,
     Arrangement,
+    DAIDEGrammar,
     create_daide_grammar,
+    create_grammar_from_press_keywords,
     daide_visitor,
 )
-from daidepp.grammar.grammar import DAIDELevel
-from diplomacy import Game, Message
+from daidepp.grammar.grammar import MAX_DAIDE_LEVEL
+from diplomacy import Game
 from diplomacy.utils import strings
 import numpy as np
-from tornado import gen
-from typing_extensions import get_args
 
 if TYPE_CHECKING:
     from baseline_bots.bots.dipnet_bot import DipnetBot
@@ -42,19 +43,27 @@ POWER_NAMES_DICT = {
     "TUR": "TURKEY",
 }
 
-MAX_DAIDE_LEVEL = get_args(DAIDELevel)[-1]
 MESSAGE_GRAMMAR = create_daide_grammar(level=MAX_DAIDE_LEVEL, string_type="message")
+# Grammar for limited DAIDE subset used in communications protocol
+LIMITED_MESSAGE_GRAMMAR = create_grammar_from_press_keywords(
+    ["ALY_VSS", "AND", "DMZ", "HUH", "NAR", "PCE", "PRP", "REJ", "XDO", "YES"]
+)
 ALL_GRAMMAR = create_daide_grammar(level=MAX_DAIDE_LEVEL, string_type="all")
 
 
-def is_valid_daide_message(string: str) -> bool:
+def is_valid_daide_message(string: str, grammar: Optional[DAIDEGrammar] = None) -> bool:
     """Determines whether a string is a valid DAIDE message.
     :param string: String to check for valid DAIDE.
+    :param grammar: DAIDE grammar to use. Defaults to complete message grammar.
     :return: Whether the string is valid DAIDE or not.
     """
+    if grammar is None:
+        grammar = MESSAGE_GRAMMAR
     try:
-        parse_tree = MESSAGE_GRAMMAR.parse(string)
+        parse_tree = grammar.parse(string)
         daide_visitor.visit(parse_tree)
+    except asyncio.CancelledError:
+        raise
     except Exception:
         return False
     return True
@@ -69,6 +78,8 @@ def parse_daide(string: str) -> AnyDAIDEToken:
     try:
         parse_tree = ALL_GRAMMAR.parse(string)
         return daide_visitor.visit(parse_tree)
+    except asyncio.CancelledError:
+        raise
     except Exception as ex:
         raise ValueError(f"Failed to parse DAIDE string: {string!r}") from ex
 
@@ -218,7 +229,7 @@ def is_order_aggressive(order: str, sender: str, game: Game) -> bool:
 
 def get_non_aggressive_orders(orders: List[str], sender: str, game: Game) -> List[str]:
     """
-    :return: all non aggressive orders in orders
+    :return: all non-aggressive orders in orders
     """
     return [order for order in orders if not is_order_aggressive(order, sender, game)]
 
@@ -259,44 +270,45 @@ class MessagesData(collections.abc.Collection):
 
 
 class OrdersData:
-    def __init__(self):
-        self.orders = defaultdict(str)
+    def __init__(self) -> None:
+        self.orders: Dict[str, str] = defaultdict(str)
 
-    def add_order(self, order: str, overwrite: bool = True) -> None:
+    def add_order(self, order: str) -> None:
         """
         Adds single order
 
-        :param overwrite: whether or not to overwrite an order
+        :param order: order to add
         """
-
         province = get_province_from_order(order)
+        self.orders[province] = order
 
-        if overwrite:
-            self.orders[province] = order
-        elif province not in self.orders:
-            self.orders[province] = order
-
-    def add_orders(self, orders: List[str], overwrite: bool = True) -> None:
+    def add_orders(self, orders: Sequence[str]) -> None:
         """
         Adds multiple orders
 
-        :param overwrite: whether or not to overwrite orders
+        :param orders: orders to add
         """
         for order in orders:
-            self.add_order(order, overwrite)
+            self.add_order(order)
 
-    def get_list_of_orders(self) -> List[str]:
-        return list(self.orders.values())
+    def __iter__(self) -> Iterator[str]:
+        return iter(sorted(self.orders.values()))
 
-    def __iter__(self):
-        return iter(self.orders)
+    def __len__(self) -> int:
+        return len(self.orders)
 
-    def empty(self) -> bool:
-        return len(self.orders) > 0
+    def __bool__(self) -> bool:
+        return bool(self.orders)
+
+    def __repr__(self) -> str:
+        contents = dict(sorted(self.orders.items()))
+        return f"{self.__class__.__name__}({contents})"
+
+    def __str__(self) -> str:
+        return str(list(self))
 
 
-@gen.coroutine
-def get_state_value(
+async def get_state_value(
     bot: "DipnetBot", game: Game, power_name: Optional[str], option: str = "default"
 ) -> int:
     # rollout the game --- orders in rollout are from dipnet
@@ -310,7 +322,7 @@ def get_state_value(
             movement_phase += 1
         for power in game.map.powers:
             if option == "samplingbeam":
-                list_order, prob_order = yield bot.brain.get_beam_orders(game, power)
+                list_order, prob_order = await bot.brain.get_beam_orders(game, power)
 
                 if len(list_order) > 0:
                     prob_order = np.array(prob_order)
@@ -319,9 +331,9 @@ def get_state_value(
                     select_index = np.random.choice(orders_index, p=prob_order)
                     orders = list_order[select_index]
                 else:
-                    orders = yield bot.brain.get_orders(game, power)
+                    orders = await bot.brain.get_orders(game, power)
             elif option == "default":
-                orders = yield bot.brain.get_orders(game, power)
+                orders = await bot.brain.get_orders(game, power)
             else:
                 raise ValueError(f"invalid option {option!r}")
 
@@ -339,8 +351,7 @@ def get_state_value(
     )
 
 
-@gen.coroutine
-def get_best_orders(
+async def get_best_orders(
     bot: "DipnetBot",
     proposal_order: Dict[str, List[str]],
     shared_order: Dict[str, List[str]],
@@ -413,7 +424,7 @@ def get_best_orders(
                 if other_power in shared_order:
                     power_orders = shared_order[other_power]
                 else:
-                    power_orders = yield bot.brain.get_orders(
+                    power_orders = await bot.brain.get_orders(
                         simulated_game, other_power
                     )
                 simulated_game.set_orders(power_name=other_power, orders=power_orders)
@@ -422,7 +433,7 @@ def get_best_orders(
             simulated_game.process()
 
             # rollout and get state value
-            state_value[proposer] = yield get_state_value(
+            state_value[proposer] = await get_state_value(
                 bot, simulated_game, bot.power_name
             )
 

@@ -78,8 +78,8 @@ else
   fi
 fi
 
-HOST=shade-dev.tacc.utexas.edu
-OPTS=(--bot_type SmartOrderAccepterBot)
+HOST=shade.tacc.utexas.edu
+OPTS=(--aggressiveness aggressive)
 
 if [[ -z $GAME_ID ]]; then
   # Calculate relative path based on script's expected location

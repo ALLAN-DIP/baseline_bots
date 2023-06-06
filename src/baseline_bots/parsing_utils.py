@@ -2,16 +2,15 @@
 Some quickly built parsing utils mostly for DAIDE stuff
 """
 
+import asyncio
 from collections import defaultdict
 from typing import Dict, List, Mapping, Tuple, Union
 
 from daidepp import (
     ALYVSS,
-    AND,
     CVY,
     HLD,
     MTO,
-    ORR,
     PCE,
     PRP,
     SUP,
@@ -164,7 +163,7 @@ def dipnet_to_daide_parsing(
                 and dipnet_order_tokens[2] not in unit_game_mapping
             ):
                 raise ValueError(
-                    f"Target unit {dipnet_order_tokens[0]!r} does not have a corresponding power"
+                    f"Target unit {dipnet_order_tokens[2]!r} does not have a corresponding power"
                 )
 
             # Daidefy and add source unit as it is
@@ -224,6 +223,8 @@ def dipnet_to_daide_parsing(
                         "because it has more than 2 tokens"
                     )
                 daide_orders.append(move_order)
+        except asyncio.CancelledError:
+            raise
         except Exception as e:
             print(
                 f"ALLAN: error from {__name__}.{dipnet_to_daide_parsing.__name__}()\n"
@@ -308,6 +309,8 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
             )
 
         return dipnet_order, unit_power
+    except asyncio.CancelledError:
+        raise
     except Exception as e:
         print(
             f"ALLAN: error from {__name__}.{daide_to_dipnet_parsing.__name__}\n"
@@ -379,6 +382,8 @@ def parse_proposal_messages(
                             )
                     else:
                         other_orders[order_msg.sender].append(str(order))
+            except asyncio.CancelledError:
+                raise
             except Exception as e:
                 print(
                     f"ALLAN: error from {__name__}.{parse_proposal_messages.__name__}()\n"
@@ -430,6 +435,8 @@ def parse_proposal_messages(
             "alliance_proposals": alliance_proposals,
             "peace_proposals": peace_proposals,
         }
+    except asyncio.CancelledError:
+        raise
     except Exception as e:
         print(
             f"ALLAN: error from {__name__}.{parse_proposal_messages.__name__}()\n"
