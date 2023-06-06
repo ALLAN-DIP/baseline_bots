@@ -227,21 +227,6 @@ class SmartOrderAccepterBot(DipnetBot):
                     f"Shared information {str(orders_decided)!r} with allies {', '.join(self.allies)}"
                 )
 
-    async def gen_messages(
-        self, orders_list: List[str], msgs_data: MessagesData
-    ) -> MessagesData:
-        """
-        This generates messages to be sent to the other powers.
-        Note: Messages are also generated outside of this function invocation flow
-
-        :param orders_list: final list of orders decided by the bot
-        :param msgs_data: MessagesData object containing set of all messages
-        """
-        # generate messages: we should  be sending our true orders to allies (positive stance)
-        await self.gen_pos_stance_messages(msgs_data, orders_list)
-
-        return msgs_data
-
     async def gen_proposal_reply(
         self, best_proposer: str, prp_orders: dict, messages: MessagesData
     ) -> MessagesData:
@@ -830,8 +815,8 @@ class SmartOrderAccepterBot(DipnetBot):
         # Refresh local copy of orders to include replacements
         orders_data = self.orders
 
-        # generate messages for FCT sharing info orders
-        msgs_data = await self.gen_messages(list(orders_data), msgs_data)
+        # generate FCT messages to send our true orders to allies (positive stance)
+        await self.gen_pos_stance_messages(msgs_data, list(orders_data))
 
         # send ALY requests at the start of the game
         if self.game.phase == "SPRING 1901 MOVEMENT":
