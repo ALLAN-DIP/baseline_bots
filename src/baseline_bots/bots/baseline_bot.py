@@ -47,7 +47,7 @@ class BaselineBot(ABC):
         while not all(
             power.comm_status == strings.READY
             for power in self.game.powers.values()
-            if power.player_type == strings.PRESS_BOT
+            if power.player_type == strings.PRESS_BOT and not power.is_eliminated()
         ):
             await asyncio.sleep(1)
 
