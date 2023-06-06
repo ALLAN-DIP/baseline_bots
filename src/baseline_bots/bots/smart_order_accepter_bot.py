@@ -838,7 +838,7 @@ class SmartOrderAccepterBot(DipnetBot):
                 yield self.send_message(foe, str(daide_orders), msgs_data)
 
         except Exception as e:
-            print("Raised Exception in order randomization code block")
+            print(f"Raised {type(e).__name__} in order randomization code block")
             print(e)
             print("Catching the error and resuming operations")
 
