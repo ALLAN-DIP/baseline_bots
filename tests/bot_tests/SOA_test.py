@@ -53,7 +53,7 @@ class TestSOABot(AsyncTestCase):
 
     @testing.gen_test
     def test_send_message(self):
-        hostname = "shade-dev.tacc.utexas.edu"
+        hostname = "shade.tacc.utexas.edu"
         port = 8432
         game_id = None
 

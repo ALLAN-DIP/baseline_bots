@@ -78,7 +78,7 @@ else
   fi
 fi
 
-HOST=shade-dev.tacc.utexas.edu
+HOST=shade.tacc.utexas.edu
 OPTS=(--aggressiveness aggressive)
 
 if [[ -z $GAME_ID ]]; then
