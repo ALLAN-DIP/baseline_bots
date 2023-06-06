@@ -17,8 +17,6 @@ from baseline_bots.utils import MessagesData, OrdersData, get_order_tokens
 
 SOA_TEST_PARAMS: Final = {
     "num_message_rounds": 3,
-    "min_sleep_time": 1,
-    "max_sleep_time": 3,
 }
 
 

@@ -2,6 +2,7 @@
 Some quickly built parsing utils mostly for DAIDE stuff
 """
 
+import asyncio
 from collections import defaultdict
 from typing import Dict, List, Mapping, Tuple, Union
 
@@ -224,6 +225,8 @@ def dipnet_to_daide_parsing(
                         "because it has more than 2 tokens"
                     )
                 daide_orders.append(move_order)
+        except asyncio.CancelledError:
+            raise
         except Exception as e:
             print(
                 f"ALLAN: error from {__name__}.{dipnet_to_daide_parsing.__name__}()\n"
@@ -308,6 +311,8 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
             )
 
         return dipnet_order, unit_power
+    except asyncio.CancelledError:
+        raise
     except Exception as e:
         print(
             f"ALLAN: error from {__name__}.{daide_to_dipnet_parsing.__name__}\n"
@@ -379,6 +384,8 @@ def parse_proposal_messages(
                             )
                     else:
                         other_orders[order_msg.sender].append(str(order))
+            except asyncio.CancelledError:
+                raise
             except Exception as e:
                 print(
                     f"ALLAN: error from {__name__}.{parse_proposal_messages.__name__}()\n"
@@ -430,6 +437,8 @@ def parse_proposal_messages(
             "alliance_proposals": alliance_proposals,
             "peace_proposals": peace_proposals,
         }
+    except asyncio.CancelledError:
+        raise
     except Exception as e:
         print(
             f"ALLAN: error from {__name__}.{parse_proposal_messages.__name__}()\n"

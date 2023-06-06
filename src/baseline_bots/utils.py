@@ -4,6 +4,7 @@ It would be preferable to use a real DAIDE parser in prod
 """
 
 
+import asyncio
 from collections import defaultdict
 import collections.abc
 from copy import deepcopy
@@ -61,6 +62,8 @@ def is_valid_daide_message(string: str, grammar: Optional[DAIDEGrammar] = None) 
     try:
         parse_tree = grammar.parse(string)
         daide_visitor.visit(parse_tree)
+    except asyncio.CancelledError:
+        raise
     except Exception:
         return False
     return True
@@ -75,6 +78,8 @@ def parse_daide(string: str) -> AnyDAIDEToken:
     try:
         parse_tree = ALL_GRAMMAR.parse(string)
         return daide_visitor.visit(parse_tree)
+    except asyncio.CancelledError:
+        raise
     except Exception as ex:
         raise ValueError(f"Failed to parse DAIDE string: {string!r}") from ex
 

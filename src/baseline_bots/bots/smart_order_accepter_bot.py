@@ -81,9 +81,8 @@ class SmartOrderAccepterBot(DipnetBot):
         unrealized_coef: float = 1.0,
         stance_type: str = "A",
         aggressiveness: Optional[Aggressiveness] = Aggressiveness.moderate,
-        num_message_rounds: int = 4,
-        min_sleep_time: float = 10,
-        max_sleep_time: float = 15,
+        num_message_rounds: Optional[int] = None,
+        communication_stage_length: int = 300,  # 5 minutes
     ) -> None:
         """
         :param power_name: The name of the power
@@ -165,8 +164,7 @@ class SmartOrderAccepterBot(DipnetBot):
         else:
             raise ValueError(f"{self.stance_type!r} is not a valid stance type")
         self.num_message_rounds = num_message_rounds
-        self.min_sleep_time = min_sleep_time
-        self.max_sleep_time = max_sleep_time
+        self.communication_stage_length = communication_stage_length
         self.opponents = sorted(
             power for power in game.get_map_power_names() if power != self.power_name
         )
@@ -833,6 +831,8 @@ class SmartOrderAccepterBot(DipnetBot):
                     continue
                 await self.send_message(foe, str(daide_orders), msgs_data)
 
+        except asyncio.CancelledError:
+            raise
         except Exception as e:
             print(f"Raised {type(e).__name__} in order randomization code block")
             print(e)
@@ -879,16 +879,33 @@ class SmartOrderAccepterBot(DipnetBot):
 
         await self.wait_for_comm_stage()
 
-        msgs_data = MessagesData()
+        if self.num_message_rounds:
+            msgs_data = MessagesData()
 
-        for _ in range(self.num_message_rounds):
-            # sleep for a random amount of time before retrieving new messages for the power
-            await asyncio.sleep(
-                random.uniform(self.min_sleep_time, self.max_sleep_time)
-            )
+            for _ in range(self.num_message_rounds):
+                orders_data = await self.do_messaging_round(
+                    orders_data, power_stance, msgs_data
+                )
+        else:
 
-            orders_data = await self.do_messaging_round(
-                orders_data, power_stance, msgs_data
-            )
+            async def run_messaging_loop() -> None:
+                nonlocal orders_data
+
+                msgs = MessagesData()
+
+                while True:
+                    # sleep for a random amount of time before retrieving new messages for the power
+                    await asyncio.sleep(random.uniform(0.5, 1.5))
+
+                    orders_data = await self.do_messaging_round(
+                        orders_data, power_stance, msgs
+                    )
+
+            try:
+                # Set aside 10s for cancellation
+                wait_time = self.communication_stage_length - 10
+                await asyncio.wait_for(run_messaging_loop(), timeout=wait_time)
+            except asyncio.TimeoutError:
+                print("Exiting communication phase because out of time")
 
         return list(orders_data)
