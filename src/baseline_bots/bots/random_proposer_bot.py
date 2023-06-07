@@ -6,7 +6,7 @@ from diplomacy import Game
 
 from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.parsing_utils import dipnet_to_daide_parsing
-from baseline_bots.utils import MessagesData, get_other_powers, optional_ORR
+from baseline_bots.utils import MessagesData, get_other_powers, optional_AND
 
 
 class RandomProposerBot(BaselineBot):
@@ -42,7 +42,7 @@ class RandomProposerBot(BaselineBot):
             if len(suggested_random_orders) > 0:
                 commands = dipnet_to_daide_parsing(suggested_random_orders, self.game)
                 orders = [XDO(command) for command in commands]
-                suggested_random_orders = PRP(optional_ORR(orders))
+                suggested_random_orders = PRP(optional_AND(orders))
                 # send the other power a message containing the orders
                 ret_obj.add_message(other_power, str(suggested_random_orders))
 

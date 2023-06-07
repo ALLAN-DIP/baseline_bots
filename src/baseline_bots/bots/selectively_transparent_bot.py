@@ -1,13 +1,13 @@
 from typing import List
 
-from daidepp import FCT, ORR, XDO
+from daidepp import AND, FCT, XDO
 from diplomacy import Game, Message
 
 from baseline_bots.bots.transparent_bot import TransparentBot
 from baseline_bots.utils import (
     MessagesData,
     is_order_aggressive,
-    optional_ORR,
+    optional_AND,
     parse_daide,
 )
 
@@ -29,7 +29,7 @@ class SelectivelyTransparentBot(TransparentBot):
             parsed_message = parse_daide(message["message"])
             if isinstance(parsed_message, FCT):
                 arrangement = parsed_message.arrangement_qry_not
-                if isinstance(parsed_message, ORR):
+                if isinstance(parsed_message, AND):
                     xdo_arrangements = arrangement.arrangements
                     peaceful_orders = []
                     for xdo_arrangement in xdo_arrangements:
@@ -43,7 +43,7 @@ class SelectivelyTransparentBot(TransparentBot):
 
                     # reconstruct message
                     xdo_arrangements = [XDO(order) for order in peaceful_orders]
-                    orr_arrangement = optional_ORR(xdo_arrangements)
+                    orr_arrangement = optional_AND(xdo_arrangements)
                     fct_arrangement = FCT(orr_arrangement)
                     message["message"] = str(fct_arrangement)
 

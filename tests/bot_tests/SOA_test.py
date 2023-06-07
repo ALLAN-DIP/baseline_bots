@@ -133,7 +133,7 @@ class TestSOABot(AsyncTestCase):
                 [
                     {
                         "recipient": "RUSSIA",
-                        "message": "HUH ( PRP ( ORR ( XDO ( ( RUS AMY PRU ) MTO MOS ) ) ( XDO ( ( TUR AMY PRU ) MTO LVN ) ) ) )",
+                        "message": "HUH ( PRP ( AND ( XDO ( ( RUS AMY PRU ) MTO MOS ) ) ( XDO ( ( TUR AMY PRU ) MTO LVN ) ) ) )",
                     },
                     {
                         "recipient": "AUSTRIA",

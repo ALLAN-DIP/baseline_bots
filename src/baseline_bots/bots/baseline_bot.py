@@ -11,6 +11,7 @@ from diplomacy.utils import strings
 
 from baseline_bots.utils import (
     LIMITED_MESSAGE_GRAMMAR,
+    USE_LIMITED_DAIDE,
     MessagesData,
     OrdersData,
     is_valid_daide_message,
@@ -93,10 +94,13 @@ class BaselineBot(ABC):
             )
             return
 
-        if not is_valid_daide_message(message, LIMITED_MESSAGE_GRAMMAR):
+        if USE_LIMITED_DAIDE and not is_valid_daide_message(
+            message, LIMITED_MESSAGE_GRAMMAR
+        ):
             print(
-                f"!! {self.display_name} sending a message outside of the limited DAIDE syntax: {message!r}"
+                f"!! {self.display_name} attempted a message outside of the limited DAIDE syntax: {message!r}"
             )
+            return
 
         msg_obj = Message(
             sender=self.power_name,

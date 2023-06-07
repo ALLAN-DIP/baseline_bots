@@ -84,11 +84,11 @@ def parse_daide(string: str) -> AnyDAIDEToken:
         raise ValueError(f"Failed to parse DAIDE string: {string!r}") from ex
 
 
-# Option needed for performers that don't use `ORR`
-DISABLE_ORR = False
-if os.environ.get("DISABLE_ORR") is not None:
-    print("Disabling ORR usage")
-    DISABLE_ORR = True
+# Option needed for working better with other performers
+USE_LIMITED_DAIDE = False
+if os.environ.get("USE_LIMITED_DAIDE") is not None:
+    print("Disabling DAIDE usage outside of limited subset")
+    USE_LIMITED_DAIDE = True
 
 
 def optional_ORR(arrangements: Sequence[Arrangement]) -> Arrangement:
@@ -98,7 +98,7 @@ def optional_ORR(arrangements: Sequence[Arrangement]) -> Arrangement:
     :return: Arrangement object.
     """
     arrangements = sorted(set(arrangements), key=str)
-    if len(arrangements) > 1 and not DISABLE_ORR:
+    if len(arrangements) > 1 and not USE_LIMITED_DAIDE:
         return ORR(*arrangements)
     else:
         return arrangements[0]
