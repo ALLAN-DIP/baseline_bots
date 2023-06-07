@@ -33,6 +33,7 @@ from baseline_bots.parsing_utils import (
 )
 from baseline_bots.randomize_order import random_list_orders
 from baseline_bots.utils import (
+    USE_LIMITED_DAIDE,
     MessagesData,
     OrdersData,
     get_best_orders,
@@ -816,7 +817,8 @@ class SmartOrderAccepterBot(DipnetBot):
         orders_data = self.orders
 
         # generate FCT messages to send our true orders to allies (positive stance)
-        await self.gen_pos_stance_messages(msgs_data, list(orders_data))
+        if not USE_LIMITED_DAIDE:
+            await self.gen_pos_stance_messages(msgs_data, list(orders_data))
 
         # send ALY requests at the start of the game
         if self.game.phase == "SPRING 1901 MOVEMENT":
@@ -845,7 +847,8 @@ class SmartOrderAccepterBot(DipnetBot):
         dipnet_ords = list(self.orders)
         await self.send_intent_log(f"Using orders {dipnet_ords}")
 
-        await self.send_fake_orders_to_foes(dipnet_ords, msgs_data)
+        if not USE_LIMITED_DAIDE:
+            await self.send_fake_orders_to_foes(dipnet_ords, msgs_data)
 
         # generate support proposals to allies
         await self.generate_support_proposals(msgs_data)
