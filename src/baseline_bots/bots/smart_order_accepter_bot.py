@@ -37,6 +37,7 @@ from baseline_bots.utils import (
     OrdersData,
     get_best_orders,
     get_order_tokens,
+    neighboring_opps,
     optional_ORR,
     parse_daide,
     smart_select_support_proposals,
@@ -113,6 +114,8 @@ class SmartOrderAccepterBot(DipnetBot):
                     friendly_coef=1.0,
                     unrealized_coef=1.0,
                     discount_factor=self.discount_factor,
+                    random_betrayal=False,
+                    end_game_flip=False,
                 )
             elif self.aggressiveness == Aggressiveness.moderate:
                 # default hyperparameter values for ActionBasedStance module
@@ -126,6 +129,8 @@ class SmartOrderAccepterBot(DipnetBot):
                     friendly_coef=1.0,
                     unrealized_coef=1.0,
                     discount_factor=self.discount_factor,
+                    random_betrayal=False,
+                    end_game_flip=False,
                 )
             elif self.aggressiveness == Aggressiveness.friendly:
                 self.stance = ActionBasedStance(
@@ -138,6 +143,8 @@ class SmartOrderAccepterBot(DipnetBot):
                     friendly_coef=0.5,
                     unrealized_coef=1.0,
                     discount_factor=self.discount_factor,
+                    random_betrayal=False,
+                    end_game_flip=False,
                 )
             elif self.aggressiveness is None:
                 self.stance = ActionBasedStance(
@@ -150,6 +157,8 @@ class SmartOrderAccepterBot(DipnetBot):
                     friendly_coef=self.friendly_coef,
                     unrealized_coef=self.unrealized_coef,
                     discount_factor=self.discount_factor,
+                    random_betrayal=False,
+                    end_game_flip=False,
                 )
             else:
                 raise ValueError(
@@ -182,6 +191,7 @@ class SmartOrderAccepterBot(DipnetBot):
         self.allies = []
         self.foes = []
         self.neutral = []
+        self.is_filtering_moves = True
 
     async def log_stance_change(self, stance_log) -> None:
         for pw in self.opponents:
@@ -335,7 +345,7 @@ class SmartOrderAccepterBot(DipnetBot):
                     sender, str(YES(PRP(parsed_message))), messages_data
                 )
 
-        self.update_allies_and_foes()
+        await self.update_allies_and_foes()
 
     async def respond_to_peace_messages(self, messages_data: MessagesData) -> None:
         """
@@ -379,7 +389,7 @@ class SmartOrderAccepterBot(DipnetBot):
                 self.stance.update_stance(self.power_name, sender, self.peace_score)
                 await self.send_message(sender, str(YES(PRP(message))), messages_data)
 
-        self.update_allies_and_foes()
+        await self.update_allies_and_foes()
 
     def is_support_for_selected_orders(self, support_order: str) -> bool:
         """
@@ -466,8 +476,9 @@ class SmartOrderAccepterBot(DipnetBot):
 
         return False
 
-    def update_allies_and_foes(self) -> None:
+    async def update_allies_and_foes(self) -> None:
         power_stance = self.stance.stance[self.power_name]
+        neighbors = neighboring_opps(self.game, self.power_name, self.opponents)
 
         self.allies = [
             pow for pow in self.opponents if power_stance[pow] > self.ally_threshold
@@ -475,11 +486,17 @@ class SmartOrderAccepterBot(DipnetBot):
         self.foes = [
             pow for pow in self.opponents if power_stance[pow] <= self.enemy_threshold
         ]
+
+        # disable aggressive move filtering against allies if there are no neighboring enemies
+        self.is_filtering_moves = any(pow in neighbors for pow in self.foes)
+        if not self.is_filtering_moves:
+            await self.send_intent_log(
+                "Disabled aggressive move filtering against allies because there are no neighboring enemies"
+            )
+
         assert self.enemy_threshold < self.ally_threshold
         self.neutral = [
-            pow
-            for pow in self.opponents
-            if self.enemy_threshold < power_stance[pow] <= self.ally_threshold
+            pow for pow in self.opponents if pow not in self.foes + self.allies
         ]
 
     def support_move(self, order: str) -> bool:
@@ -743,7 +760,7 @@ class SmartOrderAccepterBot(DipnetBot):
         # if there is any better proposal orders that has a state value more than ours, then do it. If not, just follow the base orders.
         valid_proposal_orders[self.power_name] = orders
 
-        self.update_allies_and_foes()
+        await self.update_allies_and_foes()
 
         best_proposer, best_orders = await get_best_orders(
             self, valid_proposal_orders, shared_orders
@@ -775,8 +792,12 @@ class SmartOrderAccepterBot(DipnetBot):
             await self.send_intent_log(stance_message)
 
             # filter out aggressive orders to allies
-            if int(self.game.get_current_phase()[1:5]) < 1909:
+            if (
+                int(self.game.get_current_phase()[1:5]) < 1909
+                and self.is_filtering_moves
+            ):
                 await self.replace_aggressive_order_to_allies()
+
         # Refresh local copy of orders to include replacements
         orders_data = self.orders
 

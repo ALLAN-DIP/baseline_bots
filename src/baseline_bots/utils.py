@@ -464,3 +464,22 @@ def smart_select_support_proposals(
             if len(order_list) > 1:
                 optimal_ordering_units.add(ordering_unit)
     return optimal_possible_support_proposals
+
+
+def neighboring_opps(
+    game: Game,
+    power_name: str,
+    opponents: List[str],
+) -> List[str]:
+    """Return a list of powers that are neighbors of power_name"""
+    neighbors = set()  # set to prevent duplicates
+    adj_provs = set()  # provs adjacent to power_name territories
+    for prov in game.powers[power_name].influence:
+        adj_provs.update(set(x.upper() for x in game.map.abut_list(prov)))
+
+    for opponent in opponents:
+        for prov in game.powers[opponent].influence:
+            if prov in adj_provs:
+                neighbors.add(opponent)
+                break
+    return sorted(neighbors)
