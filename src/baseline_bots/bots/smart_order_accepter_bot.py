@@ -711,13 +711,13 @@ class SmartOrderAccepterBot(DipnetBot):
                     order, daide_orders, self.allies
                 )
                 await self.send_intent_log(
-                    f"Replacing order {daide_to_dipnet_parsing(str(order))[0]!r} "
-                    f"with {daide_to_dipnet_parsing(str(new_order))[0]!r} because "
+                    f"Replacing order {daide_to_dipnet_parsing(order)[0]!r} "
+                    f"with {daide_to_dipnet_parsing(new_order)[0]!r} because "
                     "we should not be aggressive to allies."
                 )
             else:
                 new_order = order
-            final_orders.append(daide_to_dipnet_parsing(str(new_order))[0])
+            final_orders.append(daide_to_dipnet_parsing(new_order)[0])
 
         orders_data = OrdersData()
         orders_data.add_orders(final_orders)
