@@ -52,9 +52,9 @@ class TransparentBot(DipnetBot):
             return comms_obj
         parsed_orders = self.parse_messages(rcvd_messages)
         parsed_orders = [
-            list(daide_to_dipnet_parsing(order))[0]
+            list(daide_to_dipnet_parsing(parse_daide(order)))[0]
             for order in parsed_orders
-            if daide_to_dipnet_parsing(order)
+            if daide_to_dipnet_parsing(parse_daide(order))
         ]
 
         # My orders' messages if not already sent
