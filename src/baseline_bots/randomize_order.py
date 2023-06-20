@@ -5,7 +5,7 @@ an already existing order / list of orders.
 
 
 import random
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union  # noqa: F401
 
 from daidepp import (
     BLD,
