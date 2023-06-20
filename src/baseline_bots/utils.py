@@ -387,11 +387,11 @@ async def get_best_orders(
             ]:
                 continue
             setattr(result, key, deepcopy(getattr(game, key)))
-        setattr(result, "map", game.map)
-        setattr(result, "powers", {})
+        result.map = game.map
+        result.powers = {}
         for power in game.powers.values():
             result.powers[power.name] = deepcopy(power)
-            setattr(result.powers[power.name], "game", result)
+            result.powers[power.name].game = result
         result.role = strings.SERVER_TYPE
         return result
 
