@@ -58,3 +58,15 @@ repos:
     rev: v0.9.0.5
     hooks:
       - id: shellcheck
+  - repo: https://github.com/pycqa/flake8
+    # Newer versions do not support Python 3.7
+    rev: 5.0.4
+    hooks:
+      - id: flake8
+        additional_dependencies: ["flake8-bugbear==23.3.12"]
+        args:
+          [
+            "--max-line-length=150",
+            "--ignore=E203,W503,B001,B007,B010,E402,E501,E722,F401,F403,F841",
+            "--per-file-ignores=__init__.py:F401",
+          ]
