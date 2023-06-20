@@ -658,7 +658,7 @@ class SmartOrderAccepterBot(DipnetBot):
 
         """
         unit = dipnetify_unit(order.unit)
-        list_order, _ = await self.brain.get_beam_orders(self.game, self.power_name)
+        list_order, _ = await self.get_brain_beam_orders()
 
         if len(list_order) > 1:
             for i in range(1, len(list_order)):
@@ -863,7 +863,7 @@ class SmartOrderAccepterBot(DipnetBot):
 
     async def __call__(self) -> List[str]:
         # get dipnet order
-        orders = await self.brain.get_orders(self.game, self.power_name)
+        orders = await self.get_brain_orders()
         orders_data = OrdersData()
         orders_data.add_orders(orders)
         await self.send_intent_log(

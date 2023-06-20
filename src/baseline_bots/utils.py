@@ -325,7 +325,7 @@ async def get_state_value(
             movement_phase += 1
         for power in game.map.powers:
             if option == "samplingbeam":
-                list_order, prob_order = await bot.brain.get_beam_orders(game, power)
+                list_order, prob_order = await bot.get_brain_beam_orders(game, power)
 
                 if len(list_order) > 0:
                     prob_order = np.array(prob_order)
@@ -334,9 +334,9 @@ async def get_state_value(
                     select_index = np.random.choice(orders_index, p=prob_order)
                     orders = list_order[select_index]
                 else:
-                    orders = await bot.brain.get_orders(game, power)
+                    orders = await bot.get_brain_orders(game, power)
             elif option == "default":
-                orders = await bot.brain.get_orders(game, power)
+                orders = await bot.get_brain_orders(game, power)
             else:
                 raise ValueError(f"invalid option {option!r}")
 
@@ -425,7 +425,7 @@ async def get_best_orders(
                 if other_power in shared_order:
                     power_orders = shared_order[other_power]
                 else:
-                    power_orders = await bot.brain.get_orders(
+                    power_orders = await bot.get_brain_orders(
                         simulated_game, other_power
                     )
                 simulated_game.set_orders(power_name=other_power, orders=power_orders)

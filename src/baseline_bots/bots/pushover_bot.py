@@ -28,7 +28,7 @@ class PushoverDipnet(DipnetBot):
         self.orders = OrdersData()
         reply_obj = MessagesData()
 
-        orders = await self.brain.get_orders(self.game, self.power_name)
+        orders = await self.get_brain_orders()
         self.orders.add_orders(orders)
 
         if len(rcvd_messages) == 0:

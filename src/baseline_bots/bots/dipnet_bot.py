@@ -2,7 +2,7 @@
 
 
 from abc import ABC
-from typing import List
+from typing import List, Optional, Tuple
 
 from diplomacy import Game
 from diplomacy_research.players.benchmark_player import DipNetRLPlayer, DipNetSLPlayer
@@ -29,6 +29,24 @@ class DipnetBot(BaselineMsgRoundBot, ABC):
         else:
             self.brain = DipNetRLPlayer()
 
+    async def get_brain_orders(
+        self, game: Optional[Game] = None, power_name: Optional[str] = None
+    ) -> List[str]:
+        if game is None:
+            game = self.game
+        if power_name is None:
+            power_name = self.power_name
+        return await self.brain.get_orders(game, power_name)
+
+    async def get_brain_beam_orders(
+        self, game: Optional[Game] = None, power_name: Optional[str] = None
+    ) -> Tuple[List[str], List[float]]:
+        if game is None:
+            game = self.game
+        if power_name is None:
+            power_name = self.power_name
+        return await self.brain.get_beam_orders(game, power_name)
+
     async def gen_orders(self) -> List[str]:
         """finalizes moves"""
-        return await self.brain.get_orders(self.game, self.power_name)
+        return await self.get_brain_orders()
