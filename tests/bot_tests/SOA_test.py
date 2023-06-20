@@ -162,7 +162,7 @@ class TestSOABot(AsyncTestCase):
                 [
                     {
                         "recipient": "RUSSIA",
-                        "message": "YES (ALY (TUR RUS ENG ITA) VSS (FRA GER AUS))",
+                        "message": "YES ( PRP ( ALY ( ENG ITA RUS TUR ) VSS ( AUS FRA GER ) ) )",
                     }
                 ],
             ]
@@ -170,9 +170,9 @@ class TestSOABot(AsyncTestCase):
 
         for tc_ip, tc_op in RESPOND_TO_ALLIANCES_TC:
             msg_data = MessagesData()
-            soa_bot.alliances = tc_ip
+            soa_bot.alliances_prps = tc_ip
             yield soa_bot.respond_to_alliance_messages(msg_data)
-            # assert msg_data.messages == tc_op, (msg_data.messages, tc_op)
+            assert msg_data.messages == tc_op, (msg_data.messages, tc_op)
 
         stop_io_loop()
 
@@ -344,7 +344,7 @@ class TestSOABot(AsyncTestCase):
 
         soa_power_units = game_play.game.powers[soa_bot.power_name].units[:]
 
-        for power, orders in valid_proposal_orders.items():
+        for orders in valid_proposal_orders.values():
             for order in orders:
                 order_token = get_order_tokens(order)
                 unit_order = order_token[0]
