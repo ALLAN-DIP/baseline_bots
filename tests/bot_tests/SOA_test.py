@@ -389,7 +389,7 @@ class TestSOABot(AsyncTestCase):
         game_play.game.set_centers("RUSSIA", ["MOS"], reset=True)
         game_play.game.set_centers("GERMANY", ["MUN", "KIE", "BER", "BEL"])
         game_play.game.set_centers(soa_bot.power_name, ["PAR", "BRE", "MAR"])
-        ret_data = yield soa_bot()
+        yield soa_bot()
         soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
         print(game_play.game.get_centers())
         print("expected stance ENGLAND: 1, RUSSIA: 1, GERMANY: -1, AUTRIA:0")
