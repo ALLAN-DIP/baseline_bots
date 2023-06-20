@@ -72,7 +72,7 @@ class TestSOABot(AsyncTestCase):
                     daide_port=None,
                 )
                 game_created = True
-            except:
+            except Exception:
                 # game not created because of same game id
                 pass
 
