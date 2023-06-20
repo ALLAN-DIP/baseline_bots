@@ -228,16 +228,21 @@ def random_convoy(order: CVY) -> CVY:
     :return: A deviant order (with some chance of being the same order).
     :rtype: Tuple
     """
-    # fmt: off
     # TODO: Add to `daidepp`?
-    assert (order.convoyed_unit.unit_type == "AMY" and order.convoying_unit.unit_type == "FLT"), "The unit type is neither army nor fleet so it is invalid."
+    assert (
+        order.convoyed_unit.unit_type == "AMY"
+        and order.convoying_unit.unit_type == "FLT"
+    ), "The unit type is neither army nor fleet so it is invalid."
     # It is necessary to check whether a possible alternate "convoy-to" location is adjacent to the unit being convoyed
     # since convoying to a province adjacent to you would be less believable
     flt_loc = dipnetify_location(order.convoying_unit.location)
     amy_loc = dipnetify_location(order.convoyed_unit.location)
     province = dipnetify_location(order.province)
-    adj = [str(daidefy_location(loc)) for loc in ADJACENCY[flt_loc] if TYPES[loc] == "COAST" and loc not in ADJACENCY[amy_loc] and loc != province]
-    # fmt: on
+    adj = [
+        str(daidefy_location(loc))
+        for loc in ADJACENCY[flt_loc]
+        if TYPES[loc] == "COAST" and loc not in ADJACENCY[amy_loc] and loc != province
+    ]
     if adj:  # if valid adjacencies exist
         return CVY(
             order.convoying_unit,
@@ -286,7 +291,6 @@ def random_support(order: SUP) -> SUP:
             # returns the same support hold order if there is no value adjacent to both
             return order
     else:  # if it is supporting to move
-        # fmt: off
         sup_type = order.supporting_unit.unit_type
         sup_loc = dipnetify_location(order.supporting_unit.location)
         rec_type = order.supported_unit.unit_type
@@ -295,8 +299,11 @@ def random_support(order: SUP) -> SUP:
         sup_adjacent, rec_adjacent = ADJACENCY[sup_loc], ADJACENCY[rec_loc]
         # COMBOS and TYPES must be used to determine the possible locations a unit can support into/from based on the unit type and province type
         dest_choices = COMBOS[sup_type][rec_type]
-        adj_to_both = [daidefy_location(adjacency).province for adjacency in sup_adjacent if adjacency in rec_adjacent and adjacency != province and TYPES[adjacency]]
-        # fmt: on
+        adj_to_both = [
+            daidefy_location(adjacency).province
+            for adjacency in sup_adjacent
+            if adjacency in rec_adjacent and adjacency != province and TYPES[adjacency]
+        ]
         if adj_to_both:
             return SUP(
                 order.supporting_unit, order.supported_unit, random.choice(adj_to_both)
