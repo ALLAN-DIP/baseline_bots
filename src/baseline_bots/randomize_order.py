@@ -152,45 +152,10 @@ def random_list_orders(orders: List[Command]) -> List[Command]:
     :return: The list of deviant orders
     :rtype: List[Tuple]
     """
-    # correspondences = orders_correspondence(
-    #     orders
-    # )  # this returns a list of tuples representing correspondences or an empty list
-
     orders = list(
         map(lambda order: randomize(order), orders)
     )  # if there are no correspondences, every order is randomized alone
     return orders
-
-
-def orders_correspondence(orders: List) -> List:
-    """
-    Checks if there are corresponding orders in the list of orders it
-    takes in. Corresponding orders are orders such as (x SUP y MTO LIV)
-    and (y MTO LIV). The same principle applies to supported holds and
-    convoys.
-
-    :param orders: A list of DAIDE orders in the following format. [((FRA AMY PIC) MTO BRE), ((FRA AMY PIC) HLD), ((FRA AMY BUR) HLD)]
-    :type orders: List[Tuple]
-    :return: The list of all sets (as tuples) of corresponding orders.
-    :rtype: List[Tuple]
-    """
-    correspondences = []  # a list of tuples representing all correspondences
-    for i, order in enumerate(orders):
-        if order[1] == "SUP":
-            if len(order) > 3:  # if it is supporting a move
-                u1, _, u2, _, province = order
-                if (u2, "MTO", province) in orders:
-                    correspondences.append((order, (u2, "MTO", province)))
-            else:  # if it is supporting a hold
-                u1, _, u2 = order
-                if (u2, "HLD") in orders:
-                    correspondences.append((order, (u2, "HLD")))
-        elif order[1] == "CVY":
-            convoy_moves = filter(  # filter all the convoy related moves
-                lambda order: order[1] == "CTO" or order[1] == "CVY", orders
-            )
-            correspondences.append(tuple(convoy_moves))
-    return correspondences
 
 
 def randomize(order: Command) -> Command:
