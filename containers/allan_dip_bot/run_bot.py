@@ -4,12 +4,8 @@
 import argparse
 import asyncio
 import random
-import sys
 import time
 from typing import Optional, Type
-
-sys.path.append("..")  # Adds higher directory to python modules path.
-
 
 from diplomacy import connect
 from diplomacy.client.network_game import NetworkGame
