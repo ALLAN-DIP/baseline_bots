@@ -5,7 +5,11 @@ Bots
    :members:
    :undoc-members:
 
-.. automodule:: baseline_bots.bots.loyal_bot
+.. automodule:: baseline_bots.bots.dipnet_bot
+   :members:
+   :undoc-members:
+
+.. automodule:: baseline_bots.bots.no_press_bot
    :members:
    :undoc-members:
 
@@ -13,10 +17,18 @@ Bots
    :members:
    :undoc-members:
 
-.. automodule:: baseline_bots.bots.random_allier_proposer_bot
+.. automodule:: baseline_bots.bots.random_proposer_bot
+   :members:
+   :undoc-members:
+
+.. automodule:: baseline_bots.bots.selectively_transparent_bot
    :members:
    :undoc-members:
 
 .. automodule:: baseline_bots.bots.smart_order_accepter_bot
-    :members:
-    :undoc-members:
+   :members:
+   :undoc-members:
+
+.. automodule:: baseline_bots.bots.transparent_bot
+   :members:
+   :undoc-members:
