@@ -24,3 +24,12 @@ addopts = "--verbosity=2"
 filterwarnings = [
   "ignore::DeprecationWarning",
 ]
+
+[tool.mypy]
+files = "."
+exclude = "^data/"
+show_error_codes = true
+ignore_missing_imports = true
+python_version = "3.7"
+#strict = true
+#warn_unreachable = true
