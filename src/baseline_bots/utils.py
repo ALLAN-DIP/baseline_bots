@@ -314,6 +314,37 @@ class OrdersData:
         return str(list(self))
 
 
+def deepcopy_game(game: Game) -> Game:
+    """Fast deep copy implementation, from Paquette's game engine https://github.com/diplomacy/diplomacy"""
+    if game.__class__.__name__ != "Game":
+        cls = list(game.__class__.__bases__)[0]
+        result = cls.__new__(cls)
+    else:
+        cls = game.__class__
+        result = cls.__new__(cls)
+
+    # Deep copying
+    for key in game._slots:
+        if key in [
+            "map",
+            "renderer",
+            "powers",
+            "channel",
+            "notification_callbacks",
+            "data",
+            "__weakref__",
+        ]:
+            continue
+        setattr(result, key, deepcopy(getattr(game, key)))
+    result.map = game.map
+    result.powers = {}
+    for power in game.powers.values():
+        result.powers[power.name] = deepcopy(power)
+        result.powers[power.name].game = result
+    result.role = strings.SERVER_TYPE
+    return result
+
+
 async def get_state_value(
     bot: "DipnetBot", game: Game, power_name: Optional[str], option: str = "default"
 ) -> int:
@@ -370,37 +401,6 @@ async def get_best_orders(
         best_proposer: best power that propose the best orders to a bot, this can be itself
         proposal_order[best_proposer]: the orders from the best proposer
     """
-
-    def __deepcopy__(game):
-        """Fast deep copy implementation, from Paquette's game engine https://github.com/diplomacy/diplomacy"""
-        if game.__class__.__name__ != "Game":
-            cls = list(game.__class__.__bases__)[0]
-            result = cls.__new__(cls)
-        else:
-            cls = game.__class__
-            result = cls.__new__(cls)
-
-        # Deep copying
-        for key in game._slots:
-            if key in [
-                "map",
-                "renderer",
-                "powers",
-                "channel",
-                "notification_callbacks",
-                "data",
-                "__weakref__",
-            ]:
-                continue
-            setattr(result, key, deepcopy(getattr(game, key)))
-        result.map = game.map
-        result.powers = {}
-        for power in game.powers.values():
-            result.powers[power.name] = deepcopy(power)
-            result.powers[power.name].game = result
-        result.role = strings.SERVER_TYPE
-        return result
-
     # initialize state value for each proposal
     state_value = {power: float("-inf") for power in bot.game.powers}
 
@@ -409,7 +409,7 @@ async def get_best_orders(
         # if there is a proposal from this power
         if unit_orders:
             # simulate game by copying the current one
-            simulated_game = __deepcopy__(bot.game)
+            simulated_game = deepcopy_game(bot.game)
 
             # censor aggressive orders
             unit_orders = get_non_aggressive_orders(
