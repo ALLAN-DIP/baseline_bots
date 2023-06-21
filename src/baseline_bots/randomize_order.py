@@ -5,7 +5,7 @@ an already existing order / list of orders.
 
 
 import random
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union  # noqa: F401
 
 from daidepp import (
     BLD,
@@ -152,45 +152,10 @@ def random_list_orders(orders: List[Command]) -> List[Command]:
     :return: The list of deviant orders
     :rtype: List[Tuple]
     """
-    # correspondences = orders_correspondence(
-    #     orders
-    # )  # this returns a list of tuples representing correspondences or an empty list
-
     orders = list(
         map(lambda order: randomize(order), orders)
     )  # if there are no correspondences, every order is randomized alone
     return orders
-
-
-def orders_correspondence(orders: List) -> List:
-    """
-    Checks if there are corresponding orders in the list of orders it
-    takes in. Corresponding orders are orders such as (x SUP y MTO LIV)
-    and (y MTO LIV). The same principle applies to supported holds and
-    convoys.
-
-    :param orders: A list of DAIDE orders in the following format. [((FRA AMY PIC) MTO BRE), ((FRA AMY PIC) HLD), ((FRA AMY BUR) HLD)]
-    :type orders: List[Tuple]
-    :return: The list of all sets (as tuples) of corresponding orders.
-    :rtype: List[Tuple]
-    """
-    correspondences = []  # a list of tuples representing all correspondences
-    for i, order in enumerate(orders):
-        if order[1] == "SUP":
-            if len(order) > 3:  # if it is supporting a move
-                u1, _, u2, _, province = order
-                if (u2, "MTO", province) in orders:
-                    correspondences.append((order, (u2, "MTO", province)))
-            else:  # if it is supporting a hold
-                u1, _, u2 = order
-                if (u2, "HLD") in orders:
-                    correspondences.append((order, (u2, "HLD")))
-        elif order[1] == "CVY":
-            convoy_moves = filter(  # filter all the convoy related moves
-                lambda order: order[1] == "CTO" or order[1] == "CVY", orders
-            )
-            correspondences.append(tuple(convoy_moves))
-    return correspondences
 
 
 def randomize(order: Command) -> Command:
@@ -263,16 +228,21 @@ def random_convoy(order: CVY) -> CVY:
     :return: A deviant order (with some chance of being the same order).
     :rtype: Tuple
     """
-    # fmt: off
     # TODO: Add to `daidepp`?
-    assert (order.convoyed_unit.unit_type == "AMY" and order.convoying_unit.unit_type == "FLT"), "The unit type is neither army nor fleet so it is invalid."
+    assert (
+        order.convoyed_unit.unit_type == "AMY"
+        and order.convoying_unit.unit_type == "FLT"
+    ), "The unit type is neither army nor fleet so it is invalid."
     # It is necessary to check whether a possible alternate "convoy-to" location is adjacent to the unit being convoyed
     # since convoying to a province adjacent to you would be less believable
     flt_loc = dipnetify_location(order.convoying_unit.location)
     amy_loc = dipnetify_location(order.convoyed_unit.location)
     province = dipnetify_location(order.province)
-    adj = [str(daidefy_location(loc)) for loc in ADJACENCY[flt_loc] if TYPES[loc] == "COAST" and loc not in ADJACENCY[amy_loc] and loc != province]
-    # fmt: on
+    adj = [
+        str(daidefy_location(loc))
+        for loc in ADJACENCY[flt_loc]
+        if TYPES[loc] == "COAST" and loc not in ADJACENCY[amy_loc] and loc != province
+    ]
     if adj:  # if valid adjacencies exist
         return CVY(
             order.convoying_unit,
@@ -321,7 +291,6 @@ def random_support(order: SUP) -> SUP:
             # returns the same support hold order if there is no value adjacent to both
             return order
     else:  # if it is supporting to move
-        # fmt: off
         sup_type = order.supporting_unit.unit_type
         sup_loc = dipnetify_location(order.supporting_unit.location)
         rec_type = order.supported_unit.unit_type
@@ -330,8 +299,11 @@ def random_support(order: SUP) -> SUP:
         sup_adjacent, rec_adjacent = ADJACENCY[sup_loc], ADJACENCY[rec_loc]
         # COMBOS and TYPES must be used to determine the possible locations a unit can support into/from based on the unit type and province type
         dest_choices = COMBOS[sup_type][rec_type]
-        adj_to_both = [daidefy_location(adjacency).province for adjacency in sup_adjacent if adjacency in rec_adjacent and adjacency != province and TYPES[adjacency]]
-        # fmt: on
+        adj_to_both = [
+            daidefy_location(adjacency).province
+            for adjacency in sup_adjacent
+            if adjacency in rec_adjacent and adjacency != province and TYPES[adjacency]
+        ]
         if adj_to_both:
             return SUP(
                 order.supporting_unit, order.supported_unit, random.choice(adj_to_both)

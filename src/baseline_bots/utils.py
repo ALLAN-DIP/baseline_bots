@@ -313,9 +313,6 @@ async def get_state_value(
 ) -> int:
     # rollout the game --- orders in rollout are from dipnet
     # state value
-    firststep_sc = len(game.get_centers(power_name))
-    dipnet_comparison = {power: 0 for power in game.map.powers}
-    support_count = {power: 0 for power in game.map.powers}
     movement_phase = 0
     for i in range(3 * bot.rollout_length):
         if game.get_current_phase().endswith("M"):
@@ -390,11 +387,11 @@ async def get_best_orders(
             ]:
                 continue
             setattr(result, key, deepcopy(getattr(game, key)))
-        setattr(result, "map", game.map)
-        setattr(result, "powers", {})
+        result.map = game.map
+        result.powers = {}
         for power in game.powers.values():
             result.powers[power.name] = deepcopy(power)
-            setattr(result.powers[power.name], "game", result)
+            result.powers[power.name].game = result
         result.role = strings.SERVER_TYPE
         return result
 
@@ -405,8 +402,6 @@ async def get_best_orders(
     for proposer, unit_orders in proposal_order.items():
         # if there is a proposal from this power
         if unit_orders:
-            proposed = True
-
             # simulate game by copying the current one
             simulated_game = __deepcopy__(bot.game)
 

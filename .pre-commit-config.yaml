@@ -44,17 +44,24 @@ repos:
     hooks:
       - id: prettier
         # Older LTS version needed to run on CentOS 7 (e.g., Frontera)
-        language_version: 16.20.0
+        language_version: 16.20.1
         # Workaround from https://github.com/pre-commit/mirrors-prettier/issues/29#issuecomment-1332667344
         additional_dependencies:
           - prettier@2.8.8
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.4
+    rev: v2.2.5
     hooks:
       - id: codespell
         additional_dependencies:
           - tomli==2.0.1
   - repo: https://github.com/shellcheck-py/shellcheck-py # Unofficial but maintained by asottile
-    rev: v0.9.0.2
+    rev: v0.9.0.5
     hooks:
       - id: shellcheck
+  - repo: https://github.com/pycqa/flake8
+    # Newer versions do not support Python 3.7
+    rev: 5.0.4
+    hooks:
+      - id: flake8
+        additional_dependencies: ["flake8-bugbear==23.3.12"]
+        args: ["--max-line-length=150", "--ignore=E203,W503", "--per-file-ignores=__init__.py:F401"]

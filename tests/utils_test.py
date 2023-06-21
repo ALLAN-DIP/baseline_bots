@@ -219,7 +219,8 @@ class TestUtils:
         [
             "TURKEY",
             {
-                "RUSSIA": "PRP(AND (XDO((TUR FLT ANK) MTO BLA)) (XDO((RUS AMY SEV) MTO RUM)) (XDO((ENG AMY LVP) HLD)) (ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)) (PCE (TUR RUS) ))"
+                "RUSSIA": "PRP(AND (XDO((TUR FLT ANK) MTO BLA)) (XDO((RUS AMY SEV) MTO RUM)) "
+                "(XDO((ENG AMY LVP) HLD)) (ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)) (PCE (TUR RUS) ))"
             },
             {
                 "valid_proposals": {"RUSSIA": ["F ANK - BLA"]},

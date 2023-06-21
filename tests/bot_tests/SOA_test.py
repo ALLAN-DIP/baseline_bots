@@ -72,7 +72,7 @@ class TestSOABot(AsyncTestCase):
                     daide_port=None,
                 )
                 game_created = True
-            except:
+            except Exception:
                 # game not created because of same game id
                 pass
 
@@ -106,7 +106,8 @@ class TestSOABot(AsyncTestCase):
             msgs, done = yield game_play.step()
             test_rounds_count -= 1
 
-            # Check any other country (randomly chosen RUSSIA here for this purpose) for messages received. SOA bot by design sends ALY message to all other bots
+            # Check any other country (randomly chosen RUSSIA here for this purpose)
+            # for messages received. SOA bot by design sends ALY message to all other bots
             rcvd_messages = list(
                 game_play.game.filter_messages(
                     messages=game_play.game.messages, game_role="RUSSIA"
@@ -116,7 +117,8 @@ class TestSOABot(AsyncTestCase):
             # message count should be non-zero
             assert len(rcvd_messages) != 0
 
-            # Note this is a valid test case since we know ALY is sent by SOA bot to all other powers in the beginning and this is the only bot amongst 7 powers
+            # Note this is a valid test case since we know ALY is sent by SOA bot to
+            # all other powers in the beginning and this is the only bot amongst 7 powers
             assert any(["ALY" in msg.message for msg in rcvd_messages])
         print("finish test_send_message")
 
@@ -162,7 +164,7 @@ class TestSOABot(AsyncTestCase):
                 [
                     {
                         "recipient": "RUSSIA",
-                        "message": "YES (ALY (TUR RUS ENG ITA) VSS (FRA GER AUS))",
+                        "message": "YES ( PRP ( ALY ( ENG ITA RUS TUR ) VSS ( AUS FRA GER ) ) )",
                     }
                 ],
             ]
@@ -170,9 +172,9 @@ class TestSOABot(AsyncTestCase):
 
         for tc_ip, tc_op in RESPOND_TO_ALLIANCES_TC:
             msg_data = MessagesData()
-            soa_bot.alliances = tc_ip
+            soa_bot.alliances_prps = tc_ip
             yield soa_bot.respond_to_alliance_messages(msg_data)
-            # assert msg_data.messages == tc_op, (msg_data.messages, tc_op)
+            assert msg_data.messages == tc_op, (msg_data.messages, tc_op)
 
         stop_io_loop()
 
@@ -344,7 +346,7 @@ class TestSOABot(AsyncTestCase):
 
         soa_power_units = game_play.game.powers[soa_bot.power_name].units[:]
 
-        for power, orders in valid_proposal_orders.items():
+        for orders in valid_proposal_orders.values():
             for order in orders:
                 order_token = get_order_tokens(order)
                 unit_order = order_token[0]
@@ -389,7 +391,7 @@ class TestSOABot(AsyncTestCase):
         game_play.game.set_centers("RUSSIA", ["MOS"], reset=True)
         game_play.game.set_centers("GERMANY", ["MUN", "KIE", "BER", "BEL"])
         game_play.game.set_centers(soa_bot.power_name, ["PAR", "BRE", "MAR"])
-        ret_data = yield soa_bot()
+        yield soa_bot()
         soa_bot_stance = soa_bot.stance.get_stance()[soa_bot.power_name]
         print(game_play.game.get_centers())
         print("expected stance ENGLAND: 1, RUSSIA: 1, GERMANY: -1, AUTRIA:0")

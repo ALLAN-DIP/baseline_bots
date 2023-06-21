@@ -353,7 +353,9 @@ class SmartOrderAccepterBot(DipnetBot):
             # if the stance value is lower than accept_peace_threshold (-2.5 by default)
             # we will reject the peace proposal
             if power_stance[sender] <= self.accept_peace_threshold:
-                await self.send_message(sender, str(REJ(PRP(message))), messages_data)
+                await self.send_message(
+                    sender, str(REJ(PRP(parsed_message))), messages_data
+                )
                 await self.send_intent_log(
                     "I reject the peace proposal from {} because my stance to {} is no greater than {}".format(
                         sender, sender, self.accept_peace_threshold
@@ -708,7 +710,9 @@ class SmartOrderAccepterBot(DipnetBot):
                     order, daide_orders, self.allies
                 )
                 await self.send_intent_log(
-                    f"Replacing order {daide_to_dipnet_parsing(str(order))[0]!r} with {daide_to_dipnet_parsing(str(new_order))[0]!r} because we should not be aggressive to allies."
+                    f"Replacing order {daide_to_dipnet_parsing(str(order))[0]!r} "
+                    f"with {daide_to_dipnet_parsing(str(new_order))[0]!r} because "
+                    "we should not be aggressive to allies."
                 )
             else:
                 new_order = order
@@ -765,7 +769,6 @@ class SmartOrderAccepterBot(DipnetBot):
         valid_proposal_orders = parsed_messages_dict["valid_proposals"]
         invalid_proposal_orders = parsed_messages_dict["invalid_proposals"]
         shared_orders = parsed_messages_dict["shared_orders"]
-        other_orders = parsed_messages_dict["other_orders"]
         self.alliances_prps = parsed_messages_dict["alliance_proposals"]
         self.peace_prps = parsed_messages_dict["peace_proposals"]
 
