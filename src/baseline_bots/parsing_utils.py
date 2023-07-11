@@ -23,6 +23,7 @@ from daidepp import (
 from diplomacy import Game, Message
 
 from baseline_bots.utils import (
+    DEBUG_MODE,
     get_order_tokens,
     parse_alliance_proposal,
     parse_arrangement,
@@ -232,6 +233,8 @@ def dipnet_to_daide_parsing(
                 f"\tSet of orders: {dipnet_style_order_strs}"
             )
             print(e)
+            if DEBUG_MODE:
+                raise e
             continue
     return daide_orders
 
@@ -317,6 +320,8 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
             f"\tCould not convert DAIDE command {daide_style_order_str!r} to DipNet format"
         )
         print(e)
+        if DEBUG_MODE:
+            raise e
         return None
 
 
@@ -390,6 +395,8 @@ def parse_proposal_messages(
                     f"\tUnexpected proposal message format: {order_msg.message!r}"
                 )
                 print(e)
+                if DEBUG_MODE:
+                    raise e
                 continue
 
         # Generate set of possible orders for the given power
@@ -443,6 +450,8 @@ def parse_proposal_messages(
             f"\tReceived messages: {rcvd_messages}"
         )
         print(e)
+        if DEBUG_MODE:
+            raise e
         return {
             "valid_proposals": {},
             "invalid_proposals": {},

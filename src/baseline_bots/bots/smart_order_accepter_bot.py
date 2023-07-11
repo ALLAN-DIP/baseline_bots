@@ -33,6 +33,7 @@ from baseline_bots.parsing_utils import (
 )
 from baseline_bots.randomize_order import random_list_orders
 from baseline_bots.utils import (
+    DEBUG_MODE,
     USE_LIMITED_DAIDE,
     MessagesData,
     OrdersData,
@@ -750,6 +751,8 @@ class SmartOrderAccepterBot(DipnetBot):
             print(f"Raised {type(e).__name__} in order randomization code block")
             print(e)
             print("Catching the error and resuming operations")
+            if DEBUG_MODE:
+                raise e
 
     async def do_messaging_round(
         self,

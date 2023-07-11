@@ -43,6 +43,12 @@ POWER_NAMES_DICT = {
     "TUR": "TURKEY",
 }
 
+# Option for debugging without specialized builds
+DEBUG_MODE = False
+if os.environ.get("ALLAN_DEBUG") is not None:
+    print("Enabling debugging mode")
+    DEBUG_MODE = True
+
 MESSAGE_GRAMMAR = create_daide_grammar(level=MAX_DAIDE_LEVEL, string_type="message")
 # Grammar for limited DAIDE subset used in communications protocol
 LIMITED_MESSAGE_GRAMMAR = create_grammar_from_press_keywords(
