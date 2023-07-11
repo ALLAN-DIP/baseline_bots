@@ -348,10 +348,12 @@ def deepcopy_game(game: Game) -> Game:
 async def get_state_value(
     bot: "DipnetBot", game: Game, power_name: Optional[str], option: str = "default"
 ) -> int:
+    rollout_length = getattr(bot, "rollout_length", 1)
+    rollout_n_order = getattr(bot, "rollout_n_order", 1)
     # rollout the game --- orders in rollout are from dipnet
     # state value
     movement_phase = 0
-    for i in range(3 * bot.rollout_length):
+    for i in range(3 * rollout_length):
         if game.get_current_phase().endswith("M"):
             movement_phase += 1
         for power in game.map.powers:
@@ -373,10 +375,10 @@ async def get_state_value(
 
             game.set_orders(
                 power_name=power,
-                orders=orders[: min(bot.rollout_n_order, len(orders))],
+                orders=orders[: min(rollout_n_order, len(orders))],
             )
         game.process()
-        if movement_phase >= bot.rollout_length:
+        if movement_phase >= rollout_length:
             break
     return (
         len(game.get_centers(power_name))
