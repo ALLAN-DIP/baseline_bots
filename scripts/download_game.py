@@ -6,36 +6,36 @@ import argparse
 import asyncio
 import json
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from diplomacy.client.connection import connect
 from diplomacy.client.network_game import NetworkGame
 from diplomacy.utils.export import to_saved_game_format
 
+REPO_DIR = Path(__file__).resolve().parent.parent
+
 DEFAULT_USER = "allanumd"
 DEFAULT_PASSWORD = "password"
+DEFAULT_HOST = "localhost"
+DEFAULT_PORT = 8432
 
 
 async def download_game(
     game_id: str,
-    output_file: Path,
     user: str = DEFAULT_USER,
     password: str = DEFAULT_PASSWORD,
     game_password: Optional[str] = None,
-    hostname: str = "localhost",
-    port: int = 8432,
-) -> None:
+    hostname: str = DEFAULT_HOST,
+    port: int = DEFAULT_PORT,
+) -> Any:
     """Downloads a game from the Diplomacy server"""
     connection = await connect(hostname, port)
     channel = await connection.authenticate(user, password)
     game: NetworkGame = await channel.join_game(
         game_id=game_id, power_name=None, registration_password=game_password
     )
-
-    with open(output_file, mode="w") as file:
-        json.dump(to_saved_game_format(game), file, ensure_ascii=False, indent=2)
-        file.write("\n")
-    print(f"Wrote game log to file {str(output_file)!r}")
+    game_json = to_saved_game_format(game)
+    return game_json
 
 
 def main() -> None:
@@ -48,30 +48,39 @@ def main() -> None:
     )
     parser.add_argument("--game-password", type=str, help="Game password.")
     parser.add_argument(
-        "--host", type=str, default="localhost", help="Server hostname."
+        "--host", type=str, default=DEFAULT_HOST, help="Server hostname."
     )
-    parser.add_argument("--port", type=int, default=8432, help="Server port.")
+    parser.add_argument("--port", type=int, default=DEFAULT_PORT, help="Server port.")
     args = parser.parse_args()
+    game_id: str = args.game_id
+    raw_output_file: Optional[Path] = args.output_file
+    user: str = args.user
+    password: str = args.password
+    game_password: Optional[str] = args.game_password
+    host: str = args.host
+    port: int = args.port
 
-    if args.output_file is None:
-        repository_dir = Path(__file__).resolve().parent.parent
-        output_file = repository_dir / "data" / f"{args.game_id}_log.json"
+    if raw_output_file is None:
+        output_file = REPO_DIR / "data" / f"{game_id}_log.json"
     else:
-        output_file = args.output_file
+        output_file = raw_output_file
     if not output_file.parent.is_dir():
         output_file.parent.mkdir(parents=True, exist_ok=True)
 
-    asyncio.run(
+    game_json = asyncio.run(
         download_game(
-            game_id=args.game_id,
-            output_file=output_file,
-            user=args.user,
-            password=args.password,
-            game_password=args.game_password,
-            hostname=args.host,
-            port=args.port,
+            game_id=game_id,
+            user=user,
+            password=password,
+            game_password=game_password,
+            hostname=host,
+            port=port,
         )
     )
+    with open(output_file, mode="w") as file:
+        json.dump(game_json, file, ensure_ascii=False, indent=2)
+        file.write("\n")
+    print(f"Wrote game log to file {str(output_file)!r}")
 
 
 if __name__ == "__main__":
