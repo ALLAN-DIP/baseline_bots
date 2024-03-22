@@ -64,6 +64,15 @@ ENV PYTHONPATH=/model/src/model_server/research:$PYTHONPATH
 # Copy baseline_bots code into the Docker image
 COPY src/ /model/src/model_server/baseline_bots/src/
 
+# Generate batch file for running server
+COPY containers/allan_dip_bot/ /model/src/model_server/baseline_bots/containers/allan_dip_bot/
+RUN chmod -R 777 /model/src/model_server/baseline_bots/containers/allan_dip_bot/
+
+ENV BATCH_FILE=/model/src/model_server/baseline_bots/batch.txt
+ENV WORKING_DIR=/model/src/model_server/research/WORKING_DIR
+
+RUN bash /model/src/model_server/baseline_bots/containers/allan_dip_bot/generate_batch_file.sh
+
 FROM base AS dev
 
 # Copy specialized files
@@ -80,12 +89,6 @@ FROM dev as test_ci
 CMD ["/bin/bash", "-c", "/model/src/model_server/baseline_bots/containers/allan_dip_bot/run_model_server.sh & pytest"]
 
 FROM base AS allan_dip_bot
-
-# Copy specialized files
-COPY containers/allan_dip_bot/ /model/src/model_server/baseline_bots/containers/allan_dip_bot/
-RUN chmod -R 777 /model/src/model_server/baseline_bots/containers/allan_dip_bot/
-
-ENV WORKING_DIR=/model/src/model_server/research/WORKING_DIR
 
 # Script executors
 ENTRYPOINT ["/model/src/model_server/baseline_bots/containers/allan_dip_bot/run.sh"]
