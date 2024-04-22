@@ -1,0 +1,29 @@
+[
+  {
+    "id": "antony_template",
+    "agents": {
+      "AUSTRIA": {
+        "agent_params": ""
+      },
+      "ENGLAND": {
+        "agent_params": ""
+      },
+      "FRANCE": {
+        "agent_params": ""
+      },
+      "GERMANY": {
+        "agent_params": ""
+      },
+      "ITALY": {
+        "agent_params": ""
+      },
+      "RUSSIA": {
+        "agent_params": ""
+      },
+      "TURKEY": {
+        "agent_params": ""
+      }
+    },
+    "stop_year": 1905
+  }
+]

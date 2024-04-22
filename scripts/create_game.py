@@ -5,26 +5,30 @@
 import argparse
 import asyncio
 import json
-from typing import Optional, Sequence
+from typing import Any, Optional, Sequence
 
 from diplomacy.client.connection import connect
 
 DEFAULT_RULES = ("REAL_TIME", "POWER_CHOICE")
+DEFAULT_DEADLINE = 0
+DEFAULT_NUM_PLAYERS = 7
 DEFAULT_USER = "allanumd"
 DEFAULT_PASSWORD = "password"
+DEFAULT_HOST = "localhost"
+DEFAULT_PORT = 8432
 
 
 async def create_game(
     game_id: str,
     rules: Sequence[str] = DEFAULT_RULES,
-    deadline: int = 0,
-    n_controls: int = 7,
+    deadline: int = DEFAULT_DEADLINE,
+    n_controls: int = DEFAULT_NUM_PLAYERS,
     user: str = DEFAULT_USER,
     password: str = DEFAULT_PASSWORD,
     game_password: Optional[str] = None,
-    hostname: str = "localhost",
-    port: int = 8432,
-) -> None:
+    hostname: str = DEFAULT_HOST,
+    port: int = DEFAULT_PORT,
+) -> Any:
     """Creates a game on the Diplomacy server"""
     connection = await connect(hostname, port)
     channel = await connection.authenticate(user, password)
@@ -47,7 +51,7 @@ async def create_game(
         "status": game.status,
         "daide_port": game.daide_port,
     }
-    print(json.dumps(game_data, ensure_ascii=False, indent=4))
+    return game_data
 
 
 def main() -> None:
@@ -55,12 +59,15 @@ def main() -> None:
     parser.add_argument("--game_id", type=str, required=True, help="Game ID.")
     parser.add_argument("--rules", nargs="+", default=DEFAULT_RULES, help="Game rules.")
     parser.add_argument(
-        "--deadline", type=int, default=0, help="Turn deadline in seconds."
+        "--deadline",
+        type=int,
+        default=DEFAULT_DEADLINE,
+        help="Turn deadline in seconds.",
     )
     parser.add_argument(
         "--n_controls",
         type=int,
-        default=7,
+        default=DEFAULT_NUM_PLAYERS,
         help="Number of controlled powers (default: %(default)s)",
     )
     parser.add_argument("--user", type=str, default=DEFAULT_USER, help="SHADE user.")
@@ -69,9 +76,9 @@ def main() -> None:
     )
     parser.add_argument("--game-password", type=str, help="Game password.")
     parser.add_argument(
-        "--host", type=str, default="localhost", help="Server hostname."
+        "--host", type=str, default=DEFAULT_HOST, help="Server hostname."
     )
-    parser.add_argument("--port", type=int, default=8432, help="Server port.")
+    parser.add_argument("--port", type=int, default=DEFAULT_PORT, help="Server port.")
     args = parser.parse_args()
 
     if args.deadline < 0:
@@ -81,7 +88,7 @@ def main() -> None:
     if args.n_controls > 7:
         raise ValueError("--n_controls cannot be greater than 7")
 
-    asyncio.run(
+    game_data = asyncio.run(
         create_game(
             game_id=args.game_id,
             rules=args.rules,
@@ -94,6 +101,7 @@ def main() -> None:
             port=args.port,
         )
     )
+    print(json.dumps(game_data, ensure_ascii=False, indent=4))
 
 
 if __name__ == "__main__":
