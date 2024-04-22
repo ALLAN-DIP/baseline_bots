@@ -43,6 +43,12 @@ POWER_NAMES_DICT = {
     "TUR": "TURKEY",
 }
 
+# Option for debugging without specialized builds
+DEBUG_MODE = False
+if os.environ.get("ALLAN_DEBUG") is not None:
+    print("Enabling debugging mode")
+    DEBUG_MODE = True
+
 MESSAGE_GRAMMAR = create_daide_grammar(level=MAX_DAIDE_LEVEL, string_type="message")
 # Grammar for limited DAIDE subset used in communications protocol
 LIMITED_MESSAGE_GRAMMAR = create_grammar_from_press_keywords(
@@ -308,18 +314,51 @@ class OrdersData:
         return str(list(self))
 
 
+def deepcopy_game(game: Game) -> Game:
+    """Fast deep copy implementation, from Paquette's game engine https://github.com/diplomacy/diplomacy"""
+    if game.__class__.__name__ != "Game":
+        cls = list(game.__class__.__bases__)[0]
+        result = cls.__new__(cls)
+    else:
+        cls = game.__class__
+        result = cls.__new__(cls)
+
+    # Deep copying
+    for key in game._slots:
+        if key in [
+            "map",
+            "renderer",
+            "powers",
+            "channel",
+            "notification_callbacks",
+            "data",
+            "__weakref__",
+        ]:
+            continue
+        setattr(result, key, deepcopy(getattr(game, key)))
+    result.map = game.map
+    result.powers = {}
+    for power in game.powers.values():
+        result.powers[power.name] = deepcopy(power)
+        result.powers[power.name].game = result
+    result.role = strings.SERVER_TYPE
+    return result
+
+
 async def get_state_value(
     bot: "DipnetBot", game: Game, power_name: Optional[str], option: str = "default"
 ) -> int:
+    rollout_length = getattr(bot, "rollout_length", 1)
+    rollout_n_order = getattr(bot, "rollout_n_order", 1)
     # rollout the game --- orders in rollout are from dipnet
     # state value
     movement_phase = 0
-    for i in range(3 * bot.rollout_length):
+    for i in range(3 * rollout_length):
         if game.get_current_phase().endswith("M"):
             movement_phase += 1
         for power in game.map.powers:
             if option == "samplingbeam":
-                list_order, prob_order = await bot.brain.get_beam_orders(game, power)
+                list_order, prob_order = await bot.get_brain_beam_orders(game, power)
 
                 if len(list_order) > 0:
                     prob_order = np.array(prob_order)
@@ -328,18 +367,18 @@ async def get_state_value(
                     select_index = np.random.choice(orders_index, p=prob_order)
                     orders = list_order[select_index]
                 else:
-                    orders = await bot.brain.get_orders(game, power)
+                    orders = await bot.get_brain_orders(game, power)
             elif option == "default":
-                orders = await bot.brain.get_orders(game, power)
+                orders = await bot.get_brain_orders(game, power)
             else:
                 raise ValueError(f"invalid option {option!r}")
 
             game.set_orders(
                 power_name=power,
-                orders=orders[: min(bot.rollout_n_order, len(orders))],
+                orders=orders[: min(rollout_n_order, len(orders))],
             )
         game.process()
-        if movement_phase >= bot.rollout_length:
+        if movement_phase >= rollout_length:
             break
     return (
         len(game.get_centers(power_name))
@@ -364,37 +403,6 @@ async def get_best_orders(
         best_proposer: best power that propose the best orders to a bot, this can be itself
         proposal_order[best_proposer]: the orders from the best proposer
     """
-
-    def __deepcopy__(game):
-        """Fast deep copy implementation, from Paquette's game engine https://github.com/diplomacy/diplomacy"""
-        if game.__class__.__name__ != "Game":
-            cls = list(game.__class__.__bases__)[0]
-            result = cls.__new__(cls)
-        else:
-            cls = game.__class__
-            result = cls.__new__(cls)
-
-        # Deep copying
-        for key in game._slots:
-            if key in [
-                "map",
-                "renderer",
-                "powers",
-                "channel",
-                "notification_callbacks",
-                "data",
-                "__weakref__",
-            ]:
-                continue
-            setattr(result, key, deepcopy(getattr(game, key)))
-        result.map = game.map
-        result.powers = {}
-        for power in game.powers.values():
-            result.powers[power.name] = deepcopy(power)
-            result.powers[power.name].game = result
-        result.role = strings.SERVER_TYPE
-        return result
-
     # initialize state value for each proposal
     state_value = {power: float("-inf") for power in bot.game.powers}
 
@@ -403,7 +411,7 @@ async def get_best_orders(
         # if there is a proposal from this power
         if unit_orders:
             # simulate game by copying the current one
-            simulated_game = __deepcopy__(bot.game)
+            simulated_game = deepcopy_game(bot.game)
 
             # censor aggressive orders
             unit_orders = get_non_aggressive_orders(
@@ -419,7 +427,7 @@ async def get_best_orders(
                 if other_power in shared_order:
                     power_orders = shared_order[other_power]
                 else:
-                    power_orders = await bot.brain.get_orders(
+                    power_orders = await bot.get_brain_orders(
                         simulated_game, other_power
                     )
                 simulated_game.set_orders(power_name=other_power, orders=power_orders)

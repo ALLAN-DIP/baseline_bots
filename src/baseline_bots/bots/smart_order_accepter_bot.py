@@ -33,6 +33,7 @@ from baseline_bots.parsing_utils import (
 )
 from baseline_bots.randomize_order import random_list_orders
 from baseline_bots.utils import (
+    DEBUG_MODE,
     USE_LIMITED_DAIDE,
     MessagesData,
     OrdersData,
@@ -657,7 +658,7 @@ class SmartOrderAccepterBot(DipnetBot):
 
         """
         unit = dipnetify_unit(order.unit)
-        list_order, _ = await self.brain.get_beam_orders(self.game, self.power_name)
+        list_order, _ = await self.get_brain_beam_orders()
 
         if len(list_order) > 1:
             for i in range(1, len(list_order)):
@@ -710,13 +711,13 @@ class SmartOrderAccepterBot(DipnetBot):
                     order, daide_orders, self.allies
                 )
                 await self.send_intent_log(
-                    f"Replacing order {daide_to_dipnet_parsing(str(order))[0]!r} "
-                    f"with {daide_to_dipnet_parsing(str(new_order))[0]!r} because "
+                    f"Replacing order {daide_to_dipnet_parsing(order)[0]!r} "
+                    f"with {daide_to_dipnet_parsing(new_order)[0]!r} because "
                     "we should not be aggressive to allies."
                 )
             else:
                 new_order = order
-            final_orders.append(daide_to_dipnet_parsing(str(new_order))[0])
+            final_orders.append(daide_to_dipnet_parsing(new_order)[0])
 
         orders_data = OrdersData()
         orders_data.add_orders(final_orders)
@@ -750,6 +751,8 @@ class SmartOrderAccepterBot(DipnetBot):
             print(f"Raised {type(e).__name__} in order randomization code block")
             print(e)
             print("Catching the error and resuming operations")
+            if DEBUG_MODE:
+                raise e
 
     async def do_messaging_round(
         self,
@@ -860,7 +863,7 @@ class SmartOrderAccepterBot(DipnetBot):
 
     async def __call__(self) -> List[str]:
         # get dipnet order
-        orders = await self.brain.get_orders(self.game, self.power_name)
+        orders = await self.get_brain_orders()
         orders_data = OrdersData()
         orders_data.add_orders(orders)
         await self.send_intent_log(

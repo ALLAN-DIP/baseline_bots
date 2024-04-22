@@ -2,6 +2,8 @@
 # Use the command `hadolint Dockerfile` to test
 # Adding Hadolint to `pre-commit` is non-trivial, so the command must be run manually
 
+FROM allanumd/allan_bots:model_zip as model_zip
+
 FROM pcpaquette/tensorflow-serving:20190226 AS base
 
 WORKDIR /model/src/model_server
@@ -14,10 +16,9 @@ RUN apt-get -y update \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy SL model
-RUN wget --progress=dot:giga https://f002.backblazeb2.com/file/ppaquette-public/benchmarks/neurips2019-sl_model.zip \
-    && mkdir /model/src/model_server/bot_neurips2019-sl_model \
-    && unzip neurips2019-sl_model.zip -d /model/src/model_server/bot_neurips2019-sl_model \
-    && rm neurips2019-sl_model.zip \
+RUN --mount=from=model_zip,target=/model_zip \
+    mkdir /model/src/model_server/bot_neurips2019-sl_model \
+    && unzip /model_zip/neurips2019-sl_model.zip -d /model/src/model_server/bot_neurips2019-sl_model \
     && chmod -R 777 /model/src/model_server/bot_neurips2019-sl_model
 
 # Clone and prepare research repo

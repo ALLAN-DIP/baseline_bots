@@ -23,6 +23,7 @@ from daidepp import (
 from diplomacy import Game, Message
 
 from baseline_bots.utils import (
+    DEBUG_MODE,
     get_order_tokens,
     parse_alliance_proposal,
     parse_arrangement,
@@ -232,6 +233,8 @@ def dipnet_to_daide_parsing(
                 f"\tSet of orders: {dipnet_style_order_strs}"
             )
             print(e)
+            if DEBUG_MODE:
+                raise e
             continue
     return daide_orders
 
@@ -265,47 +268,45 @@ def dipnetify_unit(unit: Unit) -> str:
     return f"{unit_type} {location}"
 
 
-def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
+def daide_to_dipnet_parsing(daide_order: Command) -> Tuple[str, str]:
     """Convert single DAIDE-style order to DipNet-style order
 
     More details here: https://docs.google.com/document/d/16RODa6KDX7vNNooBdciI4NqSVN31lToto3MLTNcEHk0/edit?usp=sharing
 
-    :param daide_style_order_str: DAIDE-style string to be converted to DipNet style
+    :param daide_order: DAIDE-style order to be converted to DipNet style
     :return: DipNet-style order string and unit's power name
     """
 
     try:
-        parsed_order: Command = parse_daide(daide_style_order_str)
-
         # Dipnetify source unit
-        acting_unit = dipnetify_unit(parsed_order.unit)
-        unit_power = parsed_order.unit.power
-        if isinstance(parsed_order, SUP):
+        acting_unit = dipnetify_unit(daide_order.unit)
+        unit_power = daide_order.unit.power
+        if isinstance(daide_order, SUP):
             # Support order
-            supported_unit = dipnetify_unit(parsed_order.supported_unit)
+            supported_unit = dipnetify_unit(daide_order.supported_unit)
             dipnet_order = f"{acting_unit} S {supported_unit}"
-            if parsed_order.province_no_coast_location is not None:
-                prov = dipnetify_location(parsed_order.province_no_coast_location)
+            if daide_order.province_no_coast_location is not None:
+                prov = dipnetify_location(daide_order.province_no_coast_location)
                 dipnet_order += f" - {prov}"
-        elif isinstance(parsed_order, HLD):
+        elif isinstance(daide_order, HLD):
             # Hold order
             dipnet_order = f"{acting_unit} H"
-        elif isinstance(parsed_order, MoveByCVY):
+        elif isinstance(daide_order, MoveByCVY):
             # CTO order
-            prov = dipnetify_location(parsed_order.province)
+            prov = dipnetify_location(daide_order.province)
             dipnet_order = f"{acting_unit} - {prov} VIA"
-        elif isinstance(parsed_order, CVY):
+        elif isinstance(daide_order, CVY):
             # Convoy order
-            convoyed_unit = dipnetify_unit(parsed_order.convoyed_unit)
-            prov = dipnetify_location(parsed_order.province)
+            convoyed_unit = dipnetify_unit(daide_order.convoyed_unit)
+            prov = dipnetify_location(daide_order.province)
             dipnet_order = f"{acting_unit} C {convoyed_unit} - {prov}"
-        elif isinstance(parsed_order, MTO):
+        elif isinstance(daide_order, MTO):
             # Move orders
-            prov = dipnetify_location(parsed_order.location)
+            prov = dipnetify_location(daide_order.location)
             dipnet_order = f"{acting_unit} - {prov}"
         else:
             raise NotImplementedError(
-                f"Conversion for {type(parsed_order).__name__} commands has not been implemented yet"
+                f"Conversion for {type(daide_order).__name__} commands has not been implemented yet"
             )
 
         return dipnet_order, unit_power
@@ -314,9 +315,11 @@ def daide_to_dipnet_parsing(daide_style_order_str: str) -> Tuple[str, str]:
     except Exception as e:
         print(
             f"ALLAN: error from {__name__}.{daide_to_dipnet_parsing.__name__}\n"
-            f"\tCould not convert DAIDE command {daide_style_order_str!r} to DipNet format"
+            f"\tCould not convert DAIDE command {str(daide_order)!r} to DipNet format"
         )
         print(e)
+        if DEBUG_MODE:
+            raise e
         return None
 
 
@@ -365,7 +368,7 @@ def parse_proposal_messages(
                 ]
                 for order in daide_style_orders:
                     if isinstance(order, XDO):
-                        temp_message = daide_to_dipnet_parsing(str(order.order))
+                        temp_message = daide_to_dipnet_parsing(order.order)
                         if temp_message:
                             proposals[order_msg.sender].append(temp_message)
                     # from RY: I think this parsing is problematic though..
@@ -390,6 +393,8 @@ def parse_proposal_messages(
                     f"\tUnexpected proposal message format: {order_msg.message!r}"
                 )
                 print(e)
+                if DEBUG_MODE:
+                    raise e
                 continue
 
         # Generate set of possible orders for the given power
@@ -443,6 +448,8 @@ def parse_proposal_messages(
             f"\tReceived messages: {rcvd_messages}"
         )
         print(e)
+        if DEBUG_MODE:
+            raise e
         return {
             "valid_proposals": {},
             "invalid_proposals": {},
