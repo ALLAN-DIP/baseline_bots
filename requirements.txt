@@ -1,5 +1,5 @@
 daidepp @ git+https://git@github.com/SHADE-AI/daidepp.git@d55a2090c261783e5128fc7c58b5cb137a7653a6
-diplomacy @ git+https://git@github.com/SHADE-AI/diplomacy.git@ef624e31839de8aaa8b0d62ebd4d394a5178d54e
+diplomacy @ git+https://git@github.com/ALLAN-DIP/diplomacy.git@647ddb467d8cba8895fc8305e2449b8cb90fbea0
 gym==0.18.3
 karma-sphinx-theme==0.0.8
 numpy==1.21.6
