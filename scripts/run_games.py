@@ -123,7 +123,7 @@ def main():
     log_dir.mkdir(parents=True, exist_ok=True)
     data_dir = output_dir / "data"
     data_dir.mkdir(parents=True, exist_ok=True)
-    powers = sorted(POWER_NAMES_DICT.values())[1:]
+    powers = sorted(POWER_NAMES_DICT.values())
     run_cmds = []
     for power in powers:
         # `localhost` doesn't work when running an agent with Docker Desktop
