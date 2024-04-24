@@ -90,5 +90,7 @@ CMD ["/bin/bash", "-c", "/model/src/model_server/baseline_bots/containers/allan_
 
 FROM base AS allan_dip_bot
 
+ENV DIPLOMACY_LOGGING=DEBUG
+
 # Script executors
 ENTRYPOINT ["/model/src/model_server/baseline_bots/containers/allan_dip_bot/run.sh"]
