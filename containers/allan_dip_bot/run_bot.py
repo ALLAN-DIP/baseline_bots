@@ -40,7 +40,7 @@ async def play(
     """
 
     # Connect to the game
-    print(f"DipNetSL joining game: {game_id} as {power_name}")
+    print(f"{bot_class.__name__} joining game {game_id!r} as {power_name}")
     connection = await connect(hostname, port)
     channel = await connection.authenticate(
         f"allan_{bot_class.__name__.lower()}_{power_name}", "password"
@@ -49,12 +49,7 @@ async def play(
         game_id=game_id, power_name=power_name, player_type=bot_class.player_type
     )
 
-    if bot_class in [
-        RandomProposerBot,
-    ]:
-        bot: BaselineBot = bot_class(power_name, game)
-    else:
-        raise ValueError(f"{bot_class.__name__!r} is not a valid bot type")
+    bot = bot_class(power_name, game)
 
     # Wait while game is still being formed
     print("Waiting for game to start", end=" ")
