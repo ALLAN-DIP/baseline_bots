@@ -21,6 +21,6 @@ check: precommit test
 .PHONY: build
 build:
 	docker build \
-		--target bot \
+		--target achilles \
 		--tag achilles \
 		.
