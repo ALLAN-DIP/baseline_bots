@@ -4,14 +4,13 @@ import datetime
 
 from diplomacy import Game, Message
 from diplomacy.client.connection import connect
-from diplomacy_research.utils.cluster import stop_io_loop
+# from diplomacy_research.utils.cluster import stop_io_loop
 from gameplay_framework import GamePlay
 from tornado import testing
 from tornado.testing import AsyncTestCase
 from typing_extensions import Final
 
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
-from baseline_bots.bots.smart_order_accepter_bot import SmartOrderAccepterBot
 from baseline_bots.parsing_utils import parse_proposal_messages
 from baseline_bots.utils import MessagesData, OrdersData, get_order_tokens
 
