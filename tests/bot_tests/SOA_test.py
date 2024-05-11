@@ -5,7 +5,7 @@ import datetime
 from diplomacy import Game, Message
 from diplomacy.client.connection import connect
 from gameplay_framework import GamePlay
-from tornado import testing, ioloop
+from tornado import ioloop, testing
 from tornado.testing import AsyncTestCase
 from typing_extensions import Final
 
@@ -19,8 +19,7 @@ SOA_TEST_PARAMS: Final = {
 
 
 def stop_io_loop():
-    """ Stops an asynchronous IO loop
-    """
+    """Stops an asynchronous IO loop"""
     # Based on https://github.com/SHADE-AI/research/blob/27edb5b98abb4e0af8e551d88ece28cd8ced5e1e/diplomacy_research/utils/cluster.py#L280-L286
     io_loop = ioloop.IOLoop.instance()
     io_loop.stop()
@@ -186,9 +185,7 @@ class TestSOABot(AsyncTestCase):
     def test_score_stance(self):
         # score-based
         game = Game()
-        soa_bot = RandomProposerBot(
-            "FRANCE", game
-        )
+        soa_bot = RandomProposerBot("FRANCE", game)
         bot_instances = [
             RandomProposerBot("AUSTRIA", game),
             RandomProposerBot("ENGLAND", game),
@@ -375,9 +372,7 @@ class TestSOABot(AsyncTestCase):
     def test_gen_pos_stance_messages(self):
         # gen for only allies
         game = Game()
-        soa_bot = RandomProposerBot(
-            "FRANCE", game
-        )
+        soa_bot = RandomProposerBot("FRANCE", game)
         soa_bot.ally_threshold = 0.5
         bot_instances = [
             RandomProposerBot("AUSTRIA", game),

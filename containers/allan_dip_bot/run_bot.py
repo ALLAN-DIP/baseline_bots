@@ -4,16 +4,15 @@
 import argparse
 import asyncio
 import random
+import socket
 import time
 from typing import Type
 
 from diplomacy import connect
 from diplomacy.client.network_game import NetworkGame
-import socket
 
 from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
-
 
 POWERS = ["AUSTRIA", "ENGLAND", "FRANCE", "GERMANY", "ITALY", "RUSSIA", "TURKEY"]
 BOTS = [
@@ -22,10 +21,10 @@ BOTS = [
 NAMES_TO_BOTS = {bot.__name__: bot for bot in BOTS}
 
 
-def is_port_opened(port, hostname='127.0.0.1'):
-    """ Checks if the specified port is opened
-        :param port: The port to check
-        :param hostname: The hostname to check, defaults to '127.0.0.1'
+def is_port_opened(port, hostname="127.0.0.1"):
+    """Checks if the specified port is opened
+    :param port: The port to check
+    :param hostname: The hostname to check, defaults to '127.0.0.1'
     """
     # Copied from https://github.com/SHADE-AI/research/blob/27edb5b98abb4e0af8e551d88ece28cd8ced5e1e/diplomacy_research/utils/cluster.py#L228-L237
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
