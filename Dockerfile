@@ -37,7 +37,8 @@ COPY src/ src/
 FROM base AS dev
 
 # Copy specialized files
-COPY containers/ /model/src/model_server/baseline_bots/containers/
+COPY containers/allan_dip_bot/run.sh .
+COPY containers/allan_dip_bot/run_bot.py .
 COPY scripts/ /model/src/model_server/baseline_bots/scripts/
 COPY tests/ /model/src/model_server/baseline_bots/tests/
 
