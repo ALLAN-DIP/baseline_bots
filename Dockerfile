@@ -34,15 +34,9 @@ RUN pip install --no-cache-dir -e .
 # Copy baseline_bots code into the Docker image
 COPY src/ src/
 
-FROM base AS dev
+FROM base as test_ci
 
-# Copy specialized files
-COPY containers/allan_dip_bot/run.sh .
-COPY containers/allan_dip_bot/run_bot.py .
-COPY scripts/ /model/src/model_server/baseline_bots/scripts/
-COPY tests/ /model/src/model_server/baseline_bots/tests/
-
-FROM dev as test_ci
+COPY tests/ tests/
 
 # Test parameter for async tests
 ENV ASYNC_TEST_TIMEOUT=180
@@ -50,6 +44,9 @@ ENV ASYNC_TEST_TIMEOUT=180
 CMD ["/bin/bash", "-c", "pytest"]
 
 FROM base AS allan_dip_bot
+
+COPY containers/allan_dip_bot/run.sh .
+COPY containers/allan_dip_bot/run_bot.py .
 
 # Script executors
 ENTRYPOINT ["/bot/run.sh"]
