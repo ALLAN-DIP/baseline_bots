@@ -16,11 +16,6 @@ RUN apt-get -y update \
 # Later versions of pip and setuptools do not work properly
 RUN pip install --no-cache-dir --upgrade pip==24.0
 
-# Install baseline_bots requirements
-# hadolint ignore=DL3059
-RUN mkdir -p /model/src/model_server/baseline_bots/src
-WORKDIR /model/src/model_server/baseline_bots
-
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
