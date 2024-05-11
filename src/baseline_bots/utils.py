@@ -9,7 +9,7 @@ from collections import defaultdict
 import collections.abc
 from copy import deepcopy
 import os
-from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Sequence, Set, Tuple
+from typing import Dict, Iterator, List, Optional, Sequence, Set
 
 import daidepp
 from daidepp import (
@@ -27,11 +27,6 @@ from daidepp import (
 from daidepp.grammar.grammar import MAX_DAIDE_LEVEL
 from diplomacy import Game
 from diplomacy.utils import strings
-import numpy as np
-
-if TYPE_CHECKING:
-    from baseline_bots.bots.dipnet_bot import DipnetBot
-
 
 POWER_NAMES_DICT = {
     "AUS": "AUSTRIA",
@@ -343,130 +338,6 @@ def deepcopy_game(game: Game) -> Game:
         result.powers[power.name].game = result
     result.role = strings.SERVER_TYPE
     return result
-
-
-async def get_state_value(
-    bot: "DipnetBot", game: Game, power_name: Optional[str], option: str = "default"
-) -> int:
-    rollout_length = getattr(bot, "rollout_length", 1)
-    rollout_n_order = getattr(bot, "rollout_n_order", 1)
-    # rollout the game --- orders in rollout are from dipnet
-    # state value
-    movement_phase = 0
-    for i in range(3 * rollout_length):
-        if game.get_current_phase().endswith("M"):
-            movement_phase += 1
-        for power in game.map.powers:
-            if option == "samplingbeam":
-                list_order, prob_order = await bot.get_brain_beam_orders(game, power)
-
-                if len(list_order) > 0:
-                    prob_order = np.array(prob_order)
-                    prob_order /= prob_order.sum()
-                    orders_index = [i for i in range(len(list_order))]
-                    select_index = np.random.choice(orders_index, p=prob_order)
-                    orders = list_order[select_index]
-                else:
-                    orders = await bot.get_brain_orders(game, power)
-            elif option == "default":
-                orders = await bot.get_brain_orders(game, power)
-            else:
-                raise ValueError(f"invalid option {option!r}")
-
-            game.set_orders(
-                power_name=power,
-                orders=orders[: min(rollout_n_order, len(orders))],
-            )
-        game.process()
-        if movement_phase >= rollout_length:
-            break
-    return (
-        len(game.get_centers(power_name))
-        + 0.5 * len(game.powers[power_name].units)
-        + 0.3 * len(game.get_power(power_name).influence)
-    )
-
-
-async def get_best_orders(
-    bot: "DipnetBot",
-    proposal_order: Dict[str, List[str]],
-    shared_order: Dict[str, List[str]],
-) -> Tuple[str, List[str]]:
-    """
-    input:
-        bot: A bot instance e.g. RealPolitik
-        proposal_order: a dictionary of key=power name of proposer, value=list of orders. This can include self base order
-                        i.e. if a bot is RealPolitik, its base order is from DipNet
-        shared_order: a dictionary of key=power name of proposer, value=list of orders. The proposers share info (or orders) about the current turn,
-                    where we can use these shared order to our current turn in a simulated game to roll out with most correct info.
-    output:
-        best_proposer: best power that propose the best orders to a bot, this can be itself
-        proposal_order[best_proposer]: the orders from the best proposer
-    """
-    # initialize state value for each proposal
-    state_value = {power: float("-inf") for power in bot.game.powers}
-
-    # get state value for each proposal
-    for proposer, unit_orders in proposal_order.items():
-        # if there is a proposal from this power
-        if unit_orders:
-            # simulate game by copying the current one
-            simulated_game = deepcopy_game(bot.game)
-
-            # censor aggressive orders
-            unit_orders = get_non_aggressive_orders(
-                unit_orders, bot.power_name, bot.game
-            )
-
-            # set orders as a proposal order
-            simulated_game.set_orders(power_name=bot.power_name, orders=unit_orders)
-
-            # consider shared orders in a simulated game
-            for other_power in simulated_game.powers:
-                # if they are not sharing any info about their orders then assume that they are DipNet-based
-                if other_power in shared_order:
-                    power_orders = shared_order[other_power]
-                else:
-                    power_orders = await bot.get_brain_orders(
-                        simulated_game, other_power
-                    )
-                simulated_game.set_orders(power_name=other_power, orders=power_orders)
-
-            # process current turn
-            simulated_game.process()
-
-            # rollout and get state value
-            state_value[proposer] = await get_state_value(
-                bot, simulated_game, bot.power_name
-            )
-
-    # get power name that gives the max state value
-    best_proposer = max(state_value, key=state_value.get)
-    return best_proposer, proposal_order[best_proposer]
-
-
-def smart_select_support_proposals(
-    possible_support_proposals: Dict[str, List[Tuple[str, str, str]]]
-) -> Dict[str, List[Tuple[str, str, str]]]:
-    optimal_possible_support_proposals = defaultdict(list)
-    optimal_ordering_units = set()
-    order_proposal_mapping = defaultdict(list)
-    for ord_list in possible_support_proposals.values():
-        for ordering_unit, move_to_support, order in ord_list:
-            order_proposal_mapping[move_to_support].append(
-                (ordering_unit, move_to_support, order)
-            )
-    order_proposal_mapping_sorted = [x for x in order_proposal_mapping.items()]
-    order_proposal_mapping_sorted.sort(key=lambda x: len(x[1]), reverse=True)
-    for move_to_support, order_list in order_proposal_mapping_sorted:
-        for ordering_unit, move_to_support, order in order_list:
-            if ordering_unit not in optimal_ordering_units:
-                optimal_possible_support_proposals[ordering_unit].append(
-                    (ordering_unit, move_to_support, order)
-                )
-            if len(order_list) > 1:
-                optimal_ordering_units.add(ordering_unit)
-    return optimal_possible_support_proposals
 
 
 def neighboring_opps(
