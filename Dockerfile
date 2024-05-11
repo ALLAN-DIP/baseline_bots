@@ -9,7 +9,7 @@ WORKDIR /bot
 # Update Git
 # Pinned version is a wildcard because Ubuntu doesn't keep older patch versions available
 RUN apt-get -y update \
-    && apt-get --no-install-recommends -y install git \
+    && apt-get --no-install-recommends -y install git=1:2.39.2-1.1 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
