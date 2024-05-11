@@ -2,7 +2,7 @@
 # Use the command `hadolint Dockerfile` to test
 # Adding Hadolint to `pre-commit` is non-trivial, so the command must be run manually
 
-FROM python:3.7.17-slim-bookworm AS base
+FROM python:3.7.17-slim-bookworm AS achilles
 
 WORKDIR /bot
 
@@ -27,8 +27,6 @@ RUN pip install --no-cache-dir -e .
 
 # Copy baseline_bots code into the Docker image
 COPY src/ src/
-
-FROM base AS bot
 
 COPY scripts/run_bot.py .
 
