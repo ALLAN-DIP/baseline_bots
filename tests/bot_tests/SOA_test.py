@@ -216,7 +216,7 @@ class TestSOABot(AsyncTestCase):
     def test_action_stance(self):
         # score-based
         game = Game()
-        soa_bot = RandomProposerBot("FRANCE")
+        soa_bot = RandomProposerBot("FRANCE", game)
         bot_instances = [
             RandomProposerBot("ENGLAND", game),
             RandomProposerBot("GERMANY", game),
