@@ -4,7 +4,6 @@ gym==0.18.3
 numpy==1.21.6
 pre-commit==2.21.0
 pytest==7.3.1
-stance_vector @ git+https://git@github.com/ALLAN-DIP/stance_vector.git@7d1295a4a28a506d43ee8c44206bcfc6d413abfa
 tornado==6.2
 tqdm==4.65.0
 ujson==5.7.0

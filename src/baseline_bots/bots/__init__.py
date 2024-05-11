@@ -1,8 +1,2 @@
 from baseline_bots.bots.baseline_bot import BaselineBot, BaselineMsgRoundBot
-from baseline_bots.bots.dipnet_bot import DipnetBot
-from baseline_bots.bots.no_press_bot import NoPressDipBot
-from baseline_bots.bots.pushover_bot import PushoverDipnet
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
-from baseline_bots.bots.selectively_transparent_bot import SelectivelyTransparentBot
-from baseline_bots.bots.smart_order_accepter_bot import SmartOrderAccepterBot
-from baseline_bots.bots.transparent_bot import TransparentBot
