@@ -10,13 +10,5 @@ __pycache__/
 
 # Project-specific files
 *.sif
-*Game.json
-/Analysis/GameAnalysisFiles/
-/GameAnalysisFiles/
 /data/
-/docs/build/
 /logs/
-batch.txt
-bot_neurips2019-sl_model
-myjob.*
-neurips2019-sl_model.zip
