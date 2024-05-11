@@ -1,6 +1,16 @@
-# Python files
-**/*.egg*
-**/__pycache__/
+# For efficiency, avoid all files by default
+*
 
-# Project-specific files
-/docs/build/
+# Explicitly list allowed files
+!/LICENSE
+!/README.md
+!/pyproject.toml
+!/requirements.txt
+!/scripts/run_bot.py
+!/setup.cfg
+!/setup.py
+!/src/
+
+# Block directories that can exist in `src/`
+**/*.egg*/
+**/__pycache__/
