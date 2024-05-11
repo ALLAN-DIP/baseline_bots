@@ -41,8 +41,7 @@ CMD ["/bin/bash", "-c", "pytest"]
 
 FROM base AS allan_dip_bot
 
-COPY containers/allan_dip_bot/run.sh .
 COPY containers/allan_dip_bot/run_bot.py .
 
 # Script executors
-ENTRYPOINT ["/bot/run.sh"]
+ENTRYPOINT ["python", "run_bot.py"]
