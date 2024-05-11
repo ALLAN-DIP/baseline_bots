@@ -19,6 +19,7 @@ RUN pip install --no-cache-dir --upgrade pip==24.0
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+RUN mkdir src/
 COPY LICENSE .
 COPY README.md .
 COPY pyproject.toml .
