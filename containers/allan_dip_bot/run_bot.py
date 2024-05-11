@@ -4,7 +4,6 @@
 import argparse
 import asyncio
 import random
-import socket
 import time
 from typing import Type
 
@@ -19,34 +18,6 @@ BOTS = [
     RandomProposerBot,
 ]
 NAMES_TO_BOTS = {bot.__name__: bot for bot in BOTS}
-
-
-def is_port_opened(port, hostname="127.0.0.1"):
-    """Checks if the specified port is opened
-    :param port: The port to check
-    :param hostname: The hostname to check, defaults to '127.0.0.1'
-    """
-    # Copied from https://github.com/SHADE-AI/research/blob/27edb5b98abb4e0af8e551d88ece28cd8ced5e1e/diplomacy_research/utils/cluster.py#L228-L237
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    result = sock.connect_ex((hostname, port))
-    if result == 0:
-        return True
-    return False
-
-
-async def launch() -> None:
-    """
-    Waits for dipnet model to load
-    """
-
-    print("Waiting for TensorFlow server to come online", end=" ")
-    serving_flag = False
-    while not serving_flag:
-        serving_flag = is_port_opened(9501)
-        print("", end=".")
-        await asyncio.sleep(1)
-    print()
-    print("TensorFlow server online")
 
 
 async def play(
