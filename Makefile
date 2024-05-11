@@ -12,8 +12,8 @@ precommit:
 
 .PHONY: test
 test:
-	docker build --target test_ci --tag ci_image .
-	docker run --rm ci_image
+	docker build --target run_tests --tag achilles:testing .
+	docker run --rm achilles:testing
 
 .PHONY: check
 check: precommit test
@@ -21,8 +21,6 @@ check: precommit test
 .PHONY: build
 build:
 	docker build \
-		--target allan_dip_bot \
-		--tag allan_dip_bot \
-		--build-arg BUILDKIT_INLINE_CACHE=1 \
-		--cache-from allanumd/allan_bots:base-latest \
+		--target bot \
+		--tag achilles \
 		.
