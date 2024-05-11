@@ -12,8 +12,8 @@ precommit:
 
 .PHONY: test
 test:
-	docker build --target run_tests --tag achilles:testing .
-	docker run --rm achilles:testing
+	export ASYNC_TEST_TIMEOUT=180 && \
+	pytest
 
 .PHONY: check
 check: precommit test
