@@ -12,8 +12,8 @@ precommit:
 
 .PHONY: test
 test:
-	docker build --target test_ci --tag ci_image .
-	docker run --rm ci_image
+	export ASYNC_TEST_TIMEOUT=180 && \
+	pytest
 
 .PHONY: check
 check: precommit test
