@@ -17,7 +17,7 @@ RUN apt-get -y update \
 ENV ASYNC_TEST_TIMEOUT=180
 
 # Later versions of pip and setuptools do not work properly
-RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir --upgrade pip==24.0
 
 # Install baseline_bots requirements
 # hadolint ignore=DL3059
