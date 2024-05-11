@@ -10,8 +10,7 @@ from typing import Type
 from diplomacy import connect
 from diplomacy.client.network_game import NetworkGame
 
-from baseline_bots.bots import BaselineBot
-from baseline_bots.bots import RandomProposerBot
+from baseline_bots.bots import BaselineBot, RandomProposerBot
 from baseline_bots.utils import POWER_NAMES_DICT
 
 POWERS = sorted(POWER_NAMES_DICT.values())
