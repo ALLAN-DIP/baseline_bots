@@ -28,15 +28,6 @@ RUN pip install --no-cache-dir -e .
 # Copy baseline_bots code into the Docker image
 COPY src/ src/
 
-FROM base as run_tests
-
-COPY tests/ tests/
-
-# Test parameter for async tests
-ENV ASYNC_TEST_TIMEOUT=180
-
-CMD ["/bin/bash", "-c", "pytest"]
-
 FROM base AS bot
 
 COPY scripts/run_bot.py .
