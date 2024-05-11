@@ -28,7 +28,6 @@ from daidepp.grammar.grammar import MAX_DAIDE_LEVEL
 from diplomacy import Game
 from diplomacy.utils import strings
 
-
 POWER_NAMES_DICT = {
     "AUS": "AUSTRIA",
     "ENG": "ENGLAND",
