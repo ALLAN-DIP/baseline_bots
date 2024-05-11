@@ -10,8 +10,8 @@ from typing import Type
 from diplomacy import connect
 from diplomacy.client.network_game import NetworkGame
 
-from baseline_bots.bots.baseline_bot import BaselineBot
-from baseline_bots.bots.random_proposer_bot import RandomProposerBot
+from baseline_bots.bots import BaselineBot
+from baseline_bots.bots import RandomProposerBot
 
 POWERS = ["AUSTRIA", "ENGLAND", "FRANCE", "GERMANY", "ITALY", "RUSSIA", "TURKEY"]
 BOTS = [
