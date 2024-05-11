@@ -21,8 +21,6 @@ check: precommit test
 .PHONY: build
 build:
 	docker build \
-		--target allan_dip_bot \
-		--tag allan_dip_bot \
-		--build-arg BUILDKIT_INLINE_CACHE=1 \
-		--cache-from allanumd/allan_bots:base-latest \
+		--target achilles \
+		--tag achilles \
 		.

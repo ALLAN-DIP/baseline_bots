@@ -71,7 +71,7 @@ def main():
     )
     parser.add_argument(
         "--agent",
-        default=None if IS_ON_CARC or IS_ON_TACC else "allan_dip_bot",
+        default=None if IS_ON_CARC or IS_ON_TACC else "achilles",
         type=str,
         help="Bot to run. (current default: %(default)s)",
     )
