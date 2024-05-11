@@ -41,7 +41,7 @@ class GamePlay:
 
         self.game = game
         self.msg_rounds = msg_rounds
-        self.save_json = save_json
+        self.save_json = False
         self.cur_local_message_round = 0
         self.phase_init_bots()
 

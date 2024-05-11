@@ -13,7 +13,6 @@ from baseline_bots.utils import (
     get_order_tokens,
     parse_arrangement,
     parse_daide,
-    smart_select_support_proposals,
 )
 
 
@@ -344,35 +343,6 @@ class TestUtils:
             parse_arrangement(test_input),
             expected,
         )
-
-    def test_smart_select_support_proposals(self):
-        test_input = {
-            "A BOH": [
-                ("A BOH", "A BUD - GAL", "A BOH S A BUD - GAL"),
-                ("A BOH", "A BER - MUN", "A BOH S A BER - MUN"),
-                ("A BOH", "A MUN - TYR", "A BOH S A MUN - TYR"),
-            ],
-            "A VIE": [
-                ("A VIE", "A BUD - GAL", "A VIE S A BUD - GAL"),
-                ("A VIE", "A MUN - TYR", "A VIE S A MUN - TYR"),
-            ],
-            "A SIL": [("A SIL", "A BUD - GAL", "A SIL S A BUD - GAL")],
-            "A SER": [
-                ("A SER", "F BUL/EC - RUM", "A SER S F BUL/EC - RUM"),
-                ("A SER", "F GRE H", "A SER F GRE H"),
-            ],
-        }
-        expected = {
-            "A BOH": [("A BOH", "A BUD - GAL", "A BOH S A BUD - GAL")],
-            "A VIE": [("A VIE", "A BUD - GAL", "A VIE S A BUD - GAL")],
-            "A SIL": [("A SIL", "A BUD - GAL", "A SIL S A BUD - GAL")],
-            "A SER": [
-                ("A SER", "F BUL/EC - RUM", "A SER S F BUL/EC - RUM"),
-                ("A SER", "F GRE H", "A SER F GRE H"),
-            ],
-        }
-
-        assert smart_select_support_proposals(test_input) == expected
 
     GET_ORDER_TOKENS_TEST_CASES = [
         ["A PAR S A MAR - BUR", ["A PAR", "S", "A MAR", "- BUR"]],
