@@ -5,48 +5,19 @@ import argparse
 import asyncio
 import random
 import time
-from typing import Optional, Type
+from typing import Type
 
 from diplomacy import connect
 from diplomacy.client.network_game import NetworkGame
-from diplomacy_research.utils.cluster import is_port_opened
 
-from baseline_bots.bots.baseline_bot import BaselineBot
-from baseline_bots.bots.no_press_bot import NoPressDipBot
-from baseline_bots.bots.pushover_bot import PushoverDipnet
-from baseline_bots.bots.random_proposer_bot import RandomProposerBot
-from baseline_bots.bots.selectively_transparent_bot import SelectivelyTransparentBot
-from baseline_bots.bots.smart_order_accepter_bot import (
-    Aggressiveness,
-    SmartOrderAccepterBot,
-)
-from baseline_bots.bots.transparent_bot import TransparentBot
+from baseline_bots.bots import BaselineBot, RandomProposerBot
+from baseline_bots.utils import POWER_NAMES_DICT
 
-POWERS = ["AUSTRIA", "ENGLAND", "FRANCE", "GERMANY", "ITALY", "RUSSIA", "TURKEY"]
+POWERS = sorted(POWER_NAMES_DICT.values())
 BOTS = [
-    NoPressDipBot,
-    PushoverDipnet,
     RandomProposerBot,
-    SelectivelyTransparentBot,
-    SmartOrderAccepterBot,
-    TransparentBot,
 ]
 NAMES_TO_BOTS = {bot.__name__: bot for bot in BOTS}
-
-
-async def launch() -> None:
-    """
-    Waits for dipnet model to load
-    """
-
-    print("Waiting for TensorFlow server to come online", end=" ")
-    serving_flag = False
-    while not serving_flag:
-        serving_flag = is_port_opened(9501)
-        print("", end=".")
-        await asyncio.sleep(1)
-    print()
-    print("TensorFlow server online")
 
 
 async def play(
@@ -56,15 +27,6 @@ async def play(
     power_name: str,
     bot_class: Type[BaselineBot],
     sleep_delay: bool,
-    communication_stage_length: int,
-    discount_factor: float,
-    invasion_coef: float,
-    conflict_coef: float,
-    invasive_support_coef: float,
-    conflict_support_coef: float,
-    friendly_coef: float,
-    unrealized_coef: float,
-    aggressiveness: Optional[Aggressiveness] = Aggressiveness.moderate,
 ) -> None:
     """
     Launches the bot for game play
@@ -76,10 +38,9 @@ async def play(
     :param bot_class: the type of bot to be launched - NoPressDipBot/TransparentBot/SmartOrderAccepterBot/..
     :param sleep_delay: bool to indicate if bot should sleep randomly for 1-3s before execution
     """
-    await launch()
 
     # Connect to the game
-    print(f"DipNetSL joining game: {game_id} as {power_name}")
+    print(f"{bot_class.__name__} joining game {game_id!r} as {power_name}")
     connection = await connect(hostname, port)
     channel = await connection.authenticate(
         f"allan_{bot_class.__name__.lower()}_{power_name}", "password"
@@ -88,30 +49,7 @@ async def play(
         game_id=game_id, power_name=power_name, player_type=bot_class.player_type
     )
 
-    if bot_class in [
-        NoPressDipBot,
-        PushoverDipnet,
-        RandomProposerBot,
-        SelectivelyTransparentBot,
-        TransparentBot,
-    ]:
-        bot: BaselineBot = bot_class(power_name, game)
-    elif bot_class == SmartOrderAccepterBot:
-        bot = SmartOrderAccepterBot(
-            power_name,
-            game,
-            discount_factor,
-            aggressiveness=aggressiveness,
-            invasion_coef=invasion_coef,
-            conflict_coef=conflict_coef,
-            invasive_support_coef=invasive_support_coef,
-            conflict_support_coef=conflict_support_coef,
-            friendly_coef=friendly_coef,
-            unrealized_coef=unrealized_coef,
-            communication_stage_length=communication_stage_length,
-        )
-    else:
-        raise ValueError(f"{bot_class.__name__!r} is not a valid bot type")
+    bot = bot_class(power_name, game)
 
     # Wait while game is still being formed
     print("Waiting for game to start", end=" ")
@@ -126,7 +64,7 @@ async def play(
     print("Started playing")
     while not game.is_game_done:
         current_phase = game.get_current_phase()
-        if sleep_delay and not isinstance(bot, SmartOrderAccepterBot):
+        if sleep_delay:
             # sleep randomly for 2-5s before retrieving new messages for the power
             # SOA bot handles sleeping itself, so it's skipped here
             await asyncio.sleep(random.uniform(2, 5))
@@ -184,7 +122,7 @@ def main() -> None:
         "--bot_type",
         type=str,
         choices=list(NAMES_TO_BOTS),
-        default=SmartOrderAccepterBot.__name__,
+        default=RandomProposerBot.__name__,
         help="type of bot to be launched (default: %(default)s)",
     )
     parser.add_argument(
@@ -192,60 +130,7 @@ def main() -> None:
         action="store_false",
         help="disable bot sleeping randomly for 1-3s before execution",
     )
-    parser.add_argument(
-        "--communication_stage_length",
-        type=int,
-        default=300,  # 5 minutes
-        help="Length of communication stage in seconds",
-    )
-    parser.add_argument(
-        "--discount_factor",
-        type=float,
-        default=0.5,
-        help="discount factor for ActionBasedStance (default: %(default)s)",
-    )
-    parser.add_argument(
-        "--invasion_coef",
-        type=float,
-        default=1.0,
-        help="Stance on nation k -= α1 * count(k’s hostile moves) (default: %(default)s)",
-    )
-    parser.add_argument(
-        "--conflict_coef",
-        type=float,
-        default=0.5,
-        help="Stance on nation k -= α2 * count(k’s conflict moves) (default: %(default)s)",
-    )
-    parser.add_argument(
-        "--invasive_support_coef",
-        type=float,
-        default=1.0,
-        help="Stance on nation k -=β1 * k’s count(hostile supports/convoys) (default: %(default)s)",
-    )
-    parser.add_argument(
-        "--conflict_support_coef",
-        type=float,
-        default=0.5,
-        help="Stance on nation k -= β2 * count(k’s conflict supports/convoys) (default: %(default)s)",
-    )
-    parser.add_argument(
-        "--friendly_coef",
-        type=float,
-        default=1.0,
-        help="Stance on nation k += γ1 * count(k’s friendly supports/convoys) (default: %(default)s)",
-    )
-    parser.add_argument(
-        "--unrealized_coef",
-        type=float,
-        default=1.0,
-        help="Stance on nation k += γ2 * count(k’s unrealized hostile moves) (default: %(default)s)",
-    )
-    parser.add_argument(
-        "--aggressiveness",
-        type=str,
-        choices=[str(a.value) for a in Aggressiveness],
-        help="aggressiveness of the bot, overrides individual coefficients (default: %(default)s)",
-    )
+
     args = parser.parse_args()
     host: str = args.host
     port: int = args.port
@@ -253,17 +138,6 @@ def main() -> None:
     power: str = args.power
     bot_type: str = args.bot_type
     sleep_delay: bool = args.no_sleep_delay
-    communication_stage_length: int = args.communication_stage_length
-    discount_factor: float = args.discount_factor
-    invasion_coef: float = args.invasion_coef
-    conflict_coef: float = args.conflict_coef
-    invasive_support_coef: float = args.invasive_support_coef
-    conflict_support_coef: float = args.conflict_support_coef
-    friendly_coef: float = args.friendly_coef
-    unrealized_coef: float = args.unrealized_coef
-    aggressiveness: Optional[Aggressiveness] = (
-        Aggressiveness(args.aggressiveness) if args.aggressiveness else None
-    )
 
     bot_class: Type[BaselineBot] = NAMES_TO_BOTS[bot_type]
 
@@ -275,15 +149,6 @@ def main() -> None:
             power_name=power,
             bot_class=bot_class,
             sleep_delay=sleep_delay,
-            communication_stage_length=communication_stage_length,
-            discount_factor=discount_factor,
-            invasion_coef=invasion_coef,
-            conflict_coef=conflict_coef,
-            invasive_support_coef=invasive_support_coef,
-            conflict_support_coef=conflict_support_coef,
-            friendly_coef=friendly_coef,
-            unrealized_coef=unrealized_coef,
-            aggressiveness=aggressiveness,
         )
     )
 
