@@ -13,9 +13,6 @@ RUN apt-get -y update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Test parameter for async tests
-ENV ASYNC_TEST_TIMEOUT=180
-
 # Later versions of pip and setuptools do not work properly
 RUN pip install --no-cache-dir --upgrade pip==24.0
 
@@ -45,6 +42,9 @@ COPY scripts/ /model/src/model_server/baseline_bots/scripts/
 COPY tests/ /model/src/model_server/baseline_bots/tests/
 
 FROM dev as test_ci
+
+# Test parameter for async tests
+ENV ASYNC_TEST_TIMEOUT=180
 
 CMD ["/bin/bash", "-c", "pytest"]
 
