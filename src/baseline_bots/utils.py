@@ -9,7 +9,7 @@ from collections import defaultdict
 import collections.abc
 from copy import deepcopy
 import os
-from typing import TYPE_CHECKING, Dict, Iterator, List, Optional, Sequence, Set, Tuple
+from typing import Dict, Iterator, List, Optional, Sequence, Set
 
 import daidepp
 from daidepp import (
@@ -27,7 +27,6 @@ from daidepp import (
 from daidepp.grammar.grammar import MAX_DAIDE_LEVEL
 from diplomacy import Game
 from diplomacy.utils import strings
-import numpy as np
 
 
 POWER_NAMES_DICT = {
