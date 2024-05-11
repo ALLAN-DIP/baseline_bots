@@ -12,8 +12,9 @@ from diplomacy.client.network_game import NetworkGame
 
 from baseline_bots.bots import BaselineBot
 from baseline_bots.bots import RandomProposerBot
+from baseline_bots.utils import POWER_NAMES_DICT
 
-POWERS = ["AUSTRIA", "ENGLAND", "FRANCE", "GERMANY", "ITALY", "RUSSIA", "TURKEY"]
+POWERS = sorted(POWER_NAMES_DICT.values())
 BOTS = [
     RandomProposerBot,
 ]
