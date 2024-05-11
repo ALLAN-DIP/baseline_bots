@@ -67,7 +67,6 @@ async def play(
     :param bot_class: the type of bot to be launched - NoPressDipBot/TransparentBot/SmartOrderAccepterBot/..
     :param sleep_delay: bool to indicate if bot should sleep randomly for 1-3s before execution
     """
-    await launch()
 
     # Connect to the game
     print(f"DipNetSL joining game: {game_id} as {power_name}")
