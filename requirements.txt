@@ -1,11 +1,9 @@
 daidepp @ git+https://git@github.com/SHADE-AI/daidepp.git@d55a2090c261783e5128fc7c58b5cb137a7653a6
 diplomacy @ git+https://git@github.com/SHADE-AI/diplomacy.git@ef624e31839de8aaa8b0d62ebd4d394a5178d54e
 gym==0.18.3
-karma-sphinx-theme==0.0.8
 numpy==1.21.6
 pre-commit==2.21.0
 pytest==7.3.1
-sphinx==5.3.0
 stance_vector @ git+https://git@github.com/ALLAN-DIP/stance_vector.git@7d1295a4a28a506d43ee8c44206bcfc6d413abfa
 tornado==6.2
 tqdm==4.65.0
