@@ -28,7 +28,8 @@ from baseline_bots.utils import (
     parse_alliance_proposal,
     parse_arrangement,
     parse_daide,
-    parse_peace_proposal, return_logger,
+    parse_peace_proposal,
+    return_logger,
 )
 
 logger = return_logger(__name__)
@@ -348,7 +349,10 @@ def parse_proposal_messages(
         order_msgs = [
             msg for msg in rcvd_messages if isinstance(parse_daide(msg.message), PRP)
         ]
-        logger.info(f"Received {len(order_msgs)} PRP messages: "f"{[(order_msg.sender, order_msg.message) for order_msg in order_msgs]}")
+        logger.info(
+            f"Received {len(order_msgs)} PRP messages: "
+            f"{[(order_msg.sender, order_msg.message) for order_msg in order_msgs]}"
+        )
 
         # Generate a dictionary of sender to list of DipNet-style orders for this sender
         proposals = defaultdict(list)
@@ -425,7 +429,10 @@ def parse_proposal_messages(
                     other_orders[sender].append(order)
 
         if other_orders:
-            logger.info("ALLAN: Found other orders while extracting proposal messages: "f"{[msg.message for msg in order_msgs]}")
+            logger.info(
+                "ALLAN: Found other orders while extracting proposal messages: "
+                f"{[msg.message for msg in order_msgs]}"
+            )
             logger.info(f"ALLAN: Other orders found: {dict(other_orders)}")
 
         return {

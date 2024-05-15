@@ -15,10 +15,12 @@ from baseline_bots.utils import (
     LIMITED_MESSAGE_GRAMMAR,
     USE_LIMITED_DAIDE,
     MessagesData,
-    is_valid_daide_message, return_logger,
+    is_valid_daide_message,
+    return_logger,
 )
 
 logger = return_logger(__name__)
+
 
 @dataclass
 class BaselineBot(ABC):
