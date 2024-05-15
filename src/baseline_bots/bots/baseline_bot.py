@@ -19,6 +19,7 @@ from baseline_bots.utils import (
     is_valid_daide_message,
 )
 
+
 @dataclass
 class BaselineBot(ABC):
     """Abstract Base Class for baselines bots"""
@@ -167,8 +168,11 @@ class BaselineBot(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def do_messaging_round(self, orders: Sequence[str],
-        msgs_data: MessagesData,) -> List[str]:
+    async def do_messaging_round(
+        self,
+        orders: Sequence[str],
+        msgs_data: MessagesData,
+    ) -> List[str]:
         """
         :return: dict containing messages and orders
         """
@@ -179,9 +183,7 @@ class BaselineBot(ABC):
         :return: dict containing messages and orders
         """
         orders = await self.gen_orders()
-        await self.send_intent_log(
-            f"Initial orders (before communication): {orders}"
-        )
+        await self.send_intent_log(f"Initial orders (before communication): {orders}")
 
         # Skip communications unless in the movement phase
         if not self.game.get_current_phase().endswith("M"):
@@ -193,9 +195,7 @@ class BaselineBot(ABC):
             msgs_data = MessagesData()
 
             for _ in range(self.num_message_rounds):
-                orders = await self.do_messaging_round(
-                    orders, msgs_data
-                )
+                orders = await self.do_messaging_round(orders, msgs_data)
         else:
 
             async def run_messaging_loop() -> None:
@@ -207,9 +207,7 @@ class BaselineBot(ABC):
                     # sleep for a random amount of time before retrieving new messages for the power
                     await asyncio.sleep(random.uniform(0.5, 1.5))
 
-                    orders = await self.do_messaging_round(
-                        orders, msgs
-                    )
+                    orders = await self.do_messaging_round(orders, msgs)
 
             try:
                 # Set aside 10s for cancellation
