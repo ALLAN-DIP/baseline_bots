@@ -30,7 +30,7 @@ from diplomacy import Game
 from diplomacy.utils import strings
 
 
-def return_logger(name: str, log_level: int = logging.WARNING) -> logging.Logger:
+def return_logger(name: str, log_level: int = logging.INFO) -> logging.Logger:
     """Returns a properly set up logger.
 
     Args:
@@ -53,7 +53,7 @@ def return_logger(name: str, log_level: int = logging.WARNING) -> logging.Logger
     return new_logger
 
 
-logger = return_logger(__name__, logging.INFO)
+logger = return_logger(__name__)
 
 POWER_NAMES_DICT = {
     "AUS": "AUSTRIA",
