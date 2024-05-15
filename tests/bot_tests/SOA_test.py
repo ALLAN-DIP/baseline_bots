@@ -51,11 +51,7 @@ class TestSOABot(AsyncTestCase):
             True,
         )
 
-        # test 1 round
-        test_rounds_count = 1
-        while test_rounds_count:
-            msgs, done = yield game_play.step()
-            test_rounds_count -= 1
+        yield game_play.play()
         print("finish test_play")
 
     @testing.gen_test
