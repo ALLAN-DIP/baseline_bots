@@ -48,7 +48,7 @@ class TestSOABot(AsyncTestCase):
 
     @testing.gen_test
     def test_send_message(self):
-        hostname = "shade.tacc.utexas.edu"
+        hostname = "localhost"
         port = 8432
         game_id = None
 
