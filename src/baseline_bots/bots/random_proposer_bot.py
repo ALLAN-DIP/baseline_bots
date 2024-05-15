@@ -61,7 +61,11 @@ class RandomProposerBot(BaselineBot):
         """
         :return: dict containing messages and orders
         """
-        messages = await self.gen_messages()
-        await self.send_messages(messages)
         orders = await self.gen_orders()
+
+        # Only communication in the movement phase
+        if self.game.get_current_phase().endswith("M"):
+            messages = await self.gen_messages()
+            await self.send_messages(messages)
+
         return orders
