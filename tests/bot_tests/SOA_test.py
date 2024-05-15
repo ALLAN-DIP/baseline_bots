@@ -2,16 +2,14 @@
 import asyncio
 import datetime
 
-from diplomacy import Game, Message
+from diplomacy import Game
 from diplomacy.client.connection import connect
-from gameplay_framework import GamePlay
 from tornado import ioloop, testing
 from tornado.testing import AsyncTestCase
 from typing_extensions import Final
 
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
-from baseline_bots.parsing_utils import parse_proposal_messages
-from baseline_bots.utils import MessagesData, OrdersData, get_order_tokens
+from gameplay_framework import GamePlay
 
 SOA_TEST_PARAMS: Final = {
     "num_message_rounds": 3,
