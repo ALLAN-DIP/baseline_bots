@@ -4,7 +4,7 @@ from typing import List, Optional, Tuple, Type, Union
 from diplomacy import Game
 from diplomacy.utils.export import to_saved_game_format
 
-from baseline_bots.bots.baseline_bot import BaselineBot, BaselineMsgRoundBot
+from baseline_bots.bots.baseline_bot import BaselineBot
 
 sys.path.append("../../../dipnet_press")
 
@@ -58,10 +58,6 @@ class GamePlay:
 
     def phase_init_bots(self) -> None:
         self.cur_local_message_round = 0
-        # reset bot round info
-        for bot in self.bots:
-            if isinstance(bot, BaselineMsgRoundBot):
-                bot.phase_init()
 
     async def step(self) -> Tuple[Optional[dict], bool]:
         """one step of messaging"""
