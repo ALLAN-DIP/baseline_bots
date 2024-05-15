@@ -8,6 +8,7 @@ import asyncio
 from collections import defaultdict
 import collections.abc
 from copy import deepcopy
+import logging
 import os
 from typing import Dict, Iterator, List, Optional, Sequence, Set
 
@@ -27,6 +28,32 @@ from daidepp import (
 from daidepp.grammar.grammar import MAX_DAIDE_LEVEL
 from diplomacy import Game
 from diplomacy.utils import strings
+
+
+def return_logger(name: str, log_level: int = logging.WARNING) -> logging.Logger:
+    """Returns a properly set up logger.
+
+    Args:
+        name: Name of logger.
+        log_level: Verbosity level of logger.
+
+    Returns:
+        An initialized logger.
+    """
+    # Monkey patch module to show milliseconds
+    logging.Formatter.default_msec_format = "%s.%03d"
+
+    logging.basicConfig(
+        format="[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s",
+        # Fall back to `WARNING`, the default level of the root logger, if `log_level` is `NOTSET`
+        level=log_level or logging.WARNING,
+    )
+    new_logger = logging.getLogger(name)
+    new_logger.setLevel(log_level)
+    return new_logger
+
+
+logger = return_logger(__name__)
 
 POWER_NAMES_DICT = {
     "AUS": "AUSTRIA",

@@ -10,7 +10,7 @@ from diplomacy import connect
 from diplomacy.client.network_game import NetworkGame
 
 from baseline_bots.bots import BaselineBot, RandomProposerBot
-from baseline_bots.utils import POWER_NAMES_DICT
+from baseline_bots.utils import POWER_NAMES_DICT, logger
 
 POWERS = sorted(POWER_NAMES_DICT.values())
 BOTS = [
@@ -38,7 +38,7 @@ async def play(
     """
 
     # Connect to the game
-    print(f"{bot_class.__name__} joining game {game_id!r} as {power_name}")
+    logger.info(f"{bot_class.__name__} joining game {game_id!r} as {power_name}")
     connection = await connect(hostname, port)
     channel = await connection.authenticate(
         f"allan_{bot_class.__name__.lower()}_{power_name}", "password"
@@ -50,7 +50,7 @@ async def play(
     bot = bot_class(power_name, game)
 
     # Wait while game is still being formed
-    print("Waiting for game to start", end=" ")
+    logger.info("Waiting for game to start", end=" ")
     while game.is_game_forming:
         await asyncio.sleep(2)
         print("", end=".")
@@ -59,12 +59,12 @@ async def play(
     t1 = time.perf_counter()
 
     # Playing game
-    print("Started playing")
+    logger.info("Started playing")
     while not game.is_game_done:
         current_phase = game.get_current_phase()
 
         phase_start_time = time.time()
-        print(f"Starting phase: {current_phase}")
+        logger.info(f"Starting phase: {current_phase}")
 
         if not game.powers[bot.power_name].is_eliminated():
             # Fetch orders from bot
@@ -74,7 +74,7 @@ async def play(
             await bot.send_orders(orders_data)
 
         phase_end_time = time.time()
-        print(
+        logger.info(
             f"Time taken for phase {current_phase}: {phase_end_time - phase_start_time:0.4}s"
         )
 
@@ -82,8 +82,8 @@ async def play(
             await asyncio.sleep(2)
 
     t2 = time.perf_counter()
-    print(f"Time taken for game: {t2-t1:0.4}")
-    print("-" * 30 + "GAME COMPLETE" + "-" * 30)
+    logger.info(f"Time taken for game: {t2-t1:0.4}")
+    logger.info("-" * 30 + "GAME COMPLETE" + "-" * 30)
 
 
 def main() -> None:
