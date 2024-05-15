@@ -53,7 +53,7 @@ def return_logger(name: str, log_level: int = logging.WARNING) -> logging.Logger
     return new_logger
 
 
-logger = return_logger(__name__)
+logger = return_logger(__name__, logging.INFO)
 
 POWER_NAMES_DICT = {
     "AUS": "AUSTRIA",
