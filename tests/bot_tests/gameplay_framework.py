@@ -10,8 +10,6 @@ class GamePlay:
     A simple framework to test multiple bots together
     """
 
-    max_turns: int = 20
-
     def __init__(
         self,
         game: Game,
@@ -21,8 +19,7 @@ class GamePlay:
         assert len(bots) <= 7, "too many bots"
         self.bots = bots
         self.game = game
-        self.msg_rounds = msg_rounds
-        self.cur_local_message_round = 0
+        self.max_turns = msg_rounds
 
     async def play(self) -> None:
         """play a game with the bots"""
@@ -34,7 +31,6 @@ class GamePlay:
 
     async def step(self) -> None:
         """one step of messaging"""
-
         if self.game.is_game_done:
             return
 
@@ -48,7 +44,4 @@ class GamePlay:
             orders = await bot()
             await bot.send_orders(orders)
 
-        self.cur_local_message_round += 1
-
-        if self.cur_local_message_round == self.msg_rounds:
-            self.game.process()
+        self.game.process()
