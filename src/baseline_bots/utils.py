@@ -115,7 +115,7 @@ def parse_daide(string: str) -> AnyDAIDEToken:
 # Option needed for working better with other performers
 USE_LIMITED_DAIDE = False
 if os.environ.get("USE_LIMITED_DAIDE") is not None:
-    print("Disabling DAIDE usage outside of limited subset")
+    logger.info("Disabling DAIDE usage outside of limited subset")
     USE_LIMITED_DAIDE = True
 
 

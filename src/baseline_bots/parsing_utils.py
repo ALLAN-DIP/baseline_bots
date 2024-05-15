@@ -28,8 +28,10 @@ from baseline_bots.utils import (
     parse_alliance_proposal,
     parse_arrangement,
     parse_daide,
-    parse_peace_proposal,
+    parse_peace_proposal, return_logger,
 )
+
+logger = return_logger(__name__)
 
 dipnet2daide_loc = {
     "BOT": "GOB",
@@ -227,12 +229,11 @@ def dipnet_to_daide_parsing(
         except asyncio.CancelledError:
             raise
         except Exception as e:
-            print(
+            logger.exception(
                 f"ALLAN: error from {__name__}.{dipnet_to_daide_parsing.__name__}()\n"
                 f"\tOrder with error: {' '.join(dipnet_order_tokens)!r}\n"
                 f"\tSet of orders: {dipnet_style_order_strs}"
             )
-            print(e)
             if DEBUG_MODE:
                 raise e
             continue
@@ -313,11 +314,10 @@ def daide_to_dipnet_parsing(daide_order: Command) -> Tuple[str, str]:
     except asyncio.CancelledError:
         raise
     except Exception as e:
-        print(
+        logger.exception(
             f"ALLAN: error from {__name__}.{daide_to_dipnet_parsing.__name__}\n"
             f"\tCould not convert DAIDE command {str(daide_order)!r} to DipNet format"
         )
-        print(e)
         if DEBUG_MODE:
             raise e
         return None
@@ -348,8 +348,7 @@ def parse_proposal_messages(
         order_msgs = [
             msg for msg in rcvd_messages if isinstance(parse_daide(msg.message), PRP)
         ]
-        print(f"Received {len(order_msgs)} PRP messages:")
-        print([(order_msg.sender, order_msg.message) for order_msg in order_msgs])
+        logger.info(f"Received {len(order_msgs)} PRP messages: "f"{[(order_msg.sender, order_msg.message) for order_msg in order_msgs]}")
 
         # Generate a dictionary of sender to list of DipNet-style orders for this sender
         proposals = defaultdict(list)
@@ -388,11 +387,10 @@ def parse_proposal_messages(
             except asyncio.CancelledError:
                 raise
             except Exception as e:
-                print(
+                logger.exception(
                     f"ALLAN: error from {__name__}.{parse_proposal_messages.__name__}()\n"
                     f"\tUnexpected proposal message format: {order_msg.message!r}"
                 )
-                print(e)
                 if DEBUG_MODE:
                     raise e
                 continue
@@ -427,10 +425,8 @@ def parse_proposal_messages(
                     other_orders[sender].append(order)
 
         if other_orders:
-            print("ALLAN: Found other orders while extracting proposal messages:")
-            print([msg.message for msg in order_msgs])
-            print("ALLAN: Other orders found:")
-            print(dict(other_orders))
+            logger.info("ALLAN: Found other orders while extracting proposal messages: "f"{[msg.message for msg in order_msgs]}")
+            logger.info(f"ALLAN: Other orders found: {dict(other_orders)}")
 
         return {
             "valid_proposals": valid_proposals,
@@ -443,11 +439,10 @@ def parse_proposal_messages(
     except asyncio.CancelledError:
         raise
     except Exception as e:
-        print(
+        logger.exception(
             f"ALLAN: error from {__name__}.{parse_proposal_messages.__name__}()\n"
             f"\tReceived messages: {rcvd_messages}"
         )
-        print(e)
         if DEBUG_MODE:
             raise e
         return {
