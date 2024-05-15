@@ -15,9 +15,10 @@ from baseline_bots.utils import (
     LIMITED_MESSAGE_GRAMMAR,
     USE_LIMITED_DAIDE,
     MessagesData,
-    is_valid_daide_message,
+    is_valid_daide_message, return_logger,
 )
 
+logger = return_logger(__name__)
 
 @dataclass
 class BaselineBot(ABC):
@@ -69,14 +70,14 @@ class BaselineBot(ABC):
             msg for msg in messages.values() if msg.sender != self.power_name
         )
         for msg_obj in received_messages:
-            print(f"{self.display_name} received message: {msg_obj}")
+            logger.info(f"{self.display_name} received message: {msg_obj}")
         valid_messages = []
         for msg in received_messages:
             if is_valid_daide_message(msg.message):
                 valid_messages.append(msg)
             else:
-                print(
-                    f"!! {self.display_name} received a message with invalid DAIDE syntax: {msg.message!r}"
+                logger.warning(
+                    f"{self.display_name} received a message with invalid DAIDE syntax: {msg.message!r}"
                 )
         return valid_messages
 
@@ -90,16 +91,16 @@ class BaselineBot(ABC):
         :param msg_data: MessagesData object containing set of all sent messages
         """
         if not is_valid_daide_message(message):
-            print(
-                f"!! {self.display_name} attempted to send a message with invalid DAIDE syntax: {message!r}"
+            logger.warning(
+                f"{self.display_name} attempted to send a message with invalid DAIDE syntax: {message!r}"
             )
             return
 
         if USE_LIMITED_DAIDE and not is_valid_daide_message(
             message, LIMITED_MESSAGE_GRAMMAR
         ):
-            print(
-                f"!! {self.display_name} attempted a message outside of the limited DAIDE syntax: {message!r}"
+            logger.warning(
+                f"{self.display_name} attempted a message outside of the limited DAIDE syntax: {message!r}"
             )
             return
 
@@ -115,7 +116,7 @@ class BaselineBot(ABC):
         if message_already_exists:
             return
 
-        print(f"{self.display_name} sent message: {msg_obj}")
+        logger.info(f"{self.display_name} sent message: {msg_obj}")
 
         # Messages should not be sent in local games, only stored
         if isinstance(self.game, NetworkGame):
@@ -138,7 +139,7 @@ class BaselineBot(ABC):
 
         :param log_msg: Log message to be sent
         """
-        print(f"Intent log: {log_msg!r}")
+        logger.info(f"Intent log: {log_msg!r}")
         # Intent logging should not be sent in local games
         if not isinstance(self.game, NetworkGame):
             return
@@ -150,7 +151,7 @@ class BaselineBot(ABC):
 
         :param orders: Orders to be sent
         """
-        print(f"Sent orders: {orders}")
+        logger.info(f"Sent orders: {orders}")
 
         # Orders should not be sent in local games, only stored
         if isinstance(self.game, NetworkGame):
@@ -216,6 +217,6 @@ class BaselineBot(ABC):
                 wait_time = self.communication_stage_length - 10
                 await asyncio.wait_for(run_messaging_loop(), timeout=wait_time)
             except asyncio.TimeoutError:
-                print("Exiting communication phase because out of time")
+                logger.info("Exiting communication phase because out of time")
 
         return orders

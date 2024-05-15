@@ -68,7 +68,7 @@ POWER_NAMES_DICT = {
 # Option for debugging without specialized builds
 DEBUG_MODE = False
 if os.environ.get("ALLAN_DEBUG") is not None:
-    print("Enabling debugging mode")
+    logger.info("Enabling debugging mode")
     DEBUG_MODE = True
 
 MESSAGE_GRAMMAR = create_daide_grammar(level=MAX_DAIDE_LEVEL, string_type="message")

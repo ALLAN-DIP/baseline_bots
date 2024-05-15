@@ -10,7 +10,9 @@ from diplomacy import connect
 from diplomacy.client.network_game import NetworkGame
 
 from baseline_bots.bots import BaselineBot, RandomProposerBot
-from baseline_bots.utils import POWER_NAMES_DICT, logger
+from baseline_bots.utils import POWER_NAMES_DICT, return_logger
+
+logger = return_logger(__name__)
 
 POWERS = sorted(POWER_NAMES_DICT.values())
 BOTS = [
