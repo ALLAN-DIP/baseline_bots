@@ -3,7 +3,6 @@
 
 import argparse
 import asyncio
-import random
 import time
 from typing import Type
 
@@ -26,7 +25,6 @@ async def play(
     game_id: str,
     power_name: str,
     bot_class: Type[BaselineBot],
-    sleep_delay: bool,
 ) -> None:
     """
     Launches the bot for game play
@@ -121,11 +119,6 @@ def main() -> None:
         default=RandomProposerBot.__name__,
         help="type of bot to be launched (default: %(default)s)",
     )
-    parser.add_argument(
-        "--no_sleep_delay",
-        action="store_false",
-        help="disable bot sleeping randomly for 1-3s before execution",
-    )
 
     args = parser.parse_args()
     host: str = args.host
@@ -133,7 +126,6 @@ def main() -> None:
     game_id: str = args.game_id
     power: str = args.power
     bot_type: str = args.bot_type
-    sleep_delay: bool = args.no_sleep_delay
 
     bot_class: Type[BaselineBot] = NAMES_TO_BOTS[bot_type]
 
@@ -144,7 +136,6 @@ def main() -> None:
             game_id=game_id,
             power_name=power,
             bot_class=bot_class,
-            sleep_delay=sleep_delay,
         )
     )
 

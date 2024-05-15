@@ -2,7 +2,6 @@ import random
 from typing import List, Sequence
 
 from daidepp import PRP, XDO
-from diplomacy import Game
 
 from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.parsing_utils import dipnet_to_daide_parsing

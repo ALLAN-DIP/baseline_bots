@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 import asyncio
 from dataclasses import dataclass
 import random
-from typing import ClassVar, Dict, List, Optional, Sequence
+from typing import ClassVar, List, Optional, Sequence
 
 from diplomacy import Game, Message
 from diplomacy.client.network_game import NetworkGame
@@ -15,7 +15,6 @@ from baseline_bots.utils import (
     LIMITED_MESSAGE_GRAMMAR,
     USE_LIMITED_DAIDE,
     MessagesData,
-    OrdersData,
     is_valid_daide_message,
 )
 
