@@ -186,11 +186,12 @@ class BaselineBot(ABC):
         :return: dict containing messages and orders
         """
         orders = await self.gen_orders()
-        await self.send_intent_log(f"Initial orders (before communication): {orders}")
 
         # Skip communications unless in the movement phase
         if not self.game.get_current_phase().endswith("M"):
             return orders
+
+        await self.send_intent_log(f"Initial orders (before communication): {orders}")
 
         await self.wait_for_comm_stage()
 
