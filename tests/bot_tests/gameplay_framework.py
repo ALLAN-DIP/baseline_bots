@@ -1,12 +1,9 @@
-import sys
-from typing import List, Optional, Tuple, Type, Union
+from typing import List, Optional, Tuple
 
 from diplomacy import Game
 from diplomacy.utils.export import to_saved_game_format
 
 from baseline_bots.bots.baseline_bot import BaselineBot
-
-sys.path.append("../../../dipnet_press")
 
 
 class GamePlay:
@@ -19,31 +16,14 @@ class GamePlay:
     def __init__(
         self,
         game: Game,
-        bots: List[Union[BaselineBot, Type[BaselineBot]]],
+        bots: List[BaselineBot],
         msg_rounds: int,
-        save_json: bool = False,
     ) -> None:
         assert len(bots) <= 7, "too many bots"
-        # if no game is passed, assume bots is a list of bot classes to
-        # be instantiated.
-        if game is None:
-            # make game
-            game = Game()
-            # get list of powers
-            power_names = list(game.get_map_power_names())
-            inst_bots = []
-            # instantiate each bot
-            for i, bot_class in enumerate(bots):
-                inst_bots.append(bot_class(power_names[i], game))
-            self.bots = inst_bots
-        else:
-            self.bots = bots
-
+        self.bots = bots
         self.game = game
         self.msg_rounds = msg_rounds
-        self.save_json = False
         self.cur_local_message_round = 0
-        self.phase_init_bots()
 
     async def play(self) -> None:
         """play a game with the bots"""
@@ -53,42 +33,23 @@ class GamePlay:
             await self.step()
             turn += 1
 
-        if self.save_json:
-            to_saved_game_format(self.game, output_path="GamePlayFramework.json")
-
-    def phase_init_bots(self) -> None:
-        self.cur_local_message_round = 0
-
-    async def step(self) -> Tuple[Optional[dict], bool]:
+    async def step(self) -> None:
         """one step of messaging"""
 
         if self.game.is_game_done:
-            return None, True
+            return
 
-        # if message rounds over
-        if self.cur_local_message_round == self.msg_rounds:
-            self.phase_init_bots()
-        while self.game.get_current_phase()[-1] != "M":
+        while not self.game.get_current_phase().endswith("M"):
             self.game.process()
             if self.game.is_game_done:
-                return None, True
+                return
 
-        msgs_to_send = {}
         for bot in self.bots:
-            if bot is None:
-                continue
-
-            # get orders to be sent from bot
+            # get and send orders to be sent from bot
             orders = await bot()
-
-        # get/set orders
-        for bot in self.bots:
-            if bot is None:
-                continue
-            self.game.set_orders(power_name=bot.power_name, orders=orders)
+            await bot.send_orders(orders)
 
         self.cur_local_message_round += 1
 
         if self.cur_local_message_round == self.msg_rounds:
             self.game.process()
-        return {"messages": msgs_to_send}, self.game.is_game_done
