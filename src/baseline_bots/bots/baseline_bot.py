@@ -27,7 +27,8 @@ class BaselineBot(ABC):
     power_name: str
     game: Game
     num_message_rounds: Optional[int] = None
-    communication_stage_length: int = 300  # 5 minutes
+    # communication_stage_length: int = 300  # 5 minutes
+    communication_stage_length: int = 30  # in seconds
 
     @property
     def display_name(self) -> str:
