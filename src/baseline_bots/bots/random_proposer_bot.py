@@ -1,8 +1,7 @@
 import random
-from typing import List
+from typing import List, Sequence
 
 from daidepp import PRP, XDO
-from diplomacy import Game
 
 from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.parsing_utils import dipnet_to_daide_parsing
@@ -14,15 +13,14 @@ class RandomProposerBot(BaselineBot):
     Just sends random order proposals to other bots.
     """
 
-    def __init__(self, power_name: str, game: Game) -> None:
-        super().__init__(power_name, game)
-
-    async def gen_messages(self) -> MessagesData:
-        # Return data initialization
-        ret_obj = MessagesData()
-
-        if self.game.get_current_phase()[-1] != "M":
-            return ret_obj
+    async def do_messaging_round(
+        self,
+        orders: Sequence[str],
+        msgs_data: MessagesData,
+    ) -> List[str]:
+        """
+        :return: dict containing messages and orders
+        """
         # Getting the list of possible orders for all locations
         possible_orders = self.game.get_all_possible_orders()
 
@@ -41,12 +39,14 @@ class RandomProposerBot(BaselineBot):
             )
             if len(suggested_random_orders) > 0:
                 commands = dipnet_to_daide_parsing(suggested_random_orders, self.game)
-                orders = [XDO(command) for command in commands]
-                suggested_random_orders = PRP(optional_AND(orders))
+                random_orders = [XDO(command) for command in commands]
+                suggested_random_orders = PRP(optional_AND(random_orders))
                 # send the other power a message containing the orders
-                ret_obj.add_message(other_power, str(suggested_random_orders))
+                await self.send_message(
+                    other_power, str(suggested_random_orders), msgs_data
+                )
 
-        return ret_obj
+        return list(orders)
 
     async def gen_orders(self) -> List[str]:
         possible_orders = self.game.get_all_possible_orders()
@@ -55,13 +55,4 @@ class RandomProposerBot(BaselineBot):
             for loc in self.game.get_orderable_locations(self.power_name)
             if possible_orders[loc]
         ]
-        return orders
-
-    async def __call__(self) -> List[str]:
-        """
-        :return: dict containing messages and orders
-        """
-        messages = await self.gen_messages()
-        await self.send_messages(messages)
-        orders = await self.gen_orders()
         return orders
