@@ -105,24 +105,20 @@ class TestSOABot(AsyncTestCase):
             True,
         )
 
-        # test 1 round
-        test_rounds_count = 1
-        while test_rounds_count:
-            msgs, done = yield game_play.step()
-            test_rounds_count -= 1
+        msgs, done = yield game_play.step()
 
-            # Check any other country (randomly chosen RUSSIA here for this purpose)
-            # for messages received. SOA bot by design sends ALY message to all other bots
-            rcvd_messages = list(
-                game_play.game.filter_messages(
-                    messages=game_play.game.messages, game_role="RUSSIA"
-                ).values()
-            )
-            print([msg.message for msg in rcvd_messages])
-            # message count should be non-zero
-            assert len(rcvd_messages) != 0
+        # Check any other country (randomly chosen RUSSIA here for this purpose)
+        # for messages received. SOA bot by design sends ALY message to all other bots
+        rcvd_messages = list(
+            game_play.game.filter_messages(
+                messages=game_play.game.messages, game_role="RUSSIA"
+            ).values()
+        )
+        print([msg.message for msg in rcvd_messages])
+        # message count should be non-zero
+        assert len(rcvd_messages) != 0
 
-            # Note this is a valid test case since we know ALY is sent by SOA bot to
-            # all other powers in the beginning and this is the only bot amongst 7 powers
-            assert any(["ALY" in msg.message for msg in rcvd_messages])
+        # Note this is a valid test case since we know ALY is sent by SOA bot to
+        # all other powers in the beginning and this is the only bot amongst 7 powers
+        assert any(["ALY" in msg.message for msg in rcvd_messages])
         print("finish test_send_message")
