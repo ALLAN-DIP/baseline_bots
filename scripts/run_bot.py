@@ -50,11 +50,10 @@ async def play(
     bot = bot_class(power_name, game)
 
     # Wait while game is still being formed
-    logger.info("Waiting for game to start", end=" ")
+    logger.info("Waiting for game to start")
     while game.is_game_forming:
         await asyncio.sleep(2)
-        print("", end=".")
-    print()
+        logger.info("Still waiting")
 
     t1 = time.perf_counter()
 
