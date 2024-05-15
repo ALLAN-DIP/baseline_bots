@@ -3,7 +3,9 @@
 
 from abc import ABC, abstractmethod
 import asyncio
-from typing import ClassVar, List, Sequence
+from dataclasses import dataclass
+import random
+from typing import ClassVar, Dict, List, Optional, Sequence
 
 from diplomacy import Game, Message
 from diplomacy.client.network_game import NetworkGame
@@ -17,17 +19,15 @@ from baseline_bots.utils import (
     is_valid_daide_message,
 )
 
-
+@dataclass
 class BaselineBot(ABC):
     """Abstract Base Class for baselines bots"""
 
     player_type: ClassVar[str] = strings.PRESS_BOT
     power_name: str
     game: Game
-
-    def __init__(self, power_name: str, game: Game) -> None:
-        self.power_name = power_name
-        self.game = game
+    num_message_rounds: Optional[int] = None
+    communication_stage_length: int = 300  # 5 minutes
 
     @property
     def display_name(self) -> str:
@@ -160,43 +160,62 @@ class BaselineBot(ABC):
             self.game.set_orders(power_name=self.power_name, orders=orders)
 
     @abstractmethod
-    def __call__(self) -> List[str]:
+    async def gen_orders(self) -> List[str]:
         """
         :return: dict containing messages and orders
         """
         raise NotImplementedError()
 
-
-class BaselineMsgRoundBot(BaselineBot, ABC):
-    """
-    Abstract Base Class for bots which execute
-    multiple rounds of communication before setting
-    orders
-    """
-
-    total_msg_rounds: int
-    cur_msg_round: int
-    orders: OrdersData
-
-    def __init__(self, power_name: str, game: Game, total_msg_rounds: int = 3) -> None:
+    @abstractmethod
+    async def do_messaging_round(self, orders: Sequence[str],
+        msgs_data: MessagesData,) -> List[str]:
         """
-        :param num_msg_rounds: the number of communication rounds the bot
-        will go through
+        :return: dict containing messages and orders
         """
-        super().__init__(power_name, game)
-        self.total_msg_rounds = total_msg_rounds
-        self.orders = OrdersData()
+        raise NotImplementedError()
 
-    def gen_orders(self) -> OrdersData:
-        """finalizes moves"""
-        return self.orders
+    async def __call__(self) -> List[str]:
+        """
+        :return: dict containing messages and orders
+        """
+        orders = await self.gen_orders()
+        await self.send_intent_log(
+            f"Initial orders (before communication): {orders}"
+        )
 
-    def phase_init(self) -> None:
-        """reset information after each order round complete"""
-        # the current message round, which is reset after each order round
-        self.curr_msg_round = 1
-        # reset selected orders
-        self.orders = OrdersData()
+        # Skip communications unless in the movement phase
+        if not self.game.get_current_phase().endswith("M"):
+            return orders
 
-    def are_msg_rounds_done(self) -> bool:
-        return self.curr_msg_round == self.total_msg_rounds + 1
+        await self.wait_for_comm_stage()
+
+        if self.num_message_rounds:
+            msgs_data = MessagesData()
+
+            for _ in range(self.num_message_rounds):
+                orders = await self.do_messaging_round(
+                    orders, msgs_data
+                )
+        else:
+
+            async def run_messaging_loop() -> None:
+                nonlocal orders
+
+                msgs = MessagesData()
+
+                while True:
+                    # sleep for a random amount of time before retrieving new messages for the power
+                    await asyncio.sleep(random.uniform(0.5, 1.5))
+
+                    orders = await self.do_messaging_round(
+                        orders, msgs
+                    )
+
+            try:
+                # Set aside 10s for cancellation
+                wait_time = self.communication_stage_length - 10
+                await asyncio.wait_for(run_messaging_loop(), timeout=wait_time)
+            except asyncio.TimeoutError:
+                print("Exiting communication phase because out of time")
+
+        return orders
