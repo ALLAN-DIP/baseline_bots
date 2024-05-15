@@ -4,17 +4,19 @@ import datetime
 
 from diplomacy import Game
 from diplomacy.client.connection import connect
-from tornado import ioloop, testing
+from tornado import testing
 from tornado.testing import AsyncTestCase
 from typing_extensions import Final
 
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
 from baseline_bots.utils import MessagesData
-from gameplay_framework import GamePlay
+
+from .gameplay_framework import GamePlay
 
 SOA_TEST_PARAMS: Final = {
     "num_message_rounds": 3,
 }
+
 
 class TestSOABot(AsyncTestCase):
     @testing.gen_test

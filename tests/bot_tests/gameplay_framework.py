@@ -1,7 +1,6 @@
-from typing import List, Optional, Tuple
+from typing import List
 
 from diplomacy import Game
-from diplomacy.utils.export import to_saved_game_format
 
 from baseline_bots.bots.baseline_bot import BaselineBot
 
