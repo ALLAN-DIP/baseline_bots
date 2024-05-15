@@ -5,7 +5,7 @@ import datetime
 from diplomacy import Game
 from diplomacy.client.connection import connect
 from gameplay_framework import GamePlay
-from tornado import ioloop, testing
+from tornado import testing
 from tornado.testing import AsyncTestCase
 from typing_extensions import Final
 
@@ -15,13 +15,6 @@ from baseline_bots.utils import MessagesData
 SOA_TEST_PARAMS: Final = {
     "num_message_rounds": 3,
 }
-
-
-def stop_io_loop():
-    """Stops an asynchronous IO loop"""
-    # Based on https://github.com/SHADE-AI/research/blob/27edb5b98abb4e0af8e551d88ece28cd8ced5e1e/diplomacy_research/utils/cluster.py#L280-L286
-    io_loop = ioloop.IOLoop.instance()
-    io_loop.stop()
 
 
 class TestSOABot(AsyncTestCase):
@@ -48,7 +41,6 @@ class TestSOABot(AsyncTestCase):
                 RandomProposerBot("TURKEY", game, **SOA_TEST_PARAMS),
             ],
             3,
-            True,
         )
 
         yield game_play.play()
@@ -94,18 +86,11 @@ class TestSOABot(AsyncTestCase):
             game,
             [
                 soa_bot1,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
             ],
             3,
-            True,
         )
 
-        msgs, done = yield game_play.step()
+        yield game_play.step()
 
         # Check any other country (randomly chosen RUSSIA here for this purpose)
         # for messages received. SOA bot by design sends ALY message to all other bots
