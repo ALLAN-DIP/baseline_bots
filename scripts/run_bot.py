@@ -67,7 +67,9 @@ async def play(
         phase_start_time = time.time()
         logger.info(f"Starting phase: {current_phase}")
 
-        # if not game.powers[bot.power_name].is_eliminated():
+        # Do not take a turn if no moves can be made
+        # Attempting to take a turn when not needed can cause state
+        # to desync between the bot and the server, causing the former to crash
         if game.get_orderable_locations(bot.power_name):
             # Fetch orders from bot
             orders_data = await bot()
