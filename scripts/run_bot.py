@@ -68,7 +68,7 @@ async def play(
         logger.info(f"Starting phase: {current_phase}")
 
         # if not game.powers[bot.power_name].is_eliminated():
-        if not game.get_orderable_locations(bot.power_name):
+        if game.get_orderable_locations(bot.power_name):
             # Fetch orders from bot
             orders_data = await bot()
 
