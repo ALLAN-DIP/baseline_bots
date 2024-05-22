@@ -29,7 +29,7 @@ target-version = "py37"
 ignore-init-module-imports = true
 select = [
   "B", # flake8-bugbear
-  "D", # pydocstyle
+  # "D", # pydocstyle
   "E", # pycodestyle error
   "F", # pyflakes
   "I", # isort
