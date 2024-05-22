@@ -110,6 +110,7 @@ def main():
     else:
         # Should never happen
         raise ValueError(f"Provided container runtime {runner!r} not recognized.")
+    runner_command += " --env NO_COLOR=1"
     if game_id is None:
         user = getpass.getuser()
         now = datetime.datetime.now(datetime.timezone.utc)
