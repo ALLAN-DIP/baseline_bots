@@ -107,9 +107,7 @@ class TestUtils:
             "/WC",
         }:
             comparison_tc_op = comparison_tc_op.rsplit("/", maxsplit=1)[0]
-        assert (
-            daide_to_dipnet_parsing(parse_daide(expected[0]))[0] == comparison_tc_op
-        ), (
+        assert daide_to_dipnet_parsing(parse_daide(expected[0]))[0] == comparison_tc_op, (
             daide_to_dipnet_parsing(parse_daide(expected[0])),
             comparison_tc_op,
         )
@@ -133,25 +131,19 @@ class TestUtils:
         ),
     ]
 
-    @pytest.mark.parametrize(
-        "test_input,expected", DIPNET_TO_DAIDE_PARSING_CONVOY_TEST_CASES
-    )
-    def test_dipnet_to_daide_parsing_convoys(
-        self, test_input: List[str], expected: List[str]
-    ):
+    @pytest.mark.parametrize("test_input,expected", DIPNET_TO_DAIDE_PARSING_CONVOY_TEST_CASES)
+    def test_dipnet_to_daide_parsing_convoys(self, test_input: List[str], expected: List[str]):
         game_tc = Game()
         game_tc.set_units("ITALY", ["A TUN", "F ION", "F EAS", "F AEG"])
 
-        assert [
-            str(c) for c in dipnet_to_daide_parsing(test_input, game_tc)
-        ] == expected, (
+        assert [str(c) for c in dipnet_to_daide_parsing(test_input, game_tc)] == expected, (
             [str(c) for c in dipnet_to_daide_parsing(test_input, game_tc)],
             expected,
         )
         for tc_ip_ord, tc_op_ord in zip(test_input, expected):
-            assert daide_to_dipnet_parsing(parse_daide(tc_op_ord))[
-                0
-            ] == tc_ip_ord.replace(" R ", " - "), (
+            assert daide_to_dipnet_parsing(parse_daide(tc_op_ord))[0] == tc_ip_ord.replace(
+                " R ", " - "
+            ), (
                 daide_to_dipnet_parsing(parse_daide(tc_op_ord)),
                 tc_ip_ord.replace(" R ", " - "),
             )
@@ -191,18 +183,10 @@ class TestUtils:
                 "shared_orders": {},
                 "other_orders": {},
                 "alliance_proposals": {
-                    "GERMANY": [
-                        ("GERMANY", "ALY ( ENG GER ITA RUS ) VSS ( AUS FRA TUR )")
-                    ],
-                    "ENGLAND": [
-                        ("GERMANY", "ALY ( ENG GER ITA RUS ) VSS ( AUS FRA TUR )")
-                    ],
-                    "ITALY": [
-                        ("GERMANY", "ALY ( ENG GER ITA RUS ) VSS ( AUS FRA TUR )")
-                    ],
-                    "AUSTRIA": [
-                        ("AUSTRIA", "ALY ( AUS RUS ) VSS ( ENG FRA GER ITA TUR )")
-                    ],
+                    "GERMANY": [("GERMANY", "ALY ( ENG GER ITA RUS ) VSS ( AUS FRA TUR )")],
+                    "ENGLAND": [("GERMANY", "ALY ( ENG GER ITA RUS ) VSS ( AUS FRA TUR )")],
+                    "ITALY": [("GERMANY", "ALY ( ENG GER ITA RUS ) VSS ( AUS FRA TUR )")],
+                    "AUSTRIA": [("AUSTRIA", "ALY ( AUS RUS ) VSS ( ENG FRA GER ITA TUR )")],
                 },
                 "peace_proposals": {},
             },
@@ -233,15 +217,9 @@ class TestUtils:
                 "shared_orders": {"RUSSIA": ["A SEV - RUM"]},
                 "other_orders": {"RUSSIA": ["A LVP H"]},
                 "alliance_proposals": {
-                    "RUSSIA": [
-                        ("RUSSIA", "ALY ( ENG ITA RUS TUR ) VSS ( AUS FRA GER )")
-                    ],
-                    "ENGLAND": [
-                        ("RUSSIA", "ALY ( ENG ITA RUS TUR ) VSS ( AUS FRA GER )")
-                    ],
-                    "ITALY": [
-                        ("RUSSIA", "ALY ( ENG ITA RUS TUR ) VSS ( AUS FRA GER )")
-                    ],
+                    "RUSSIA": [("RUSSIA", "ALY ( ENG ITA RUS TUR ) VSS ( AUS FRA GER )")],
+                    "ENGLAND": [("RUSSIA", "ALY ( ENG ITA RUS TUR ) VSS ( AUS FRA GER )")],
+                    "ITALY": [("RUSSIA", "ALY ( ENG ITA RUS TUR ) VSS ( AUS FRA GER )")],
                 },
                 "peace_proposals": {
                     "RUSSIA": [("RUSSIA", "PCE ( RUS TUR )")],
@@ -254,9 +232,7 @@ class TestUtils:
                 "FRANCE": "PRP(AND(XDO((ENG AMY LVP) MTO WAL))(XDO((ENG FLT EDI) MTO NTH))(XDO((ENG FLT LON) MTO ECH)))"
             },
             {
-                "valid_proposals": {
-                    "FRANCE": ["A LVP - WAL", "F EDI - NTH", "F LON - ENG"]
-                },
+                "valid_proposals": {"FRANCE": ["A LVP - WAL", "F EDI - NTH", "F LON - ENG"]},
                 "invalid_proposals": {},
                 "shared_orders": {},
                 "other_orders": {},
@@ -266,9 +242,7 @@ class TestUtils:
         ],
     ]
 
-    @pytest.mark.parametrize(
-        "power_name,test_input,expected", PARSE_PROPOSAL_MESSAGES_TEST_CASES
-    )
+    @pytest.mark.parametrize("power_name,test_input,expected", PARSE_PROPOSAL_MESSAGES_TEST_CASES)
     def test_parse_proposal_messages(
         self,
         power_name: str,
@@ -285,25 +259,19 @@ class TestUtils:
                 phase=game_GTP.get_current_phase(),
             )
             game_GTP.add_message(message=msg_obj)
-        msgs = game_GTP.filter_messages(
-            messages=game_GTP.messages, game_role=power_name
-        ).values()
+        msgs = game_GTP.filter_messages(messages=game_GTP.messages, game_role=power_name).values()
         parsed_orders_dict = parse_proposal_messages(msgs, game_GTP, power_name)
 
         assert set(parsed_orders_dict.keys()) == set(expected.keys())
         for pod_key in parsed_orders_dict:
-            assert set(parsed_orders_dict[pod_key].keys()) == set(
-                expected[pod_key].keys()
-            ), (
+            assert set(parsed_orders_dict[pod_key].keys()) == set(expected[pod_key].keys()), (
                 pod_key,
                 set(parsed_orders_dict[pod_key].keys()),
                 set(expected[pod_key].keys()),
             )
 
             for key in parsed_orders_dict[pod_key]:
-                assert set(parsed_orders_dict[pod_key][key]) == set(
-                    expected[pod_key][key]
-                ), (
+                assert set(parsed_orders_dict[pod_key][key]) == set(expected[pod_key][key]), (
                     pod_key,
                     key,
                     set(parsed_orders_dict[pod_key][key]),

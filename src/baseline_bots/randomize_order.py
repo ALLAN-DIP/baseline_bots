@@ -203,9 +203,7 @@ def random_convoy_to(order: MoveByCVY) -> MoveByCVY:
         valid = [
             loc
             for loc in ADJACENCY[sea]
-            if TYPES[loc] == "COAST"
-            and loc != [province]
-            and loc not in ADJACENCY[amy_loc]
+            if TYPES[loc] == "COAST" and loc != [province] and loc not in ADJACENCY[amy_loc]
         ]  # the location must not be the one the unit is already convoying to
         # fmt: on
         if valid:
@@ -230,8 +228,7 @@ def random_convoy(order: CVY) -> CVY:
     """
     # TODO: Add to `daidepp`?
     assert (
-        order.convoyed_unit.unit_type == "AMY"
-        and order.convoying_unit.unit_type == "FLT"
+        order.convoyed_unit.unit_type == "AMY" and order.convoying_unit.unit_type == "FLT"
     ), "The unit type is neither army nor fleet so it is invalid."
     # It is necessary to check whether a possible alternate "convoy-to" location is adjacent to the unit being convoyed
     # since convoying to a province adjacent to you would be less believable
@@ -272,9 +269,7 @@ def random_support(order: SUP) -> SUP:
             ADJACENCY[supporter_loc],
             ADJACENCY[supported_loc],
         )
-        dest_choices = COMBOS[supporter_type][
-            supported_type
-        ]  # Set of possible destinations
+        dest_choices = COMBOS[supporter_type][supported_type]  # Set of possible destinations
         adj_to_both = [
             daidefy_location(adjacency).province
             for adjacency in supporter_adjacent  # this finds all provinces adjacent to the supportee and suporter locations
@@ -284,9 +279,7 @@ def random_support(order: SUP) -> SUP:
         # fmt: on
         chance_of_move = 0.5  # the chance of a support hold becoming a move is 50/50
         if adj_to_both and random.random() < chance_of_move:
-            return SUP(
-                order.supporting_unit, order.supported_unit, random.choice(adj_to_both)
-            )
+            return SUP(order.supporting_unit, order.supported_unit, random.choice(adj_to_both))
         else:
             # returns the same support hold order if there is no value adjacent to both
             return order
@@ -305,16 +298,12 @@ def random_support(order: SUP) -> SUP:
             if adjacency in rec_adjacent and adjacency != province and TYPES[adjacency]
         ]
         if adj_to_both:
-            return SUP(
-                order.supporting_unit, order.supported_unit, random.choice(adj_to_both)
-            )
+            return SUP(order.supporting_unit, order.supported_unit, random.choice(adj_to_both))
         else:
             return order  # returns original order if no "trickier" option is found
 
 
-def random_movement(
-    order: Union[MTO, RTO], chance_of_move: float = 0.5
-) -> Union[MTO, RTO, HLD]:
+def random_movement(order: Union[MTO, RTO], chance_of_move: float = 0.5) -> Union[MTO, RTO, HLD]:
     """
     Takes in a movement order and returns a similar but randomly different version of it.
     This may turn a movement order into a hold order.
@@ -352,13 +341,9 @@ def random_hold(order: HLD, chance_of_move: float = 0.8) -> Union[MTO, HLD]:
     :rtype: Tuple
     """
 
-    if (
-        random.random() < chance_of_move
-    ):  # The chance of changing the hold to a move is high
+    if random.random() < chance_of_move:  # The chance of changing the hold to a move is high
         loc = dipnetify_location(order.unit.location)
-        move_loc = random.choice(
-            ADJACENCY[loc]
-        )  # randomly chooses an adjacent location
+        move_loc = random.choice(ADJACENCY[loc])  # randomly chooses an adjacent location
         return MTO(order.unit, daidefy_location(move_loc))
     else:
         return order

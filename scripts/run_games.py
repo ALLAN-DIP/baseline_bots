@@ -43,9 +43,7 @@ async def run_cmd(cmd: str) -> str:
     return stdout.decode("utf-8")
 
 
-async def run_all_cmds(
-    cmds: Sequence[str], *, delay_seconds: Optional[int] = None
-) -> List[str]:
+async def run_all_cmds(cmds: Sequence[str], *, delay_seconds: Optional[int] = None) -> List[str]:
     coroutines = []
     for cmd in cmds:
         coroutines.append(run_cmd(cmd))
@@ -99,7 +97,9 @@ def main():
         # Flags based on following docs:
         # - https://apptainer.org/docs/user/1.1/cli/apptainer_run.html
         # - https://apptainer.org/docs/user/1.1/docker_and_oci.html#docker-like-compat-flag
-        runner_command = "apptainer run --cleanenv --ipc --no-eval --no-home --no-init --no-umask --pid"
+        runner_command = (
+            "apptainer run --cleanenv --ipc --no-eval --no-home --no-init --no-umask --pid"
+        )
     elif runner == DOCKER:  # For local development
         runner_command = "docker run --rm"
     elif runner == SINGULARITY:  # For CARC

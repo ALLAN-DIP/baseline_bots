@@ -42,9 +42,7 @@ class RandomProposerBot(BaselineBot):
                 random_orders = [XDO(command) for command in commands]
                 suggested_random_orders = PRP(optional_AND(random_orders))
                 # send the other power a message containing the orders
-                await self.send_message(
-                    other_power, str(suggested_random_orders), msgs_data
-                )
+                await self.send_message(other_power, str(suggested_random_orders), msgs_data)
 
         return list(orders)
 
