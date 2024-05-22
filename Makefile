@@ -88,12 +88,12 @@ fix: lock check
 .PHONY: update
 update:
 	pip install --upgrade pip
-	pip install --upgrade -r requirements-lock.txt
+	pip install --upgrade -r requirements-lock.txt -e .
 
 .PHONY: upgrade
 upgrade:
 	pip install --upgrade pip
-	pip install --upgrade --upgrade-strategy eager -r requirements.txt -r requirements-dev.txt
+	pip install --upgrade --upgrade-strategy eager -r requirements.txt -r requirements-dev.txt -e .
 
 .PHONY: install
 install:
