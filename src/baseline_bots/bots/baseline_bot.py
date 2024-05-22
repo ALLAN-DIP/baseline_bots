@@ -11,13 +11,7 @@ from diplomacy import Game, Message
 from diplomacy.client.network_game import NetworkGame
 from diplomacy.utils import strings
 
-from baseline_bots.utils import (
-    LIMITED_MESSAGE_GRAMMAR,
-    USE_LIMITED_DAIDE,
-    MessagesData,
-    is_valid_daide_message,
-    return_logger,
-)
+from baseline_bots.utils import MessagesData, return_logger
 
 logger = return_logger(__name__)
 
@@ -73,15 +67,7 @@ class BaselineBot(ABC):
         )
         for msg_obj in received_messages:
             logger.info(f"{self.display_name} received message: {msg_obj}")
-        valid_messages = []
-        for msg in received_messages:
-            if is_valid_daide_message(msg.message):
-                valid_messages.append(msg)
-            else:
-                logger.warning(
-                    f"{self.display_name} received a message with invalid DAIDE syntax: {msg.message!r}"
-                )
-        return valid_messages
+        return received_messages
 
     async def send_message(
         self, recipient: str, message: str, msg_data: MessagesData
@@ -92,20 +78,6 @@ class BaselineBot(ABC):
         :param message: Message to be sent
         :param msg_data: MessagesData object containing set of all sent messages
         """
-        if not is_valid_daide_message(message):
-            logger.warning(
-                f"{self.display_name} attempted to send a message with invalid DAIDE syntax: {message!r}"
-            )
-            return
-
-        if USE_LIMITED_DAIDE and not is_valid_daide_message(
-            message, LIMITED_MESSAGE_GRAMMAR
-        ):
-            logger.warning(
-                f"{self.display_name} attempted a message outside of the limited DAIDE syntax: {message!r}"
-            )
-            return
-
         msg_obj = Message(
             sender=self.power_name,
             recipient=recipient,
