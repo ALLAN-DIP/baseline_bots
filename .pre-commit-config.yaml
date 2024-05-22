@@ -2,65 +2,91 @@
 #   pre-commit run --all-files
 # Update this file:
 #   pre-commit autoupdate
+default_language_version:
+  # Use latest LTS release
+  node: 20.13.1
 repos:
   - repo: meta
     hooks:
       - id: check-useless-excludes
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.6.0
     hooks:
+      - id: check-added-large-files
       - id: check-ast
       - id: check-case-conflict
       - id: check-executables-have-shebangs
       - id: check-json
       - id: check-merge-conflict
+      - id: check-symlinks
       - id: check-toml
       - id: check-vcs-permalinks
+      - id: check-xml
       - id: check-yaml
       - id: debug-statements
+      - id: destroyed-symlinks
+      - id: detect-aws-credentials
+        args: [--allow-missing-credentials]
       - id: detect-private-key
       - id: end-of-file-fixer
       - id: fix-byte-order-marker
-      - id: fix-encoding-pragma
-        args: [--remove]
       - id: forbid-submodules
       - id: mixed-line-ending
         args: [--fix=lf]
+      - id: name-tests-test
+        args: [--unittest]
+      - id: no-commit-to-branch
       - id: requirements-txt-fixer
       - id: trailing-whitespace
+  - repo: https://github.com/sirosen/texthooks
+    rev: 0.6.6
+    hooks:
+      - id: alphabetize-codeowners
+      - id: fix-ligatures
+      - id: fix-smartquotes
+      - id: fix-spaces
+      - id: forbid-bidi-controls
   - repo: https://github.com/psf/black
-    rev: 23.3.0
+    rev: 24.4.2
     hooks:
       - id: black
-  - repo: https://github.com/pycqa/isort
-    # Newer versions do not support Python 3.7
-    rev: 5.11.5
-    hooks:
-      - id: isort
-        name: isort (python)
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v2.7.1
+    rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
-        # Older LTS version needed to run on CentOS 7 (e.g., Frontera)
-        language_version: 16.20.1
-        # Workaround from https://github.com/pre-commit/mirrors-prettier/issues/29#issuecomment-1332667344
         additional_dependencies:
-          - prettier@2.8.8
+          - prettier@3.2.5
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.8.0-1
+    hooks:
+      - id: shfmt
+        args: [
+            --write,
+            --indent=2,
+            --case-indent, # Switch cases will be indented.
+          ]
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.4
+    hooks:
+      - id: ruff
+        args: [--exit-non-zero-on-fix]
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.40.0
+    hooks:
+      - id: markdownlint
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: [--strict]
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.5
+    rev: v2.2.6
     hooks:
       - id: codespell
         additional_dependencies:
-          - tomli==2.0.1
-  - repo: https://github.com/shellcheck-py/shellcheck-py # Unofficial but maintained by asottile
-    rev: v0.9.0.5
-    hooks:
-      - id: shellcheck
-  - repo: https://github.com/pycqa/flake8
-    # Newer versions do not support Python 3.7
-    rev: 5.0.4
-    hooks:
-      - id: flake8
-        additional_dependencies: ["flake8-bugbear==23.3.12"]
-        args: ["--max-line-length=150", "--ignore=E203,W503", "--per-file-ignores=__init__.py:F401"]
+          # `tomllib` was added to stdlib in Python 3.11
+          - tomli==2.0.1 ; python_version < "3.11"

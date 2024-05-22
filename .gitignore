@@ -1,14 +1,98 @@
-# Python files
-*.egg*
-/.mypy_cache/
-/.pytest_cache/
-__pycache__/
+# File partially derived from https://github.com/github/gitignore
+# See upstream repo for more entries
 
-# IDE files
-/.idea/
-/.vscode/
-
-# Project-specific files
+### Project files
 *.sif
 /data/
 /logs/
+
+### Programming language files
+## Java files
+# From https://github.com/github/gitignore/blob/4488915eec0b3a45b5c63ead28f286819c0917de/Java.gitignore
+# Compiled class files
+*.class
+## JavaScript files
+# From https://github.com/github/gitignore/blob/4488915eec0b3a45b5c63ead28f286819c0917de/Node.gitignore
+# Nodenv files
+.node-version
+# NPM files
+node_modules/
+# Yarn files
+.pnp.*
+.yarn/build-state.yml
+.yarn/cache/
+.yarn/install-state.gz
+.yarn/unplugged/
+## Python files
+# From https://github.com/github/gitignore/blob/4488915eec0b3a45b5c63ead28f286819c0917de/Python.gitignore
+# Byte-compiled / optimized / DLL files
+*$py.class
+*.py[cod]
+__pycache__/
+# Code quality tooling files
+.coverage
+.coverage.*
+.mypy_cache/
+.nox/
+.ruff_cache/
+.tox/
+htmlcov/
+.pytest_cache/
+# Distribution / packaging files
+*.egg-info/
+# Jupyter notebook files
+# From https://github.com/github/gitignore/blob/4488915eec0b3a45b5c63ead28f286819c0917de/community/Python/JupyterNotebooks.gitignore
+*/.ipynb_checkpoints/
+.ipynb_checkpoints
+# Pyenv files
+.python-version
+# Virtual environment files
+.env/
+.venv/
+env/
+venv/
+
+### Tooling files
+## Direnv files
+.envrc
+## JetBrains files
+.idea/
+## Vim files
+# From https://github.com/github/gitignore/blob/4488915eec0b3a45b5c63ead28f286819c0917de/Global/Vim.gitignore
+# Swap files
+[._]*.s[a-v][a-z]
+!*.svg
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+## Visual Studio Code files
+# From https://github.com/github/gitignore/blob/4488915eec0b3a45b5c63ead28f286819c0917de/Global/VisualStudioCode.gitignore
+# Configuration files
+.vscode/*
+!.vscode/*.code-snippets
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/tasks.json
+
+### Operating system files
+## Linux files
+# From https://github.com/github/gitignore/blob/4488915eec0b3a45b5c63ead28f286819c0917de/Global/Linux.gitignore
+*~
+# .nfs files are created when a file open with NFS is removed while still being accessed
+.nfs*
+## macOS files
+# From https://github.com/github/gitignore/blob/4488915eec0b3a45b5c63ead28f286819c0917de/Global/macOS.gitignore
+.DS_Store
+# Thumbnails
+._*
+## Windows files
+# From https://github.com/github/gitignore/blob/4488915eec0b3a45b5c63ead28f286819c0917de/Global/Windows.gitignore
+# Folder config file
+[Dd]esktop.ini
+# Thumbnail cache files
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db

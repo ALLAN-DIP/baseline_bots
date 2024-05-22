@@ -1,0 +1,19 @@
+# "Consider adding a default `*)` case, even if it just exits with error."
+# https://www.shellcheck.net/wiki/SC2249
+enable=add-default-case
+
+# "Prefer explicit `-n` to check non-empty string (or use `=`/`-ne` to check boolean/integer)."
+# https://www.shellcheck.net/wiki/SC2244
+enable=avoid-nullary-conditions
+
+# "Prefer `[[ ]]` over `[ ]` for tests in Bash/Ksh."
+# https://www.shellcheck.net/wiki/SC2292
+enable=require-double-brackets
+
+# "Can't follow non-constant source. Use a directive to specify location"
+# https://www.shellcheck.net/wiki/SC1090
+disable=SC1090
+
+# "Not following: (error message here)"
+# https://www.shellcheck.net/wiki/SC1091
+disable=SC1091

@@ -1,0 +1,17 @@
+extends: default
+
+rules:
+  colons: disable # Let Prettier handle formatting
+  commas: disable # Let Prettier handle formatting
+  comments:
+    min-spaces-from-content: 1 # Match Prettier formatting
+  document-start: disable
+  empty-lines: disable # Let Prettier handle formatting
+  empty-values: enable
+  indentation: disable # Let Prettier handle formatting
+  hyphens: disable # Let Prettier handle formatting
+  line-length: disable # Let Prettier handle formatting
+  new-line-at-end-of-file: disable # Let Prettier handle formatting
+  new-lines: disable # Let end-of-file-fixer handle formatting
+  octal-values: enable
+  trailing-spaces: enable # Let trailing-whitespace handle formatting

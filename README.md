@@ -26,3 +26,13 @@ $ docker run -it allan_dip_bot --help
 $ docker run -it allan_dip_bot --game_id test_game --host shade.tacc.utexas.edu --power TURKEY
 $
 ```
+
+## Contributing
+
+This project uses various code quality tooling, all of which is automatically installed with the rest of the development requirements.
+
+All checks can be run with `make check`, and some additional automatic changes can be run with `make fix`.
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)

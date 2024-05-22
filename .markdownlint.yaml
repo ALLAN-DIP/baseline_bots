@@ -1,0 +1,13 @@
+# Default state for all rules
+default: true
+
+# Path to configuration file to extend
+extends: null
+
+# line-length
+# Let Prettier handle formatting
+MD013: false
+
+# no-duplicate-heading
+MD024:
+  siblings_only: true
