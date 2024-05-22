@@ -1,5 +1,5 @@
 daidepp @ git+https://git@github.com/SHADE-AI/daidepp.git@d55a2090c261783e5128fc7c58b5cb137a7653a6
-diplomacy @ git+https://git@github.com/ALLAN-DIP/diplomacy.git@e9c2878c39a418ee9f2a7aa9f35351d886ec1ddd
+diplomacy @ git+https://git@github.com/ALLAN-DIP/diplomacy.git@5438cbd12aa036c1db9abec0642f520d5058164e
 pre-commit==2.21.0
 pytest==7.3.1
 tornado==6.2
