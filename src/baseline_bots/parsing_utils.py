@@ -84,9 +84,7 @@ def daidefy_unit(dipnet_unit: str, unit_game_mapping: Mapping[str, str]) -> Unit
     elif dipnet_unit.startswith("F"):
         unit_type = "FLT"
     else:
-        raise ValueError(
-            f"Cannot extract unit type from DipNet-style unit {dipnet_unit!r}"
-        )
+        raise ValueError(f"Cannot extract unit type from DipNet-style unit {dipnet_unit!r}")
 
     location = daidefy_location(dipnet_unit.split()[-1])
 
@@ -119,13 +117,10 @@ def dipnet_to_daide_parsing(
     # Convert strings to order tokens and store a dictionary mapping of armies to be convoyed and fleets helping to convoy
     for i in range(len(dipnet_style_order_strs)):
         if not (unit_power_tuples_included):
-            dipnet_style_order_strs_tokens[i] = get_order_tokens(
-                dipnet_style_order_strs[i]
-            )
+            dipnet_style_order_strs_tokens[i] = get_order_tokens(dipnet_style_order_strs[i])
             if dipnet_style_order_strs_tokens[i][1] == "C":
                 convoy_map[
-                    dipnet_style_order_strs_tokens[i][2]
-                    + dipnet_style_order_strs_tokens[i][3]
+                    dipnet_style_order_strs_tokens[i][2] + dipnet_style_order_strs_tokens[i][3]
                 ].append(dipnet_style_order_strs_tokens[i][0].split()[-1])
         else:  # If unit powers are also included in the input, then use the right values
             dipnet_style_order_strs_tokens[i] = (
@@ -346,9 +341,7 @@ def parse_proposal_messages(
     """
     try:
         # Extract messages containing PRP string
-        order_msgs = [
-            msg for msg in rcvd_messages if isinstance(parse_daide(msg.message), PRP)
-        ]
+        order_msgs = [msg for msg in rcvd_messages if isinstance(parse_daide(msg.message), PRP)]
         logger.info(
             f"Received {len(order_msgs)} PRP messages: "
             f"{[(order_msg.sender, order_msg.message) for order_msg in order_msgs]}"
@@ -378,14 +371,10 @@ def parse_proposal_messages(
                     # when we YES/REJ a ALY/PCE proposal we should do it as a whole..
                     elif isinstance(order, ALYVSS):
                         for ally in parse_alliance_proposal(order, power_name):
-                            alliance_proposals[ally].append(
-                                (order_msg.sender, str(order))
-                            )
+                            alliance_proposals[ally].append((order_msg.sender, str(order)))
                     elif isinstance(order, PCE):
                         for peace in parse_peace_proposal(order, power_name):
-                            peace_proposals[peace].append(
-                                (order_msg.sender, str(order))
-                            )
+                            peace_proposals[peace].append((order_msg.sender, str(order)))
                     else:
                         other_orders[order_msg.sender].append(str(order))
             except asyncio.CancelledError:

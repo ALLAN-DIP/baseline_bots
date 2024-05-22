@@ -71,13 +71,9 @@ def main() -> None:
         help="Number of controlled powers (default: %(default)s)",
     )
     parser.add_argument("--user", type=str, default=DEFAULT_USER, help="SHADE user.")
-    parser.add_argument(
-        "--password", type=str, default=DEFAULT_PASSWORD, help="SHADE password."
-    )
+    parser.add_argument("--password", type=str, default=DEFAULT_PASSWORD, help="SHADE password.")
     parser.add_argument("--game-password", type=str, help="Game password.")
-    parser.add_argument(
-        "--host", type=str, default=DEFAULT_HOST, help="Server hostname."
-    )
+    parser.add_argument("--host", type=str, default=DEFAULT_HOST, help="Server hostname.")
     parser.add_argument("--port", type=int, default=DEFAULT_PORT, help="Server port.")
     args = parser.parse_args()
 

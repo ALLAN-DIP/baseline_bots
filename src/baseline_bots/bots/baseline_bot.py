@@ -40,13 +40,9 @@ class BaselineBot(ABC):
         """
         # Comm status should not be sent in local games, only set
         if isinstance(self.game, NetworkGame):
-            await self.game.set_comm_status(
-                power_name=self.power_name, comm_status=strings.READY
-            )
+            await self.game.set_comm_status(power_name=self.power_name, comm_status=strings.READY)
         else:
-            self.game.set_comm_status(
-                power_name=self.power_name, comm_status=strings.READY
-            )
+            self.game.set_comm_status(power_name=self.power_name, comm_status=strings.READY)
 
         while not all(
             power.comm_status == strings.READY
@@ -59,9 +55,7 @@ class BaselineBot(ABC):
         """Retrieves all valid messages for the current phase sent to the bot.
         :return: List of messages.
         """
-        messages = self.game.filter_messages(
-            messages=self.game.messages, game_role=self.power_name
-        )
+        messages = self.game.filter_messages(messages=self.game.messages, game_role=self.power_name)
         received_messages = sorted(
             msg for msg in messages.values() if msg.sender != self.power_name
         )
@@ -69,9 +63,7 @@ class BaselineBot(ABC):
             logger.info(f"{self.display_name} received message: {msg_obj}")
         return received_messages
 
-    async def send_message(
-        self, recipient: str, message: str, msg_data: MessagesData
-    ) -> None:
+    async def send_message(self, recipient: str, message: str, msg_data: MessagesData) -> None:
         """Send message asynchronously to the server
 
         :param recipient: The name of the recipient power
@@ -129,9 +121,7 @@ class BaselineBot(ABC):
 
         # Orders should not be sent in local games, only stored
         if isinstance(self.game, NetworkGame):
-            await self.game.set_orders(
-                power_name=self.power_name, orders=orders, wait=wait
-            )
+            await self.game.set_orders(power_name=self.power_name, orders=orders, wait=wait)
         else:
             self.game.set_orders(power_name=self.power_name, orders=orders)
 

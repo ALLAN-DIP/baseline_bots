@@ -275,9 +275,7 @@ class MessagesData(collections.abc.Collection):
     def __init__(self):
         self.messages = []
 
-    def add_message(
-        self, recipient: str, message: str, allow_duplicates: bool = True
-    ) -> bool:
+    def add_message(self, recipient: str, message: str, allow_duplicates: bool = True) -> bool:
         pair = {"recipient": recipient, "message": message}
         message_already_exists = pair in self
         if allow_duplicates or not message_already_exists:

@@ -43,13 +43,9 @@ def main() -> None:
     parser.add_argument("--game_id", type=str, required=True, help="Game ID.")
     parser.add_argument("--output_file", type=Path, help="Output file path.")
     parser.add_argument("--user", type=str, default=DEFAULT_USER, help="SHADE user.")
-    parser.add_argument(
-        "--password", type=str, default=DEFAULT_PASSWORD, help="SHADE password."
-    )
+    parser.add_argument("--password", type=str, default=DEFAULT_PASSWORD, help="SHADE password.")
     parser.add_argument("--game-password", type=str, help="Game password.")
-    parser.add_argument(
-        "--host", type=str, default=DEFAULT_HOST, help="Server hostname."
-    )
+    parser.add_argument("--host", type=str, default=DEFAULT_HOST, help="Server hostname.")
     parser.add_argument("--port", type=int, default=DEFAULT_PORT, help="Server port.")
     args = parser.parse_args()
     game_id: str = args.game_id
