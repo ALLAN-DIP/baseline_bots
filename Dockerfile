@@ -7,6 +7,7 @@ FROM python:3.7.17-slim-bookworm AS achilles
 WORKDIR /bot
 
 RUN apt-get -y update \
+    && apt-get -y upgrade \
     && apt-get --no-install-recommends -y install git=1:2.39.2-1.1 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
