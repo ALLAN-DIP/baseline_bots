@@ -6,7 +6,7 @@ charset-normalizer==3.3.2
 coloredlogs==15.0.1
 daidepp @ git+https://git@github.com/SHADE-AI/daidepp.git@d55a2090c261783e5128fc7c58b5cb137a7653a6
 dill==0.3.7
-diplomacy @ git+https://git@github.com/ALLAN-DIP/diplomacy.git@0a8f9d21f555da67849003e470499e1b8524c59c
+diplomacy @ git+https://git@github.com/ALLAN-DIP/diplomacy.git@3d5db5ecfbb0aaa4d5b92cc128a43ca9ee8f35a6
 distlib==0.3.8
 exceptiongroup==1.2.1
 filelock==3.12.2
