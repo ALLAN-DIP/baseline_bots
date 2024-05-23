@@ -50,28 +50,20 @@ class TestSOABot(AsyncTestCase):
     def test_send_message(self):
         hostname = "localhost"
         port = 8432
-        game_id = None
 
         connection = yield connect(hostname, port)
         channel = yield connection.authenticate("userX", "password")
 
-        game_created = False
-        while not (game_created):
-            now = datetime.datetime.now(datetime.timezone.utc)
-            game_id = f"usc_soa_test_{now.strftime('%Y_%m_%d_%H_%M_%S_%f')}"
-            try:
-                game = yield channel.create_game(
-                    game_id=game_id,
-                    rules={"REAL_TIME", "NO_DEADLINE", "POWER_CHOICE"},
-                    deadline=30,
-                    n_controls=1,
-                    registration_password="",
-                    daide_port=None,
-                )
-                game_created = True
-            except Exception:
-                # game not created because of same game id
-                pass
+        now = datetime.datetime.now(datetime.timezone.utc)
+        game_id = f"usc_soa_test_{now.strftime('%Y_%m_%d_%H_%M_%S_%f')}"
+        yield channel.create_game(
+            game_id=game_id,
+            rules={"REAL_TIME", "NO_DEADLINE", "POWER_CHOICE"},
+            deadline=30,
+            n_controls=1,
+            registration_password="",
+            daide_port=None,
+        )
 
         # Waiting for the game, then joining it
         while not (yield channel.list_games(game_id=game_id)):
