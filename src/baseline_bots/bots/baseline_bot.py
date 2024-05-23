@@ -124,6 +124,10 @@ class BaselineBot(ABC):
         else:
             self.game.set_orders(power_name=self.power_name, orders=orders)
 
+    async def start_phase(self) -> None:
+        """Execute actions at the start of the phase."""
+        pass
+
     @abstractmethod
     async def gen_orders(self) -> List[str]:
         """
@@ -142,10 +146,16 @@ class BaselineBot(ABC):
         """
         raise NotImplementedError()
 
+    async def end_phase(self) -> None:
+        """Execute actions at the end of the phase."""
+        pass
+
     async def __call__(self) -> List[str]:
         """
         :return: dict containing messages and orders
         """
+        await self.start_phase()
+
         orders = await self.gen_orders()
 
         # Skip communications unless in the movement phase
@@ -182,5 +192,7 @@ class BaselineBot(ABC):
                 await asyncio.wait_for(run_messaging_loop(), timeout=wait_time)
             except asyncio.TimeoutError:
                 logger.info("Exiting communication phase because out of time")
+
+        await self.end_phase()
 
         return orders
