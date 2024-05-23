@@ -10,7 +10,6 @@ from tornado.testing import AsyncTestCase
 from typing_extensions import Final
 
 from baseline_bots.bots.random_proposer_bot import RandomProposerBot
-from baseline_bots.utils import MessagesData
 
 SOA_TEST_PARAMS: Final = {
     "num_message_rounds": 3,
@@ -22,8 +21,7 @@ class TestSOABot(AsyncTestCase):
     def test_play_simple(self):
         game = Game()
         soa_bot = RandomProposerBot("FRANCE", game)
-        msg_data = MessagesData()
-        yield soa_bot.send_message("FRANCE", "A PAR - BUR", msg_data)
+        yield soa_bot.send_message("FRANCE", "A PAR - BUR")
 
     @testing.gen_test
     def test_play(self):
