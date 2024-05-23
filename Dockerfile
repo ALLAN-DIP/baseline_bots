@@ -12,7 +12,6 @@ RUN apt-get -y update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Later versions of pip and setuptools do not work properly
 RUN pip install --no-cache-dir --upgrade pip==24.0
 
 COPY requirements.txt .
