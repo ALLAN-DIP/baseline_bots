@@ -13,6 +13,12 @@ class RandomProposerBot(BaselineBot):
     Just sends random order proposals to other bots.
     """
 
+    is_first_messaging_round = False
+
+    async def start_phase(self) -> None:
+        """Execute actions at the start of the phase."""
+        self.is_first_messaging_round = True
+
     async def do_messaging_round(
         self,
         orders: Sequence[str],
@@ -21,6 +27,9 @@ class RandomProposerBot(BaselineBot):
         """
         :return: dict containing messages and orders
         """
+        if not self.is_first_messaging_round:
+            return list(orders)
+
         # Getting the list of possible orders for all locations
         possible_orders = self.game.get_all_possible_orders()
 
@@ -43,6 +52,8 @@ class RandomProposerBot(BaselineBot):
                 suggested_random_orders = PRP(optional_AND(random_orders))
                 # send the other power a message containing the orders
                 await self.send_message(other_power, str(suggested_random_orders), msgs_data)
+
+        self.is_first_messaging_round = False
 
         return list(orders)
 
