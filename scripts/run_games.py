@@ -127,6 +127,8 @@ def main():
     powers = sorted(POWER_NAMES_DICT.values())
     run_cmds = []
     for power in powers:
+        if runner == DOCKER:
+            runner_command += f" --name {power}-{game_id}"
         # `localhost` doesn't work when running an agent with Docker Desktop
         host_from_container = "host.docker.internal" if host == "localhost" else host
         log_file = str(log_dir / f"{power}.txt")
