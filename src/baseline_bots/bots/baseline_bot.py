@@ -11,7 +11,7 @@ from diplomacy import Game, Message
 from diplomacy.client.network_game import NetworkGame
 from diplomacy.utils import strings
 
-from baseline_bots.utils import MessagesData, return_logger
+from baseline_bots.utils import return_logger
 
 logger = return_logger(__name__)
 
@@ -63,12 +63,11 @@ class BaselineBot(ABC):
             logger.info(f"{self.display_name} received message: {msg_obj}")
         return received_messages
 
-    async def send_message(self, recipient: str, message: str, msg_data: MessagesData) -> None:
+    async def send_message(self, recipient: str, message: str) -> None:
         """Send message asynchronously to the server
 
         :param recipient: The name of the recipient power
         :param message: Message to be sent
-        :param msg_data: MessagesData object containing set of all sent messages
         """
         msg_obj = Message(
             sender=self.power_name,
@@ -76,12 +75,6 @@ class BaselineBot(ABC):
             message=message,
             phase=self.game.get_current_phase(),
         )
-        message_already_exists = msg_data.add_message(
-            msg_obj.recipient, msg_obj.message, allow_duplicates=False
-        )
-        if message_already_exists:
-            return
-
         logger.info(f"{self.display_name} sent message: {msg_obj}")
 
         # Messages should not be sent in local games, only stored
@@ -89,16 +82,6 @@ class BaselineBot(ABC):
             await self.game.send_game_message(message=msg_obj)
         else:
             self.game.add_message(message=msg_obj)
-
-    async def send_messages(self, msg_data: MessagesData) -> None:
-        """Send messages asynchronously to the server
-
-        :param msg_data: MessagesData object containing messages to send
-        """
-        for msg in msg_data.messages:
-            # A new `MessagesData` instance is used because we don't want
-            # to add duplicate messages to the passed-in instance
-            await self.send_message(msg["recipient"], msg["message"], MessagesData())
 
     async def send_intent_log(self, log_msg: str) -> None:
         """Send intent log asynchronously to the server
@@ -137,11 +120,7 @@ class BaselineBot(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    async def do_messaging_round(
-        self,
-        orders: Sequence[str],
-        msgs_data: MessagesData,
-    ) -> List[str]:
+    async def do_messaging_round(self, orders: Sequence[str]) -> List[str]:
         """
         :return: dict containing messages and orders
         """
@@ -168,24 +147,20 @@ class BaselineBot(ABC):
         await self.wait_for_comm_stage()
 
         if self.num_message_rounds:
-            msgs_data = MessagesData()
-
             for _ in range(self.num_message_rounds):
                 # sleep for a random amount of time before retrieving new messages for the power
                 await asyncio.sleep(random.uniform(0.5, 1.5))
-                orders = await self.do_messaging_round(orders, msgs_data)
+                orders = await self.do_messaging_round(orders)
         else:
 
             async def run_messaging_loop() -> None:
                 nonlocal orders
 
-                msgs = MessagesData()
-
                 while True:
                     # sleep for a random amount of time before retrieving new messages for the power
                     await asyncio.sleep(random.uniform(0.5, 1.5))
 
-                    orders = await self.do_messaging_round(orders, msgs)
+                    orders = await self.do_messaging_round(orders)
 
             try:
                 # Set aside 10s for cancellation

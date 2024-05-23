@@ -5,7 +5,7 @@ from daidepp import PRP, XDO
 
 from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.parsing_utils import dipnet_to_daide_parsing
-from baseline_bots.utils import MessagesData, get_other_powers, optional_AND
+from baseline_bots.utils import get_other_powers, optional_AND
 
 
 class RandomProposerBot(BaselineBot):
@@ -19,11 +19,7 @@ class RandomProposerBot(BaselineBot):
         """Execute actions at the start of the phase."""
         self.is_first_messaging_round = True
 
-    async def do_messaging_round(
-        self,
-        orders: Sequence[str],
-        msgs_data: MessagesData,
-    ) -> List[str]:
+    async def do_messaging_round(self, orders: Sequence[str]) -> List[str]:
         """
         :return: dict containing messages and orders
         """
@@ -51,7 +47,7 @@ class RandomProposerBot(BaselineBot):
                 random_orders = [XDO(command) for command in commands]
                 suggested_random_orders = PRP(optional_AND(random_orders))
                 # send the other power a message containing the orders
-                await self.send_message(other_power, str(suggested_random_orders), msgs_data)
+                await self.send_message(other_power, str(suggested_random_orders))
 
         self.is_first_messaging_round = False
 
