@@ -63,17 +63,18 @@ class BaselineBot(ABC):
             logger.info(f"{self.display_name} received message: {msg_obj}")
         return received_messages
 
-    async def send_message(self, recipient: str, message: str) -> None:
+    async def send_message(self, recipient: str, message: str, *, sender: Optional[str] = None, msg_type: Optional[str] = None) -> None:
         """Send message asynchronously to the server
 
         :param recipient: The name of the recipient power
         :param message: Message to be sent
         """
         msg_obj = Message(
-            sender=self.power_name,
+            sender=sender or self.power_name,
             recipient=recipient,
             message=message,
             phase=self.game.get_current_phase(),
+            type=msg_type,
         )
         logger.info(f"{self.display_name} sent message: {msg_obj}")
 
@@ -82,6 +83,22 @@ class BaselineBot(ABC):
             await self.game.send_game_message(message=msg_obj)
         else:
             self.game.add_message(message=msg_obj)
+
+    async def suggest_orders(self, orders: List[str]) -> None:
+        await self.send_message(
+            "GLOBAL",
+            f"{self.power_name} Cicero suggests move: {', '.join(orders)}",
+            sender="omniscient_type",
+            msg_type="suggested_move",
+        )
+
+    async def suggest_message(self, recipient: str, message: str) -> None:
+        await self.send_message(
+            "GLOBAL",
+            f"{self.power_name} Cicero suggests a message to {recipient}: {message}",
+            sender="omniscient_type",
+            msg_type="suggested_message",
+        )
 
     async def send_intent_log(self, log_msg: str) -> None:
         """Send intent log asynchronously to the server
