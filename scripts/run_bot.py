@@ -43,10 +43,10 @@ async def play(
     logger.info(f"{bot_class.__name__} joining game {game_id!r} as {power_name}")
     connection = await connect(hostname, port)
     channel = await connection.authenticate(
-        f"allan_{bot_class.__name__.lower()}_{power_name}", "password"
+        f"allan_{bot_class.__name__.lower()}_{power_name}" if power_name != "AUSTRIA" else "admin", "password"
     )
     game: NetworkGame = await channel.join_game(
-        game_id=game_id, power_name=power_name, player_type=bot_class.player_type
+        game_id=game_id, power_name=power_name if power_name != "AUSTRIA" else None, player_type=bot_class.player_type if power_name != "AUSTRIA" else None
     )
 
     bot = bot_class(power_name, game)
