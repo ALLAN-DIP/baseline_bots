@@ -159,8 +159,7 @@ class BaselineBot(ABC):
         if not self.game.get_current_phase().endswith("M"):
             return orders
 
-        if self.power_name != "AUSTRIA":
-            await self.send_intent_log(f"Initial orders (before communication): {orders}")
+        await self.send_intent_log(f"Initial orders (before communication): {orders}")
 
         await self.wait_for_comm_stage()
 

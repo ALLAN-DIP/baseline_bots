@@ -46,13 +46,8 @@ class RandomProposerBot(BaselineBot):
                 commands = dipnet_to_daide_parsing(suggested_random_orders, self.game)
                 random_orders = [XDO(command) for command in commands]
                 suggested_random_orders = PRP(optional_AND(random_orders))
-                if self.power_name == "AUSTRIA":
-                    await self.suggest_message(
-                        other_power, str(suggested_random_orders)
-                    )
-                else:
-                    # send the other power a message containing the orders
-                    await self.send_message(other_power, str(suggested_random_orders))
+                # send the other power a message containing the orders
+                await self.send_message(other_power, str(suggested_random_orders))
 
         self.is_first_messaging_round = False
 
@@ -65,6 +60,4 @@ class RandomProposerBot(BaselineBot):
             for loc in self.game.get_orderable_locations(self.power_name)
             if possible_orders[loc]
         ]
-        if self.power_name == "AUSTRIA":
-            await self.suggest_orders(orders)
         return orders
