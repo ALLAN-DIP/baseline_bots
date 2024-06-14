@@ -4,7 +4,7 @@
 #   pre-commit autoupdate
 default_language_version:
   # Use latest LTS release
-  node: 20.13.1
+  node: 20.14.0
 repos:
   - repo: meta
     hooks:
@@ -55,7 +55,7 @@ repos:
     hooks:
       - id: prettier
         additional_dependencies:
-          - prettier@3.2.5
+          - prettier@3.3.2
   - repo: https://github.com/scop/pre-commit-shfmt
     rev: v3.7.0-1
     hooks:
@@ -66,12 +66,12 @@ repos:
             --case-indent, # Switch cases will be indented.
           ]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.4.4
+    rev: v0.4.8
     hooks:
       - id: ruff
         args: [--exit-non-zero-on-fix]
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.40.0
+    rev: v0.41.0
     hooks:
       - id: markdownlint
   - repo: https://github.com/adrienverge/yamllint
@@ -83,6 +83,10 @@ repos:
     rev: v0.9.0.5
     hooks:
       - id: shellcheck
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.1
+    hooks:
+      - id: actionlint
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.5
     hooks:

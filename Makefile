@@ -26,6 +26,10 @@ endif
 	# They install automatically on Linux as a requirement of PyTorch
 	sed --in-place -e '/^\(nvidia-.*\|triton\)==.*/d' requirements-lock.txt
 
+.PHONY: actionlint
+actionlint:
+	pre-commit run --all-files actionlint
+
 .PHONY: black
 black:
 	pre-commit run --all-files black
