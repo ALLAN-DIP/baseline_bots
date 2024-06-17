@@ -34,7 +34,6 @@ repos:
       - id: mixed-line-ending
         args: [--fix=lf]
       - id: name-tests-test
-        args: [--unittest]
       - id: no-commit-to-branch
       - id: requirements-txt-fixer
       - id: trailing-whitespace
