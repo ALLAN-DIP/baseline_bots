@@ -6,7 +6,6 @@ It would be preferable to use a real DAIDE parser in prod
 
 import asyncio
 from collections import defaultdict
-import collections.abc
 from copy import deepcopy
 import logging
 import os

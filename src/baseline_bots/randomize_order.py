@@ -208,7 +208,7 @@ def random_convoy_to(order: MoveByCVY) -> MoveByCVY:
         # fmt: on
         if valid:
             route = tuple(
-                (reversed(sea_provinces[i:]))
+                reversed(sea_provinces[i:])
             )  # the list must be reversed back to the correct order before returning
             route = [daidefy_location(sea).province for sea in route]
             return MoveByCVY(order.unit, daidefy_location(random.choice(valid)), *route)
