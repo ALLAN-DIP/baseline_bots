@@ -132,7 +132,7 @@ class BaselineBot(ABC):
         else:
             self.game.set_orders(power_name=self.power_name, orders=orders)
 
-    async def start_phase(self) -> None:
+    async def start_phase(self) -> None:  # noqa: B027 (`empty-method-without-abstract-decorator` from `flake8-bugbear`)
         """Execute actions at the start of the phase."""
         pass
 
@@ -150,7 +150,7 @@ class BaselineBot(ABC):
         """
         raise NotImplementedError()
 
-    async def end_phase(self) -> None:
+    async def end_phase(self) -> None:  # noqa: B027 (`empty-method-without-abstract-decorator` from `flake8-bugbear`)
         """Execute actions at the end of the phase."""
         pass
 
