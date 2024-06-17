@@ -46,6 +46,7 @@ ignore = [
 [tool.ruff.lint.isort]
 combine-as-imports = true
 force-sort-within-sections = true
+known-first-party = ["baseline_bots"]
 
 [tool.ruff.lint.pycodestyle]
 # Detect extra-long lines that Black can't handle
