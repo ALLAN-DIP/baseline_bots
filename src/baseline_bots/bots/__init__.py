@@ -1,2 +1,2 @@
-from baseline_bots.bots.baseline_bot import BaselineBot
-from baseline_bots.bots.random_proposer_bot import RandomProposerBot
+from baseline_bots.bots.baseline_bot import BaselineBot as BaselineBot
+from baseline_bots.bots.random_proposer_bot import RandomProposerBot as RandomProposerBot
