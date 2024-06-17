@@ -133,7 +133,7 @@ class BaselineBot(ABC):
 
     async def start_phase(self) -> None:
         """Execute actions at the start of the phase."""
-        pass
+        return
 
     @abstractmethod
     async def gen_orders(self) -> List[str]:
@@ -151,7 +151,7 @@ class BaselineBot(ABC):
 
     async def end_phase(self) -> None:
         """Execute actions at the end of the phase."""
-        pass
+        return
 
     async def __call__(self) -> List[str]:
         """

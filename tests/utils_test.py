@@ -96,7 +96,7 @@ class TestUtils:
         )
         comparison_tc_op = (
             test_input[0].replace(" R ", " - ")
-            if type(test_input[0]) == str
+            if isinstance(test_input[0], str)
             else test_input[0][0].replace(" R ", " - ")
         )
         # Remove coast for target destination in support orders
