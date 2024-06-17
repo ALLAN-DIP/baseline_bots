@@ -1,6 +1,7 @@
 """unit tests for smart order accepter bot"""
 import asyncio
 import datetime
+from typing import Coroutine, Generator, Iterator
 
 from diplomacy import Game
 from diplomacy.client.connection import connect
@@ -18,13 +19,13 @@ SOA_TEST_PARAMS: Final = {
 
 class TestSOABot(AsyncTestCase):
     @testing.gen_test
-    def test_play_simple(self) -> None:
+    def test_play_simple(self):  # type: ignore[no-untyped-def]
         game = Game()
         soa_bot = RandomProposerBot("FRANCE", game)
         yield soa_bot.send_message("FRANCE", "A PAR - BUR")
 
     @testing.gen_test
-    def test_play(self) -> None:
+    def test_play(self):  # type: ignore[no-untyped-def]
         game = Game()
 
         game_play = GamePlay(
@@ -45,7 +46,7 @@ class TestSOABot(AsyncTestCase):
         print("finish test_play")
 
     @testing.gen_test
-    def test_send_message(self) -> None:
+    def test_send_message(self):  # type: ignore[no-untyped-def]
         hostname = "localhost"
         port = 8432
 
