@@ -5,7 +5,7 @@ an already existing order / list of orders.
 
 
 import random
-from typing import List, Tuple, Union  # noqa: F401
+from typing import Iterable, List, Tuple, Union  # noqa: F401
 
 from daidepp import (
     BLD,
@@ -203,14 +203,13 @@ def random_convoy_to(order: MoveByCVY) -> MoveByCVY:
         valid = [
             loc
             for loc in ADJACENCY[sea]
-            if TYPES[loc] == "COAST" and loc != [province] and loc not in ADJACENCY[amy_loc]
+            if TYPES[loc] == "COAST" and loc != province and loc not in ADJACENCY[amy_loc]
         ]  # the location must not be the one the unit is already convoying to
         # fmt: on
         if valid:
-            route = tuple(
-                reversed(sea_provinces[i:])
-            )  # the list must be reversed back to the correct order before returning
-            route = [daidefy_location(sea).province for sea in route]
+            # the list must be reversed back to the correct order before returning
+            route: Iterable[str] = reversed(sea_provinces[i:])
+            route = (daidefy_location(sea).province for sea in route)
             return MoveByCVY(order.unit, daidefy_location(random.choice(valid)), *route)
     return order
 
