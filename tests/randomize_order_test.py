@@ -50,7 +50,7 @@ class TestRandomizeDipnet:
         random.seed(1)
         assert random_list_orders(orders) == [
             parse_daide("(FRA FLT NTH) CVY (FRA AMY HOL) CTO EDI"),
-            parse_daide("(FRA AMY HOL) CTO NWY VIA (NTH)"),
+            parse_daide("(FRA AMY HOL) CTO YOR VIA (NTH)"),
         ]
         random.seed(15)
         assert random_list_orders(orders) == [
