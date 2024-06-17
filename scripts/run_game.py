@@ -40,7 +40,7 @@ async def run_all_cmds(
     return await asyncio.gather(*coroutines)
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "command_file",

@@ -17,7 +17,7 @@ from baseline_bots.utils import (
 
 
 class TestUtils:
-    def test_get_list_of_orders(self):
+    def test_get_list_of_orders(self) -> None:
         EXAMPLE_ORDER = "A VIE S A BUD - GAL"
         EXAMPLE_ORDER_2 = "A VIE H"
 

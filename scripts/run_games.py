@@ -52,7 +52,7 @@ async def run_all_cmds(cmds: Sequence[str], *, delay_seconds: Optional[int] = No
     return await asyncio.gather(*coroutines)
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--runner",

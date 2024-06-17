@@ -11,7 +11,7 @@ REPO_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_HOST = "shade.tacc.utexas.edu"
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "config_file",

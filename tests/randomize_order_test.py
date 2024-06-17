@@ -5,7 +5,7 @@ from baseline_bots.utils import parse_daide
 
 
 class TestRandomizeDipnet:
-    def test(self):
+    def test(self) -> None:
         # The following three tests check that build, disband and remove commands do not get changed when input into the order randomizer.
 
         orders = [parse_daide("(FRA AMY PAR) BLD")]
