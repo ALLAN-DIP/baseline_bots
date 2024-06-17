@@ -63,7 +63,14 @@ class BaselineBot(ABC):
             logger.info(f"{self.display_name} received message: {msg_obj}")
         return received_messages
 
-    async def send_message(self, recipient: str, message: str, *, sender: Optional[str] = None, msg_type: Optional[str] = None) -> None:
+    async def send_message(
+        self,
+        recipient: str,
+        message: str,
+        *,
+        sender: Optional[str] = None,
+        msg_type: Optional[str] = None,
+    ) -> None:
         """Send message asynchronously to the server
 
         :param recipient: The name of the recipient power
