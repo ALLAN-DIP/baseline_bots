@@ -72,7 +72,7 @@ def main() -> None:
     output = {"run_output": run_output, "game_record": game_record}
     data_dir.mkdir(parents=True, exist_ok=True)
     output_file = data_dir / f"record_{game_id}.json"
-    with open(output_file, "w") as file:
+    with open(output_file, "w", encoding="utf-8") as file:
         json.dump(output, file, ensure_ascii=False, indent=2)
         file.write("\n")
 

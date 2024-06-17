@@ -73,7 +73,7 @@ def main() -> None:
             port=port,
         )
     )
-    with open(output_file, mode="w") as file:
+    with open(output_file, mode="w", encoding="utf-8") as file:
         json.dump(game_json, file, ensure_ascii=False, indent=2)
         file.write("\n")
     print(f"Wrote game log to file {str(output_file)!r}")

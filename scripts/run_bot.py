@@ -40,7 +40,7 @@ async def play(
     """
 
     # Connect to the game
-    logger.info(f"{bot_class.__name__} joining game {game_id!r} as {power_name}")
+    logger.info(f"%s joining game %s as %s", bot_class.__name__, repr(game_id), power_name)
     connection = await connect(hostname, port)
     channel = await connection.authenticate(
         f"allan_{bot_class.__name__.lower()}_{power_name}", "password"
@@ -57,7 +57,7 @@ async def play(
         await asyncio.sleep(2)
         logger.info("Still waiting")
 
-    t1 = time.perf_counter()
+    game_start_time = time.perf_counter()
 
     # Playing game
     logger.info("Started playing")
@@ -65,7 +65,7 @@ async def play(
         current_phase = game.get_current_phase()
 
         phase_start_time = time.time()
-        logger.info(f"Starting phase: {current_phase}")
+        logger.info(f"Starting phase: %s", current_phase)
 
         # Do not take a turn if no moves can be made
         # Attempting to take a turn when not needed can cause state
@@ -79,14 +79,15 @@ async def play(
 
         phase_end_time = time.time()
         logger.info(
-            f"Time taken for phase {current_phase}: {phase_end_time - phase_start_time:0.4}s"
+            f"Time taken for phase %s: %0.4fs", current_phase
+            ,phase_end_time - phase_start_time
         )
 
         while current_phase == game.get_current_phase():
             await asyncio.sleep(2)
 
-    t2 = time.perf_counter()
-    logger.info(f"Time taken for game: {t2-t1:0.4}")
+    game_end_time = time.perf_counter()
+    logger.info(f"Time taken for game: %0.4f", game_end_time-game_start_time)
     logger.info("-" * 30 + "GAME COMPLETE" + "-" * 30)
 
 
