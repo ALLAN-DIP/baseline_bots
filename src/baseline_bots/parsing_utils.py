@@ -4,7 +4,7 @@ Some quickly built parsing utils mostly for DAIDE stuff
 
 import asyncio
 from collections import defaultdict
-from typing import Dict, List, Mapping, Tuple, Union
+from typing import Any, Dict, List, Mapping, Optional, Tuple, Union
 
 from daidepp import (
     ALYVSS,
@@ -112,12 +112,12 @@ def dipnet_to_daide_parsing(
     """
 
     convoy_map = defaultdict(list)
-    dipnet_style_order_strs_tokens = [None for _ in range(len(dipnet_style_order_strs))]
+    dipnet_style_order_strs_tokens: List[Any] = [None for _ in range(len(dipnet_style_order_strs))]
 
     # Convert strings to order tokens and store a dictionary mapping of armies to be convoyed and fleets helping to convoy
     for i in range(len(dipnet_style_order_strs)):
         if not (unit_power_tuples_included):
-            dipnet_style_order_strs_tokens[i] = get_order_tokens(dipnet_style_order_strs[i])
+            dipnet_style_order_strs_tokens[i] = get_order_tokens(dipnet_style_order_strs[i])  # type: ignore[arg-type]
             if dipnet_style_order_strs_tokens[i][1] == "C":
                 convoy_map[
                     dipnet_style_order_strs_tokens[i][2] + dipnet_style_order_strs_tokens[i][3]
@@ -265,7 +265,7 @@ def dipnetify_unit(unit: Unit) -> str:
     return f"{unit_type} {location}"
 
 
-def daide_to_dipnet_parsing(daide_order: Command) -> Tuple[str, str]:
+def daide_to_dipnet_parsing(daide_order: Command) -> Optional[Tuple[str, str]]:
     """Convert single DAIDE-style order to DipNet-style order
 
     More details here: https://docs.google.com/document/d/16RODa6KDX7vNNooBdciI4NqSVN31lToto3MLTNcEHk0/edit?usp=sharing
@@ -321,7 +321,7 @@ def daide_to_dipnet_parsing(daide_order: Command) -> Tuple[str, str]:
 
 def parse_proposal_messages(
     rcvd_messages: List[Message], game: Game, power_name: str
-) -> Dict[str, Dict[str, List[str]]]:
+) -> Dict[str, Any]:
     """Extracts proposals and orders from received messages
 
     From each received messages, extract the proposals (categorize as valid and invalid),
