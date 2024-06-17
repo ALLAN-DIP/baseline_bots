@@ -118,7 +118,7 @@ if os.environ.get("USE_LIMITED_DAIDE") is not None:
     USE_LIMITED_DAIDE = True
 
 
-def optional_ORR(arrangements: Sequence[Arrangement]) -> Arrangement:
+def optional_ORR(arrangements: Sequence[Arrangement]) -> Arrangement:  # pylint: disable=invalid-name
     """Wraps a list of arrangements in an `ORR`.
     If the list has a single element, return that element instead.
     :param arrangements: List of arrangements.
@@ -131,7 +131,7 @@ def optional_ORR(arrangements: Sequence[Arrangement]) -> Arrangement:
         return arrangements[0]
 
 
-def optional_AND(arrangements: Sequence[Arrangement]) -> Arrangement:
+def optional_AND(arrangements: Sequence[Arrangement]) -> Arrangement:  # pylint: disable=invalid-name
     """Wraps a list of arrangements in an `AND`.
     If the list has a single element, return that element instead.
     :param arrangements: List of arrangements.
@@ -319,7 +319,7 @@ def deepcopy_game(game: Game) -> Game:
         result = cls.__new__(cls)
 
     # Deep copying
-    for key in game._slots:
+    for key in game._slots:  # pylint: disable=protected-access
         if key in [
             "map",
             "renderer",
