@@ -79,15 +79,14 @@ async def play(
 
         phase_end_time = time.time()
         logger.info(
-            f"Time taken for phase %s: %0.4fs", current_phase
-            ,phase_end_time - phase_start_time
+            f"Time taken for phase %s: %0.4fs", current_phase, phase_end_time - phase_start_time
         )
 
         while current_phase == game.get_current_phase():
             await asyncio.sleep(2)
 
     game_end_time = time.perf_counter()
-    logger.info(f"Time taken for game: %0.4f", game_end_time-game_start_time)
+    logger.info(f"Time taken for game: %0.4f", game_end_time - game_start_time)
     logger.info("-" * 30 + "GAME COMPLETE" + "-" * 30)
 
 

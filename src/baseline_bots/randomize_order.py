@@ -153,9 +153,7 @@ def random_list_orders(orders: List[Command]) -> List[Command]:
     :rtype: List[Tuple]
     """
     # if there are no correspondences, every order is randomized alone
-    orders = list(
-        map(randomize, orders)
-    )
+    orders = list(map(randomize, orders))
     return orders
 
 

@@ -226,10 +226,11 @@ def dipnet_to_daide_parsing(
             raise
         except Exception as ex:
             logger.exception(
-                f"ALLAN: error from %s.%s()\n"
-                f"\tOrder with error: %r\n"
-                f"\tSet of orders: %s",
-                __name__, dipnet_to_daide_parsing.__name__, ' '.join(dipnet_order_tokens), dipnet_style_order_strs
+                f"ALLAN: error from %s.%s()\n" f"\tOrder with error: %r\n" f"\tSet of orders: %s",
+                __name__,
+                dipnet_to_daide_parsing.__name__,
+                " ".join(dipnet_order_tokens),
+                dipnet_style_order_strs,
             )
             if DEBUG_MODE:
                 raise ex
@@ -312,9 +313,10 @@ def daide_to_dipnet_parsing(daide_order: Command) -> Optional[Tuple[str, str]]:
         raise
     except Exception as ex:
         logger.exception(
-            f"ALLAN: error from %s.%s\n"
-            f"\tCould not convert DAIDE command %r to DipNet format",
-            __name__, daide_to_dipnet_parsing.__name__, str(daide_order)
+            f"ALLAN: error from %s.%s\n" f"\tCould not convert DAIDE command %r to DipNet format",
+            __name__,
+            daide_to_dipnet_parsing.__name__,
+            str(daide_order),
         )
         if DEBUG_MODE:
             raise ex
@@ -345,9 +347,9 @@ def parse_proposal_messages(
         # Extract messages containing PRP string
         order_msgs = [msg for msg in rcvd_messages if isinstance(parse_daide(msg.message), PRP)]
         logger.info(
-            f"Received %d PRP messages: "
-            f"%s",
-            len(order_msgs),[(order_msg.sender, order_msg.message) for order_msg in order_msgs]
+            f"Received %d PRP messages: " f"%s",
+            len(order_msgs),
+            [(order_msg.sender, order_msg.message) for order_msg in order_msgs],
         )
 
         # Generate a dictionary of sender to list of DipNet-style orders for this sender
@@ -384,9 +386,10 @@ def parse_proposal_messages(
                 raise
             except Exception as ex:
                 logger.exception(
-                    f"ALLAN: error from %s.%s()\n"
-                    f"\tUnexpected proposal message format: %r",
-                    __name__, parse_proposal_messages.__name__, order_msg.message
+                    f"ALLAN: error from %s.%s()\n" f"\tUnexpected proposal message format: %r",
+                    __name__,
+                    parse_proposal_messages.__name__,
+                    order_msg.message,
                 )
                 if DEBUG_MODE:
                     raise ex
@@ -423,8 +426,8 @@ def parse_proposal_messages(
 
         if other_orders:
             logger.info(
-                "ALLAN: Found other orders while extracting proposal messages: "
-                f"%s", [msg.message for msg in order_msgs]
+                "ALLAN: Found other orders while extracting proposal messages: " f"%s",
+                [msg.message for msg in order_msgs],
             )
             logger.info(f"ALLAN: Other orders found: %s", dict(other_orders))
 
@@ -442,7 +445,9 @@ def parse_proposal_messages(
         logger.exception(
             f"ALLAN: error from %s.%s()\n"
             f"\tReceived messages: %s",
-            __name__, parse_proposal_messages.__name__, rcvd_messages
+            __name__,
+            parse_proposal_messages.__name__,
+            rcvd_messages,
         )
         if DEBUG_MODE:
             raise ex
