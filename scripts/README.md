@@ -14,17 +14,22 @@ The workflow for this orchestration is unfortunately complex. Here are the steps
 
 1. Create JSON config file (e.g., `config.json`) describing games to run
 2. Run `generate_sbatch.py` to create command files for individual games
+
    ```bash
    python scripts/generate_sbatch.py config.json --output-dir output/
    ```
+
 3. Run `game_runner.sh` with `sbatch` and a game command file as input
+
    ```bash
    USER_EMAIL=$USER@$(hostname | sed 's/.*\.\(.*\..*\)/\1/g')
    SLURM_SCRIPT=$(realpath scripts/game_runner.sh)
    COMMAND_FILE=$(realpath config_antony_template_2023_09_01_22_39_28_312128.json)
    sbatch --mail-user="$USER_EMAIL" "$SLURM_SCRIPT" "$COMMAND_FILE"
    ```
+
    These steps do not require any user intervention, but they are useful to know when debugging:
+
    1. `game_runner.sh` directly runs `run_game.py`. It only exists as a wrapper for running the Python script with Slurm.
    2. `run_game.py` sets up a single game, runs the provided commands, and saves results for that game.
    3. `run_antony.sh`, called by the generated commands, runs an ANTONY container.
