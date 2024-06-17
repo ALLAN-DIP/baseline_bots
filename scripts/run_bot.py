@@ -40,7 +40,7 @@ async def play(
     """
 
     # Connect to the game
-    logger.info(f"%s joining game %s as %s", bot_class.__name__, repr(game_id), power_name)
+    logger.info(f"%s joining game %r as %s", bot_class.__name__, (game_id), power_name)
     connection = await connect(hostname, port)
     channel = await connection.authenticate(
         f"allan_{bot_class.__name__.lower()}_{power_name}", "password"

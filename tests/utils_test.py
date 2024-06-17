@@ -267,18 +267,18 @@ class TestUtils:
         parsed_orders_dict = parse_proposal_messages(msgs, game_GTP, power_name)
 
         assert set(parsed_orders_dict.keys()) == set(expected.keys())
-        for pod_key in parsed_orders_dict:
-            assert set(parsed_orders_dict[pod_key].keys()) == set(expected[pod_key].keys()), (
+        for pod_key, pod_value in parsed_orders_dict.items():
+            assert set(pod_value.keys()) == set(expected[pod_key].keys()), (
                 pod_key,
-                set(parsed_orders_dict[pod_key].keys()),
+                set(pod_value.keys()),
                 set(expected[pod_key].keys()),
             )
 
             for key in parsed_orders_dict[pod_key]:
-                assert set(parsed_orders_dict[pod_key][key]) == set(expected[pod_key][key]), (
+                assert set(pod_value[key]) == set(expected[pod_key][key]), (
                     pod_key,
                     key,
-                    set(parsed_orders_dict[pod_key][key]),
+                    set(pod_value[key]),
                     set(expected[pod_key][key]),
                 )
 

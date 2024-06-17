@@ -152,9 +152,10 @@ def random_list_orders(orders: List[Command]) -> List[Command]:
     :return: The list of deviant orders
     :rtype: List[Tuple]
     """
+    # if there are no correspondences, every order is randomized alone
     orders = list(
-        map(lambda order: randomize(order), orders)
-    )  # if there are no correspondences, every order is randomized alone
+        map(randomize, orders)
+    )
     return orders
 
 
