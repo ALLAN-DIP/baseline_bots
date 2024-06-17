@@ -5,7 +5,7 @@ an already existing order / list of orders.
 
 
 import random
-from typing import Iterable, List, Tuple, Union  # noqa: F401
+from typing import Iterable, List, Tuple, Union  # noqa: F401  # pylint: disable=unused-import
 
 from daidepp import (
     BLD,
@@ -152,9 +152,8 @@ def random_list_orders(orders: List[Command]) -> List[Command]:
     :return: The list of deviant orders
     :rtype: List[Tuple]
     """
-    orders = list(
-        map(lambda order: randomize(order), orders)
-    )  # if there are no correspondences, every order is randomized alone
+    # if there are no correspondences, every order is randomized alone
+    orders = list(map(randomize, orders))
     return orders
 
 

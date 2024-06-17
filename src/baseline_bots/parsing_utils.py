@@ -115,8 +115,8 @@ def dipnet_to_daide_parsing(
     dipnet_style_order_strs_tokens: List[Any] = [None for _ in range(len(dipnet_style_order_strs))]
 
     # Convert strings to order tokens and store a dictionary mapping of armies to be convoyed and fleets helping to convoy
-    for i in range(len(dipnet_style_order_strs)):
-        if not (unit_power_tuples_included):
+    for i in range(len(dipnet_style_order_strs)):  # pylint: disable=consider-using-enumerate
+        if not unit_power_tuples_included:
             dipnet_style_order_strs_tokens[i] = get_order_tokens(dipnet_style_order_strs[i])  # type: ignore[arg-type]
             if dipnet_style_order_strs_tokens[i][1] == "C":
                 convoy_map[
@@ -224,14 +224,16 @@ def dipnet_to_daide_parsing(
                 daide_orders.append(move_order)
         except asyncio.CancelledError:
             raise
-        except Exception as e:
+        except Exception as ex:  # pylint: disable=broad-exception-caught
             logger.exception(
-                f"ALLAN: error from {__name__}.{dipnet_to_daide_parsing.__name__}()\n"
-                f"\tOrder with error: {' '.join(dipnet_order_tokens)!r}\n"
-                f"\tSet of orders: {dipnet_style_order_strs}"
+                "ALLAN: error from %s.%s()\n\tOrder with error: %r\n\tSet of orders: %s",
+                __name__,
+                dipnet_to_daide_parsing.__name__,
+                " ".join(dipnet_order_tokens),
+                dipnet_style_order_strs,
             )
             if DEBUG_MODE:
-                raise e
+                raise ex
             continue
     return daide_orders
 
@@ -309,13 +311,15 @@ def daide_to_dipnet_parsing(daide_order: Command) -> Optional[Tuple[str, str]]:
         return dipnet_order, unit_power
     except asyncio.CancelledError:
         raise
-    except Exception as e:
+    except Exception as ex:  # pylint: disable=broad-exception-caught
         logger.exception(
-            f"ALLAN: error from {__name__}.{daide_to_dipnet_parsing.__name__}\n"
-            f"\tCould not convert DAIDE command {str(daide_order)!r} to DipNet format"
+            "ALLAN: error from %s.%s\n\tCould not convert DAIDE command %r to DipNet format",
+            __name__,
+            daide_to_dipnet_parsing.__name__,
+            str(daide_order),
         )
         if DEBUG_MODE:
-            raise e
+            raise ex
         return None
 
 
@@ -343,8 +347,9 @@ def parse_proposal_messages(
         # Extract messages containing PRP string
         order_msgs = [msg for msg in rcvd_messages if isinstance(parse_daide(msg.message), PRP)]
         logger.info(
-            f"Received {len(order_msgs)} PRP messages: "
-            f"{[(order_msg.sender, order_msg.message) for order_msg in order_msgs]}"
+            "Received %d PRP messages: %s",
+            len(order_msgs),
+            [(order_msg.sender, order_msg.message) for order_msg in order_msgs],
         )
 
         # Generate a dictionary of sender to list of DipNet-style orders for this sender
@@ -379,13 +384,15 @@ def parse_proposal_messages(
                         other_orders[order_msg.sender].append(str(order))
             except asyncio.CancelledError:
                 raise
-            except Exception as e:
+            except Exception as ex:  # pylint: disable=broad-exception-caught
                 logger.exception(
-                    f"ALLAN: error from {__name__}.{parse_proposal_messages.__name__}()\n"
-                    f"\tUnexpected proposal message format: {order_msg.message!r}"
+                    "ALLAN: error from %s.%s()\n\tUnexpected proposal message format: %r",
+                    __name__,
+                    parse_proposal_messages.__name__,
+                    order_msg.message,
                 )
                 if DEBUG_MODE:
-                    raise e
+                    raise ex
                 continue
 
         # Generate set of possible orders for the given power
@@ -419,10 +426,10 @@ def parse_proposal_messages(
 
         if other_orders:
             logger.info(
-                "ALLAN: Found other orders while extracting proposal messages: "
-                f"{[msg.message for msg in order_msgs]}"
+                "ALLAN: Found other orders while extracting proposal messages: %s",
+                [msg.message for msg in order_msgs],
             )
-            logger.info(f"ALLAN: Other orders found: {dict(other_orders)}")
+            logger.info("ALLAN: Other orders found: %s", dict(other_orders))
 
         return {
             "valid_proposals": valid_proposals,
@@ -434,13 +441,15 @@ def parse_proposal_messages(
         }
     except asyncio.CancelledError:
         raise
-    except Exception as e:
+    except Exception as ex:  # pylint: disable=broad-exception-caught
         logger.exception(
-            f"ALLAN: error from {__name__}.{parse_proposal_messages.__name__}()\n"
-            f"\tReceived messages: {rcvd_messages}"
+            "ALLAN: error from %s.%s()\n\tReceived messages: %s",
+            __name__,
+            parse_proposal_messages.__name__,
+            rcvd_messages,
         )
         if DEBUG_MODE:
-            raise e
+            raise ex
         return {
             "valid_proposals": {},
             "invalid_proposals": {},

@@ -18,17 +18,17 @@ from baseline_bots.utils import (
 
 class TestUtils:
     def test_get_list_of_orders(self) -> None:
-        EXAMPLE_ORDER = "A VIE S A BUD - GAL"
-        EXAMPLE_ORDER_2 = "A VIE H"
+        example_order_1 = "A VIE S A BUD - GAL"
+        example_order_2 = "A VIE H"
 
         orders_data = OrdersData()
 
         # test initial add
-        orders_data.add_order(EXAMPLE_ORDER)
+        orders_data.add_order(example_order_1)
         assert list(orders_data) == ["A VIE S A BUD - GAL"]
 
         # test overwrite add
-        orders_data.add_order(EXAMPLE_ORDER_2)
+        orders_data.add_order(example_order_2)
         assert list(orders_data) == ["A VIE H"]
 
     DIPNET_TO_DAIDE_PARSING_TEST_CASES = [
@@ -254,31 +254,31 @@ class TestUtils:
         expected: Dict[str, Dict[str, List[str]]],
     ) -> None:
         # Tests for parse_proposal_messages
-        game_GTP = Game()
+        game_gtp = Game()
         for sender in test_input:
             msg_obj = Message(
                 sender=sender,
                 recipient=power_name,
                 message=test_input[sender],
-                phase=game_GTP.get_current_phase(),
+                phase=game_gtp.get_current_phase(),
             )
-            game_GTP.add_message(message=msg_obj)
-        msgs = game_GTP.filter_messages(messages=game_GTP.messages, game_role=power_name).values()
-        parsed_orders_dict = parse_proposal_messages(msgs, game_GTP, power_name)
+            game_gtp.add_message(message=msg_obj)
+        msgs = game_gtp.filter_messages(messages=game_gtp.messages, game_role=power_name).values()
+        parsed_orders_dict = parse_proposal_messages(msgs, game_gtp, power_name)
 
         assert set(parsed_orders_dict.keys()) == set(expected.keys())
-        for pod_key in parsed_orders_dict:
-            assert set(parsed_orders_dict[pod_key].keys()) == set(expected[pod_key].keys()), (
+        for pod_key, pod_value in parsed_orders_dict.items():
+            assert set(pod_value.keys()) == set(expected[pod_key].keys()), (
                 pod_key,
-                set(parsed_orders_dict[pod_key].keys()),
+                set(pod_value.keys()),
                 set(expected[pod_key].keys()),
             )
 
             for key in parsed_orders_dict[pod_key]:
-                assert set(parsed_orders_dict[pod_key][key]) == set(expected[pod_key][key]), (
+                assert set(pod_value[key]) == set(expected[pod_key][key]), (
                     pod_key,
                     key,
-                    set(parsed_orders_dict[pod_key][key]),
+                    set(pod_value[key]),
                     set(expected[pod_key][key]),
                 )
 

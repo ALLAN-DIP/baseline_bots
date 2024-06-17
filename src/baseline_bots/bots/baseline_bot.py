@@ -59,7 +59,7 @@ class BaselineBot(ABC):
             msg for msg in messages.values() if msg.sender != self.power_name
         )
         for msg_obj in received_messages:
-            logger.info(f"{self.display_name} received message: {msg_obj}")
+            logger.info("%s received message: %s", self.display_name, msg_obj)
         return received_messages
 
     async def send_message(
@@ -82,7 +82,7 @@ class BaselineBot(ABC):
             phase=self.game.get_current_phase(),
             type=msg_type,
         )
-        logger.info(f"{self.display_name} sent message: {msg_obj}")
+        logger.info("%s sent message: %s", self.display_name, msg_obj)
 
         # Messages should not be sent in local games, only stored
         if isinstance(self.game, NetworkGame):
@@ -111,7 +111,7 @@ class BaselineBot(ABC):
 
         :param log_msg: Log message to be sent
         """
-        logger.info(f"Intent log: {log_msg!r}")
+        logger.info("Intent log: %r", (log_msg))
         # Intent logging should not be sent in local games
         if not isinstance(self.game, NetworkGame):
             return
@@ -123,10 +123,11 @@ class BaselineBot(ABC):
 
         :param orders: Orders to be sent
         """
-        logger.info(f"Sent orders: {orders}")
+        logger.info("Sent orders: %s", orders)
 
         # Orders should not be sent in local games, only stored
         if isinstance(self.game, NetworkGame):
+            # pylint: disable=unexpected-keyword-arg
             await self.game.set_orders(power_name=self.power_name, orders=orders, wait=wait)
         else:
             self.game.set_orders(power_name=self.power_name, orders=orders)

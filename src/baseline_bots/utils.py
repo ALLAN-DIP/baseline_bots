@@ -91,7 +91,7 @@ def is_valid_daide_message(string: str, grammar: Optional[DAIDEGrammar] = None) 
         daide_visitor.visit(parse_tree)
     except asyncio.CancelledError:
         raise
-    except Exception:
+    except Exception:  # pylint: disable=broad-exception-caught
         return False
     return True
 
@@ -118,6 +118,7 @@ if os.environ.get("USE_LIMITED_DAIDE") is not None:
     USE_LIMITED_DAIDE = True
 
 
+# pylint: disable=invalid-name
 def optional_ORR(arrangements: Sequence[Arrangement]) -> Arrangement:
     """Wraps a list of arrangements in an `ORR`.
     If the list has a single element, return that element instead.
@@ -131,6 +132,7 @@ def optional_ORR(arrangements: Sequence[Arrangement]) -> Arrangement:
         return arrangements[0]
 
 
+# pylint: disable=invalid-name
 def optional_AND(arrangements: Sequence[Arrangement]) -> Arrangement:
     """Wraps a list of arrangements in an `AND`.
     If the list has a single element, return that element instead.
@@ -319,7 +321,7 @@ def deepcopy_game(game: Game) -> Game:
         result = cls.__new__(cls)
 
     # Deep copying
-    for key in game._slots:
+    for key in game._slots:  # pylint: disable=protected-access
         if key in [
             "map",
             "renderer",
