@@ -1,7 +1,6 @@
 """unit tests for smart order accepter bot"""
 import asyncio
 import datetime
-from typing import Coroutine, Generator, Iterator
 
 from diplomacy import Game
 from diplomacy.client.connection import connect

@@ -133,7 +133,9 @@ class TestUtils:
     ]
 
     @pytest.mark.parametrize("test_input,expected", DIPNET_TO_DAIDE_PARSING_CONVOY_TEST_CASES)
-    def test_dipnet_to_daide_parsing_convoys(self, test_input: List[str], expected: List[str]) -> None:
+    def test_dipnet_to_daide_parsing_convoys(
+        self, test_input: List[str], expected: List[str]
+    ) -> None:
         game_tc = Game()
         game_tc.set_units("ITALY", ["A TUN", "F ION", "F EAS", "F AEG"])
 

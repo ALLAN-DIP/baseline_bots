@@ -3,7 +3,7 @@ import asyncio
 import json
 from pathlib import Path
 import sys
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, Optional, Sequence, Tuple
 
 from create_game import create_game
 from download_game import download_game
