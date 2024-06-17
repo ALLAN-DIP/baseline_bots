@@ -128,6 +128,7 @@ class BaselineBot(ABC):
 
         # Orders should not be sent in local games, only stored
         if isinstance(self.game, NetworkGame):
+            # pylint: disable=unexpected-keyword-arg
             await self.game.set_orders(power_name=self.power_name, orders=orders, wait=wait)
         else:
             self.game.set_orders(power_name=self.power_name, orders=orders)

@@ -5,7 +5,7 @@ an already existing order / list of orders.
 
 
 import random
-from typing import Iterable, List, Tuple, Union  # noqa: F401
+from typing import Iterable, List, Tuple, Union  # noqa: F401  # pylint: disable=unused-import
 
 from daidepp import (
     BLD,

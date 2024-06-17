@@ -115,7 +115,7 @@ def dipnet_to_daide_parsing(
     dipnet_style_order_strs_tokens: List[Any] = [None for _ in range(len(dipnet_style_order_strs))]
 
     # Convert strings to order tokens and store a dictionary mapping of armies to be convoyed and fleets helping to convoy
-    for i in range(len(dipnet_style_order_strs)):
+    for i in range(len(dipnet_style_order_strs)):  # pylint: disable=consider-using-enumerate
         if not unit_power_tuples_included:
             dipnet_style_order_strs_tokens[i] = get_order_tokens(dipnet_style_order_strs[i])  # type: ignore[arg-type]
             if dipnet_style_order_strs_tokens[i][1] == "C":
@@ -224,7 +224,7 @@ def dipnet_to_daide_parsing(
                 daide_orders.append(move_order)
         except asyncio.CancelledError:
             raise
-        except Exception as ex:
+        except Exception as ex:  # pylint: disable=broad-exception-caught
             logger.exception(
                 "ALLAN: error from %s.%s()\n\tOrder with error: %r\n\tSet of orders: %s",
                 __name__,
@@ -311,7 +311,7 @@ def daide_to_dipnet_parsing(daide_order: Command) -> Optional[Tuple[str, str]]:
         return dipnet_order, unit_power
     except asyncio.CancelledError:
         raise
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-exception-caught
         logger.exception(
             "ALLAN: error from %s.%s\n\tCould not convert DAIDE command %r to DipNet format",
             __name__,
@@ -384,7 +384,7 @@ def parse_proposal_messages(
                         other_orders[order_msg.sender].append(str(order))
             except asyncio.CancelledError:
                 raise
-            except Exception as ex:
+            except Exception as ex:  # pylint: disable=broad-exception-caught
                 logger.exception(
                     "ALLAN: error from %s.%s()\n\tUnexpected proposal message format: %r",
                     __name__,
@@ -441,7 +441,7 @@ def parse_proposal_messages(
         }
     except asyncio.CancelledError:
         raise
-    except Exception as ex:
+    except Exception as ex:  # pylint: disable=broad-exception-caught
         logger.exception(
             "ALLAN: error from %s.%s()\n\tReceived messages: %s",
             __name__,

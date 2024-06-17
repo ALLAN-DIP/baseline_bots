@@ -87,7 +87,7 @@ async def play(
 
     game_end_time = time.perf_counter()
     logger.info("Time taken for game: %0.4f", game_end_time - game_start_time)
-    logger.info("-" * 30 + "GAME COMPLETE" + "-" * 30)
+    logger.info("-" * 30 + "GAME COMPLETE" + "-" * 30)  # pylint: disable=logging-not-lazy
 
 
 def main() -> None:
