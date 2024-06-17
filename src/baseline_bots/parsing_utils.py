@@ -4,7 +4,7 @@ Some quickly built parsing utils mostly for DAIDE stuff
 
 import asyncio
 from collections import defaultdict
-from typing import Any, Dict, List, Mapping, Optional, Tuple, Union
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 from daidepp import (
     ALYVSS,
@@ -93,7 +93,7 @@ def daidefy_unit(dipnet_unit: str, unit_game_mapping: Mapping[str, str]) -> Unit
 
 
 def dipnet_to_daide_parsing(
-    dipnet_style_order_strs: List[Union[str, Tuple[str, str]]],
+    dipnet_style_order_strs: Sequence[Union[str, Tuple[str, str]]],
     game: Game,
     unit_power_tuples_included: bool = False,
 ) -> List[Command]:

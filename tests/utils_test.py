@@ -72,7 +72,7 @@ class TestUtils:
         test_input: List[str],
         expected: List[str],
         unit_power_tuples_included: bool,
-    ):
+    ) -> None:
         game_tc = Game()
         game_tc.set_units("TURKEY", ["F BLA"])
 
@@ -132,7 +132,7 @@ class TestUtils:
     ]
 
     @pytest.mark.parametrize("test_input,expected", DIPNET_TO_DAIDE_PARSING_CONVOY_TEST_CASES)
-    def test_dipnet_to_daide_parsing_convoys(self, test_input: List[str], expected: List[str]):
+    def test_dipnet_to_daide_parsing_convoys(self, test_input: List[str], expected: List[str]) -> None:
         game_tc = Game()
         game_tc.set_units("ITALY", ["A TUN", "F ION", "F EAS", "F AEG"])
 
@@ -248,7 +248,7 @@ class TestUtils:
         power_name: str,
         test_input: Dict[str, str],
         expected: Dict[str, Dict[str, List[str]]],
-    ):
+    ) -> None:
         # Tests for parse_proposal_messages
         game_GTP = Game()
         for sender in test_input:
@@ -306,7 +306,7 @@ class TestUtils:
     ]
 
     @pytest.mark.parametrize("test_input,expected", PARSE_ARRANGEMENT_TEST_CASES)
-    def test_parse_arrangement(self, test_input: str, expected: List[str]):
+    def test_parse_arrangement(self, test_input: str, expected: List[str]) -> None:
         assert parse_arrangement(test_input) == expected, (
             parse_arrangement(test_input),
             expected,
@@ -322,5 +322,5 @@ class TestUtils:
     ]
 
     @pytest.mark.parametrize("test_input,expected", GET_ORDER_TOKENS_TEST_CASES)
-    def test_get_order_tokens(self, test_input: str, expected: List[str]):
+    def test_get_order_tokens(self, test_input: str, expected: List[str]) -> None:
         assert get_order_tokens(test_input) == expected

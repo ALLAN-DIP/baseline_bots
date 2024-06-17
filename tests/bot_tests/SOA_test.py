@@ -18,13 +18,13 @@ SOA_TEST_PARAMS: Final = {
 
 class TestSOABot(AsyncTestCase):
     @testing.gen_test
-    def test_play_simple(self):
+    def test_play_simple(self) -> None:
         game = Game()
         soa_bot = RandomProposerBot("FRANCE", game)
         yield soa_bot.send_message("FRANCE", "A PAR - BUR")
 
     @testing.gen_test
-    def test_play(self):
+    def test_play(self) -> None:
         game = Game()
 
         game_play = GamePlay(
@@ -45,7 +45,7 @@ class TestSOABot(AsyncTestCase):
         print("finish test_play")
 
     @testing.gen_test
-    def test_send_message(self):
+    def test_send_message(self) -> None:
         hostname = "localhost"
         port = 8432
 
