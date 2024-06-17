@@ -15,12 +15,12 @@ Usage:
 
 ```shell
 $ docker run -it allan_dip_bot --help
---host 		HOST [default localhost]
---port 		PORT [default 8432]
---game_id 	GAME_ID
---power		POWER
---bot_type  BOT_TYPE [default TransparentBot]
---outdir    OUT_DIR
+--host     HOST [default localhost]
+--port     PORT [default 8432]
+--game_id  GAME_ID
+--power    POWER
+--bot_type BOT_TYPE [default TransparentBot]
+--outdir   OUT_DIR
 
 #connect to remote game engine
 $ docker run -it allan_dip_bot --game_id test_game --host shade.tacc.utexas.edu --power TURKEY
