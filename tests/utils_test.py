@@ -17,7 +17,7 @@ from baseline_bots.utils import (
 
 
 class TestUtils:
-    def test_get_list_of_orders(self):
+    def test_get_list_of_orders(self) -> None:
         EXAMPLE_ORDER = "A VIE S A BUD - GAL"
         EXAMPLE_ORDER_2 = "A VIE H"
 
@@ -72,7 +72,7 @@ class TestUtils:
         test_input: List[str],
         expected: List[str],
         unit_power_tuples_included: bool,
-    ):
+    ) -> None:
         game_tc = Game()
         game_tc.set_units("TURKEY", ["F BLA"])
 
@@ -107,8 +107,9 @@ class TestUtils:
             "/WC",
         }:
             comparison_tc_op = comparison_tc_op.rsplit("/", maxsplit=1)[0]
-        assert daide_to_dipnet_parsing(parse_daide(expected[0]))[0] == comparison_tc_op, (
-            daide_to_dipnet_parsing(parse_daide(expected[0])),
+        dipnet_order = daide_to_dipnet_parsing(parse_daide(expected[0]))
+        assert dipnet_order is not None and dipnet_order[0] == comparison_tc_op, (
+            dipnet_order,
             comparison_tc_op,
         )
 
@@ -132,7 +133,9 @@ class TestUtils:
     ]
 
     @pytest.mark.parametrize("test_input,expected", DIPNET_TO_DAIDE_PARSING_CONVOY_TEST_CASES)
-    def test_dipnet_to_daide_parsing_convoys(self, test_input: List[str], expected: List[str]):
+    def test_dipnet_to_daide_parsing_convoys(
+        self, test_input: List[str], expected: List[str]
+    ) -> None:
         game_tc = Game()
         game_tc.set_units("ITALY", ["A TUN", "F ION", "F EAS", "F AEG"])
 
@@ -141,10 +144,11 @@ class TestUtils:
             expected,
         )
         for tc_ip_ord, tc_op_ord in zip(test_input, expected):
-            assert daide_to_dipnet_parsing(parse_daide(tc_op_ord))[0] == tc_ip_ord.replace(
+            dipnet_order = daide_to_dipnet_parsing(parse_daide(tc_op_ord))
+            assert dipnet_order is not None and dipnet_order[0] == tc_ip_ord.replace(
                 " R ", " - "
             ), (
-                daide_to_dipnet_parsing(parse_daide(tc_op_ord)),
+                dipnet_order,
                 tc_ip_ord.replace(" R ", " - "),
             )
 
@@ -248,7 +252,7 @@ class TestUtils:
         power_name: str,
         test_input: Dict[str, str],
         expected: Dict[str, Dict[str, List[str]]],
-    ):
+    ) -> None:
         # Tests for parse_proposal_messages
         game_GTP = Game()
         for sender in test_input:
@@ -306,7 +310,7 @@ class TestUtils:
     ]
 
     @pytest.mark.parametrize("test_input,expected", PARSE_ARRANGEMENT_TEST_CASES)
-    def test_parse_arrangement(self, test_input: str, expected: List[str]):
+    def test_parse_arrangement(self, test_input: str, expected: List[str]) -> None:
         assert parse_arrangement(test_input) == expected, (
             parse_arrangement(test_input),
             expected,
@@ -322,5 +326,5 @@ class TestUtils:
     ]
 
     @pytest.mark.parametrize("test_input,expected", GET_ORDER_TOKENS_TEST_CASES)
-    def test_get_order_tokens(self, test_input: str, expected: List[str]):
+    def test_get_order_tokens(self, test_input: str, expected: List[str]) -> None:
         assert get_order_tokens(test_input) == expected

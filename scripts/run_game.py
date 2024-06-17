@@ -3,7 +3,7 @@ import asyncio
 import json
 from pathlib import Path
 import sys
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, Optional, Sequence, Tuple
 
 from create_game import create_game
 from download_game import download_game
@@ -31,16 +31,16 @@ async def run_cmd(cmd: str) -> Dict[str, Any]:
 
 async def run_all_cmds(
     cmds: Sequence[str], *, delay_seconds: Optional[int] = None
-) -> List[Dict[str, Any]]:
+) -> Tuple[Dict[str, Any]]:
     coroutines = []
     for cmd in cmds:
         coroutines.append(run_cmd(cmd))
         if delay_seconds is not None:
             await asyncio.sleep(delay_seconds)
-    return await asyncio.gather(*coroutines)
+    return await asyncio.gather(*coroutines)  # type: ignore[no-any-return]
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "command_file",
