@@ -443,8 +443,7 @@ def parse_proposal_messages(
         raise
     except Exception as ex:
         logger.exception(
-            "ALLAN: error from %s.%s()\n"
-            "\tReceived messages: %s",
+            "ALLAN: error from %s.%s()\n" "\tReceived messages: %s",
             __name__,
             parse_proposal_messages.__name__,
             rcvd_messages,
