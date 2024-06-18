@@ -59,8 +59,6 @@ class TestSOABot(AsyncTestCase):
             rules={"REAL_TIME", "NO_DEADLINE", "POWER_CHOICE"},
             deadline=30,
             n_controls=1,
-            registration_password="",
-            daide_port=None,
         )
 
         # Waiting for the game, then joining it
