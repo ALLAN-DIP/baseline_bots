@@ -34,10 +34,10 @@ __pycache__/
 .coverage.*
 .mypy_cache/
 .nox/
+.pytest_cache/
 .ruff_cache/
 .tox/
 htmlcov/
-.pytest_cache/
 # Distribution / packaging files
 *.egg-info/
 # Jupyter notebook files
