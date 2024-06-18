@@ -5,9 +5,8 @@ import os
 
 from diplomacy import Game
 from diplomacy.client.connection import connect
-import pytest
-
 from gameplay_framework import GamePlay  # TODO: Fix sorting
+import pytest
 from tornado import testing
 from tornado.testing import AsyncTestCase
 from typing_extensions import Final
