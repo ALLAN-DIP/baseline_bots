@@ -4,29 +4,10 @@ from diplomacy import Game
 import pytest
 
 from baseline_bots.parsing_utils import daide_to_dipnet_parsing, dipnet_to_daide_parsing
-from baseline_bots.utils import (
-    OrdersData,
-    get_order_tokens,
-    parse_arrangement,
-    parse_daide,
-)
+from baseline_bots.utils import get_order_tokens, parse_daide
 
 
 class TestUtils:
-    def test_get_list_of_orders(self) -> None:
-        example_order_1 = "A VIE S A BUD - GAL"
-        example_order_2 = "A VIE H"
-
-        orders_data = OrdersData()
-
-        # test initial add
-        orders_data.add_order(example_order_1)
-        assert list(orders_data) == ["A VIE S A BUD - GAL"]
-
-        # test overwrite add
-        orders_data.add_order(example_order_2)
-        assert list(orders_data) == ["A VIE H"]
-
     DIPNET_TO_DAIDE_PARSING_TEST_CASES = [
         (["A PAR H"], ["( FRA AMY PAR ) HLD"], False),
         (["F STP/SC H"], ["( RUS FLT (STP SCS) ) HLD"], False),
@@ -147,40 +128,6 @@ class TestUtils:
                 dipnet_order,
                 tc_ip_ord.replace(" R ", " - "),
             )
-
-    PARSE_ARRANGEMENT_TEST_CASES = [
-        ["PRP (XDO ((RUS FLT BLA) MTO CON))", ["XDO ( ( RUS FLT BLA ) MTO CON )"]],
-        [
-            "PRP (ORR (XDO(( RUS FLT BLA ) MTO CON))(XDO(( RUS AMY RUM ) MTO BUD))(XDO(( RUS FLT BLA ) MTO BUD)))",
-            [
-                "XDO ( ( RUS AMY RUM ) MTO BUD )",
-                "XDO ( ( RUS FLT BLA ) MTO BUD )",
-                "XDO ( ( RUS FLT BLA ) MTO CON )",
-            ],
-        ],
-        [
-            "PRP (ORR (XDO(( RUS FLT BLA ) MTO CON))(XDO(( RUS AMY RUM ) MTO BUD)))",
-            ["XDO ( ( RUS AMY RUM ) MTO BUD )", "XDO ( ( RUS FLT BLA ) MTO CON )"],
-        ],
-        [
-            "PRP(ALY (GER RUS) VSS (FRA ENG ITA TUR AUS))",
-            ["ALY ( GER RUS ) VSS ( AUS ENG FRA ITA TUR )"],
-        ],
-        [
-            "PRP(ORR (XDO (( RUS FLT BLA ) MTO CON)) (ALY (GER RUS TUR) VSS (FRA ENG ITA AUS)))",
-            [
-                "ALY ( GER RUS TUR ) VSS ( AUS ENG FRA ITA )",
-                "XDO ( ( RUS FLT BLA ) MTO CON )",
-            ],
-        ],
-    ]
-
-    @pytest.mark.parametrize("test_input,expected", PARSE_ARRANGEMENT_TEST_CASES)
-    def test_parse_arrangement(self, test_input: str, expected: List[str]) -> None:
-        assert parse_arrangement(test_input) == expected, (
-            parse_arrangement(test_input),
-            expected,
-        )
 
     GET_ORDER_TOKENS_TEST_CASES = [
         ["A PAR S A MAR - BUR", ["A PAR", "S", "A MAR", "- BUR"]],
