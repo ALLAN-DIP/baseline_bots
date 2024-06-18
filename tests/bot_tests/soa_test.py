@@ -56,11 +56,9 @@ class TestSOABot(AsyncTestCase):
         game_id = f"usc_soa_test_{now.strftime('%Y_%m_%d_%H_%M_%S_%f')}"
         yield channel.create_game(
             game_id=game_id,
-            rules={"REAL_TIME", "NO_DEADLINE", "POWER_CHOICE"},
-            deadline=30,
             n_controls=1,
-            registration_password="",
-            daide_port=None,
+            deadline=30,
+            rules={"REAL_TIME", "NO_DEADLINE", "POWER_CHOICE"},
         )
 
         # Waiting for the game, then joining it
