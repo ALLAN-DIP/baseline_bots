@@ -1,11 +1,11 @@
 import random
 from typing import List, Sequence
 
-from daidepp import PRP, XDO
+from daidepp import AND, PRP, XDO
 
 from baseline_bots.bots.baseline_bot import BaselineBot
 from baseline_bots.parsing_utils import dipnet_to_daide_parsing
-from baseline_bots.utils import get_other_powers, optional_AND
+from baseline_bots.utils import get_other_powers
 
 
 class RandomProposerBot(BaselineBot):
@@ -45,7 +45,10 @@ class RandomProposerBot(BaselineBot):
             if len(suggested_random_orders) > 0:
                 commands = dipnet_to_daide_parsing(suggested_random_orders, self.game)
                 random_orders = [XDO(command) for command in commands]
-                suggested_random_orders = PRP(optional_AND(random_orders))
+                if len(random_orders) > 1:
+                    suggested_random_orders = PRP(AND(*random_orders))
+                else:
+                    suggested_random_orders = PRP(*random_orders)
                 # send the other power a message containing the orders
                 await self.send_message(other_power, str(suggested_random_orders))
 

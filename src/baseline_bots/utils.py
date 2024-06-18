@@ -5,28 +5,18 @@ It would be preferable to use a real DAIDE parser in prod
 
 
 import asyncio
-from collections import defaultdict
-from copy import deepcopy
 import logging
 import os
-from typing import Dict, Iterator, List, Optional, Sequence, Set
+from typing import List, Optional, Set
 
-import daidepp
 from daidepp import (
-    ALYVSS,
-    AND,
-    ORR,
-    PCE,
     AnyDAIDEToken,
-    Arrangement,
     DAIDEGrammar,
     create_daide_grammar,
-    create_grammar_from_press_keywords,
     daide_visitor,
 )
 from daidepp.grammar.grammar import MAX_DAIDE_LEVEL
 from diplomacy import Game
-from diplomacy.utils import strings
 
 
 def return_logger(name: str, log_level: int = logging.INFO) -> logging.Logger:
@@ -71,10 +61,6 @@ if os.environ.get("ALLAN_DEBUG") is not None:
     DEBUG_MODE = True
 
 MESSAGE_GRAMMAR = create_daide_grammar(level=MAX_DAIDE_LEVEL, string_type="message")
-# Grammar for limited DAIDE subset used in communications protocol
-LIMITED_MESSAGE_GRAMMAR = create_grammar_from_press_keywords(
-    ["ALY_VSS", "AND", "DMZ", "HUH", "NAR", "PCE", "PRP", "REJ", "XDO", "YES"]
-)
 ALL_GRAMMAR = create_daide_grammar(level=MAX_DAIDE_LEVEL, string_type="all")
 
 
@@ -111,41 +97,6 @@ def parse_daide(string: str) -> AnyDAIDEToken:
         raise ValueError(f"Failed to parse DAIDE string: {string!r}") from ex
 
 
-# Option needed for working better with other performers
-USE_LIMITED_DAIDE = False
-if os.environ.get("USE_LIMITED_DAIDE") is not None:
-    logger.info("Disabling DAIDE usage outside of limited subset")
-    USE_LIMITED_DAIDE = True
-
-
-# pylint: disable=invalid-name
-def optional_ORR(arrangements: Sequence[Arrangement]) -> Arrangement:
-    """Wraps a list of arrangements in an `ORR`.
-    If the list has a single element, return that element instead.
-    :param arrangements: List of arrangements.
-    :return: Arrangement object.
-    """
-    arrangements = sorted(set(arrangements), key=str)
-    if len(arrangements) > 1 and not USE_LIMITED_DAIDE:
-        return ORR(*arrangements)
-    else:
-        return arrangements[0]
-
-
-# pylint: disable=invalid-name
-def optional_AND(arrangements: Sequence[Arrangement]) -> Arrangement:
-    """Wraps a list of arrangements in an `AND`.
-    If the list has a single element, return that element instead.
-    :param arrangements: List of arrangements.
-    :return: Arrangement object.
-    """
-    arrangements = sorted(set(arrangements), key=str)
-    if len(arrangements) > 1:
-        return AND(*arrangements)
-    else:
-        return arrangements[0]
-
-
 def get_order_tokens(order: str) -> List[str]:
     """Retrieves the order tokens used in an order
     e.g. 'A PAR - MAR' would return ['A PAR', '-', 'MAR']
@@ -170,176 +121,6 @@ def get_other_powers(powers: List[str], game: Game) -> Set[str]:
     in the powers parameter
     """
     return set(game.get_map_power_names()) - set(powers)
-
-
-def parse_arrangement(msg: str) -> List[str]:
-    """
-    Attempts to parse arrangements (may or may not have ORR keyword)
-
-    Examples when xdo_only = False
-    XDO (F BLA - CON) -> ("XDO", "F BLA - CON")
-    ORR (XDO ((RUS FLT BLA) MTO CON)) (ALY (GER RUS TUR) VSS (FRA ENG ITA AUS)) (ABC (F BLA - CON))
-            -> ("XDO", "(RUS FLT BLA) MTO CON"), ("ALY", "ALY (GER RUS TUR) VSS (FRA ENG ITA AUS)"), ("ABC", "ABC (F BLA - CON)")
-
-    Examples when xdo_only = True
-    ORR (XDO(F BLK - CON))(XDO(A RUM - BUD))(XDO(F BLK - BUD))
-            -> "F BLK - CON", "A RUM - BUD", "F BLK - BUD"
-
-    :param msg: message to be parsed
-    :param xdo_only: flag indicating if subarrangement type should be included in the return structure
-    :return: parsed subarrangements
-    """
-    parsed_msg = parse_daide(msg)
-    if isinstance(parsed_msg.arrangement, (daidepp.AND, daidepp.ORR)):
-        daide_style_orders = parsed_msg.arrangement.arrangements
-    else:
-        daide_style_orders = [parsed_msg.arrangement]
-    return [str(o) for o in daide_style_orders]
-
-
-def parse_alliance_proposal(msg: ALYVSS, recipient: str) -> List[str]:
-    """Parses an alliance proposal
-
-    E.g. (assuming the receiving country is RUSSIA)
-    "ALY (GER RUS) VSS (AUS ENG FRA ITA TUR)" -> [GERMANY]
-
-    :param recipient: the power which has received the alliance proposal
-    :return: list of allies in the proposal
-    """
-    allies = list(msg.aly_powers)
-
-    recipient = recipient[:3]
-    if recipient not in allies:
-        allies = []
-        return allies
-
-    allies.remove(recipient)
-
-    return sorted(POWER_NAMES_DICT[ally] for ally in allies)
-
-
-def parse_peace_proposal(msg: PCE, recipient: str) -> List[str]:
-    """Parses a peace proposal
-
-    E.g. (assuming the receiving country is RUSSIA)
-    "PCE (GER RUS)" -> [GERMANY]
-
-    :param recipient: the power which has received the peace proposal
-    :return: list of allies in the proposal
-    """
-    peaces = list(msg.powers)
-
-    recipient = recipient[:3]
-    if recipient not in peaces:
-        peaces = []
-        return peaces
-
-    peaces.remove(recipient)
-
-    return sorted(POWER_NAMES_DICT[pea] for pea in peaces)
-
-
-def is_order_aggressive(order: str, sender: str, game: Game) -> bool:
-    """
-    Checks if this is an aggressive order
-    :param order: A string order, e.g. "A BUD S F TRI"
-    NOTE: Adapted directly from Joy's code
-    """
-    order_token = get_order_tokens(order)
-    if order_token[0].startswith("A") or order_token[0].startswith("F"):
-        # get location - add order_token[0] ('A' or 'F') at front to check if it collides with other powers' units
-        order_unit = order_token[0][0] + order_token[1][1:]
-        # check if loc has some units of other powers on
-        for power in game.powers:
-            if sender != power and order_unit in game.powers[power].units:
-                return True
-    return False
-
-
-def get_non_aggressive_orders(orders: List[str], sender: str, game: Game) -> List[str]:
-    """
-    :return: all non-aggressive orders in orders
-    """
-    return [order for order in orders if not is_order_aggressive(order, sender, game)]
-
-
-def get_province_from_order(order: str) -> str:
-    order_tokens = get_order_tokens(order)
-    parts = order_tokens[0].split()
-    if len(parts) >= 2:
-        return parts[1]
-    else:
-        return order_tokens[0]
-
-
-class OrdersData:
-    def __init__(self) -> None:
-        self.orders: Dict[str, str] = defaultdict(str)
-
-    def add_order(self, order: str) -> None:
-        """
-        Adds single order
-
-        :param order: order to add
-        """
-        province = get_province_from_order(order)
-        self.orders[province] = order
-
-    def add_orders(self, orders: Sequence[str]) -> None:
-        """
-        Adds multiple orders
-
-        :param orders: orders to add
-        """
-        for order in orders:
-            self.add_order(order)
-
-    def __iter__(self) -> Iterator[str]:
-        return iter(sorted(self.orders.values()))
-
-    def __len__(self) -> int:
-        return len(self.orders)
-
-    def __bool__(self) -> bool:
-        return bool(self.orders)
-
-    def __repr__(self) -> str:
-        contents = dict(sorted(self.orders.items()))
-        return f"{self.__class__.__name__}({contents})"
-
-    def __str__(self) -> str:
-        return str(list(self))
-
-
-def deepcopy_game(game: Game) -> Game:
-    """Fast deep copy implementation, from Paquette's game engine https://github.com/diplomacy/diplomacy"""
-    if game.__class__.__name__ != "Game":
-        cls = list(game.__class__.__bases__)[0]
-        result = cls.__new__(cls)
-    else:
-        cls = game.__class__
-        result = cls.__new__(cls)
-
-    # Deep copying
-    for key in game._slots:  # pylint: disable=protected-access
-        if key in [
-            "map",
-            "renderer",
-            "powers",
-            "channel",
-            "notification_callbacks",
-            "data",
-            "__weakref__",
-        ]:
-            continue
-        setattr(result, key, deepcopy(getattr(game, key)))
-    result.map = game.map
-    result.powers = {}
-    for power in game.powers.values():
-        result.powers[power.name] = deepcopy(power)
-        result.powers[power.name].game = result
-    result.role = strings.SERVER_TYPE
-    return result
 
 
 def neighboring_opps(
