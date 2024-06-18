@@ -1,0 +1,38 @@
+extends: default
+
+rules:
+  # Let Prettier handle most formatting
+  colons: disable
+  commas: disable
+  comments:
+    min-spaces-from-content: 1 # Match Prettier formatting
+  empty-lines: disable
+  hyphens: disable
+  indentation: disable
+  line-length: disable
+  new-line-at-end-of-file: disable
+  new-lines: disable # Let end-of-file-fixer handle formatting
+  trailing-spaces: enable
+
+  document-start: disable
+  empty-values:
+    # YAML keys with empty values are common, so allow them
+    # This still forbids keys with empty values in embedded JSON-like objects
+    forbid-in-block-mappings: false
+  # Allow `0o755` but not `0755`
+  # Octal values are sometimes used for expressing permissions, so they should not be prohibited
+  octal-values:
+    forbid-explicit-octal: false
+  # yamllint assumes that values like `01:23` are strings, not base-60 numbers.
+  # This is correct for YAML v1.2 but not YAML v1.1.
+  # When using literals of this form that should be treated as strings,
+  # further configuration is needed.
+  quoted-strings:
+    required: only-when-needed
+  truthy:
+    # YAML keys are parsed as booleans the same way as values, so they are checked by default
+    # GitHub Actions uses the key `on`, which is considered a boolean in YAML v1.1 but not YAML v1.2
+    # Therefore, it is likely that GitHub Actions uses YAML v1.2 so this will not be a problem
+    # Outside of GitHub Actions, there is little use for `on`, `off`, `yes`, and `no` (and capitalization variants)
+    # as keys, so this check is mostly superfluous
+    check-keys: false
