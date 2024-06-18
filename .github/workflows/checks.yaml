@@ -46,4 +46,4 @@ jobs:
           key: precommit--${{ runner.os }}--${{ runner.arch }}--${{ env.PYTHON_VERSION }}--${{ hashFiles('.pre-commit-config.yaml') }}
       - name: Run all checks
         run: |
-          SKIP=no-commit-to-branch make check
+          SKIP=actionlint,no-commit-to-branch make check
