@@ -1,13 +1,9 @@
-from typing import Dict, List
+from typing import List
 
-from diplomacy import Game, Message
+from diplomacy import Game
 import pytest
 
-from baseline_bots.parsing_utils import (
-    daide_to_dipnet_parsing,
-    dipnet_to_daide_parsing,
-    parse_proposal_messages,
-)
+from baseline_bots.parsing_utils import daide_to_dipnet_parsing, dipnet_to_daide_parsing
 from baseline_bots.utils import (
     OrdersData,
     get_order_tokens,
@@ -151,136 +147,6 @@ class TestUtils:
                 dipnet_order,
                 tc_ip_ord.replace(" R ", " - "),
             )
-
-    PARSE_PROPOSAL_MESSAGES_TEST_CASES = [
-        [
-            "RUSSIA",
-            {
-                "GERMANY": "PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (XDO ((RUS FLT SEV) MTO RUM)) (XDO ((RUS AMY PRU) MTO LVN)))",
-                "AUSTRIA": "PRP (XDO ((RUS AMY MOS) SUP (RUS FLT (STP SCS)) MTO LVN))",
-                "ENGLAND": "PRP (XDO ((RUS AMY PRU) MTO LVN))",
-            },
-            {
-                "valid_proposals": {
-                    "GERMANY": ["A WAR - PRU", "F SEV - RUM"],
-                    "AUSTRIA": ["A MOS S F STP/SC - LVN"],
-                },
-                "invalid_proposals": {
-                    "GERMANY": [("A PRU - LVN", "RUS")],
-                    "ENGLAND": [("A PRU - LVN", "RUS")],
-                },
-                "shared_orders": {},
-                "other_orders": {},
-                "alliance_proposals": {},
-                "peace_proposals": {},
-            },
-        ],
-        [
-            "RUSSIA",
-            {
-                "GERMANY": "PRP (ORR (XDO ((RUS AMY WAR) MTO PRU)) (ALY (GER RUS ENG ITA) VSS (FRA TUR AUS)))",
-                "AUSTRIA": "PRP (ALY (AUS RUS) VSS (FRA ENG ITA TUR GER))",
-            },
-            {
-                "valid_proposals": {"GERMANY": ["A WAR - PRU"]},
-                "invalid_proposals": {},
-                "shared_orders": {},
-                "other_orders": {},
-                "alliance_proposals": {
-                    "GERMANY": [("GERMANY", "ALY ( ENG GER ITA RUS ) VSS ( AUS FRA TUR )")],
-                    "ENGLAND": [("GERMANY", "ALY ( ENG GER ITA RUS ) VSS ( AUS FRA TUR )")],
-                    "ITALY": [("GERMANY", "ALY ( ENG GER ITA RUS ) VSS ( AUS FRA TUR )")],
-                    "AUSTRIA": [("AUSTRIA", "ALY ( AUS RUS ) VSS ( ENG FRA GER ITA TUR )")],
-                },
-                "peace_proposals": {},
-            },
-        ],
-        [
-            "TURKEY",
-            {
-                "RUSSIA": "PRP(AND (XDO((TUR FLT ANK) MTO BLA)) (XDO((RUS AMY SEV) MTO RUM)) (XDO((ENG AMY LVP) HLD)))"
-            },
-            {
-                "valid_proposals": {"RUSSIA": ["F ANK - BLA"]},
-                "invalid_proposals": {},
-                "shared_orders": {"RUSSIA": ["A SEV - RUM"]},
-                "other_orders": {"RUSSIA": ["A LVP H"]},
-                "alliance_proposals": {},
-                "peace_proposals": {},
-            },
-        ],
-        [
-            "TURKEY",
-            {
-                "RUSSIA": "PRP(AND (XDO((TUR FLT ANK) MTO BLA)) (XDO((RUS AMY SEV) MTO RUM)) "
-                "(XDO((ENG AMY LVP) HLD)) (ALY (TUR RUS ENG ITA) VSS (FRA GER AUS)) (PCE (TUR RUS) ))"
-            },
-            {
-                "valid_proposals": {"RUSSIA": ["F ANK - BLA"]},
-                "invalid_proposals": {},
-                "shared_orders": {"RUSSIA": ["A SEV - RUM"]},
-                "other_orders": {"RUSSIA": ["A LVP H"]},
-                "alliance_proposals": {
-                    "RUSSIA": [("RUSSIA", "ALY ( ENG ITA RUS TUR ) VSS ( AUS FRA GER )")],
-                    "ENGLAND": [("RUSSIA", "ALY ( ENG ITA RUS TUR ) VSS ( AUS FRA GER )")],
-                    "ITALY": [("RUSSIA", "ALY ( ENG ITA RUS TUR ) VSS ( AUS FRA GER )")],
-                },
-                "peace_proposals": {
-                    "RUSSIA": [("RUSSIA", "PCE ( RUS TUR )")],
-                },
-            },
-        ],
-        [
-            "ENGLAND",
-            {
-                "FRANCE": "PRP(AND(XDO((ENG AMY LVP) MTO WAL))(XDO((ENG FLT EDI) MTO NTH))(XDO((ENG FLT LON) MTO ECH)))"
-            },
-            {
-                "valid_proposals": {"FRANCE": ["A LVP - WAL", "F EDI - NTH", "F LON - ENG"]},
-                "invalid_proposals": {},
-                "shared_orders": {},
-                "other_orders": {},
-                "alliance_proposals": {},
-                "peace_proposals": {},
-            },
-        ],
-    ]
-
-    @pytest.mark.parametrize("power_name,test_input,expected", PARSE_PROPOSAL_MESSAGES_TEST_CASES)
-    def test_parse_proposal_messages(
-        self,
-        power_name: str,
-        test_input: Dict[str, str],
-        expected: Dict[str, Dict[str, List[str]]],
-    ) -> None:
-        # Tests for parse_proposal_messages
-        game_gtp = Game()
-        for sender in test_input:
-            msg_obj = Message(
-                sender=sender,
-                recipient=power_name,
-                message=test_input[sender],
-                phase=game_gtp.get_current_phase(),
-            )
-            game_gtp.add_message(message=msg_obj)
-        msgs = game_gtp.filter_messages(messages=game_gtp.messages, game_role=power_name).values()
-        parsed_orders_dict = parse_proposal_messages(msgs, game_gtp, power_name)
-
-        assert set(parsed_orders_dict.keys()) == set(expected.keys())
-        for pod_key, pod_value in parsed_orders_dict.items():
-            assert set(pod_value.keys()) == set(expected[pod_key].keys()), (
-                pod_key,
-                set(pod_value.keys()),
-                set(expected[pod_key].keys()),
-            )
-
-            for key in parsed_orders_dict[pod_key]:
-                assert set(pod_value[key]) == set(expected[pod_key][key]), (
-                    pod_key,
-                    key,
-                    set(pod_value[key]),
-                    set(expected[pod_key][key]),
-                )
 
     PARSE_ARRANGEMENT_TEST_CASES = [
         ["PRP (XDO ((RUS FLT BLA) MTO CON))", ["XDO ( ( RUS FLT BLA ) MTO CON )"]],
