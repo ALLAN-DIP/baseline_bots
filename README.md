@@ -33,7 +33,7 @@ This project uses various code quality tooling, all of which is automatically in
 
 All checks can be run with `make check`, and some additional automatic changes can be run with `make fix`.
 
-To test GitHub Actions workflows locally, install [`act`](https://github.com/nektos/act) and run it with `act`.
+To test GitHub Actions workflows locally, install [`act`](https://github.com/nektos/act) and run it with `act --platform ubuntu-22.04=ghcr.io/catthehacker/ubuntu:go-22.04`. This alternate runner is needed because the latest version of `pre-commit` that supports Python 3.7 does not bootstrap Go, as later versions do. Go needs to be installed to build some checks.
 
 ## License
 
