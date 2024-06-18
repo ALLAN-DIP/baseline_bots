@@ -1,9 +1,12 @@
 """unit tests for smart order accepter bot"""
 import asyncio
 import datetime
+import os
 
 from diplomacy import Game
 from diplomacy.client.connection import connect
+import pytest
+
 from gameplay_framework import GamePlay  # TODO: Fix sorting
 from tornado import testing
 from tornado.testing import AsyncTestCase
@@ -44,6 +47,10 @@ class TestSOABot(AsyncTestCase):
         yield game_play.play()
         print("finish test_play")
 
+    @pytest.mark.skipif(
+        "CI" in os.environ,  # Do not run in CI because it does not have access to server
+        reason="Requires running Diplomacy server",
+    )
     @testing.gen_test
     def test_send_message(self):  # type: ignore[no-untyped-def]
         hostname = "localhost"
@@ -56,9 +63,9 @@ class TestSOABot(AsyncTestCase):
         game_id = f"usc_soa_test_{now.strftime('%Y_%m_%d_%H_%M_%S_%f')}"
         yield channel.create_game(
             game_id=game_id,
-            rules={"REAL_TIME", "NO_DEADLINE", "POWER_CHOICE"},
-            deadline=30,
             n_controls=1,
+            deadline=30,
+            rules={"REAL_TIME", "NO_DEADLINE", "POWER_CHOICE"},
         )
 
         # Waiting for the game, then joining it
