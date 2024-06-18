@@ -1,10 +1,12 @@
 """unit tests for smart order accepter bot"""
 import asyncio
 import datetime
+import os
 
 from diplomacy import Game
 from diplomacy.client.connection import connect
 from gameplay_framework import GamePlay
+import pytest
 from tornado import testing
 from tornado.testing import AsyncTestCase
 from typing_extensions import Final
@@ -44,8 +46,14 @@ class TestSOABot(AsyncTestCase):
         yield game_play.play()
         print("finish test_play")
 
+    @pytest.mark.skipif(
+        "CI" in os.environ,  # Do not run in CI because it does not have access to server
+        reason="Requires running Diplomacy server",  # type: ignore[no-untyped-def]
+        # Not clear why `mypy` requires the ignore to be on the above line
+        # instead of on the function declaration itself
+    )
     @testing.gen_test
-    def test_send_message(self):  # type: ignore[no-untyped-def]
+    def test_send_message(self):
         hostname = "localhost"
         port = 8432
 
