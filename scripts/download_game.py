@@ -6,36 +6,17 @@ import argparse
 import asyncio
 import json
 from pathlib import Path
-from typing import Any, Optional
+from typing import Optional
 
-from diplomacy.client.connection import connect
-from diplomacy.client.network_game import NetworkGame
-from diplomacy.utils.export import to_saved_game_format
+from baseline_bots.game_utils import (
+    DEFAULT_HOST,
+    DEFAULT_PASSWORD,
+    DEFAULT_PORT,
+    DEFAULT_USER,
+    download_game,
+)
 
 REPO_DIR = Path(__file__).resolve().parent.parent
-
-DEFAULT_USER = "allanumd"
-DEFAULT_PASSWORD = "password"
-DEFAULT_HOST = "localhost"
-DEFAULT_PORT = 8432
-
-
-async def download_game(
-    game_id: str,
-    user: str = DEFAULT_USER,
-    password: str = DEFAULT_PASSWORD,
-    game_password: Optional[str] = None,
-    hostname: str = DEFAULT_HOST,
-    port: int = DEFAULT_PORT,
-) -> Any:
-    """Downloads a game from the Diplomacy server"""
-    connection = await connect(hostname, port)
-    channel = await connection.authenticate(user, password)
-    game: NetworkGame = await channel.join_game(
-        game_id=game_id, power_name=None, registration_password=game_password
-    )
-    game_json = to_saved_game_format(game)
-    return game_json
 
 
 def main() -> None:

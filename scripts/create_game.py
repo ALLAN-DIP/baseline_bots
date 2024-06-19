@@ -5,53 +5,17 @@
 import argparse
 import asyncio
 import json
-from typing import Any, Optional, Sequence
 
-from diplomacy.client.connection import connect
-
-DEFAULT_RULES = ("REAL_TIME", "POWER_CHOICE")
-DEFAULT_DEADLINE = 0
-DEFAULT_NUM_PLAYERS = 7
-DEFAULT_USER = "allanumd"
-DEFAULT_PASSWORD = "password"
-DEFAULT_HOST = "localhost"
-DEFAULT_PORT = 8432
-
-
-async def create_game(
-    game_id: str,
-    rules: Sequence[str] = DEFAULT_RULES,
-    deadline: int = DEFAULT_DEADLINE,
-    n_controls: int = DEFAULT_NUM_PLAYERS,
-    user: str = DEFAULT_USER,
-    password: str = DEFAULT_PASSWORD,
-    game_password: Optional[str] = None,
-    hostname: str = DEFAULT_HOST,
-    port: int = DEFAULT_PORT,
-) -> Any:
-    """Creates a game on the Diplomacy server"""
-    connection = await connect(hostname, port)
-    channel = await connection.authenticate(user, password)
-
-    game = await channel.create_game(
-        game_id=game_id,
-        rules=rules,
-        deadline=deadline,
-        n_controls=n_controls,
-        registration_password=game_password,
-    )
-
-    game_data = {
-        "id": game.game_id,
-        "deadline": game.deadline,
-        "map_name": game.map_name,
-        "registration_password": game.registration_password,
-        "rules": game.rules,
-        "n_controls": n_controls,
-        "status": game.status,
-        "daide_port": game.daide_port,
-    }
-    return game_data
+from baseline_bots.game_utils import (
+    DEFAULT_DEADLINE,
+    DEFAULT_HOST,
+    DEFAULT_NUM_PLAYERS,
+    DEFAULT_PASSWORD,
+    DEFAULT_PORT,
+    DEFAULT_RULES,
+    DEFAULT_USER,
+    create_game,
+)
 
 
 def main() -> None:

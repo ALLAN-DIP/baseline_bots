@@ -5,9 +5,7 @@ from pathlib import Path
 import sys
 from typing import Any, Dict, Optional, Sequence, Tuple
 
-from create_game import create_game
-from download_game import download_game
-
+from baseline_bots.game_utils import create_game, download_game
 from baseline_bots.utils import POWER_NAMES_DICT
 
 REPO_DIR = Path(__file__).resolve().parent.parent
