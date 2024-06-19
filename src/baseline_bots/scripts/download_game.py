@@ -16,7 +16,7 @@ from baseline_bots.game_utils import (
     download_game,
 )
 
-REPO_DIR = Path(__file__).resolve().parent.parent
+REPO_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 def main() -> None:

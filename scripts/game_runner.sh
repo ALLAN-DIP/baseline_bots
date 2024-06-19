@@ -11,19 +11,6 @@
 
 set -euxo pipefail
 
-# Determine directory script is stored in
-# `sbatch` makes a temporary copy when the job is queued,
-# so some complex logic is needed
-# Currently does not support paths with spaces,
-# but that is difficult to do without a Bash parser
-# Based on https://stackoverflow.com/a/56991068/2445901
-if [[ -n ${SLURM_JOB_ID:-} ]]; then
-  SCRIPT_FILE=$(scontrol show job "$SLURM_JOB_ID" | grep -E '^   Command' | cut -f 2- -d '=' | cut -f 1 -d ' ')
-else
-  SCRIPT_FILE=$0
-fi
-SCRIPT_DIR=$(dirname "$(realpath "$SCRIPT_FILE")")
-
 for COMMAND_FILE in "$@"; do
-  time python "$SCRIPT_DIR"/run_game.py "$COMMAND_FILE"
+  time python -m baseline_bots.scripts.run_game "$COMMAND_FILE"
 done

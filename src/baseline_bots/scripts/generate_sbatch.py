@@ -6,7 +6,7 @@ from shlex import quote
 
 from baseline_bots.utils import POWER_NAMES_DICT
 
-REPO_DIR = Path(__file__).resolve().parent.parent
+REPO_DIR = Path(__file__).resolve().parent.parent.parent
 
 DEFAULT_HOST = "shade.tacc.utexas.edu"
 

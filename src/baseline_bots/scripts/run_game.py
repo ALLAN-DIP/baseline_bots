@@ -8,7 +8,7 @@ from typing import Any, Dict, Optional, Sequence, Tuple
 from baseline_bots.game_utils import create_game, download_game
 from baseline_bots.utils import POWER_NAMES_DICT
 
-REPO_DIR = Path(__file__).resolve().parent.parent
+REPO_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 async def run_cmd(cmd: str) -> Dict[str, Any]:
