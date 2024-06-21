@@ -119,7 +119,7 @@ class BaselineBot(ABC):
         log_data = self.game.new_log_data(body=log_msg)
         await self.game.send_log_data(log=log_data)
 
-    async def send_orders(self, orders: Sequence[str], wait: bool = False) -> None:
+    async def send_orders(self, orders: Sequence[str], *, wait: bool = False) -> None:
         """Send orders asynchronously to the server
 
         :param orders: Orders to be sent
