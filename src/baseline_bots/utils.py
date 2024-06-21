@@ -132,7 +132,7 @@ def neighboring_opps(
     neighbors = set()  # set to prevent duplicates
     adj_provs = set()  # provs adjacent to power_name territories
     for prov in game.powers[power_name].influence:
-        adj_provs.update(set(x.upper() for x in game.map.abut_list(prov)))
+        adj_provs.update({x.upper() for x in game.map.abut_list(prov)})
 
     for opponent in opponents:
         for prov in game.powers[opponent].influence:
