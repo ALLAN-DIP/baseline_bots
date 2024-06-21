@@ -101,5 +101,5 @@ class TestSOABot(AsyncTestCase):
 
         # Note this is a valid test case since we know ALY is sent by SOA bot to
         # all other powers in the beginning and this is the only bot amongst 7 powers
-        assert any(["PRP" in msg.message for msg in rcvd_messages])
+        assert any("PRP" in msg.message for msg in rcvd_messages)
         print("finish test_send_message")
