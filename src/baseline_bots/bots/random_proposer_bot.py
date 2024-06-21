@@ -59,7 +59,7 @@ class RandomProposerBot(BaselineBot):
     async def gen_orders(self) -> List[str]:
         possible_orders = self.game.get_all_possible_orders()
         orders = [
-            random.choice([ord for ord in possible_orders[loc]])
+            random.choice(list(possible_orders[loc]))
             for loc in self.game.get_orderable_locations(self.power_name)
             if possible_orders[loc]
         ]
