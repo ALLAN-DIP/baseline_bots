@@ -41,7 +41,7 @@ class TestUtils:
     ]
 
     @pytest.mark.parametrize(
-        "test_input,expected,unit_power_tuples_included",
+        ("test_input", "expected", "unit_power_tuples_included"),
         DIPNET_TO_DAIDE_PARSING_TEST_CASES,
     )
     def test_dipnet_to_daide_parsing(
@@ -110,7 +110,7 @@ class TestUtils:
         ),
     ]
 
-    @pytest.mark.parametrize("test_input,expected", DIPNET_TO_DAIDE_PARSING_CONVOY_TEST_CASES)
+    @pytest.mark.parametrize(("test_input", "expected"), DIPNET_TO_DAIDE_PARSING_CONVOY_TEST_CASES)
     def test_dipnet_to_daide_parsing_convoys(
         self, test_input: List[str], expected: List[str]
     ) -> None:
@@ -139,6 +139,6 @@ class TestUtils:
         ["F RUM - BUL/EC", ["F RUM", "- BUL/EC"]],
     ]
 
-    @pytest.mark.parametrize("test_input,expected", GET_ORDER_TOKENS_TEST_CASES)
+    @pytest.mark.parametrize(("test_input", "expected"), GET_ORDER_TOKENS_TEST_CASES)
     def test_get_order_tokens(self, test_input: str, expected: List[str]) -> None:
         assert get_order_tokens(test_input) == expected
