@@ -74,6 +74,7 @@ def daidefy_unit(dipnet_unit: str, unit_game_mapping: Mapping[str, str]) -> Unit
 def dipnet_to_daide_parsing(
     dipnet_style_order_strs: Sequence[Union[str, Tuple[str, str]]],
     game: Game,
+    *,
     unit_power_tuples_included: bool = False,
 ) -> List[Command]:
     """Convert set of DipNet-style orders to DAIDE-style orders

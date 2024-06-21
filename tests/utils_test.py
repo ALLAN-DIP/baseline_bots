@@ -48,6 +48,7 @@ class TestUtils:
         self,
         test_input: List[str],
         expected: List[str],
+        *,
         unit_power_tuples_included: bool,
     ) -> None:
         game_tc = Game()
