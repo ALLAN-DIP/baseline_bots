@@ -110,11 +110,12 @@ allow-reexport-from-package = true
 #   `missing-function-docstring` when using `pydocstyle`
 # Disabled `consider-using-f-string` because handled by `pyupgrade`
 # Disabled `logging-not-lazy` because handled by `flake8-logging-format`
+# Disabled `broad-exception-caught` because handled by `flake8-blind-except`
 disable = """
 R,fixme,no-member,unsupported-membership-test,unsubscriptable-object,
 unsupported-assignment-operation,not-an-iterable,too-many-lines,wrong-import-order,
 missing-module-docstring,missing-class-docstring,missing-function-docstring,
-consider-using-f-string,logging-not-lazy
+consider-using-f-string,logging-not-lazy,broad-exception-caught
 """
 
 [tool.pylint.reports]
