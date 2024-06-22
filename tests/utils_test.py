@@ -86,10 +86,8 @@ class TestUtils:
         }:
             comparison_tc_op = comparison_tc_op.rsplit("/", maxsplit=1)[0]
         dipnet_order = daide_to_dipnet_parsing(parse_daide(expected[0]))
-        assert dipnet_order is not None and dipnet_order[0] == comparison_tc_op, (
-            dipnet_order,
-            comparison_tc_op,
-        )
+        assert dipnet_order is not None
+        assert dipnet_order[0] == comparison_tc_op, (dipnet_order, comparison_tc_op)
 
     DIPNET_TO_DAIDE_PARSING_CONVOY_TEST_CASES = [
         (
@@ -123,9 +121,8 @@ class TestUtils:
         )
         for tc_ip_ord, tc_op_ord in zip(test_input, expected):
             dipnet_order = daide_to_dipnet_parsing(parse_daide(tc_op_ord))
-            assert dipnet_order is not None and dipnet_order[0] == tc_ip_ord.replace(
-                " R ", " - "
-            ), (
+            assert dipnet_order is not None
+            assert dipnet_order[0] == tc_ip_ord.replace(" R ", " - "), (
                 dipnet_order,
                 tc_ip_ord.replace(" R ", " - "),
             )
