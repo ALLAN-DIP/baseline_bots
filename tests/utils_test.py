@@ -8,7 +8,7 @@ from baseline_bots.utils import get_order_tokens, parse_daide
 
 
 class TestUtils:
-    DIPNET_TO_DAIDE_PARSING_TEST_CASES = [
+    DIPNET_TO_DAIDE_PARSING_TEST_CASES = (
         (["A PAR H"], ["( FRA AMY PAR ) HLD"], False),
         (["F STP/SC H"], ["( RUS FLT (STP SCS) ) HLD"], False),
         ([("A PAR H", "ENG")], ["( ENG AMY PAR ) HLD"], True),
@@ -38,7 +38,7 @@ class TestUtils:
             ["( TUR AMY CON ) SUP ( TUR FLT BLA ) MTO BUL"],
             False,
         ),
-    ]
+    )
 
     @pytest.mark.parametrize(
         ("test_input", "expected", "unit_power_tuples_included"),
@@ -89,7 +89,7 @@ class TestUtils:
         assert dipnet_order is not None
         assert dipnet_order[0] == comparison_tc_op, (dipnet_order, comparison_tc_op)
 
-    DIPNET_TO_DAIDE_PARSING_CONVOY_TEST_CASES = [
+    DIPNET_TO_DAIDE_PARSING_CONVOY_TEST_CASES = (
         (
             ["A TUN - SYR VIA", "F ION C A TUN - SYR", "F EAS C A TUN - SYR"],
             [
@@ -106,7 +106,7 @@ class TestUtils:
                 "( ITA FLT AEG ) CVY ( ITA AMY TUN ) CTO BUL",
             ],
         ),
-    ]
+    )
 
     @pytest.mark.parametrize(("test_input", "expected"), DIPNET_TO_DAIDE_PARSING_CONVOY_TEST_CASES)
     def test_dipnet_to_daide_parsing_convoys(
@@ -127,14 +127,14 @@ class TestUtils:
                 tc_ip_ord.replace(" R ", " - "),
             )
 
-    GET_ORDER_TOKENS_TEST_CASES = [
+    GET_ORDER_TOKENS_TEST_CASES = (
         ["A PAR S A MAR - BUR", ["A PAR", "S", "A MAR", "- BUR"]],
         ["A MAR - BUR", ["A MAR", "- BUR"]],
         ["A MAR R BUR", ["A MAR", "- BUR"]],
         ["A MAR H", ["A MAR", "H"]],
         ["F BUL/EC - RUM", ["F BUL/EC", "- RUM"]],
         ["F RUM - BUL/EC", ["F RUM", "- BUL/EC"]],
-    ]
+    )
 
     @pytest.mark.parametrize(("test_input", "expected"), GET_ORDER_TOKENS_TEST_CASES)
     def test_get_order_tokens(self, test_input: str, expected: List[str]) -> None:
