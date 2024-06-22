@@ -142,14 +142,14 @@ class BaselineBot(ABC):
         """
         :return: dict containing messages and orders
         """
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @abstractmethod
     async def do_messaging_round(self, orders: Sequence[str]) -> List[str]:
         """
         :return: dict containing messages and orders
         """
-        raise NotImplementedError()
+        raise NotImplementedError
 
     async def end_phase(self) -> None:
         """Execute actions at the end of the phase."""
