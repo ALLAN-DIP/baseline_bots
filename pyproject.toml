@@ -23,23 +23,63 @@ warn_unreachable = true
 [tool.ruff]
 fix = true
 line-length = 100
+show-fixes = true
 target-version = "py37"
 
 [tool.ruff.lint]
 select = [
+  "A", # flake8-builtins
+  "ASYNC", # flake8-async
   "B", # flake8-bugbear
+  "BLE", # flake8-blind-except
+  "C4", # flake8-comprehensions
+  "CPY", # flake8-copyright (will require spdx changes)
   # "D", # pydocstyle
+  "DTZ", # flake8-datetimez
   "E", # pycodestyle error
   "F", # pyflakes
+  "FBT", # flake8-boolean-trap
+  "FLY", # flynt
+  "FURB", # refurb
+  "G", # flake8-logging-format
   "I", # isort
+  "ICN", # flake8-import-conventions
+  "INP", # flake8-no-pep420
+  "INT", # flake8-gettext
+  "ISC", # flake8-implicit-str-concat
+  "LOG", # flake8-logging
+  "N", # pep8-naming
+  "NPY", # NumPy-specific rules
+  "PERF", # Perflint
+  "PIE", # flake8-pie
+  "PT", # flake8-pytest-style
   "PTH", # flake8-use-pathlib
+  "PYI", # flake8-pyi
+  "RET", # flake8-return
+  "RSE", # flake8-raise
+  "RUF", # Ruff-specific rules
+  "S", # flake8-bandit (but very selective, it's very picky!)
+  "SIM", # flake8-simplify
+  "SLF", # flake8-self
+  "SLOT", # flake8-slots
+  "T10", # flake8-debugger
+  "TCH", # flake8-type-checking
+  "TID", # flake8-tidy-imports
+  "TRY", # tryceratops
   "UP", # pyupgrade
   "W", # pycodestyle warning
+  "YTT", # flake8-2020
 ]
 ignore = [
   # Do not switch to `Path.open()` because `open()` is easier to test with
   # e.g., `open(data_dir / "file_a.txt")` -> `open("test/file_b.txt")`
   "PTH123", # builtin-open (from flake8-use-pathlib)
+  # TODO: Write explanation
+  "S101", # assert (from flake8-bandit)
+  # TODO: Write explanation
+  "S311", # suspicious-non-cryptographic-random-usage (from flake8-bandit)
+  # TODO: Write explanation
+  "SIM108", # if-else-block-instead-of-if-exp (from flake8-simplify)
 ]
 
 [tool.ruff.lint.isort]
