@@ -204,7 +204,7 @@ def dipnet_to_daide_parsing(
                 daide_orders.append(move_order)
         except asyncio.CancelledError:
             raise
-        except Exception as ex:  # pylint: disable=broad-exception-caught
+        except Exception as ex:
             logger.exception(
                 "ALLAN: error from %s.%s()\n\tOrder with error: %r\n\tSet of orders: %s",
                 __name__,
@@ -291,7 +291,7 @@ def daide_to_dipnet_parsing(daide_order: Command) -> Optional[Tuple[str, str]]:
         return dipnet_order, unit_power
     except asyncio.CancelledError:
         raise
-    except Exception as ex:  # pylint: disable=broad-exception-caught
+    except Exception as ex:
         logger.exception(
             "ALLAN: error from %s.%s\n\tCould not convert DAIDE command %r to DipNet format",
             __name__,
