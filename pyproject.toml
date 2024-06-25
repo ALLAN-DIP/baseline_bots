@@ -74,11 +74,14 @@ ignore = [
   # Do not switch to `Path.open()` because `open()` is easier to test with
   # e.g., `open(data_dir / "file_a.txt")` -> `open("test/file_b.txt")`
   "PTH123", # builtin-open (from flake8-use-pathlib)
-  # TODO: Write explanation
+  # Keep `assert` statements because they are often used to express typing constraints for `mypy`
+  # In addition, most people do not run Python with optimized bytecode
   "S101", # assert (from flake8-bandit)
-  # TODO: Write explanation
+  # Most code we work with is not cryptographically sensitive,
+  # so the `random` module is safe to use
   "S311", # suspicious-non-cryptographic-random-usage (from flake8-bandit)
-  # TODO: Write explanation
+  # Ternary expressions are often less readable than `if`-`else` blocks,
+  # so they should not be required
   "SIM108", # if-else-block-instead-of-if-exp (from flake8-simplify)
 ]
 
