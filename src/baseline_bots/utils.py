@@ -77,7 +77,7 @@ def is_valid_daide_message(string: str, grammar: Optional[DAIDEGrammar] = None) 
         daide_visitor.visit(parse_tree)
     except asyncio.CancelledError:
         raise
-    except Exception:
+    except Exception:  # noqa: BLE001
         return False
     return True
 
