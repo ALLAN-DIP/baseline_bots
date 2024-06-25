@@ -33,14 +33,12 @@ select = [
   "B", # flake8-bugbear
   "BLE", # flake8-blind-except
   "C4", # flake8-comprehensions
-  "CPY", # flake8-copyright (will require spdx changes)
   # "D", # pydocstyle
   "DTZ", # flake8-datetimez
   "E", # pycodestyle error
   "F", # pyflakes
   "FBT", # flake8-boolean-trap
   "FLY", # flynt
-  "FURB", # refurb
   "G", # flake8-logging-format
   "I", # isort
   "ICN", # flake8-import-conventions
