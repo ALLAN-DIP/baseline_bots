@@ -225,8 +225,10 @@ def random_convoy(order: CVY) -> CVY:
     :rtype: Tuple
     """
     # TODO: Add to `daidepp`?
-    assert order.convoyed_unit.unit_type == "AMY", "The convoyed unit is not an army, so it is invalid."
-    assert order.convoying_unit.unit_type == "FLT", "The convoying unit is not a fleet, so it is invalid."
+    if order.convoyed_unit.unit_type != "AMY":
+        raise ValueError("The convoyed unit is not an army, so it is invalid.")
+    if order.convoying_unit.unit_type != "FLT":
+        raise ValueError("The convoying unit is not a fleet, so it is invalid.")
     # It is necessary to check whether a possible alternate "convoy-to" location is adjacent to the unit being convoyed
     # since convoying to a province adjacent to you would be less believable
     flt_loc = dipnetify_location(order.convoying_unit.location)
