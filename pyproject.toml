@@ -33,12 +33,14 @@ select = [
   "B", # flake8-bugbear
   "BLE", # flake8-blind-except
   "C4", # flake8-comprehensions
+  # "CPY", # flake8-copyright (will require spdx changes)
   # "D", # pydocstyle
   "DTZ", # flake8-datetimez
   "E", # pycodestyle error
   "F", # pyflakes
   "FBT", # flake8-boolean-trap
   "FLY", # flynt
+  # "FURB", # refurb
   "G", # flake8-logging-format
   "I", # isort
   "ICN", # flake8-import-conventions
@@ -48,12 +50,12 @@ select = [
   "LOG", # flake8-logging
   "N", # pep8-naming
   "NPY", # NumPy-specific rules
-  "PERF", # Perflint
+  # "PERF", # Perflint
   "PIE", # flake8-pie
   "PT", # flake8-pytest-style
   "PTH", # flake8-use-pathlib
   "PYI", # flake8-pyi
-  "RET", # flake8-return
+  # "RET", # flake8-return
   "RSE", # flake8-raise
   "RUF", # Ruff-specific rules
   "S", # flake8-bandit (but very selective, it's very picky!)
@@ -61,9 +63,9 @@ select = [
   "SLF", # flake8-self
   "SLOT", # flake8-slots
   "T10", # flake8-debugger
-  "TCH", # flake8-type-checking
+  # "TCH", # flake8-type-checking
   "TID", # flake8-tidy-imports
-  "TRY", # tryceratops
+  # "TRY", # tryceratops
   "UP", # pyupgrade
   "W", # pycodestyle warning
   "YTT", # flake8-2020
@@ -79,6 +81,11 @@ ignore = [
   # TODO: Write explanation
   "SIM108", # if-else-block-instead-of-if-exp (from flake8-simplify)
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# Ignore `INP001` (implicit-namespace-package) in `test/` directory because pytest recommends
+# not using `__init__.py` files: https://docs.pytest.org/en/7.4.x/explanation/goodpractices.html
+"tests/**.py" = ["INP001"]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
