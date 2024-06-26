@@ -14,13 +14,14 @@ RUN apt-get -y update \
 
 RUN pip install --no-cache-dir --upgrade pip==24.0
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements-lock.txt .
+RUN pip install --no-cache-dir -r requirements-lock.txt
 
 RUN mkdir src/
 COPY LICENSE .
 COPY README.md .
 COPY pyproject.toml .
+COPY requirements.txt .
 COPY setup.cfg .
 COPY setup.py .
 RUN pip install --no-cache-dir -e .
