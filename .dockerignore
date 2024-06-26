@@ -6,7 +6,7 @@
 !/README.md
 !/pyproject.toml
 !/requirements.txt
-!/scripts/run_bot.py
+!/requirements-lock.txt
 !/setup.cfg
 !/setup.py
 !/src/
