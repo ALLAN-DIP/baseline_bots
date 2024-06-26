@@ -3,7 +3,6 @@ import asyncio
 import datetime
 import os
 
-from chiron_utils.bots.random_proposer_bot import RandomProposerBot
 from diplomacy import Game
 from diplomacy.client.connection import connect
 from gameplay_framework import GamePlay  # TODO: Fix sorting
@@ -11,6 +10,8 @@ import pytest
 from tornado import testing
 from tornado.testing import AsyncTestCase
 from typing_extensions import Final
+
+from chiron_utils.bots.random_proposer_bot import RandomProposerBot
 
 SOA_TEST_PARAMS: Final = {
     "num_message_rounds": 3,
