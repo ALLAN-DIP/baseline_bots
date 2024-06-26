@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from shlex import quote
 
-from baseline_bots.utils import POWER_NAMES_DICT
+from chiron_utils.utils import POWER_NAMES_DICT
 
 REPO_DIR = Path(__file__).resolve().parent.parent.parent
 

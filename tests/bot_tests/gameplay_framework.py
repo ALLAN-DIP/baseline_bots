@@ -1,8 +1,7 @@
 from typing import List
 
+from chiron_utils.bots.baseline_bot import BaselineBot
 from diplomacy import Game
-
-from baseline_bots.bots.baseline_bot import BaselineBot
 
 
 class GamePlay:

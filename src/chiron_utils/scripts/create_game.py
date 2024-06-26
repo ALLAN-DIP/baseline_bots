@@ -6,7 +6,7 @@ import argparse
 import asyncio
 import json
 
-from baseline_bots.game_utils import (
+from chiron_utils.game_utils import (
     DEFAULT_DEADLINE,
     DEFAULT_HOST,
     DEFAULT_NUM_PLAYERS,

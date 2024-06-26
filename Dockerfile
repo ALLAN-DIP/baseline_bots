@@ -26,7 +26,7 @@ COPY setup.cfg .
 COPY setup.py .
 RUN pip install --no-cache-dir -e .
 
-# Copy baseline_bots code into the Docker image
+# Copy package code into the Docker image
 COPY src/ src/
 
 # Script executors

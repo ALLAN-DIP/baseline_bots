@@ -1,10 +1,9 @@
 from typing import List
 
+from chiron_utils.parsing_utils import daide_to_dipnet_parsing, dipnet_to_daide_parsing
+from chiron_utils.utils import get_order_tokens, parse_daide
 from diplomacy import Game
 import pytest
-
-from baseline_bots.parsing_utils import daide_to_dipnet_parsing, dipnet_to_daide_parsing
-from baseline_bots.utils import get_order_tokens, parse_daide
 
 
 class TestUtils:

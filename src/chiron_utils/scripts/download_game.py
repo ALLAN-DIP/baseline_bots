@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 from typing import Optional
 
-from baseline_bots.game_utils import (
+from chiron_utils.game_utils import (
     DEFAULT_HOST,
     DEFAULT_PASSWORD,
     DEFAULT_PORT,

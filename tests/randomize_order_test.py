@@ -1,7 +1,7 @@
 import random
 
-from baseline_bots.randomize_order import random_list_orders
-from baseline_bots.utils import parse_daide
+from chiron_utils.randomize_order import random_list_orders
+from chiron_utils.utils import parse_daide
 
 
 class TestRandomizeDipnet:

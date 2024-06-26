@@ -12,5 +12,5 @@
 set -euxo pipefail
 
 for COMMAND_FILE in "$@"; do
-  time python -m baseline_bots.scripts.run_game "$COMMAND_FILE"
+  time python -m chiron_utils.scripts.run_game "$COMMAND_FILE"
 done

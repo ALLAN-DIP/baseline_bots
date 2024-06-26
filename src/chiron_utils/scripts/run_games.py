@@ -8,8 +8,8 @@ from shlex import quote
 import socket
 from typing import List, Optional, Sequence
 
-from baseline_bots.game_utils import create_game, download_game
-from baseline_bots.utils import POWER_NAMES_DICT
+from chiron_utils.game_utils import create_game, download_game
+from chiron_utils.utils import POWER_NAMES_DICT
 
 REPO_DIR = Path(__file__).resolve().parent.parent.parent
 
