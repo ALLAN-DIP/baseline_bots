@@ -11,7 +11,7 @@ from diplomacy import Game, Message
 from diplomacy.client.network_game import NetworkGame
 from diplomacy.utils import strings
 
-from baseline_bots.utils import return_logger
+from chiron_utils.utils import return_logger
 
 logger = return_logger(__name__)
 

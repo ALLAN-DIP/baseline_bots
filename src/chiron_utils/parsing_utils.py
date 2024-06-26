@@ -9,7 +9,7 @@ from typing import Any, List, Mapping, Optional, Sequence, Tuple, Union
 from daidepp import CVY, HLD, MTO, SUP, Command, Location, MoveByCVY, Unit
 from diplomacy import Game
 
-from baseline_bots.utils import DEBUG_MODE, get_order_tokens, return_logger
+from chiron_utils.utils import DEBUG_MODE, get_order_tokens, return_logger
 
 logger = return_logger(__name__)
 

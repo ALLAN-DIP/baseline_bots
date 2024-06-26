@@ -25,8 +25,8 @@ COPY setup.cfg .
 COPY setup.py .
 RUN pip install --no-cache-dir -e .
 
-# Copy baseline_bots code into the Docker image
+# Copy package code into the Docker image
 COPY src/ src/
 
 # Script executors
-ENTRYPOINT ["python", "-m", "baseline_bots.scripts.run_bot"]
+ENTRYPOINT ["python", "-m", "chiron_utils.scripts.run_bot"]

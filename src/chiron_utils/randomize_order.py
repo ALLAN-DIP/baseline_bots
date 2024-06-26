@@ -22,7 +22,7 @@ from daidepp import (
     MoveByCVY,
 )
 
-from baseline_bots.parsing_utils import daidefy_location, dipnetify_location
+from chiron_utils.parsing_utils import daidefy_location, dipnetify_location
 
 # The comments below signal the formatter not to expand these dicts to multiple lines
 # fmt: off

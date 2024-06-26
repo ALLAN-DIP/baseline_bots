@@ -11,7 +11,7 @@ from tornado import testing
 from tornado.testing import AsyncTestCase
 from typing_extensions import Final
 
-from baseline_bots.bots.random_proposer_bot import RandomProposerBot
+from chiron_utils.bots.random_proposer_bot import RandomProposerBot
 
 SOA_TEST_PARAMS: Final = {
     "num_message_rounds": 3,

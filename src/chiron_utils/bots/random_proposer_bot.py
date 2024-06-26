@@ -3,9 +3,9 @@ from typing import List, Sequence
 
 from daidepp import AND, PRP, XDO
 
-from baseline_bots.bots.baseline_bot import BaselineBot
-from baseline_bots.parsing_utils import dipnet_to_daide_parsing
-from baseline_bots.utils import get_other_powers
+from chiron_utils.bots.baseline_bot import BaselineBot
+from chiron_utils.parsing_utils import dipnet_to_daide_parsing
+from chiron_utils.utils import get_other_powers
 
 
 class RandomProposerBot(BaselineBot):
