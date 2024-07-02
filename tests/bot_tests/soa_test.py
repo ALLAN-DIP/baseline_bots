@@ -11,7 +11,7 @@ from tornado import testing
 from tornado.testing import AsyncTestCase
 from typing_extensions import Final
 
-from chiron_utils.bots.random_proposer_bot import RandomProposerBot
+from chiron_utils.bots import RandomProposerPlayer
 
 SOA_TEST_PARAMS: Final = {
     "num_message_rounds": 3,
@@ -22,7 +22,7 @@ class TestSOABot(AsyncTestCase):
     @testing.gen_test
     def test_play_simple(self):  # type: ignore[no-untyped-def]
         game = Game()
-        soa_bot = RandomProposerBot("FRANCE", game)
+        soa_bot = RandomProposerPlayer("FRANCE", game)
         yield soa_bot.send_message("FRANCE", "A PAR - BUR")
 
     @testing.gen_test
@@ -32,13 +32,13 @@ class TestSOABot(AsyncTestCase):
         game_play = GamePlay(
             game,
             [
-                RandomProposerBot("AUSTRIA", game, **SOA_TEST_PARAMS),
-                RandomProposerBot("ENGLAND", game, **SOA_TEST_PARAMS),
-                RandomProposerBot("FRANCE", game, **SOA_TEST_PARAMS),
-                RandomProposerBot("RUSSIA", game, **SOA_TEST_PARAMS),
-                RandomProposerBot("GERMANY", game, **SOA_TEST_PARAMS),
-                RandomProposerBot("ITALY", game, **SOA_TEST_PARAMS),
-                RandomProposerBot("TURKEY", game, **SOA_TEST_PARAMS),
+                RandomProposerPlayer("AUSTRIA", game, **SOA_TEST_PARAMS),
+                RandomProposerPlayer("ENGLAND", game, **SOA_TEST_PARAMS),
+                RandomProposerPlayer("FRANCE", game, **SOA_TEST_PARAMS),
+                RandomProposerPlayer("RUSSIA", game, **SOA_TEST_PARAMS),
+                RandomProposerPlayer("GERMANY", game, **SOA_TEST_PARAMS),
+                RandomProposerPlayer("ITALY", game, **SOA_TEST_PARAMS),
+                RandomProposerPlayer("TURKEY", game, **SOA_TEST_PARAMS),
             ],
             3,
         )
@@ -76,7 +76,7 @@ class TestSOABot(AsyncTestCase):
         channel = yield connection.authenticate("userX", "password")
         game = yield channel.join_game(game_id=game_id, power_name="FRANCE")
 
-        soa_bot1 = RandomProposerBot("FRANCE", game, **SOA_TEST_PARAMS)
+        soa_bot1 = RandomProposerPlayer("FRANCE", game, **SOA_TEST_PARAMS)
 
         game_play = GamePlay(
             game,

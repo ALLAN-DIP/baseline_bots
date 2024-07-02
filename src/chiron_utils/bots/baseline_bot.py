@@ -21,6 +21,7 @@ class BaselineBot(ABC):
     """Abstract Base Class for baselines bots"""
 
     player_type: ClassVar[str] = strings.PRESS_BOT
+    bot_type: ClassVar[str]
     power_name: str
     game: Game
     num_message_rounds: Optional[int] = None
@@ -166,7 +167,8 @@ class BaselineBot(ABC):
         if not self.game.get_current_phase().endswith("M"):
             return orders
 
-        await self.send_intent_log(f"Initial orders (before communication): {orders}")
+        if self.bot_type == "player":
+            await self.send_intent_log(f"Initial orders (before communication): {orders}")
 
         await self.wait_for_comm_stage()
 

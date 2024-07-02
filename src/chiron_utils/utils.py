@@ -9,12 +9,7 @@ import logging
 import os
 from typing import List, Optional, Set
 
-from daidepp import (
-    AnyDAIDEToken,
-    DAIDEGrammar,
-    create_daide_grammar,
-    daide_visitor,
-)
+from daidepp import AnyDAIDEToken, DAIDEGrammar, create_daide_grammar, daide_visitor
 from daidepp.grammar.grammar import MAX_DAIDE_LEVEL
 from diplomacy import Game
 

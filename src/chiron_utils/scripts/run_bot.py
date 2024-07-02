@@ -9,14 +9,15 @@ from typing import Type
 from diplomacy import connect
 from diplomacy.client.network_game import NetworkGame
 
-from chiron_utils.bots import BaselineBot, RandomProposerBot
+from chiron_utils.bots import BaselineBot, RandomProposerAdvisor, RandomProposerPlayer
 from chiron_utils.utils import POWER_NAMES_DICT, return_logger
 
 logger = return_logger(__name__)
 
 POWERS = sorted(POWER_NAMES_DICT.values())
 BOTS = [
-    RandomProposerBot,
+    RandomProposerAdvisor,
+    RandomProposerPlayer,
 ]
 NAMES_TO_BOTS = {bot.__name__: bot for bot in BOTS}
 
@@ -43,10 +44,15 @@ async def play(
     logger.info("%s joining game %r as %s", bot_class.__name__, (game_id), power_name)
     connection = await connect(hostname, port)
     channel = await connection.authenticate(
-        f"allan_{bot_class.__name__.lower()}_{power_name}", "password"
+        f"allan_{bot_class.__name__.lower()}_{power_name}"
+        if bot_class.bot_type == "player"
+        else "admin",
+        "password",
     )
     game: NetworkGame = await channel.join_game(
-        game_id=game_id, power_name=power_name, player_type=bot_class.player_type
+        game_id=game_id,
+        power_name=power_name if bot_class.bot_type == "player" else None,
+        player_type=bot_class.player_type if bot_class.bot_type == "player" else None,
     )
 
     bot = bot_class(power_name, game)
@@ -120,7 +126,7 @@ def main() -> None:
         "--bot_type",
         type=str,
         choices=list(NAMES_TO_BOTS),
-        default=RandomProposerBot.__name__,
+        default=RandomProposerPlayer.__name__,
         help="type of bot to be launched (default: %(default)s)",
     )
 
