@@ -194,7 +194,7 @@ def random_convoy_to(order: MoveByCVY) -> MoveByCVY:
     amy_loc = dipnetify_location(order.unit.location)
     province = dipnetify_location(order.province)
     sea_provinces = [dipnetify_location(Location(sea)) for sea in order.province_seas]
-    sea_provinces = list(reversed(sea_provinces))
+    sea_provinces.reverse()
     for i, sea in enumerate(
         sea_provinces
     ):  # searches through the sea provinces in reversed order to find the longest possible alternate convoy
