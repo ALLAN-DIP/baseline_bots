@@ -20,6 +20,7 @@ REPO_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
 
 def main() -> None:
+    """Download Diplomacy game."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--game_id", type=str, required=True, help="Game ID.")
     parser.add_argument("--output_file", type=Path, help="Output file path.")

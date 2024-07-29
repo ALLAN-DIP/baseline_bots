@@ -1,4 +1,4 @@
-"""unit tests for smart order accepter bot"""
+"""Unit tests for `RandomProposerPlayer`."""
 import asyncio
 import datetime
 import os
@@ -19,14 +19,18 @@ SOA_TEST_PARAMS: Final = {
 
 
 class TestBots(AsyncTestCase):
+    """Tests for `RandomProposerPlayer` bot."""
+
     @testing.gen_test
     def test_play_simple(self):  # type: ignore[no-untyped-def]
+        """Test sending a single message in a local game."""
         game = Game()
         soa_bot = RandomProposerPlayer("FRANCE", game)
         yield soa_bot.send_message("FRANCE", "A PAR - BUR")
 
     @testing.gen_test
     def test_play(self):  # type: ignore[no-untyped-def]
+        """Test playing a local 3-phase game with all `RandomProposerPlayer` bots."""
         game = Game()
 
         game_play = GamePlay(
@@ -54,6 +58,7 @@ class TestBots(AsyncTestCase):
     )
     @testing.gen_test
     def test_send_message(self):
+        """Test playing a network 3-phase game with a single `RandomProposerPlayer` bot."""
         hostname = "localhost"
         port = 8432
 

@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2022, Texas Advanced Computing Center
 # SPDX-License-Identifier: BSD-3-Clause
-"""Create Diplomacy games programmatically."""
+"""Control Diplomacy games programmatically."""
 # Based on https://github.com/SHADE-AI/diplomacy-playground/blob/989ec7be748257324a22132e632ac4927b8cb6c2/scripts/create_game.py
 
 from typing import Any, Optional, Sequence
@@ -29,7 +29,7 @@ async def create_game(
     hostname: str = DEFAULT_HOST,
     port: int = DEFAULT_PORT,
 ) -> Any:
-    """Creates a game on the Diplomacy server"""
+    """Creates a game on the Diplomacy server."""
     connection = await connect(hostname, port)
     channel = await connection.authenticate(user, password)
 
@@ -62,7 +62,7 @@ async def download_game(
     hostname: str = DEFAULT_HOST,
     port: int = DEFAULT_PORT,
 ) -> Any:
-    """Downloads a game from the Diplomacy server"""
+    """Downloads a game from the Diplomacy server."""
     connection = await connect(hostname, port)
     channel = await connection.authenticate(user, password)
     game: NetworkGame = await channel.join_game(

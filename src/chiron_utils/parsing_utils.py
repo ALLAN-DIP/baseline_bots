@@ -1,6 +1,4 @@
-"""
-Some quickly built parsing utils mostly for DAIDE stuff
-"""
+"""Utilities for converting between DipNet and DAIDE syntax."""
 
 import asyncio
 from collections import defaultdict
@@ -22,7 +20,7 @@ daide2dipnet_loc = {v: k for k, v in dipnet2daide_loc.items()}
 
 
 def daidefy_location(prov: str) -> Location:
-    """Converts DipNet-style location to DAIDE-style location
+    """Converts DipNet-style location to DAIDE-style location.
 
     E.g.
     BUL/EC --> BUL ECS
@@ -30,8 +28,11 @@ def daidefy_location(prov: str) -> Location:
     ENG    --> ECH
     PAR    --> PAR
 
-    :param prov: DipNet-style province notation
-    :return: DAIDE-style order
+    Args:
+        prov: DipNet-style province notation.
+
+    Returns:
+        DAIDE-style order.
     """
     if "/" in prov:
         prov, coast = prov.split("/")
@@ -44,7 +45,7 @@ def daidefy_location(prov: str) -> Location:
 
 
 def daidefy_unit(dipnet_unit: str, unit_game_mapping: Mapping[str, str]) -> Unit:
-    """Converts DipNet-style unit to DAIDE-style unit
+    """Converts DipNet-style unit to DAIDE-style unit.
 
     E.g. (for initial game state)
     A BUD --> AUS AMY BUD
@@ -52,9 +53,12 @@ def daidefy_unit(dipnet_unit: str, unit_game_mapping: Mapping[str, str]) -> Unit
     A PAR --> FRA AMY PAR
     A MAR --> FRA AMY MAR
 
-    :param dipnet_unit: DipNet-style unit notation
-    :param unit_game_mapping: Mapping from DipNet-style units to powers
-    :return: DAIDE-style unit
+    Args:
+        dipnet_unit: DipNet-style unit notation.
+        unit_game_mapping: Mapping from DipNet-style units to powers.
+
+    Returns:
+        DAIDE-style unit.
     """
     power = unit_game_mapping[dipnet_unit]
 
@@ -77,20 +81,22 @@ def dipnet_to_daide_parsing(
     *,
     unit_power_tuples_included: bool = False,
 ) -> List[Command]:
-    """Convert set of DipNet-style orders to DAIDE-style orders
+    """Convert set of DipNet-style orders to DAIDE-style orders.
 
     Needs game instance to determine the powers owning the units.
 
     More details here: https://docs.google.com/document/d/16RODa6KDX7vNNooBdciI4NqSVN31lToto3MLTNcEHk0/edit?usp=sharing
 
-    :param dipnet_style_order_strs: DipNet-style list of orders to be converted to DAIDE.
-        Either in format: {"RUSSIA": ["A SEV - RUM"]} or {"RUSSIA": [("A SEV - RUM", "RUS")]}
-    :param game: game instance
-    :param unit_power_tuples_included: Whether the unit power will also be included in
-        dipnet_style_order_strs along with the orders like this: ("A SEV - RUM", "RUS")
-    :return: List of DAIDE-style orders
-    """
+    Args:
+        dipnet_style_order_strs: DipNet-style list of orders to be converted to DAIDE.
+            Either in format {"RUSSIA": ["A SEV - RUM"]} or {"RUSSIA": [("A SEV - RUM", "RUS")]}.
+        game: Game instance.
+        unit_power_tuples_included: Whether the unit power will also be included in
+            `dipnet_style_order_strs` along with the orders like this: ("A SEV - RUM", "RUS").
 
+    Returns:
+        List of DAIDE-style orders.
+    """
     convoy_map = defaultdict(list)
     dipnet_style_order_strs_tokens: List[Any] = [None for _ in range(len(dipnet_style_order_strs))]
 
@@ -219,7 +225,7 @@ def dipnet_to_daide_parsing(
 
 
 def dipnetify_location(loc: Location) -> str:
-    """Converts DipNet-style location to DAIDE-style location
+    """Converts DipNet-style location to DAIDE-style location.
 
     E.g.
     BUL ECS --> BUL/EC
@@ -227,8 +233,11 @@ def dipnetify_location(loc: Location) -> str:
     ECH     --> ENG
     PAR     --> PAR
 
-    :param loc: DAIDE-style location
-    :return: DipNet-style province notation
+    Args:
+        loc: DAIDE-style location.
+
+    Returns:
+        DipNet-style province notation.
     """
     prov = daide2dipnet_loc.get(loc.province, loc.province)
     if loc.coast is not None:
@@ -237,10 +246,13 @@ def dipnetify_location(loc: Location) -> str:
 
 
 def dipnetify_unit(unit: Unit) -> str:
-    """Converts DAIDE-style unit to DipNet-style unit
+    """Converts DAIDE-style unit to DipNet-style unit.
 
-    :param unit: DAIDE-style unit
-    :return: DipNet-style unit notation
+    Args:
+        unit: DAIDE-style unit.
+
+    Returns:
+        DipNet-style unit notation.
     """
     unit_type = unit.unit_type[0]
     location = dipnetify_location(unit.location)
@@ -248,14 +260,16 @@ def dipnetify_unit(unit: Unit) -> str:
 
 
 def daide_to_dipnet_parsing(daide_order: Command) -> Optional[Tuple[str, str]]:
-    """Convert single DAIDE-style order to DipNet-style order
+    """Convert single DAIDE-style order to DipNet-style order.
 
     More details here: https://docs.google.com/document/d/16RODa6KDX7vNNooBdciI4NqSVN31lToto3MLTNcEHk0/edit?usp=sharing
 
-    :param daide_order: DAIDE-style order to be converted to DipNet style
-    :return: DipNet-style order string and unit's power name
-    """
+    Args:
+        daide_order: DAIDE-style order to be converted to DipNet style.
 
+    Returns:
+        DipNet-style order string and unit's power name.
+    """
     try:
         # Dipnetify source unit
         acting_unit = dipnetify_unit(daide_order.unit)

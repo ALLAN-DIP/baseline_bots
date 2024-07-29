@@ -19,6 +19,7 @@ from chiron_utils.game_utils import (
 
 
 def main() -> None:
+    """Create Diplomacy game."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--game_id", type=str, required=True, help="Game ID.")
     parser.add_argument("--rules", nargs="+", default=DEFAULT_RULES, help="Game rules.")

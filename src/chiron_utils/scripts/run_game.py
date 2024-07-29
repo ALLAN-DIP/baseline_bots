@@ -1,3 +1,5 @@
+"""Run a single game on CARC."""
+
 import argparse
 import asyncio
 import json
@@ -12,6 +14,14 @@ REPO_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
 
 async def run_cmd(cmd: str) -> Dict[str, Any]:
+    """Run a shell command, capturing all output in the process.
+
+    Args:
+        cmd: Command to run.
+
+    Returns:
+        Command's console output (both stdout and stderr) and exit code.
+    """
     proc = await asyncio.create_subprocess_exec(
         "/usr/bin/env",
         *("bash", "-c", cmd),
@@ -30,6 +40,15 @@ async def run_cmd(cmd: str) -> Dict[str, Any]:
 async def run_all_cmds(
     cmds: Sequence[str], *, delay_seconds: Optional[int] = None
 ) -> Tuple[Dict[str, Any]]:
+    """Runs multiple commands, capturing their output.
+
+    Args:
+        cmds: List of shell commands to run.
+        delay_seconds: Number of seconds to wait between running each command.
+
+    Returns:
+        Separate output for each command.
+    """
     coroutines = []
     for cmd in cmds:
         coroutines.append(run_cmd(cmd))
@@ -39,6 +58,7 @@ async def run_all_cmds(
 
 
 def main() -> None:
+    """Runs commands from provided file and stores command output."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "command_file",

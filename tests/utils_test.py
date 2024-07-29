@@ -1,3 +1,5 @@
+"""Test functions from the `parsing_utils` and `utils` modules."""
+
 from typing import List
 
 from diplomacy import Game
@@ -8,6 +10,8 @@ from chiron_utils.utils import get_order_tokens, parse_daide
 
 
 class TestUtils:
+    """Class to contain tests."""
+
     DIPNET_TO_DAIDE_PARSING_TEST_CASES = (
         (["A PAR H"], ["( FRA AMY PAR ) HLD"], False),
         (["F STP/SC H"], ["( RUS FLT (STP SCS) ) HLD"], False),
@@ -51,6 +55,13 @@ class TestUtils:
         *,
         unit_power_tuples_included: bool,
     ) -> None:
+        """Test `parsing_utils.dipnet_to_daide_parsing()`.
+
+        Args:
+            test_input: List of DipNet orders to convert.
+            expected: List of DAIDE orders expected as output.
+            unit_power_tuples_included: Whether the unit power will also be included in the input.
+        """
         game_tc = Game()
         game_tc.set_units("TURKEY", ["F BLA"])
 
@@ -112,6 +123,12 @@ class TestUtils:
     def test_dipnet_to_daide_parsing_convoys(
         self, test_input: List[str], expected: List[str]
     ) -> None:
+        """Test convoy logic in `parsing_utils.dipnet_to_daide_parsing()`.
+
+        Args:
+            test_input: List of DipNet orders to convert.
+            expected: List of DAIDE orders expected as output.
+        """
         game_tc = Game()
         game_tc.set_units("ITALY", ["A TUN", "F ION", "F EAS", "F AEG"])
 
@@ -138,4 +155,10 @@ class TestUtils:
 
     @pytest.mark.parametrize(("test_input", "expected"), GET_ORDER_TOKENS_TEST_CASES)
     def test_get_order_tokens(self, test_input: str, expected: List[str]) -> None:
+        """Test `utils.get_order_tokens()`.
+
+        Args:
+            test_input: DipNet order.
+            expected: List of tokens from DipNet order.
+        """
         assert get_order_tokens(test_input) == expected

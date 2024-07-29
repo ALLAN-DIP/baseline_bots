@@ -1,3 +1,5 @@
+"""Run a single game using a container runner."""
+
 import argparse
 import asyncio
 import datetime
@@ -31,6 +33,14 @@ DEFAULT_HOST = "shade.tacc.utexas.edu"
 
 
 async def run_cmd(cmd: str) -> str:
+    """Run a shell command, capturing all output in the process.
+
+    Args:
+        cmd: Command to run.
+
+    Returns:
+        Command's console output (both stdout and stderr).
+    """
     proc = await asyncio.create_subprocess_exec(
         "/usr/bin/env",
         *("bash", "-c", cmd),
@@ -42,6 +52,15 @@ async def run_cmd(cmd: str) -> str:
 
 
 async def run_all_cmds(cmds: Sequence[str], *, delay_seconds: Optional[int] = None) -> List[str]:
+    """Runs multiple commands, capturing their output.
+
+    Args:
+        cmds: List of shell commands to run.
+        delay_seconds: Number of seconds to wait between running each command.
+
+    Returns:
+        Separate output for each command.
+    """
     coroutines = []
     for cmd in cmds:
         coroutines.append(run_cmd(cmd))
@@ -51,6 +70,7 @@ async def run_all_cmds(cmds: Sequence[str], *, delay_seconds: Optional[int] = No
 
 
 def main() -> None:
+    """Runs a single game."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--runner",

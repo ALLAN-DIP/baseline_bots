@@ -1,4 +1,4 @@
-"""ALLAN-DIP: Team ALLAN's Diplomacy Agent"""
+"""Run any implemented Diplomacy agent."""
 
 
 import argparse
@@ -29,17 +29,15 @@ async def play(
     power_name: str,
     bot_class: Type[BaselineBot],
 ) -> None:
-    """
-    Launches the bot for game play
+    """Launches the bot for game play.
 
-    :param hostname: name of host on which games are hosted
-    :param port: port to which the bot should connect on the host
-    :param game_id: game id to connect to on host
-    :param power_name: power name of the bot to be launched
-    :param bot_class: the type of bot to be launched - NoPressDipBot/TransparentBot/SmartOrderAccepterBot/..
-    :param sleep_delay: bool to indicate if bot should sleep randomly for 1-3s before execution
+    Args:
+        hostname: Host name of game server.
+        port: Port of game server.
+        game_id: ID of game to join.
+        power_name: Name of power bot will play as or advise.
+        bot_class: Type of bot to launch.
     """
-
     # Connect to the game
     logger.info("%s joining game %r as %s", bot_class.__name__, (game_id), power_name)
     connection = await connect(hostname, port)
@@ -97,37 +95,38 @@ async def play(
 
 
 def main() -> None:
+    """Run Diplomacy agent."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--host",
         type=str,
         default="localhost",
-        help="host IP address (default: %(default)s)",
+        help="Host name of game server. (default: %(default)s)",
     )
     parser.add_argument(
         "--port",
         type=int,
         default=8432,
-        help="port to connect to the game (default: %(default)s)",
+        help="Port of game server. (default: %(default)s)",
     )
     parser.add_argument(
         "--game_id",
         type=str,
         required=True,
-        help="game id of game created in DATC diplomacy game",
+        help="ID of game to join.",
     )
     parser.add_argument(
         "--power",
         choices=POWERS,
         required=True,
-        help="power name",
+        help="Name of power bot will play as or advise.",
     )
     parser.add_argument(
         "--bot_type",
         type=str,
         choices=list(NAMES_TO_BOTS),
         default=RandomProposerPlayer.__name__,
-        help="type of bot to be launched (default: %(default)s)",
+        help="Type of bot to launch. (default: %(default)s)",
     )
 
     args = parser.parse_args()

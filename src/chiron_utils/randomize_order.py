@@ -1,7 +1,4 @@
-"""
-Some functions that generate randomized orders from
-an already existing order / list of orders.
-"""
+"""Functions that generate randomized orders from an already existing order or list of orders."""
 
 
 import random
@@ -144,13 +141,13 @@ joiners = {"AND", "ORR"}
 
 
 def random_list_orders(orders: List[Command]) -> List[Command]:
-    """
-    Generates a randomly deviant orders in the same form.
+    """Generates randomly deviant orders in the same forms as the originals.
 
-    :param orders: A list of DAIDE orders in the following format. [((FRA AMY PIC) MTO BRE), ((FRA AMY PIC) HLD), ((FRA AMY BUR) HLD)]
-    :type orders: List[Tuple]
-    :return: The list of deviant orders
-    :rtype: List[Tuple]
+    Args:
+        orders: A list of DAIDE orders.
+
+    Return:
+        The list of deviant orders.
     """
     # if there are no correspondences, every order is randomized alone
     orders = list(map(randomize, orders))
@@ -158,13 +155,13 @@ def random_list_orders(orders: List[Command]) -> List[Command]:
 
 
 def randomize(order: Command) -> Command:
-    """
-    Takes in an order and returns a randomly deviant version of it.
+    """Takes an order and returns a randomly deviant version of it.
 
-    :param order: A DAIDE order
-    :type order: Tuple
-    :return: A deviant order (with some chance of being the same order).
-    :rtype: Tuple
+    Args:
+        order: A DAIDE order.
+
+    Return:
+        A deviant order (with some chance of it being the original order).
     """
     if isinstance(order, (MTO, RTO)):
         return random_movement(order)
@@ -183,13 +180,13 @@ def randomize(order: Command) -> Command:
 
 
 def random_convoy_to(order: MoveByCVY) -> MoveByCVY:
-    """
-    This takes a convoy order and returns the longest alternate convoy.
+    """Converts a convoy order to the longest alternate convoy.
 
-    :param order: A "convoy to" (CTO) order
-    :type order: Tuple
-    :return: A deviant order (with some chance of being the same order).
-    :rtype: Tuple
+    Args:
+        order: A "convoy to" (CTO) order.
+
+    Returns:
+        A deviant order (with some chance of it being the original order).
     """
     amy_loc = dipnetify_location(order.unit.location)
     province = dipnetify_location(order.province)
@@ -214,15 +211,17 @@ def random_convoy_to(order: MoveByCVY) -> MoveByCVY:
 
 
 def random_convoy(order: CVY) -> CVY:
-    """
+    """Generates a random variant of a convoy order.
+
     This takes in the order and produces a convoy to a different destination if it is possible
     and believable. An unbelievable convoy would be one that convoys a unit to a province the
     unit can move to by itself.
 
-    :param order: A "convoy" (CVY) order
-    :type order: Tuple
-    :return: A deviant order (with some chance of being the same order).
-    :rtype: Tuple
+    Args:
+        order: A "convoy" (CVY) order.
+
+    Returns:
+        A deviant order (with some chance of it being the original order).
     """
     # TODO: Add to `daidepp`?
     if order.convoyed_unit.unit_type != "AMY":
@@ -250,13 +249,13 @@ def random_convoy(order: CVY) -> CVY:
 
 
 def random_support(order: SUP) -> SUP:
-    """
-    Takes in a support order and returns a believable but randomized version of it.
+    """Generates a believable but randomized version of a support order.
 
-    :param order: A "support" (SUP) order
-    :type order: Tuple
-    :return: A deviant order (with some chance of being the same order).
-    :rtype: Tuple
+    Args:
+        order: A "support" (SUP) order.
+
+    Returns:
+        A deviant order (with some chance of it being the original order).
     """
     if order.province_no_coast is None:  # if it is supporting to hold
         # fmt : off
@@ -303,14 +302,17 @@ def random_support(order: SUP) -> SUP:
 
 
 def random_movement(order: Union[MTO, RTO], chance_of_move: float = 0.5) -> Union[MTO, RTO, HLD]:
-    """
+    """Generates a believable but randomized version of a move order.
+
     Takes in a movement order and returns a similar but randomly different version of it.
     This may turn a movement order into a hold order.
 
-    :param order: A "move to" (MTO) or "retreat to" (RTO) order
-    :type order: Tuple
-    :return: A deviant order (with some chance of being the same order).
-    :rtype: Tuple
+    Args:
+        order: A "move to" (MTO) or "retreat to" (RTO) order.
+        chance_of_move: Probability that the move order will remain a move order.
+
+    Returns:
+        A deviant order (with some chance of it being the original order).
     """
     unit = order.unit
     if random.random() < chance_of_move or isinstance(
@@ -330,16 +332,17 @@ def random_movement(order: Union[MTO, RTO], chance_of_move: float = 0.5) -> Unio
 
 
 def random_hold(order: HLD, chance_of_move: float = 0.8) -> Union[MTO, HLD]:
-    """
-    Takes in a hold order and returns a move from the same location or possibly
-    the same hold order.
+    """Generates a believable but randomized version of a hold order.
 
-    :param order: A "hold" (HLD) order
-    :type order: Tuple
-    :return: A deviant order (with some chance of being the same order).
-    :rtype: Tuple
-    """
+    Takes in a hold order and returns a move from the same location or possibly the same hold order.
 
+    Args:
+        order: A "hold" (HLD) order.
+        chance_of_move: Probability that the hold order will become a move order.
+
+    Returns:
+        A deviant order (with some chance of it being the original order).
+    """
     if random.random() < chance_of_move:  # The chance of changing the hold to a move is high
         loc = dipnetify_location(order.unit.location)
         move_loc = random.choice(ADJACENCY[loc])  # randomly chooses an adjacent location

@@ -1,3 +1,5 @@
+"""Bots that carry out random orders and make random order proposals."""
+
 from abc import ABC
 import random
 from typing import ClassVar, Dict, List, Sequence
@@ -10,8 +12,10 @@ from chiron_utils.utils import get_other_powers
 
 
 class RandomProposerBot(BaselineBot, ABC):
-    """
-    Just sends random order proposals to other bots.
+    """Bot that carries out random orders and sends random order proposals to other bots.
+
+    Because of the similarity between the advisor and player versions of this bot,
+    both of their behaviors are abstracted into this single abstract base class.
     """
 
     is_first_messaging_round = False
@@ -21,6 +25,11 @@ class RandomProposerBot(BaselineBot, ABC):
         self.is_first_messaging_round = True
 
     def get_random_proposal_orders(self) -> Dict[str, str]:
+        """Generate random order proposals for other powers.
+
+        Returns:
+            Mapping from powers to random order proposals.
+        """
         # Getting the list of possible orders for all locations
         possible_orders = self.game.get_all_possible_orders()
 
@@ -52,8 +61,10 @@ class RandomProposerBot(BaselineBot, ABC):
         return proposals
 
     async def do_messaging_round(self, orders: Sequence[str]) -> List[str]:
-        """
-        :return: dict containing messages and orders
+        """Carry out one round of messaging, along with related tasks.
+
+        Returns:
+            List of orders to carry out.
         """
         if not self.is_first_messaging_round:
             return list(orders)
@@ -71,6 +82,11 @@ class RandomProposerBot(BaselineBot, ABC):
         return list(orders)
 
     def get_random_orders(self) -> List[str]:
+        """Generate random orders to carry out.
+
+        Returns:
+            List of random orders.
+        """
         possible_orders = self.game.get_all_possible_orders()
         orders = [
             random.choice(list(possible_orders[loc]))
@@ -80,6 +96,11 @@ class RandomProposerBot(BaselineBot, ABC):
         return orders
 
     async def gen_orders(self) -> List[str]:
+        """Generate orders for a turn.
+
+        Returns:
+            List of orders to carry out.
+        """
         orders = self.get_random_orders()
         if self.bot_type == "advisor":
             await self.suggest_orders(orders)
@@ -87,8 +108,12 @@ class RandomProposerBot(BaselineBot, ABC):
 
 
 class RandomProposerAdvisor(RandomProposerBot):
+    """Advisor form of `RandomProposerBot`."""
+
     bot_type: ClassVar[str] = "advisor"
 
 
 class RandomProposerPlayer(RandomProposerBot):
+    """Player form of `RandomProposerBot`."""
+
     bot_type: ClassVar[str] = "player"

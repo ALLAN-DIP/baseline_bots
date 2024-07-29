@@ -1,7 +1,4 @@
-"""
-Some quickly built utils mostly for DAIDE stuff
-It would be preferable to use a real DAIDE parser in prod
-"""
+"""A collection of various utilities useful for building bots."""
 
 
 import asyncio
@@ -61,9 +58,13 @@ ALL_GRAMMAR = create_daide_grammar(level=MAX_DAIDE_LEVEL, string_type="all")
 
 def is_valid_daide_message(string: str, grammar: Optional[DAIDEGrammar] = None) -> bool:
     """Determines whether a string is a valid DAIDE message.
-    :param string: String to check for valid DAIDE.
-    :param grammar: DAIDE grammar to use. Defaults to complete message grammar.
-    :return: Whether the string is valid DAIDE or not.
+
+    Args:
+        string: String to check for valid DAIDE.
+        grammar: DAIDE grammar to use. Defaults to complete message grammar.
+
+    Returns:
+        Whether the string is valid DAIDE or not.
     """
     if grammar is None:
         grammar = MESSAGE_GRAMMAR
@@ -79,9 +80,15 @@ def is_valid_daide_message(string: str, grammar: Optional[DAIDEGrammar] = None) 
 
 def parse_daide(string: str) -> AnyDAIDEToken:
     """Parses a DAIDE string into `daidepp` objects.
-    :param string: String to parse into DAIDE.
-    :return: Parsed DAIDE object.
-    :raises ValueError: If string is invalid DAIDE.
+
+    Args:
+        string: String to parse into DAIDE.
+
+    Returns:
+        Parsed DAIDE object.
+
+    Raises:
+        ValueError: If string is invalid DAIDE.
     """
     try:
         parse_tree = ALL_GRAMMAR.parse(string)
@@ -93,9 +100,16 @@ def parse_daide(string: str) -> AnyDAIDEToken:
 
 
 def get_order_tokens(order: str) -> List[str]:
-    """Retrieves the order tokens used in an order
-    e.g. 'A PAR - MAR' would return ['A PAR', '-', 'MAR']
-    NOTE: Stolen from diplomacy_research
+    """Retrieves the order tokens used in an order.
+
+    e.g., "A PAR - MAR" would return ["A PAR", "-", "MAR"]
+    NOTE: Stolen from `diplomacy_research` repository
+
+    Args:
+        order: DipNet order.
+
+    Returns:
+        List of tokens from DipNet order.
     """
     # We need to keep 'A', 'F', and '-' in a temporary buffer to concatenate them with the next word
     # We replace 'R' orders with '-'
@@ -111,9 +125,14 @@ def get_order_tokens(order: str) -> List[str]:
 
 
 def get_other_powers(powers: List[str], game: Game) -> Set[str]:
-    """
-    :return: powers in the game other than those listed
-    in the powers parameter
+    """Get all powers not provided in input.
+
+    Args:
+        powers: Powers to not return.
+        game: Game to retrieve powers from.
+
+    Returns:
+        Powers in the game other than those given.
     """
     return set(game.get_map_power_names()) - set(powers)
 
@@ -123,7 +142,16 @@ def neighboring_opps(
     power_name: str,
     opponents: List[str],
 ) -> List[str]:
-    """Return a list of powers that are neighbors of power_name"""
+    """Retrieve a list of neighboring opponents of a given power.
+
+    Args:
+        game: Game to retrieve information from.
+        power_name: Power to find neighboring opponents of.
+        opponents: List of opponents of given power.
+
+    Returns:
+        List of opponents that are neighbors of the given power.
+    """
     neighbors = set()  # set to prevent duplicates
     adj_provs = set()  # provs adjacent to power_name territories
     for prov in game.powers[power_name].influence:

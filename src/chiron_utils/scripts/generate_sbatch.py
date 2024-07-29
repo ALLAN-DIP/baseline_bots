@@ -1,3 +1,4 @@
+"""Generates file to run a game with Slurm's `sbatch`."""
 import argparse
 import datetime
 import json
@@ -12,6 +13,7 @@ DEFAULT_HOST = "shade.tacc.utexas.edu"
 
 
 def main() -> None:
+    """Generate file to run with `sbatch`."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "config_file",

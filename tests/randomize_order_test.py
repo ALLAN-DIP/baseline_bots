@@ -1,3 +1,4 @@
+"""Test functions from the `randomize_order` module."""
 import random
 
 from chiron_utils.randomize_order import random_list_orders
@@ -5,7 +6,10 @@ from chiron_utils.utils import parse_daide
 
 
 class TestRandomizeDipnet:
+    """Class to contain tests."""
+
     def test(self) -> None:
+        """Run tests for various functions in the `randomize_order` module."""
         # The following three tests check that build, disband and remove commands do not get changed when input into the order randomizer.
 
         orders = [parse_daide("(FRA AMY PAR) BLD")]

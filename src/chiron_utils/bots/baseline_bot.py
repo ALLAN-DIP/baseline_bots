@@ -1,4 +1,4 @@
-"""Abstract base classes for baseline bots"""
+"""Abstract base classes for bots."""
 
 
 from abc import ABC, abstractmethod
@@ -18,7 +18,7 @@ logger = return_logger(__name__)
 
 @dataclass
 class BaselineBot(ABC):
-    """Abstract Base Class for baselines bots"""
+    """Abstract base class for bots."""
 
     player_type: ClassVar[str] = strings.PRESS_BOT
     bot_type: ClassVar[str]
@@ -53,7 +53,9 @@ class BaselineBot(ABC):
 
     def read_messages(self) -> List[Message]:
         """Retrieves all valid messages for the current phase sent to the bot.
-        :return: List of messages.
+
+        Returns:
+            List of messages.
         """
         messages = self.game.filter_messages(messages=self.game.messages, game_role=self.power_name)
         received_messages = sorted(
@@ -71,10 +73,13 @@ class BaselineBot(ABC):
         sender: Optional[str] = None,
         msg_type: Optional[str] = None,
     ) -> None:
-        """Send message asynchronously to the server
+        """Send message to the server.
 
-        :param recipient: The name of the recipient power
-        :param message: Message to be sent
+        Args:
+            recipient: The name of the power receiving the message.
+            message: Text of message to be sent.
+            sender: The name of the power sending the message.
+            msg_type: Type of message (e.g., `"suggested_message"`, `"suggested_move"`)
         """
         msg_obj = Message(
             sender=sender or self.power_name,
@@ -92,6 +97,11 @@ class BaselineBot(ABC):
             self.game.add_message(message=msg_obj)
 
     async def suggest_orders(self, orders: List[str]) -> None:
+        """Send suggested orders for power to the server.
+
+        Args:
+            orders: Orders to suggest.
+        """
         await self.send_message(
             "GLOBAL",
             f"{self.power_name} Cicero suggests move: {', '.join(orders)}",
@@ -100,6 +110,12 @@ class BaselineBot(ABC):
         )
 
     async def suggest_message(self, recipient: str, message: str) -> None:
+        """Send suggested messages for power to the server.
+
+        Args:
+            recipient: The name of the power that would receive the recommended message.
+            message: Text of the recommended message.
+        """
         await self.send_message(
             "GLOBAL",
             f"{self.power_name} Cicero suggests a message to {recipient}: {message}",
@@ -108,9 +124,10 @@ class BaselineBot(ABC):
         )
 
     async def send_intent_log(self, log_msg: str) -> None:
-        """Send intent log asynchronously to the server
+        """Send intent log to the server.
 
-        :param log_msg: Log message to be sent
+        Args:
+            log_msg: Text of message to store in intent log.
         """
         logger.info("Intent log: %r", (log_msg))
         # Intent logging should not be sent in local games
@@ -120,9 +137,11 @@ class BaselineBot(ABC):
         await self.game.send_log_data(log=log_data)
 
     async def send_orders(self, orders: Sequence[str], *, wait: bool = False) -> None:
-        """Send orders asynchronously to the server
+        """Send orders to the server.
 
-        :param orders: Orders to be sent
+        Args:
+            orders: Orders to send.
+            wait: Whether the server should be told to wait for further orders.
         """
         logger.info("Sent orders: %s", orders)
 
@@ -139,15 +158,19 @@ class BaselineBot(ABC):
 
     @abstractmethod
     async def gen_orders(self) -> List[str]:
-        """
-        :return: dict containing messages and orders
+        """Generate orders for a turn.
+
+        Returns:
+            List of orders to carry out.
         """
         raise NotImplementedError
 
     @abstractmethod
     async def do_messaging_round(self, orders: Sequence[str]) -> List[str]:
-        """
-        :return: dict containing messages and orders
+        """Carry out one round of messaging, along with related tasks.
+
+        Returns:
+            List of orders to carry out.
         """
         raise NotImplementedError
 
@@ -156,8 +179,10 @@ class BaselineBot(ABC):
         return
 
     async def __call__(self) -> List[str]:
-        """
-        :return: dict containing messages and orders
+        """Carry out one phase of the game.
+
+        Returns:
+            List of orders to carry out.
         """
         await self.start_phase()
 
