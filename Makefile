@@ -103,9 +103,11 @@ upgrade:
 install:
 	make update
 
+TAG ?= latest
+
 .PHONY: build
 build:
 	docker build \
 		--target achilles \
-		--tag achilles \
+		--tag ghcr.io/allan-dip/chiron-utils:$(TAG) \
 		.

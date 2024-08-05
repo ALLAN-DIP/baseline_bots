@@ -31,3 +31,5 @@ COPY src/ src/
 
 # Script executors
 ENTRYPOINT ["python", "-m", "chiron_utils.scripts.run_bot"]
+
+LABEL org.opencontainers.image.source=https://github.com/ALLAN-DIP/chiron-utils
