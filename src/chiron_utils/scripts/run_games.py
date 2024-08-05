@@ -8,7 +8,8 @@ import json
 from pathlib import Path
 from shlex import quote
 import socket
-from typing import List, Optional, Sequence
+import sys
+from typing import Any, Dict, Optional, Sequence, Tuple
 
 from chiron_utils.game_utils import create_game, download_game
 from chiron_utils.utils import POWER_NAMES_DICT
@@ -32,26 +33,33 @@ else:
 DEFAULT_HOST = "shade.tacc.utexas.edu"
 
 
-async def run_cmd(cmd: str) -> str:
+async def run_cmd(cmd: str) -> Dict[str, Any]:
     """Run a shell command, capturing all output in the process.
 
     Args:
         cmd: Command to run.
 
     Returns:
-        Command's console output (both stdout and stderr).
+        Command's console output (both stdout and stderr) and exit code.
     """
     proc = await asyncio.create_subprocess_exec(
         "/usr/bin/env",
         *("bash", "-c", cmd),
+        # Write stdout and stderr as a single stream
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.STDOUT,
     )
     stdout, _ = await proc.communicate()
-    return stdout.decode("utf-8")
+    exit_code = proc.returncode
+    return {
+        "stdout": stdout.decode("utf-8"),
+        "exit_code": exit_code,
+    }
 
 
-async def run_all_cmds(cmds: Sequence[str], *, delay_seconds: Optional[int] = None) -> List[str]:
+async def run_all_cmds(
+    cmds: Sequence[str], *, delay_seconds: Optional[int] = None
+) -> Tuple[Dict[str, Any]]:
     """Runs multiple commands, capturing their output.
 
     Args:
@@ -66,7 +74,7 @@ async def run_all_cmds(cmds: Sequence[str], *, delay_seconds: Optional[int] = No
         coroutines.append(run_cmd(cmd))
         if delay_seconds is not None:
             await asyncio.sleep(delay_seconds)
-    return await asyncio.gather(*coroutines)
+    return await asyncio.gather(*coroutines)  # type: ignore[no-any-return]
 
 
 def main() -> None:
@@ -156,16 +164,31 @@ def main() -> None:
     print(run_cmds)
 
     results = asyncio.run(run_all_cmds(run_cmds, delay_seconds=4))
-    run_output = {
-        power: {"command": cmd, "console_output": result}
-        for power, cmd, result in zip(powers, run_cmds, results)
-    }
+    run_output = {}
+    for power, cmd, result in zip(powers, run_cmds, results):
+        run_output[power] = {
+            "command": cmd,
+            "stdout": result["stdout"],
+            "exit_code": result["exit_code"],
+        }
     game_record = asyncio.run(download_game(game_id, hostname=host))
     output = {"run_output": run_output, "game_record": game_record}
     output_file = data_dir / f"{game_id}.json"
     with open(output_file, "w", encoding="utf-8") as file:
         json.dump(output, file, ensure_ascii=False, indent=2)
         file.write("\n")
+
+    # Exit code of child processes can be negative:
+    # https://docs.python.org/3.7/library/asyncio-subprocess.html#asyncio.asyncio.subprocess.Process.returncode
+    sub_exit_codes = [result["exit_code"] for result in results]
+    if max(sub_exit_codes) > 0:
+        exit_code = max(sub_exit_codes)
+    elif min(sub_exit_codes) < 0:
+        exit_code = min(sub_exit_codes)
+    else:
+        exit_code = 0
+    print(f"Exit code: {exit_code}")
+    sys.exit(exit_code)
 
 
 if __name__ == "__main__":
