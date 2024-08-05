@@ -73,6 +73,7 @@ def main() -> None:
     game_id = command_json["game_id"]
     host = command_json["host"]
     data_dir = Path(command_json["data_dir"])
+    data_dir.mkdir(parents=True, exist_ok=True)
 
     create_game_data = asyncio.run(create_game(game_id, hostname=host))
     print(json.dumps(create_game_data, ensure_ascii=False, indent=2))
@@ -88,7 +89,6 @@ def main() -> None:
         }
     game_record = asyncio.run(download_game(game_id, hostname=host))
     output = {"run_output": run_output, "game_record": game_record}
-    data_dir.mkdir(parents=True, exist_ok=True)
     output_file = data_dir / f"record_{game_id}.json"
     with open(output_file, "w", encoding="utf-8") as file:
         json.dump(output, file, ensure_ascii=False, indent=2)
