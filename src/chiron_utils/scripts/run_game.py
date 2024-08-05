@@ -89,7 +89,7 @@ def main() -> None:
         }
     game_record = asyncio.run(download_game(game_id, hostname=host))
     output = {"run_output": run_output, "game_record": game_record}
-    output_file = data_dir / f"record_{game_id}.json"
+    output_file = data_dir / f"game_{game_id}.json"
     with open(output_file, "w", encoding="utf-8") as file:
         json.dump(output, file, ensure_ascii=False, indent=2)
         file.write("\n")
