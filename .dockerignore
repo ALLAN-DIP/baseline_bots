@@ -1,6 +1,3 @@
-# Python files
-**/*.egg*
+# Directories that Python creates in `src/`
+**/*.egg*/
 **/__pycache__/
-
-# Project-specific files
-/docs/build/
