@@ -15,7 +15,7 @@ DEFAULT_NUM_PLAYERS = 7
 DEFAULT_USER = "allanumd"
 DEFAULT_PASSWORD = "password"  # noqa: S105
 DEFAULT_HOST = "localhost"
-DEFAULT_PORT = 8432
+DEFAULT_PORT = 8433
 
 
 async def create_game(
