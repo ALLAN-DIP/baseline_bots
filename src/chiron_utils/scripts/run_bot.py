@@ -10,6 +10,7 @@ from diplomacy import connect
 from diplomacy.client.network_game import NetworkGame
 
 from chiron_utils.bots import BaselineBot, RandomProposerAdvisor, RandomProposerPlayer
+from chiron_utils.game_utils import DEFAULT_HOST, DEFAULT_PORT
 from chiron_utils.utils import POWER_NAMES_DICT, return_logger
 
 logger = return_logger(__name__)
@@ -100,13 +101,13 @@ def main() -> None:
     parser.add_argument(
         "--host",
         type=str,
-        default="localhost",
+        default=DEFAULT_HOST,
         help="Host name of game server. (default: %(default)s)",
     )
     parser.add_argument(
         "--port",
         type=int,
-        default=8432,
+        default=DEFAULT_PORT,
         help="Port of game server. (default: %(default)s)",
     )
     parser.add_argument(

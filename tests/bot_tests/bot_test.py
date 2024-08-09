@@ -12,6 +12,7 @@ from tornado.testing import AsyncTestCase
 from typing_extensions import Final
 
 from chiron_utils.bots import RandomProposerPlayer
+from chiron_utils.game_utils import DEFAULT_PORT
 
 SOA_TEST_PARAMS: Final = {
     "num_message_rounds": 3,
@@ -60,7 +61,7 @@ class TestBots(AsyncTestCase):
     def test_send_message(self):
         """Test playing a network 3-phase game with a single `RandomProposerPlayer` bot."""
         hostname = "localhost"
-        port = 8432
+        port = DEFAULT_PORT
 
         connection = yield connect(hostname, port)
         channel = yield connection.authenticate("userX", "password")
