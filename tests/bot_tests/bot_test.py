@@ -18,7 +18,7 @@ SOA_TEST_PARAMS: Final = {
 }
 
 
-class TestSOABot(AsyncTestCase):
+class TestBots(AsyncTestCase):
     @testing.gen_test
     def test_play_simple(self):  # type: ignore[no-untyped-def]
         game = Game()
