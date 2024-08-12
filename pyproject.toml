@@ -8,7 +8,9 @@ target-version = ["py37"]
 
 [tool.codespell]
 ignore-regex = "\\[nt]" # Do not count escaped newlines or tabs as part of a word
-ignore-words-list = "astroid,ans,hel,opps,ser,vie"  # "HEL", "SER", and "VIE" are from DAIDE
+# `astroid` is a dependency of pylint
+# "HEL", "SER", and "VIE" are from DAIDE
+ignore-words-list = "astroid,hel,ser,vie"
 quiet-level = 0 # Display all warnings
 check-filenames = ""
 check-hidden = ""
@@ -23,23 +25,63 @@ warn_unreachable = true
 [tool.ruff]
 fix = true
 line-length = 100
+# Show full violation messages by setting `RUFF_OUTPUT_FORMAT=full` in environment
+output-format = "concise"
+show-fixes = true
 target-version = "py37"
 
 [tool.ruff.lint]
 select = [
+  "A", # flake8-builtins
+  "ASYNC", # flake8-async
   "B", # flake8-bugbear
+  "BLE", # flake8-blind-except
+  "C4", # flake8-comprehensions
   # "D", # pydocstyle
+  "DTZ", # flake8-datetimez
   "E", # pycodestyle error
   "F", # pyflakes
+  "FBT", # flake8-boolean-trap
+  "FLY", # flynt
+  "FURB", # refurb
+  "G", # flake8-logging-format
   "I", # isort
+  "ICN", # flake8-import-conventions
+  "INP", # flake8-no-pep420
+  "INT", # flake8-gettext
+  "ISC", # flake8-implicit-str-concat
+  "LOG", # flake8-logging
+  "N", # pep8-naming
+  "NPY", # NumPy-specific rules
+  "PIE", # flake8-pie
+  "PT", # flake8-pytest-style
   "PTH", # flake8-use-pathlib
+  "PYI", # flake8-pyi
+  "RSE", # flake8-raise
+  "RUF", # Ruff-specific rules
+  "S", # flake8-bandit
+  "SIM", # flake8-simplify
+  "SLF", # flake8-self
+  "SLOT", # flake8-slots
+  "T10", # flake8-debugger
+  "TID", # flake8-tidy-imports
   "UP", # pyupgrade
   "W", # pycodestyle warning
+  "YTT", # flake8-2020
 ]
 ignore = [
   # Do not switch to `Path.open()` because `open()` is easier to test with
   # e.g., `open(data_dir / "file_a.txt")` -> `open("test/file_b.txt")`
   "PTH123", # builtin-open (from flake8-use-pathlib)
+  # Keep `assert` statements because they are often used to express typing constraints for `mypy`
+  # In addition, most people do not run Python with optimized bytecode
+  "S101", # assert (from flake8-bandit)
+  # Most code we work with is not cryptographically sensitive,
+  # so the `random` module is safe to use
+  "S311", # suspicious-non-cryptographic-random-usage (from flake8-bandit)
+  # Ternary expressions are often less readable than `if`-`else` blocks,
+  # so they should not be required
+  "SIM108", # if-else-block-instead-of-if-exp (from flake8-simplify)
 ]
 
 [tool.ruff.lint.isort]
@@ -69,11 +111,13 @@ allow-reexport-from-package = true
 # - `missing-module-docstring`, `missing-class-docstring`,
 #   `missing-function-docstring` when using `pydocstyle`
 # Disabled `consider-using-f-string` because handled by `pyupgrade`
+# Disabled `logging-not-lazy` because handled by `flake8-logging-format`
+# Disabled `broad-exception-caught` because handled by `flake8-blind-except`
 disable = """
 R,fixme,no-member,unsupported-membership-test,unsubscriptable-object,
 unsupported-assignment-operation,not-an-iterable,too-many-lines,wrong-import-order,
 missing-module-docstring,missing-class-docstring,missing-function-docstring,
-consider-using-f-string
+consider-using-f-string,logging-not-lazy,broad-exception-caught
 """
 
 [tool.pylint.reports]

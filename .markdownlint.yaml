@@ -1,13 +1,11 @@
-# Default state for all rules
+# Enable all rules
 default: true
 
-# Path to configuration file to extend
-extends: null
+# Disable rules that conflict with Prettier
+# See https://github.com/DavidAnson/markdownlint/blob/main/doc/Prettier.md
+extends: markdownlint/style/prettier
 
-# line-length
-# Let Prettier handle formatting
-MD013: false
-
-# no-duplicate-heading
-MD024:
+# Allow duplicate headings if they are not siblings
+# See https://github.com/DavidAnson/markdownlint/blob/main/doc/md024.md
+no-duplicate-heading:
   siblings_only: true
