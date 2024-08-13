@@ -63,7 +63,7 @@ class TestBots(AsyncTestCase):
         hostname = "localhost"
         port = DEFAULT_PORT
 
-        connection = yield connect(hostname, port)
+        connection = yield connect(hostname, port, use_ssl=False)
         channel = yield connection.authenticate("userX", "password")
 
         now = datetime.datetime.now(datetime.timezone.utc)

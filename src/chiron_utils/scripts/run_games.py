@@ -113,6 +113,11 @@ def main() -> None:
         help="Port of game server. (default: %(default)s)",
     )
     parser.add_argument(
+        "--use-ssl",
+        action="store_true",
+        help="Whether to use SSL to connect to the game server. (default: %(default)s)",
+    )
+    parser.add_argument(
         "--output-dir",
         default=REPO_DIR,
         type=Path,
@@ -124,6 +129,7 @@ def main() -> None:
     agent: str = args.agent
     host: str = args.host
     port: int = args.port
+    use_ssl: bool = args.use_ssl
     output_dir: Path = args.output_dir
     extra_bot_args: Optional[str] = args.bot_args
     if runner == APPTAINER:  # For TACC
@@ -147,7 +153,9 @@ def main() -> None:
         user = getpass.getuser()
         now = datetime.datetime.now(datetime.timezone.utc)
         game_id = f"{user}_{now.strftime('%Y_%m_%d_%H_%M_%S_%f')}"
-        create_game_data = asyncio.run(create_game(game_id, hostname=host, port=port))
+        create_game_data = asyncio.run(
+            create_game(game_id, hostname=host, port=port, use_ssl=use_ssl)
+        )
         print(json.dumps(create_game_data, ensure_ascii=False, indent=2))
     bot_args = ""
     if extra_bot_args is not None:
@@ -169,6 +177,7 @@ def main() -> None:
             f"{quote(agent)} "
             f"--host {quote(host_from_container)} "
             f"--port {port} "
+            f"{'--use-ssl ' if use_ssl else ''}"
             f"--game_id {quote(game_id)} "
             f"--power {power} "
             f"{bot_args} "
@@ -184,7 +193,7 @@ def main() -> None:
             "stdout": result["stdout"],
             "exit_code": result["exit_code"],
         }
-    game_record = asyncio.run(download_game(game_id, hostname=host, port=port))
+    game_record = asyncio.run(download_game(game_id, hostname=host, port=port, use_ssl=use_ssl))
     output = {"run_output": run_output, "game_record": game_record}
     output_file = data_dir / f"game_{game_id}.json"
     with open(output_file, "w", encoding="utf-8") as file:

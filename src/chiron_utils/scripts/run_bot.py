@@ -29,6 +29,8 @@ async def play(
     game_id: str,
     power_name: str,
     bot_class: Type[BaselineBot],
+    *,
+    use_ssl: bool,
 ) -> None:
     """Launches the bot for game play.
 
@@ -38,10 +40,11 @@ async def play(
         game_id: ID of game to join.
         power_name: Name of power bot will play as or advise.
         bot_class: Type of bot to launch.
+        use_ssl: Whether to use SSL to connect to the game server.
     """
     # Connect to the game
     logger.info("%s joining game %r as %s", bot_class.__name__, (game_id), power_name)
-    connection = await connect(hostname, port)
+    connection = await connect(hostname, port, use_ssl=use_ssl)
     channel = await connection.authenticate(
         f"allan_{bot_class.__name__.lower()}_{power_name}"
         if bot_class.bot_type == "player"
@@ -111,6 +114,11 @@ def main() -> None:
         help="Port of game server. (default: %(default)s)",
     )
     parser.add_argument(
+        "--use-ssl",
+        action="store_true",
+        help="Whether to use SSL to connect to the game server. (default: %(default)s)",
+    )
+    parser.add_argument(
         "--game_id",
         type=str,
         required=True,
@@ -133,6 +141,7 @@ def main() -> None:
     args = parser.parse_args()
     host: str = args.host
     port: int = args.port
+    use_ssl: bool = args.use_ssl
     game_id: str = args.game_id
     power: str = args.power
     bot_type: str = args.bot_type
@@ -146,6 +155,7 @@ def main() -> None:
             game_id=game_id,
             power_name=power,
             bot_class=bot_class,
+            use_ssl=use_ssl,
         )
     )
 

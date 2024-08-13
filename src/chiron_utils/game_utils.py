@@ -28,9 +28,11 @@ async def create_game(
     game_password: Optional[str] = None,
     hostname: str = DEFAULT_HOST,
     port: int = DEFAULT_PORT,
+    *,
+    use_ssl: bool = True,
 ) -> Any:
     """Creates a game on the Diplomacy server."""
-    connection = await connect(hostname, port)
+    connection = await connect(hostname, port, use_ssl=use_ssl)
     channel = await connection.authenticate(user, password)
 
     game = await channel.create_game(
@@ -61,9 +63,11 @@ async def download_game(
     game_password: Optional[str] = None,
     hostname: str = DEFAULT_HOST,
     port: int = DEFAULT_PORT,
+    *,
+    use_ssl: bool = True,
 ) -> Any:
     """Downloads a game from the Diplomacy server."""
-    connection = await connect(hostname, port)
+    connection = await connect(hostname, port, use_ssl=use_ssl)
     channel = await connection.authenticate(user, password)
     game: NetworkGame = await channel.join_game(
         game_id=game_id, power_name=None, registration_password=game_password
