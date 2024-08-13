@@ -4,6 +4,7 @@
 from abc import ABC, abstractmethod
 import asyncio
 from dataclasses import dataclass
+import os
 import random
 from typing import ClassVar, List, Optional, Sequence
 
@@ -15,6 +16,9 @@ from chiron_utils.utils import return_logger
 
 logger = return_logger(__name__)
 
+DEFAULT_COMM_STAGE_LENGTH = 300  # 5 minutes in seconds
+COMM_STAGE_LENGTH = int(os.environ.get("COMM_STAGE_LENGTH", DEFAULT_COMM_STAGE_LENGTH))
+
 
 @dataclass
 class BaselineBot(ABC):
@@ -25,7 +29,7 @@ class BaselineBot(ABC):
     power_name: str
     game: Game
     num_message_rounds: Optional[int] = None
-    communication_stage_length: int = 300  # 5 minutes
+    communication_stage_length: int = COMM_STAGE_LENGTH  # in seconds
 
     @property
     def display_name(self) -> str:
