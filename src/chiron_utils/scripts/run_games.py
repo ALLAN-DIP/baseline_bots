@@ -158,8 +158,13 @@ def main() -> None:
         host_from_container = "host.docker.internal" if host == "localhost" else host
         log_file = str(log_dir / f"{power}.txt")
         run_cmds.append(
-            f"{runner_command} {quote(agent)} --host {quote(host_from_container)} "
-            f"--game_id {quote(game_id)} --power {power} {bot_args} |& tee {quote(log_file)}"
+            f"{runner_command} "
+            f"{quote(agent)} "
+            f"--host {quote(host_from_container)} "
+            f"--game_id {quote(game_id)} "
+            f"--power {power} "
+            f"{bot_args} "
+            f"|& tee {quote(log_file)}"
         )
     print(run_cmds)
 
